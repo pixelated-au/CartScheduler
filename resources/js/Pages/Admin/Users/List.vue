@@ -3,7 +3,7 @@
     import JetHelpText from '@/Jetstream/HelpText.vue'
     import JetInput from '@/Jetstream/Input.vue'
     import JetLabel from '@/Jetstream/Label.vue'
-    import Modal from '@/Jetstream/Modal.vue'
+    import JetModal from '@/Jetstream/Modal.vue'
     import AppLayout from '@/Layouts/AppLayout.vue'
     import UserProfileForm from '@/Pages/Admin/Users/Partials/UserProfileForm.vue'
     import { computed, ref } from 'vue'
@@ -102,13 +102,13 @@
             </div>
         </div>
 
-        <modal :show="showModal" v-if="selectedUser" @close="selectedUser = null">
+        <JetModal :show="showModal" :closeable="false" v-if="selectedUser" @close="selectedUser = null">
             <div class="p-5 bg-gray-200">
                 <!--                <h3 class="font-semibold text-xl text-gray-800 leading-tight">{{ selectedUser.name }} </h3>-->
-                <UserProfileForm :user="selectedUser"/>
+                <UserProfileForm :user="selectedUser" @cancel="selectedUser = null"/>
 
             </div>
-        </modal>
+        </JetModal>
     </AppLayout>
 </template>
 

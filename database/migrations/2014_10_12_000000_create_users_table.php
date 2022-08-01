@@ -11,14 +11,17 @@ return new class extends Migration {
         Schema::create('users', static function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            $table->enum('role', ['admin', 'user'])->default('user');
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
-            $table->string('password');
             $table->enum('gender', ['male', 'female']);
+            $table->string('mobile_phone');
+            $table->string('password');
             $table->rememberToken();
-            $table->foreignId('current_team_id')->nullable();
-            $table->string('profile_photo_path', 2048)->nullable();
+            //$table->string('profile_photo_path', 2048)->nullable();
+            $table->boolean('is_active')->default(true);
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

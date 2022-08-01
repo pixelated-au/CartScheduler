@@ -2,15 +2,21 @@
     import VerticalRadioButtons from '@/Components/VerticalRadioButtons.vue'
     import JetActionMessage from '@/Jetstream/ActionMessage.vue'
     import JetButton from '@/Jetstream/Button.vue'
+    import JetConfirmationModal from '@/Jetstream/ConfirmationModal.vue'
     import JetFormSection from '@/Jetstream/FormSection.vue'
     import JetInput from '@/Jetstream/Input.vue'
     import JetInputError from '@/Jetstream/InputError.vue'
     import JetLabel from '@/Jetstream/Label.vue'
     import { useForm } from '@inertiajs/inertia-vue3'
+    import { ref } from 'vue'
 
     const props = defineProps({
         user: Object,
     })
+
+    const emit = defineEmits([
+        'cancel',
+    ])
 
     const form = useForm({
         _method: 'PUT',
@@ -28,6 +34,15 @@
             preserveScroll: true,
             // onSuccess: () => {},
         })
+    }
+
+    const showConfirmationModal = ref(false)
+    const confirmClose = () => {
+        if (form.isDirty) {
+            showConfirmationModal.value = true
+        } else {
+            emit('cancel')
+        }
     }
 
 </script>
@@ -107,9 +122,30 @@
                 Saved.
             </JetActionMessage>
 
+            <JetButton class="mx-3"
+                       type="button"
+                       style-type="secondary"
+                       :class="{ 'opacity-25': form.processing }"
+                       :disabled="form.processing"
+                       @click.prevent="confirmClose">
+                Cancel
+            </JetButton>
             <JetButton :class="{ 'opacity-25': form.processing }" :disabled="form.processing">
                 Save
             </JetButton>
         </template>
     </JetFormSection>
+    <JetConfirmationModal :show="showConfirmationModal">
+        <template #title>Danger!</template>
+        <template #content>Are you sure you wish to close this? Your changes will be lost!</template>
+        <template #footer>
+            <JetButton class="mx-3" style-type="secondary" @click="showConfirmationModal = false">
+                Cancel
+            </JetButton>
+            <JetButton style-type="warning" @click="emit('cancel')">
+                Ok
+            </JetButton>
+
+        </template>
+    </JetConfirmationModal>
 </template>

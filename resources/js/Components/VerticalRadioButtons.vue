@@ -20,7 +20,6 @@
     const vModel = computed({
         get: () => props.modelValue,
         set: (val) => {
-            console.log('setting', val)
             emit('update:modelValue', val)
         },
     })
