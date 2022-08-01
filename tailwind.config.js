@@ -19,8 +19,14 @@ module.exports = {
     },
 
     safelist: [
+        'bg-transparent',
+        'border',
+        'border-1',
+        'border-2',
+        'hover:text-white',
+        'active:text-white',
         {
-            pattern: /(violet|slate|green|blue|amber|purple|red)-(500|600|900)/,
+            pattern: /(violet|slate|green|blue|amber|purple|red)-(300|500|600|900)/,
             variants: ['hover', 'focus'],
         },
     ],

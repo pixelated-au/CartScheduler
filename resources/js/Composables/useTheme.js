@@ -30,33 +30,45 @@ export default function () {
         return c
     }
     const getColours = (...colours) => {
-        return mapColours('', 500, colours)
+        return 'border-transparent text-white ' + mapColours('', 500, colours)
     }
 
     const getBackgroundColours = colours => {
-        return mapColours('bg-', 500, colours)
+        return 'border-transparent text-white ' + mapColours('bg-', 500, colours)
     }
 
     const getHoverColours = colours => {
-        return mapColours('hover:', 600, colours)
+        return 'border-transparent text-white ' + mapColours('hover:', 600, colours)
     }
 
     const getBackgroundHoverColours = colours => {
-        return mapColours('hover:bg-', 600, colours)
+        return 'hover:border-transparent hover:text-white ' + mapColours('hover:bg-', 600, colours)
     }
 
     const getActiveColours = colours => {
-        return mapColours('active:', 900, colours)
+        return 'border-transparent text-white ' + mapColours('active:', 900, colours)
     }
 
     const getBackgroundActiveColours = colours => {
-        return mapColours('active:', 900, colours)
+        return 'active:border-transparent active:text-white ' + mapColours('active:', 900, colours)
+    }
+
+    const getOutlineColours = colours => {
+        return 'bg-transparent border-2 ' + mapColours('border-', 600, colours) + ' ' + mapColours('text-', 600, colours)
+    }
+
+    const getOutlineHoverColours = colours => {
+        return 'hover:border-transparent hover:text-red-900 ' + mapColours('hover:bg-', 300, colours)
     }
 
     return {
-        getColours,
+        getActiveColours,
+        getBackgroundActiveColours,
         getBackgroundColours,
-        getHoverColours,
         getBackgroundHoverColours,
+        getColours,
+        getHoverColours,
+        getOutlineHoverColours,
+        getOutlineColours,
     }
 }
