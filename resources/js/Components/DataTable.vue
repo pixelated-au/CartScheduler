@@ -33,20 +33,17 @@
 @import 'vue3-easy-data-table/dist/style.css';
 
 .data-table {
-    //--easy-table-row-border: none;
-    --tw-bg-200: rgb(229 231 235);
-    --tw-bg-300: rgb(209 213 219);
+    --tw-th-bg: rgb(221 214 254);
+    --tw-bg-200: rgb(237 233 254);
     --tw-bg-900: rgb(17 24 39);
 
     --easy-table-border: none;
     --easy-table-header-font-size: 1rem;
     --easy-table-header-item-padding: 1rem 15px;
-    --easy-table-header-background-color: var(--tw-bg-300);
-    //--easy-table-header-background-color: rgb(229 231 235);
+    --easy-table-header-background-color: var(--tw-th-bg);
 
     --easy-table-body-row-font-size: 1rem;
     --easy-table-row-border: none;
-    //--easy-table-row-border: solid 1px rgb(229 231 235);
     --easy-table-body-item-padding: .8rem 15px;
 
     --easy-table-body-row-hover-background-color: var(--tw-bg-200);
