@@ -74,15 +74,14 @@
 <template>
     <AppLayout title="Team Settings">
         <template #header>
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">Users</h2>
-            <h1 class="font-semibold text-5xl text-fuchsia-600 leading-tight">TODO SEARCH AND FILTERS</h1>
+            <h1 class="font-semibold text-2xl text-gray-800 leading-tight">Users</h1>
         </template>
 
         <div class="max-w-7xl mx-auto pt-10 pb-5 sm:px-6 lg:px-8">
             <div class="bg-white shadow-xl sm:rounded-lg sm:p-6">
                 <JetLabel for="search" value="Search for a user"/>
                 <JetInput id="search" v-model="userSearch" type="text" class="mt-1 block w-full"/>
-                <JetHelpText>Search on name, email or phone</JetHelpText>
+                <JetHelpText>Search on name, email, phone, role or any field</JetHelpText>
             </div>
         </div>
 
@@ -102,11 +101,9 @@
             </div>
         </div>
 
-        <JetModal :show="showModal" :closeable="false" v-if="selectedUser" @close="selectedUser = null">
+        <JetModal :show="showModal" :closeable="false" @close="selectedUser = null">
             <div class="p-5 bg-gray-200">
-                <!--                <h3 class="font-semibold text-xl text-gray-800 leading-tight">{{ selectedUser.name }} </h3>-->
                 <UserProfileForm :user="selectedUser" @cancel="selectedUser = null"/>
-
             </div>
         </JetModal>
     </AppLayout>
