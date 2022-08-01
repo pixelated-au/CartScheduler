@@ -8,6 +8,9 @@ use Laravel\Jetstream\Events\TeamDeleted;
 use Laravel\Jetstream\Events\TeamUpdated;
 use Laravel\Jetstream\Team as JetstreamTeam;
 
+/**
+ * @method \Database\Factories\TeamFactory factory()
+ */
 class Team extends JetstreamTeam
 {
     use HasFactory;

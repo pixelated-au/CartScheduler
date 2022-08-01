@@ -1,6 +1,7 @@
 <?php
 
-use Illuminate\Foundation\Application;
+use App\Http\Controllers\AdminDashboardController;
+use App\Http\Controllers\UsersController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -15,21 +16,41 @@ use Inertia\Inertia;
 |
 */
 
-Route::get('/', function () {
+/*Route::get('/', static function () {
     return Inertia::render('Welcome', [
-        'canLogin' => Route::has('login'),
-        'canRegister' => Route::has('register'),
+        'canLogin'       => Route::has('login'),
+        'canRegister'    => Route::has('register'),
         'laravelVersion' => Application::VERSION,
-        'phpVersion' => PHP_VERSION,
+        'phpVersion'     => PHP_VERSION,
     ]);
+});*/
+
+Route::get('/', static function () {
+    return Inertia::render('Auth/Login');
 });
 
-Route::middleware([
-    'auth:sanctum',
-    config('jetstream.auth_session'),
-    'verified',
-])->group(function () {
-    Route::get('/dashboard', function () {
-        return Inertia::render('Dashboard');
-    })->name('dashboard');
+Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified'])->group(function () {
+    Route::get('/', static fn() => Inertia::render('Dashboard'))->name('dashboard');
+
+    Route::prefix('admin')->group(static function () {
+        Route::get('/', AdminDashboardController::class)->name('admin.dashboard');
+        Route::resource('/users', UsersController::class)->names([
+            'index'   => 'admin.users.index',
+            'create'  => 'admin.users.create',
+            'store'   => 'admin.users.store',
+            'show'    => 'admin.users.show',
+            'edit'    => 'admin.users.edit',
+            'update'  => 'admin.users.update',
+            'destroy' => 'admin.users.destroy',
+        ]);
+        //Route::get('/', static fn() => Inertia::render('Admin/Dashboard'))->name('admin.dashboard');
+
+        //Route::resource('shifts', 'Admin\ShiftsController');
+        //Route::resource('locations', 'Admin\LocationsController');
+        //Route::resource('users', 'Admin\UsersController');
+        //Route::resource('roles', 'Admin\RolesController');
+        //Route::resource('permissions', 'Admin\PermissionsController');
+        //Route::resource('reports', 'Admin\ReportsController');
+        //Route::resource('reservations', 'Admin\ReservationsController');
+    });
 });
