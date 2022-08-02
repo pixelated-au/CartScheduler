@@ -3,10 +3,9 @@
     import JetHelpText from '@/Jetstream/HelpText.vue'
     import JetInput from '@/Jetstream/Input.vue'
     import JetLabel from '@/Jetstream/Label.vue'
-    import JetModal from '@/Jetstream/Modal.vue'
     import AppLayout from '@/Layouts/AppLayout.vue'
-    import UserProfileForm from '@/Pages/Admin/Users/Partials/UserProfileForm.vue'
-    import { computed, ref } from 'vue'
+    import { Inertia } from '@inertiajs/inertia'
+    import { ref } from 'vue'
 
     defineProps({
         users: Array,
@@ -60,15 +59,10 @@
     ]
 
     const userSearch = ref('')
-    const selectedUser = ref(null)
 
     const handleSelection = (selection) => {
-        selectedUser.value = selection
+        Inertia.visit(route('admin.users.edit', selection.id))
     }
-
-    const showModal = computed(() => {
-        return !!selectedUser.value
-    })
 </script>
 
 <template>
@@ -100,12 +94,6 @@
                 </data-table>
             </div>
         </div>
-
-        <JetModal :show="showModal" :closeable="false" @close="selectedUser = null">
-            <div class="p-5 bg-gray-200">
-                <UserProfileForm :user="selectedUser" @cancel="selectedUser = null"/>
-            </div>
-        </JetModal>
     </AppLayout>
 </template>
 

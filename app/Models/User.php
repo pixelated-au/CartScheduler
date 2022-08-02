@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Database\Factories\UserFactory;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -67,4 +68,29 @@ class User extends Authenticatable
     protected $appends = [
         'profile_photo_url',
     ];
+
+    /**
+     * Format the phone number
+     *
+     * @noinspection PhpUnused
+     */
+    protected function mobilePhone(): Attribute
+    {
+        return Attribute::make(
+            get: static function ($value) {
+                if (preg_match('/^(\d{4})(\d{3})(\d{3})$/', $value, $matches)) {
+                    $result = $matches[1] . ' ' . $matches[2] . ' ' . $matches[3];
+                } else {
+                    $result = $value;
+                }
+
+                return $result;
+            },
+            set: static function ($value) {
+                $value = preg_replace('/\D+/', '', $value); // remove all non-digits
+
+                return preg_replace('/^614/', '04', $value); // If the number starts with 614, replace with 04
+            },
+        );
+    }
 }
