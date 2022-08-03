@@ -7,7 +7,6 @@ use App\Http\Requests\UpdateUserRequest;
 use App\Mail\UserAccountCreated;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Str;
@@ -36,7 +35,7 @@ class UsersController extends Controller
     public function store(CreateUserRequest $request): RedirectResponse
     {
         $data             = $request->validated();
-        $data['password'] = Hash::make(Str::random(35)); // Generate a temporary password. Then send a password reset email.
+        $data['password'] = null; // Set it to null. Once set, the user will be unable to log in
         $data['uuid']     = Str::uuid();
 
         $user = User::unguarded(static fn() => User::create($data));
