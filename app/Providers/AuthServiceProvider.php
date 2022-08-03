@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Enums\Role;
 use App\Models\Team;
 use App\Models\User;
 use App\Policies\TeamPolicy;
@@ -28,6 +29,6 @@ class AuthServiceProvider extends ServiceProvider
     {
         $this->registerPolicies();
 
-        Gate::define('adminDashboard', static fn(User $user) => $user->can('admin:dashboard'));
+        Gate::define('adminDashboard', static fn(User $user) => $user->role === Role::Admin->value);
     }
 }

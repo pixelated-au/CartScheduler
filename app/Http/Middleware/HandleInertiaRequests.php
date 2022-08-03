@@ -42,9 +42,17 @@ class HandleInertiaRequests extends Middleware
     public function share(Request $request): array
     {
         return array_merge(parent::share($request), [
-            'caPpermissions' => [
-                'canAdminDashboard' => Gate::check('adminDashboard'),
-            ],
+            'pagePermissions' => $this->getPageAccessPermissions(),
         ]);
+    }
+
+    protected function getPageAccessPermissions(): array
+    {
+        $permissions = [];
+        if (Gate::check('adminDashboard')) {
+            $permissions['canAdminDashboard'] = true;
+        }
+
+        return $permissions;
     }
 }

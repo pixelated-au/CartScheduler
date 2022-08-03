@@ -6,8 +6,8 @@
     import JetNavLink from '@/Jetstream/NavLink.vue'
     import JetResponsiveNavLink from '@/Jetstream/ResponsiveNavLink.vue'
     import { Inertia } from '@inertiajs/inertia'
-    import { Head, Link } from '@inertiajs/inertia-vue3'
-    import { ref } from 'vue'
+    import { Head, Link, usePage } from '@inertiajs/inertia-vue3'
+    import { computed, ref } from 'vue'
 
     defineProps({
         title: String,
@@ -26,6 +26,10 @@
     const logout = () => {
         Inertia.post(route('logout'))
     }
+
+    const permissions = computed(() => {
+        return usePage().props.value.pagePermissions
+    })
 </script>
 
 <template>
@@ -52,7 +56,8 @@
                                 <JetNavLink :href="route('dashboard')" :active="route().current('dashboard')">
                                     Dashboard
                                 </JetNavLink>
-                                <JetNavLink :href="route('admin.dashboard')"
+                                <JetNavLink v-if="permissions.canAdminDashboard"
+                                            :href="route('admin.dashboard')"
                                             :active="route().current('admin.dashboard')">
                                     Admin
                                 </JetNavLink>
