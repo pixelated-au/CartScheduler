@@ -2,11 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\CreateUserRequest;
 use App\Http\Requests\UpdateUserRequest;
+use App\Mail\UserAccountCreated;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -17,23 +21,32 @@ class UsersController extends Controller
         $this->authorizeResource(User::class, 'user');
     }
 
-    public function index()
+    public function index(): Response
     {
         return Inertia::render('Admin/Users/List', [
             'users' => User::all(),
         ]);
     }
 
-    public function create()
+    public function create(): Response
     {
+        return Inertia::render('Admin/Users/Add');
     }
 
-    public function store(Request $request)
+    public function store(CreateUserRequest $request): RedirectResponse
     {
-    }
+        $data             = $request->validated();
+        $data['password'] = Hash::make(Str::random(35)); // Generate a temporary password. Then send a password reset email.
+        $data['uuid']     = Str::uuid();
 
-    public function show($id)
-    {
+        $user = User::unguarded(static fn() => User::create($data));
+
+        Mail::to($user->email)->send(new UserAccountCreated($user));
+
+        session()->flash('flash.banner', "User $user->name successfully created.");
+        session()->flash('flash.bannerStyle', 'success');
+
+        return Redirect::route('admin.users.edit', $user);
     }
 
     public function edit(User $user): Response

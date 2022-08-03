@@ -1,11 +1,13 @@
 <script setup>
     import DataTable from '@/Components/DataTable.vue'
+    import JetButton from '@/Jetstream/Button.vue'
     import JetHelpText from '@/Jetstream/HelpText.vue'
     import JetInput from '@/Jetstream/Input.vue'
     import JetLabel from '@/Jetstream/Label.vue'
     import AppLayout from '@/Layouts/AppLayout.vue'
     import { Inertia } from '@inertiajs/inertia'
     import { ref } from 'vue'
+    import headers from './Lib/UserDataTableHeaders'
 
     defineProps({
         users: Array,
@@ -13,52 +15,11 @@
         permissions: Object,
     })
 
-    const headers = [
-        {
-            text: 'ID',
-            value: 'id',
-            sortable: true,
-            width: '10%',
-        },
-        {
-            text: 'Name',
-            value: 'name',
-            sortable: true,
-            width: '20%',
-        },
-        {
-            text: 'Email',
-            value: 'email',
-            sortable: true,
-            width: '20%',
-        },
-        {
-            text: 'Phone',
-            value: 'phone',
-            sortable: true,
-            width: '20%',
-        },
-        {
-            text: 'Gender',
-            value: 'gender',
-            sortable: true,
-            width: '20%',
-        },
-        {
-            text: 'Active',
-            value: 'is_active',
-            sortable: true,
-            width: '20%',
-        },
-        {
-            text: 'Role',
-            value: 'role',
-            sortable: true,
-            width: '20%',
-        },
-    ]
-
     const userSearch = ref('')
+
+    const onNewUser = () => {
+        Inertia.visit(route('admin.users.create'))
+    }
 
     const handleSelection = (selection) => {
         Inertia.visit(route('admin.users.edit', selection.id))
@@ -66,9 +27,14 @@
 </script>
 
 <template>
-    <AppLayout title="Team Settings">
+    <AppLayout title="Users">
         <template #header>
-            <h1 class="font-semibold text-2xl text-gray-800 leading-tight">Users</h1>
+            <div class="flex justify-between">
+                <h1 class="font-semibold text-2xl text-gray-800 leading-tight">Users</h1>
+                <JetButton class="mx-3" style-type="primary" @click="onNewUser">
+                    New User
+                </JetButton>
+            </div>
         </template>
 
         <div class="max-w-7xl mx-auto pt-10 pb-5 sm:px-6 lg:px-8">

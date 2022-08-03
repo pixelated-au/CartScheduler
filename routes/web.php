@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AdminDashboardController;
+use App\Http\Controllers\SetUserPasswordController;
 use App\Http\Controllers\UsersController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -25,9 +26,12 @@ use Inertia\Inertia;
     ]);
 });*/
 
-Route::get('/', static function () {
-    return Inertia::render('Auth/Login');
-});
+Route::get('/', static fn() => Inertia::render('Auth/Login'));
+
+Route::get('/set-password/{user}/{hashedEmail}', [SetUserPasswordController::class, 'show'])->name('set.password.show');
+Route::post('/set-password', [SetUserPasswordController::class, 'update'])->name('set.password.update');
+
+Route::get('/mail', static fn() => new App\Mail\UserAccountCreated(App\Models\User::find(1)));
 
 Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified'])->group(function () {
     Route::get('/', static fn() => Inertia::render('Dashboard'))->name('dashboard');

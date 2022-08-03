@@ -1,4 +1,5 @@
 <script setup>
+    import Alert from '@/Components/Alert.vue'
     import JetAuthenticationCard from '@/Jetstream/AuthenticationCard.vue'
     import JetAuthenticationCardLogo from '@/Jetstream/AuthenticationCardLogo.vue'
     import JetButton from '@/Jetstream/Button.vue'
@@ -6,7 +7,8 @@
     import JetInput from '@/Jetstream/Input.vue'
     import JetLabel from '@/Jetstream/Label.vue'
     import JetValidationErrors from '@/Jetstream/ValidationErrors.vue'
-    import { Head, Link, useForm } from '@inertiajs/inertia-vue3'
+    import { Head, Link, useForm, usePage } from '@inertiajs/inertia-vue3'
+    import { computed } from 'vue'
 
     defineProps({
         canResetPassword: Boolean,
@@ -27,6 +29,9 @@
             onFinish: () => form.reset('password'),
         })
     }
+
+    const setPasswordSuccess = computed(() => usePage().props.value.jetstream.flash?.setPassword || '')
+
 </script>
 
 <template>
@@ -42,6 +47,10 @@
         <div v-if="status" class="mb-4 font-medium text-sm text-green-600">
             {{ status }}
         </div>
+
+        <Alert v-if="setPasswordSuccess">
+            {{ setPasswordSuccess }}
+        </Alert>
 
         <form @submit.prevent="submit">
             <div>

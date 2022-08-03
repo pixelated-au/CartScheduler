@@ -10,10 +10,11 @@ return new class extends Migration {
     {
         Schema::create('users', static function (Blueprint $table) {
             $table->id();
+            $table->string('uuid')->comment('Used as a private identifier');
             $table->string('name');
             $table->enum('role', ['admin', 'user'])->default('user');
             $table->string('email')->unique();
-            $table->timestamp('email_verified_at')->nullable();
+            //$table->timestamp('email_verified_at')->nullable();
             $table->enum('gender', ['male', 'female']);
             $table->string('mobile_phone');
             $table->string('password');

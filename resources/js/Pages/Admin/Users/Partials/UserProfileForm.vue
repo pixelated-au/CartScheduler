@@ -13,6 +13,10 @@
 
     const props = defineProps({
         user: Object,
+        action: {
+            type: String,
+            default: 'edit',
+        },
     })
 
     const emit = defineEmits([
@@ -33,8 +37,22 @@
         form.put(route('admin.users.update', props.user.id), {
             errorBag: 'updateUserData',
             preserveScroll: true,
-            // onSuccess: () => {},
         })
+    }
+
+    const createUserData = () => {
+        form.post(route('admin.users.store'), {
+            errorBag: 'updateUserData',
+            preserveScroll: true,
+        })
+    }
+
+    const saveAction = () => {
+        if (props.action === 'edit') {
+            updateUserData()
+        } else {
+            createUserData()
+        }
     }
 
     const listRouteAction = () => {
@@ -142,7 +160,7 @@
         </template>
 
         <template #actions>
-            <div class="grow text-left">
+            <div v-if="action === 'edit'" class="grow text-left">
                 <JetButton outline
                            type="button"
                            style-type="warning"
@@ -167,7 +185,7 @@
                 </JetButton>
                 <JetButton :class="{ 'opacity-25': form.processing }"
                            :disabled="form.processing"
-                           @click.prevent="updateUserData">
+                           @click.prevent="saveAction">
                     Save
                 </JetButton>
             </div>
@@ -178,7 +196,7 @@
         <template #title>Danger!</template>
         <template #content>
             <template v-if="modalDeleteAction">Are you sure you wish to delete this user?</template>
-            <template else>Are you sure you wish to close this? Your changes will be lost!</template>
+            <template v-else>Are you sure you wish to return? Your changes will be lost!</template>
         </template>
         <template #footer>
             <JetButton class="mx-3" style-type="secondary" @click="showConfirmationModal = false">
