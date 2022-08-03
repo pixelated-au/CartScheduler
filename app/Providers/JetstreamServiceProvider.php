@@ -27,12 +27,6 @@ class JetstreamServiceProvider extends ServiceProvider
     {
         $this->configurePermissions();
 
-        //Jetstream::createTeamsUsing(CreateTeam::class);
-        //Jetstream::updateTeamNamesUsing(UpdateTeamName::class);
-        //Jetstream::addTeamMembersUsing(AddTeamMember::class);
-        //Jetstream::inviteTeamMembersUsing(InviteTeamMember::class);
-        //Jetstream::removeTeamMembersUsing(RemoveTeamMember::class);
-        //Jetstream::deleteTeamsUsing(DeleteTeam::class);
         Jetstream::deleteUsersUsing(DeleteUser::class);
     }
 
@@ -45,11 +39,11 @@ class JetstreamServiceProvider extends ServiceProvider
     {
         Jetstream::defaultApiTokenPermissions(['read']);
 
-        Jetstream::role('admin', 'Administrator', [
-            'admin:dashboard',
-        ])->description('Administrator users can perform any action.');
-
-        Jetstream::role('user', 'User', [
-        ])->description('Users have basic app privileges.');
+        Jetstream::permissions([
+            'create',
+            'read',
+            'update',
+            'delete',
+        ]);
     }
 }
