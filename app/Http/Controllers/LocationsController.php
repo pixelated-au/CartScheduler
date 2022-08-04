@@ -1,24 +1,29 @@
 <?php
-/**
- * Project: ${PROJECT_NAME}
- * Owner: Pixelated
- * Copyright: 2022
- */
 
 namespace App\Http\Controllers;
 
 use App\Models\Location;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
+use Inertia\Response;
 
 class LocationsController extends Controller
 {
-    public function index()
+    public function __construct()
     {
-
+        $this->authorizeResource(Location::class, 'location');
     }
 
-    public function create()
+    public function index(): Response
     {
+        return Inertia::render('Admin/Users/List', [
+            'locations' => Location::all(),
+        ]);
+    }
+
+    public function create(): Response
+    {
+        return Inertia::render('Admin/Locations/Add');
     }
 
     public function store(Request $request)

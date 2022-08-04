@@ -1,0 +1,21 @@
+<?php
+
+namespace Database\Factories;
+
+use Illuminate\Database\Eloquent\Factories\Factory;
+
+class LocationFactory extends Factory
+{
+    public function definition(): array
+    {
+        return [
+            'name'                 => $this->faker->city(),
+            'location_description' => $this->faker->sentences(asText: true),
+            'min_volunteers'       => $this->faker->randomElement(['1', '2', '3']),
+            'max_volunteers'       => $this->faker->randomElement(['1', '2', '3']),
+            'requires_brother'     => $this->faker->boolean(),
+            'latitude'             => (string)$this->faker->randomFloat(6, 143, 144),
+            'longitude'            => (string)$this->faker->randomFloat(6, -36, -37),
+        ];
+    }
+}

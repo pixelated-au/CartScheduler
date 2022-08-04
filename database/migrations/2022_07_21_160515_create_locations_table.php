@@ -1,4 +1,5 @@
 <?php
+
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -13,6 +14,8 @@ return new class extends Migration {
             $table->enum('min_volunteers', [1, 2, 3]);
             $table->enum('max_volunteers', [1, 2, 3]);
             $table->boolean('requires_brother')->default(false);
+            $table->string('latitude')->nullable();
+            $table->string('longitude')->nullable();
             $table->timestamps();
         });
     }

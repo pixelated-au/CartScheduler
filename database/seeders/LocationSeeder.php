@@ -1,18 +1,14 @@
 <?php
-/**
- * Project: ${PROJECT_NAME}
- * Owner: Pixelated
- * Copyright: 2022
- */
 
 namespace Database\Seeders;
 
+use App\Models\Location;
 use Illuminate\Database\Seeder;
 
 class LocationSeeder extends Seeder
 {
-    public function run()
+    public function run(): void
     {
-
+        Location::factory()->count(6)->create();
     }
 }
