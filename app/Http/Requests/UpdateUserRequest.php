@@ -26,7 +26,7 @@ class UpdateUserRequest extends FormRequest
             'role'         => ['required', 'string', 'in:admin,user'],
             'gender'       => ['required', 'string', 'in:male,female'],
             'mobile_phone' => ['required', 'string', 'regex:/^([0-9\+\-\s]+)$/', 'min:10', 'max:15'],
-            'is_active'    => ['boolean']
+            'is_enabled'   => ['boolean']
         ];
     }
 

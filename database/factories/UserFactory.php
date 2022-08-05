@@ -32,7 +32,7 @@ class UserFactory extends Factory
             //'email_verified_at'  => now(),
             'gender'         => $this->faker->randomElement(['male', 'female']),
             'mobile_phone'   => $this->faker->phoneNumber(),
-            'is_active'      => true,
+            'is_enabled'     => true,
             'password'       => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', // password
             'remember_token' => Str::random(10),
         ];
@@ -62,11 +62,9 @@ class UserFactory extends Factory
     public function userRoleUser(): Factory
     {
         return $this->state(function (array $attributes) {
-            $isActive = random_int(0, 9) !== 9;
-
             return [
-                'role'      => 'user',
-                'is_active' => $isActive,
+                'role'       => 'user',
+                'is_enabled' => random_int(0, 9) !== 9,
             ];
         });
     }

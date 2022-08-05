@@ -1,0 +1,34 @@
+<?php
+
+namespace App\Http\Resources;
+
+use Illuminate\Http\Resources\Json\JsonResource;
+
+/**
+ * @property mixed $id
+ * @property mixed $name
+ * @property mixed $description
+ * @property mixed $min_volunteers
+ * @property mixed $max_volunteers
+ * @property mixed $latitude
+ * @property mixed $longitude
+ * @property mixed $is_enabled
+ * @property mixed $shifts
+ */
+class LocationAdminResource extends JsonResource
+{
+    public function toArray($request): array
+    {
+        return [
+            'id'             => $this->id,
+            'name'           => $this->name,
+            'description'    => $this->description,
+            'min_volunteers' => $this->min_volunteers,
+            'max_volunteers' => $this->max_volunteers,
+            'latitude'       => $this->latitude,
+            'longitude'      => $this->longitude,
+            'is_enabled'     => $this->is_enabled,
+            'shifts'         => ShiftResource::collection($this->shifts),
+        ];
+    }
+}

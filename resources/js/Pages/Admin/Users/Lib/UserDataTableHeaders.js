@@ -31,7 +31,7 @@ export default [
     },
     {
         text: 'Active',
-        value: 'is_active',
+        value: 'is_enabled',
         sortable: true,
         width: '20%',
     },

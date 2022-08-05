@@ -2,3 +2,58 @@
 @tailwind components;
 @tailwind utilities;
 
+.v-popper__popper .v-popper__inner div {
+    @apply text-sm;
+}
+
+h1 {
+    @apply font-bold text-3xl;
+}
+
+h2 {
+    @apply font-semibold text-3xl;
+}
+
+h3 {
+    @apply font-semibold text-2xl;
+}
+
+h4 {
+    @apply font-semibold text-xl;
+}
+
+h5 {
+    @apply font-semibold text-lg;
+}
+
+h6 {
+    @apply font-semibold text-sm;
+}
+
+ul, ol {
+    @apply pl-3;
+}
+
+ul li {
+    @apply list-disc;
+}
+
+ol li {
+    @apply list-decimal;
+}
+
+a {
+    @apply cursor-pointer underline decoration-2 decoration-indigo-500;
+}
+
+a:active {
+    @apply decoration-indigo-900;
+}
+
+a:visited {
+    @apply decoration-indigo-300;
+}
+
+a:hover {
+    @apply decoration-indigo-700 transition;
+}

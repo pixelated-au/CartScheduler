@@ -1,4 +1,5 @@
 <script setup>
+    import TextEditor from '@/Components/TextEditor.vue'
     import VerticalRadioButtons from '@/Components/VerticalRadioButtons.vue'
     import JetActionMessage from '@/Jetstream/ActionMessage.vue'
     import JetButton from '@/Jetstream/Button.vue'
@@ -9,10 +10,10 @@
     import JetLabel from '@/Jetstream/Label.vue'
     import { Inertia } from '@inertiajs/inertia'
     import { useForm } from '@inertiajs/inertia-vue3'
-    import { computed, ref } from 'vue'
+    import { computed, nextTick, ref, watch } from 'vue'
 
     const props = defineProps({
-        user: Object,
+        location: Object,
         action: {
             type: String,
             default: 'edit',
@@ -24,39 +25,65 @@
     ])
 
     const form = useForm({
-        id: props.user.id,
-        name: props.user.name,
-        role: props.user.role,
-        email: props.user.email,
-        gender: props.user.gender,
-        mobile_phone: props.user.mobile_phone,
-        is_enabled: props.user.is_enabled,
+        id: props.location.id,
+        name: props.location.name,
+        description: props.location.description,
+        min_volunteers: props.location.min_volunteers,
+        max_volunteers: props.location.max_volunteers,
+        requires_brother: props.location.requires_brother,
+        latitude: props.location.latitude,
+        longitude: props.location.longitude,
+        is_enabled: props.location.is_enabled,
+        shifts: props.location.shifts,
     })
 
-    const updateUserData = () => {
-        form.put(route('admin.users.update', props.user.id), {
-            errorBag: 'updateUserData',
+    watch(() => form.min_volunteers, (value, oldValue) => {
+        if (value < 0) {
+            console.log('value', value, 'oldValue', oldValue)
+            nextTick(() => {
+                form.min_volunteers = oldValue
+            })
+        }
+        if (value > form.max_volunteers) {
+            form.max_volunteers = value
+        }
+    })
+
+    watch(() => form.max_volunteers, (value, oldValue) => {
+        if (value > 4) {
+            nextTick(() => {
+                form.max_volunteers = oldValue
+            })
+        }
+        if (value < form.min_volunteers) {
+            form.min_volunteers = value
+        }
+    })
+
+    const updateLocationData = () => {
+        form.put(route('admin.locations.update', props.location.id), {
+            errorBag: 'updateLocationData',
             preserveScroll: true,
         })
     }
 
-    const createUserData = () => {
-        form.post(route('admin.users.store'), {
-            errorBag: 'updateUserData',
+    const createLocationData = () => {
+        form.post(route('admin.locations.store'), {
+            errorBag: 'updateLocationData',
             preserveScroll: true,
         })
     }
 
     const saveAction = () => {
         if (props.action === 'edit') {
-            updateUserData()
+            updateLocationData()
         } else {
-            createUserData()
+            createLocationData()
         }
     }
 
     const listRouteAction = () => {
-        Inertia.visit(route('admin.users.index'))
+        Inertia.visit(route('admin.locations.index'))
     }
 
     const showConfirmationModal = ref(false)
@@ -76,7 +103,7 @@
     }
 
     const doDeleteAction = () => {
-        Inertia.delete(route('admin.users.destroy', props.user.id))
+        Inertia.delete(route('admin.locations.destroy', props.location.id))
     }
 
     const performConfirmationAction = () => {
@@ -91,13 +118,14 @@
 </script>
 
 <template>
-    <JetFormSection @submitted="updateUserData">
+    <JetFormSection @submitted="updateLocationData">
         <template #title>
-            Profile Information
+            Location
         </template>
 
         <template #description>
-            Update the user's personal information.
+            Update the location information. This can optionally include latitude and longitude coordinates. These can
+            be acquired from Google Maps.
         </template>
 
         <template #form>
@@ -108,36 +136,52 @@
                 <JetInputError :message="form.errors.name" class="mt-2"/>
             </div>
 
-            <!-- Email -->
-            <div class="col-span-6 sm:col-span-4">
-                <JetLabel for="email" value="Email"/>
-                <JetInput id="email" v-model="form.email" type="email" class="mt-1 block w-full"/>
-                <JetInputError :message="form.errors.email" class="mt-2"/>
+            <!-- Description -->
+            <div class="col-span-6 sm:col-span-full">
+                <JetLabel for="description" value="Description"/>
+                <TextEditor v-model="form.description"/>
+                <JetInputError :message="form.errors.description" class="mt-2"/>
             </div>
 
-            <!-- Mobile Phone -->
-            <div class="col-span-6 sm:col-span-4">
-                <JetLabel for="mobile-phone" value="Mobile Phone"/>
-                <JetInput id="mobile-phone" v-model="form.mobile_phone" type="tel" class="mt-1 block w-full"/>
-                <JetInputError :message="form.errors.mobile_phone" class="mt-2"/>
+            <!-- Minimum Volunteers -->
+            <div class="col-span-6 sm:col-span-4 md:col-span-3">
+                <JetLabel for="min-volunteers" value="Minimum Volunteers at Location"/>
+                <JetInput id="min-volunteers"
+                          v-model="form.min_volunteers"
+                          type="number"
+                          inputmode="number"
+                          class="mt-1 block w-full"/>
+                <JetInputError :message="form.errors.min_volunteers" class="mt-2"/>
+            </div>
+            <!-- Maximum Volunteers -->
+            <div class="col-span-6 sm:col-span-4 md:col-span-3">
+                <JetLabel for="max-volunteers">
+                    Maximum Volunteers at Location <span class="text-sm">(Max 4)</span>
+                </JetLabel>
+                <JetInput id="max-volunteers"
+                          v-model="form.max_volunteers"
+                          type="number"
+                          inputmode="number"
+                          class="mt-1 block w-full"/>
+                <JetInputError :message="form.errors.max_volunteers" class="mt-2"/>
             </div>
 
-            <!-- Role -->
+            <!-- Requires Brother -->
             <div class="col-span-6 sm:col-span-4">
                 <div class="font-medium text-sm text-gray-700">
-                    Role
+                    Requires Brother to be on shifts for this location?
                 </div>
-                <VerticalRadioButtons name="role" v-model="form.role" :options="[
-                    { label: 'Administrator', value: 'admin' },
-                    { label: 'Standard User', value: 'user' },
+                <VerticalRadioButtons name="role" v-model="form.requires_brother" :options="[
+                    { label: 'Yes', value: true },
+                    { label: 'No', value: false },
                 ]"/>
-                <JetInputError :message="form.errors.role" class="mt-2"/>
+                <JetInputError :message="form.errors.requires_brother" class="mt-2"/>
             </div>
 
-            <!-- Activate User -->
+            <!-- Location Status -->
             <div class="col-span-6 sm:col-span-4">
                 <div class="font-medium text-sm text-gray-700">
-                    Account Status
+                    Location Status
                 </div>
                 <VerticalRadioButtons name="is-enabled" v-model="form.is_enabled" :options="[
                     { label: 'Active', value: true },
@@ -146,16 +190,25 @@
                 <JetInputError :message="form.errors.is_enabled" class="mt-2"/>
             </div>
 
-            <div class="col-span-6 sm:col-span-4">
-                <!-- Gender -->
-                <div class="font-medium text-sm text-gray-700">
-                    Gender
-                </div>
-                <VerticalRadioButtons name="gender" v-model="form.gender" :options="[
-                    { label: 'Male', value: 'male' },
-                    { label: 'Female', value: 'female' },
-                ]"/>
-                <JetInputError :message="form.errors.gender" class="mt-2"/>
+            <!-- Minimum Volunteers -->
+            <div class="col-span-6 sm:col-span-4 md:col-span-3">
+                <JetLabel for="latitude" value="Location Latitude"/>
+                <JetInput id="latitude"
+                          v-model="form.latitude"
+                          type="number"
+                          inputmode="decimal"
+                          class="mt-1 block w-full"/>
+                <JetInputError :message="form.errors.latitude" class="mt-2"/>
+            </div>
+            <!-- Maximum Volunteers -->
+            <div class="col-span-6 sm:col-span-4 md:col-span-3">
+                <JetLabel for="longitude" value="Location Longitude"/>
+                <JetInput id="longitude"
+                          v-model="form.longitude"
+                          type="number"
+                          inputmode="decimal"
+                          class="mt-1 block w-full"/>
+                <JetInputError :message="form.errors.longitude" class="mt-2"/>
             </div>
         </template>
 
@@ -171,7 +224,7 @@
                 </JetButton>
             </div>
             <JetActionMessage :on="form.recentlySuccessful" class="mr-3">
-                Success: User Saved.
+                Success: Location Saved.
             </JetActionMessage>
 
             <div>

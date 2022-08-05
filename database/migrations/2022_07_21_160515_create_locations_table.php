@@ -10,12 +10,13 @@ return new class extends Migration {
         Schema::create('locations', static function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('location_description', 500);
+            $table->longText('description');
             $table->enum('min_volunteers', [1, 2, 3]);
             $table->enum('max_volunteers', [1, 2, 3]);
             $table->boolean('requires_brother')->default(false);
             $table->string('latitude')->nullable();
             $table->string('longitude')->nullable();
+            $table->boolean('is_enabled')->default(true);
             $table->timestamps();
         });
     }

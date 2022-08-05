@@ -3,9 +3,10 @@
 namespace App\Providers;
 
 use App\Enums\Role;
-use App\Models\Team;
+use App\Models\Location;
 use App\Models\User;
-use App\Policies\TeamPolicy;
+use App\Policies\LocationPolicy;
+use App\Policies\UserPolicy;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Gate;
 
@@ -17,7 +18,8 @@ class AuthServiceProvider extends ServiceProvider
      * @var array
      */
     protected $policies = [
-        Team::class => TeamPolicy::class,
+        User::class     => UserPolicy::class,
+        Location::class => LocationPolicy::class,
     ];
 
     /**

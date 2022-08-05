@@ -10,7 +10,7 @@
     import headers from './Lib/UserDataTableHeaders'
 
     defineProps({
-        users: Array,
+        users: Object,
         availableRoles: Array,
         permissions: Object,
     })
@@ -47,15 +47,18 @@
 
         <div class="max-w-7xl mx-auto pb-10 sm:px-6 lg:px-8">
             <div class="bg-white shadow-xl sm:rounded-lg sm:p-6">
-                <data-table :headers="headers" :items="users" :search-value="userSearch" @click-row="handleSelection">
+                <data-table :headers="headers"
+                            :items="users.data"
+                            :search-value="userSearch"
+                            @click-row="handleSelection">
                     <template #item-email="{ email }">
                         <a :href="`mailto:${email}`" class="underline decoration-1">{{ email }}</a>
                     </template>
                     <template #item-phone="{ mobile_phone }">
                         <a :href="`tel:${mobile_phone}`" class="underline decoration-1">{{ mobile_phone }}</a>
                     </template>
-                    <template #item-is_active="{ is_active }">
-                        {{ is_active ? 'Yes' : 'No' }}
+                    <template #item-is_enabled="{ is_enabled }">
+                        {{ is_enabled ? 'Yes' : 'No' }}
                     </template>
                 </data-table>
             </div>

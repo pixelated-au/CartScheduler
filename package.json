@@ -22,7 +22,12 @@
         "vue": "^3.2.31"
     },
     "dependencies": {
+        "@tiptap/extension-link": "^2.0.0-beta.43",
+        "@tiptap/extension-text-align": "^2.0.0-beta.31",
+        "@tiptap/starter-kit": "^2.0.0-beta.191",
+        "@tiptap/vue-3": "^2.0.0-beta.96",
         "@vuepic/vue-datepicker": "^3.3.1",
+        "floating-vue": "^2.0.0-beta.19",
         "vue3-easy-data-table": "^1.4.2"
     }
 }

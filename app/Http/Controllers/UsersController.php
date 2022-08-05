@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\CreateUserRequest;
 use App\Http\Requests\UpdateUserRequest;
+use App\Http\Resources\UserAdminResource;
 use App\Mail\UserAccountCreated;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
@@ -23,7 +24,7 @@ class UsersController extends Controller
     public function index(): Response
     {
         return Inertia::render('Admin/Users/List', [
-            'users' => User::all(),
+            'users' => UserAdminResource::collection(User::all()),
         ]);
     }
 

@@ -1,4 +1,5 @@
 <?php
+
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -12,7 +13,7 @@ return new class extends Migration {
             $table->enum('weekday', ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']);
             $table->time('start_time');
             $table->time('end_time');
-            $table->boolean('is_disabled')->nullable();
+            $table->boolean('is_enabled')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

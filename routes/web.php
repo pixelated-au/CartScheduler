@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AdminDashboardController;
+use App\Http\Controllers\LocationsController;
 use App\Http\Controllers\SetUserPasswordController;
 use App\Http\Controllers\UsersController;
 use Illuminate\Support\Facades\Route;
@@ -46,6 +47,16 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
             'edit'    => 'admin.users.edit',
             'update'  => 'admin.users.update',
             'destroy' => 'admin.users.destroy',
+        ]);
+
+        Route::resource('/locations', LocationsController::class)->names([
+            'index'   => 'admin.locations.index',
+            'create'  => 'admin.locations.create',
+            'store'   => 'admin.locations.store',
+            'show'    => 'admin.locations.show',
+            'edit'    => 'admin.locations.edit',
+            'update'  => 'admin.locations.update',
+            'destroy' => 'admin.locations.destroy',
         ]);
         //Route::get('/', static fn() => Inertia::render('Admin/Dashboard'))->name('admin.dashboard');
 

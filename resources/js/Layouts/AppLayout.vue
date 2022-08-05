@@ -190,7 +190,7 @@
             </header>
 
             <!-- Page Content -->
-            <main>
+            <main class="main-content">
                 <slot/>
             </main>
         </div>

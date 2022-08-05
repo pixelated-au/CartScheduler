@@ -3,9 +3,8 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
-class CreateUserRequest extends FormRequest
+class UpdateLocationRequest extends FormRequest
 {
     public function authorize(): bool
     {
@@ -20,12 +19,15 @@ class CreateUserRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name'         => ['required', 'string', 'max:255'],
-            'email'        => ['required', 'email', 'max:255', Rule::unique('users')->ignore($this->get('id'))],
-            'role'         => ['required', 'string', 'in:admin,user'],
-            'gender'       => ['required', 'string', 'in:male,female'],
-            'mobile_phone' => ['required', 'string', 'regex:/^([0-9\+\-\s]+)$/', 'min:10', 'max:15'],
-            'is_enabled'   => ['boolean']
+            'id'               => ['required', 'integer'],
+            'name'             => ['required', 'string', 'max:255'],
+            'description'      => ['required', 'string', 'max:4000000000'],
+            'min_volunteers'   => ['required', 'integer', 'min:0'],
+            'max_volunteers'   => ['required', 'integer', 'max:4'],
+            'requires_brother' => ['boolean'],
+            'latitude'         => ['numeric', 'min:-90', 'max:90.999999999999'],
+            'longitude'        => ['numeric', 'min:-180', 'max:180.999999999999'],
+            'is_enabled'       => ['boolean']
         ];
     }
 

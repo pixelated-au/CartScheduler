@@ -32,7 +32,7 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
-        'is_active',
+        'is_enabled',
         'mobile_phone',
         'password',
         'role',
@@ -56,7 +56,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $casts = [
-        'is_active'         => 'boolean',
+        'is_enabled'        => 'boolean',
         'email_verified_at' => 'datetime',
 
     ];
