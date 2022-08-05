@@ -9,7 +9,7 @@
     })
 
     defineEmits(['click-row'])
-
+    // Based on: https://tiptap.dev/
 </script>
 
 <template>
