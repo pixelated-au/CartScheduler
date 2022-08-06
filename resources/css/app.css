@@ -30,30 +30,30 @@ h6 {
     @apply font-semibold text-sm;
 }
 
-ul, ol {
+.page-content ul, .page-content ol {
     @apply pl-3;
 }
 
-ul li {
+.page-contentul li {
     @apply list-disc;
 }
 
-ol li {
+.page-content ol li {
     @apply list-decimal;
 }
 
-a {
+.page-content a {
     @apply cursor-pointer underline decoration-2 decoration-indigo-500;
 }
 
-a:active {
+.page-content a:active {
     @apply decoration-indigo-900;
 }
 
-a:visited {
+.page-content a:visited {
     @apply decoration-indigo-300;
 }
 
-a:hover {
+.page-content a:hover {
     @apply decoration-indigo-700 transition;
 }

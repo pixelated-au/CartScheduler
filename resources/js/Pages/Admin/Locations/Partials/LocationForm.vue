@@ -1,16 +1,14 @@
 <script setup>
-    import TextEditor from '@/Components/TextEditor.vue'
-    import VerticalRadioButtons from '@/Components/VerticalRadioButtons.vue'
     import JetActionMessage from '@/Jetstream/ActionMessage.vue'
     import JetButton from '@/Jetstream/Button.vue'
     import JetConfirmationModal from '@/Jetstream/ConfirmationModal.vue'
     import JetFormSection from '@/Jetstream/FormSection.vue'
-    import JetInput from '@/Jetstream/Input.vue'
-    import JetInputError from '@/Jetstream/InputError.vue'
-    import JetLabel from '@/Jetstream/Label.vue'
+    import JetSectionBorder from '@/Jetstream/SectionBorder.vue'
+    import ShiftData from '@/Pages/Admin/Locations/Partials/ShiftData.vue'
     import { Inertia } from '@inertiajs/inertia'
     import { useForm } from '@inertiajs/inertia-vue3'
     import { computed, nextTick, ref, watch } from 'vue'
+    import LocationData from './LocationData.vue'
 
     const props = defineProps({
         location: Object,
@@ -25,16 +23,16 @@
     ])
 
     const form = useForm({
-        id: props.location.id,
-        name: props.location.name,
-        description: props.location.description,
-        min_volunteers: props.location.min_volunteers,
-        max_volunteers: props.location.max_volunteers,
-        requires_brother: props.location.requires_brother,
-        latitude: props.location.latitude,
-        longitude: props.location.longitude,
-        is_enabled: props.location.is_enabled,
-        shifts: props.location.shifts,
+        id: props.location.data.id,
+        name: props.location.data.name,
+        description: props.location.data.description,
+        min_volunteers: props.location.data.min_volunteers,
+        max_volunteers: props.location.data.max_volunteers,
+        requires_brother: props.location.data.requires_brother,
+        latitude: props.location.data.latitude,
+        longitude: props.location.data.longitude,
+        is_enabled: props.location.data.is_enabled,
+        shifts: props.location.data.shifts,
     })
 
     watch(() => form.min_volunteers, (value, oldValue) => {
@@ -61,7 +59,7 @@
     })
 
     const updateLocationData = () => {
-        form.put(route('admin.locations.update', props.location.id), {
+        form.put(route('admin.locations.update', props.location.data.id), {
             errorBag: 'updateLocationData',
             preserveScroll: true,
         })
@@ -103,7 +101,7 @@
     }
 
     const doDeleteAction = () => {
-        Inertia.delete(route('admin.locations.destroy', props.location.id))
+        Inertia.delete(route('admin.locations.destroy', props.location.data.id))
     }
 
     const performConfirmationAction = () => {
@@ -115,6 +113,8 @@
     }
 
     const cancelButtonText = computed(() => form.isDirty ? 'Cancel' : 'Back')
+    const hasErrors = computed(() => Object.keys(form.errors).length > 0)
+
 </script>
 
 <template>
@@ -129,87 +129,12 @@
         </template>
 
         <template #form>
-            <!-- Name -->
-            <div class="col-span-6 sm:col-span-4">
-                <JetLabel for="name" value="Name"/>
-                <JetInput id="name" v-model="form.name" type="text" class="mt-1 block w-full" autocomplete="name"/>
-                <JetInputError :message="form.errors.name" class="mt-2"/>
-            </div>
+            <LocationData v-model="form"/>
 
-            <!-- Description -->
-            <div class="col-span-6 sm:col-span-full">
-                <JetLabel for="description" value="Description"/>
-                <TextEditor v-model="form.description"/>
-                <JetInputError :message="form.errors.description" class="mt-2"/>
-            </div>
+            <JetSectionBorder class="col-start-2 col-span-full col-end-6"/>
 
-            <!-- Minimum Volunteers -->
-            <div class="col-span-6 sm:col-span-4 md:col-span-3">
-                <JetLabel for="min-volunteers" value="Minimum Volunteers at Location"/>
-                <JetInput id="min-volunteers"
-                          v-model="form.min_volunteers"
-                          type="number"
-                          inputmode="number"
-                          class="mt-1 block w-full"/>
-                <JetInputError :message="form.errors.min_volunteers" class="mt-2"/>
-            </div>
-            <!-- Maximum Volunteers -->
-            <div class="col-span-6 sm:col-span-4 md:col-span-3">
-                <JetLabel for="max-volunteers">
-                    Maximum Volunteers at Location <span class="text-sm">(Max 4)</span>
-                </JetLabel>
-                <JetInput id="max-volunteers"
-                          v-model="form.max_volunteers"
-                          type="number"
-                          inputmode="number"
-                          class="mt-1 block w-full"/>
-                <JetInputError :message="form.errors.max_volunteers" class="mt-2"/>
-            </div>
-
-            <!-- Requires Brother -->
-            <div class="col-span-6 sm:col-span-4">
-                <div class="font-medium text-sm text-gray-700">
-                    Requires Brother to be on shifts for this location?
-                </div>
-                <VerticalRadioButtons name="role" v-model="form.requires_brother" :options="[
-                    { label: 'Yes', value: true },
-                    { label: 'No', value: false },
-                ]"/>
-                <JetInputError :message="form.errors.requires_brother" class="mt-2"/>
-            </div>
-
-            <!-- Location Status -->
-            <div class="col-span-6 sm:col-span-4">
-                <div class="font-medium text-sm text-gray-700">
-                    Location Status
-                </div>
-                <VerticalRadioButtons name="is-enabled" v-model="form.is_enabled" :options="[
-                    { label: 'Active', value: true },
-                    { label: 'Inactive', value: false },
-                ]"/>
-                <JetInputError :message="form.errors.is_enabled" class="mt-2"/>
-            </div>
-
-            <!-- Minimum Volunteers -->
-            <div class="col-span-6 sm:col-span-4 md:col-span-3">
-                <JetLabel for="latitude" value="Location Latitude"/>
-                <JetInput id="latitude"
-                          v-model="form.latitude"
-                          type="number"
-                          inputmode="decimal"
-                          class="mt-1 block w-full"/>
-                <JetInputError :message="form.errors.latitude" class="mt-2"/>
-            </div>
-            <!-- Maximum Volunteers -->
-            <div class="col-span-6 sm:col-span-4 md:col-span-3">
-                <JetLabel for="longitude" value="Location Longitude"/>
-                <JetInput id="longitude"
-                          v-model="form.longitude"
-                          type="number"
-                          inputmode="decimal"
-                          class="mt-1 block w-full"/>
-                <JetInputError :message="form.errors.longitude" class="mt-2"/>
-            </div>
+            <ShiftData v-model="form" class="col-span-full"/>
+            <div></div>
         </template>
 
         <template #actions>
@@ -226,6 +151,9 @@
             <JetActionMessage :on="form.recentlySuccessful" class="mr-3">
                 Success: Location Saved.
             </JetActionMessage>
+            <div v-if="hasErrors" class="font-bold text-red-600">
+                Something went wrong with your data. Please see above.
+            </div>
 
             <div>
                 <JetButton class="mx-3"

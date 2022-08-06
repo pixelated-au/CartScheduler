@@ -28,6 +28,7 @@
         "@tiptap/vue-3": "^2.0.0-beta.96",
         "@vuepic/vue-datepicker": "^3.3.1",
         "floating-vue": "^2.0.0-beta.19",
+        "flowbite": "^1.5.1",
         "vue3-easy-data-table": "^1.4.2"
     }
 }

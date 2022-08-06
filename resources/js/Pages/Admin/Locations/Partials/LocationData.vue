@@ -1,0 +1,102 @@
+<script setup>
+    import TextEditor from '@/Components/TextEditor.vue'
+    import VerticalRadioButtons from '@/Components/VerticalRadioButtons.vue'
+    import JetInput from '@/Jetstream/Input.vue'
+    import JetInputError from '@/Jetstream/InputError.vue'
+    import JetLabel from '@/Jetstream/Label.vue'
+    import { computed, defineProps } from 'vue'
+
+    const props = defineProps({
+        modelValue: Object,
+    })
+
+    const emit = defineEmits([
+        'update:modelValue',
+    ])
+
+    const form = computed({
+        get () {
+            return props.modelValue
+        },
+        set (value) {
+            emit('update:modelValue', value)
+        },
+    })
+</script>
+
+<template>
+    <!-- Name -->
+    <div class="col-span-6 sm:col-span-4">
+        <JetLabel for="name" value="Name"/>
+        <JetInput id="name" v-model="form.name" type="text" class="mt-1 block w-full" autocomplete="name"/>
+        <JetInputError :message="form.errors.name" class="mt-2"/>
+    </div>
+
+    <!-- Description -->
+    <div class="col-span-6 sm:col-span-full">
+        <JetLabel for="description" value="Description"/>
+        <TextEditor v-model="form.description"/>
+        <JetInputError :message="form.errors.description" class="mt-2"/>
+    </div>
+
+    <!-- Minimum Volunteers -->
+    <div class="col-span-6 sm:col-span-4 md:col-span-3">
+        <JetLabel for="min-volunteers" value="Minimum Volunteers at Location"/>
+        <JetInput id="min-volunteers"
+                  v-model="form.min_volunteers"
+                  type="number"
+                  inputmode="number"
+                  class="mt-1 block w-full"/>
+        <JetInputError :message="form.errors.min_volunteers" class="mt-2"/>
+    </div>
+    <!-- Maximum Volunteers -->
+    <div class="col-span-6 sm:col-span-4 md:col-span-3">
+        <JetLabel for="max-volunteers">
+            Maximum Volunteers at Location <span class="text-sm">(Max 4)</span>
+        </JetLabel>
+        <JetInput id="max-volunteers"
+                  v-model="form.max_volunteers"
+                  type="number"
+                  inputmode="number"
+                  class="mt-1 block w-full"/>
+        <JetInputError :message="form.errors.max_volunteers" class="mt-2"/>
+    </div>
+
+    <!-- Requires Brother -->
+    <div class="col-span-6 sm:col-span-4">
+        <div class="font-medium text-sm text-gray-700">
+            Requires Brother to be on shifts for this location?
+        </div>
+        <VerticalRadioButtons name="role" v-model="form.requires_brother" :options="[
+                    { label: 'Yes', value: true },
+                    { label: 'No', value: false },
+                ]"/>
+        <JetInputError :message="form.errors.requires_brother" class="mt-2"/>
+    </div>
+
+    <!-- Location Status -->
+    <div class="col-span-6 sm:col-span-4">
+        <div class="font-medium text-sm text-gray-700">
+            Location Status
+        </div>
+        <VerticalRadioButtons name="is-enabled" v-model="form.is_enabled" :options="[
+                    { label: 'Active', value: true },
+                    { label: 'Inactive', value: false },
+                ]"/>
+        <JetInputError :message="form.errors.is_enabled" class="mt-2"/>
+    </div>
+
+    <!-- Minimum Volunteers -->
+    <div class="col-span-6 sm:col-span-4 md:col-span-3">
+        <JetLabel for="latitude" value="Location Latitude"/>
+        <JetInput id="latitude" v-model="form.latitude" type="number" inputmode="decimal" class="mt-1 block w-full"/>
+        <JetInputError :message="form.errors.latitude" class="mt-2"/>
+    </div>
+    <!-- Maximum Volunteers -->
+    <div class="col-span-6 sm:col-span-4 md:col-span-3">
+        <JetLabel for="longitude" value="Location Longitude"/>
+        <JetInput id="longitude" v-model="form.longitude" type="number" inputmode="decimal" class="mt-1 block w-full"/>
+        <JetInputError :message="form.errors.longitude" class="mt-2"/>
+    </div>
+
+</template>
