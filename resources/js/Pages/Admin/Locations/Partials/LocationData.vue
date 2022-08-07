@@ -1,6 +1,6 @@
 <script setup>
+    import HorizontalRadioButtons from '@/Components/HorizontalRadioButtons.vue'
     import TextEditor from '@/Components/TextEditor.vue'
-    import VerticalRadioButtons from '@/Components/VerticalRadioButtons.vue'
     import JetInput from '@/Jetstream/Input.vue'
     import JetInputError from '@/Jetstream/InputError.vue'
     import JetLabel from '@/Jetstream/Label.vue'
@@ -67,7 +67,7 @@
         <div class="font-medium text-sm text-gray-700">
             Requires Brother to be on shifts for this location?
         </div>
-        <VerticalRadioButtons name="role" v-model="form.requires_brother" :options="[
+        <HorizontalRadioButtons name="role" v-model="form.requires_brother" :options="[
                     { label: 'Yes', value: true },
                     { label: 'No', value: false },
                 ]"/>
@@ -79,7 +79,7 @@
         <div class="font-medium text-sm text-gray-700">
             Location Status
         </div>
-        <VerticalRadioButtons name="is-enabled" v-model="form.is_enabled" :options="[
+        <HorizontalRadioButtons name="is-enabled" v-model="form.is_enabled" :options="[
                     { label: 'Active', value: true },
                     { label: 'Inactive', value: false },
                 ]"/>
