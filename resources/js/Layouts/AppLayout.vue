@@ -196,3 +196,7 @@
         </div>
     </div>
 </template>
+
+<style lang="scss">
+@import '@vuepic/vue-datepicker/src/VueDatePicker/style/main.scss';
+</style>
