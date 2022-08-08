@@ -29,18 +29,24 @@ class Shift extends Model
         'day_friday',
         'day_saturday',
         'day_sunday',
+        'start_time',
+        'end_time',
+        'available_from',
+        'available_to',
         'is_enabled',
     ];
 
     protected $casts = [
-        'day_monday'    => 'boolean',
-        'day_tuesday'   => 'boolean',
-        'day_wednesday' => 'boolean',
-        'day_thursday'  => 'boolean',
-        'day_friday'    => 'boolean',
-        'day_saturday'  => 'boolean',
-        'day_sunday'    => 'boolean',
-        'is_enabled'    => 'boolean',
+        'day_monday'     => 'boolean',
+        'day_tuesday'    => 'boolean',
+        'day_wednesday'  => 'boolean',
+        'day_thursday'   => 'boolean',
+        'day_friday'     => 'boolean',
+        'day_saturday'   => 'boolean',
+        'day_sunday'     => 'boolean',
+        'is_enabled'     => 'boolean',
+        'available_from' => 'datetime',
+        'available_to'   => 'datetime',
     ];
 
     public function location(): BelongsTo

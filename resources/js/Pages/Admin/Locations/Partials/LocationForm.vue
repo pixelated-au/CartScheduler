@@ -131,7 +131,7 @@
         <template #form>
             <LocationData v-model="form"/>
 
-            <JetSectionBorder class="col-start-2 col-span-full col-end-6"/>
+            <JetSectionBorder class="col-span-full"/>
 
             <ShiftData v-model="form" class="col-span-full"/>
             <div></div>

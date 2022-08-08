@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redirect;
 use Inertia\Inertia;
 use Inertia\Response;
+use RuntimeException;
 
 class LocationsController extends Controller
 {
@@ -53,10 +54,24 @@ class LocationsController extends Controller
 
     public function update(UpdateLocationRequest $request, Location $location): RedirectResponse
     {
+        ray()->showQueries();
         DB::beginTransaction();
-        Shift::upsert($request->input('shifts'), 'id');
+        foreach ($request->validated('shifts') as $shift) {
+            if (isset($shift['id'])) {
+                $shiftModel = Shift::find($shift['id']);
+                if (!$shiftModel) {
+                    throw new RuntimeException("Shift with an ID of {$shift['id']} belonging to $location->name not found");
+                }
+            } else {
+                $shiftModel = new Shift();
+            }
+            $shiftModel->fill($shift);
+            ray($shift, $shiftModel);
+            $shiftModel->save();
+        }
         $location->update($request->validated());
         DB::commit();
+        ray()->stopShowingQueries();
 
         return Redirect::route('admin.locations.edit', $location);
     }
