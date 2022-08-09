@@ -2,18 +2,25 @@
     import JetButton from '@/Jetstream/Button.vue'
     import AppLayout from '@/Layouts/AppLayout.vue'
     import { Inertia } from '@inertiajs/inertia'
+    import { truncate } from 'lodash'
 
     defineProps({
         locations: Object.data,
     })
 
     const onNewLocation = () => {
-        Inertia.visit(route('admin.users.create'))
+        Inertia.visit(route('admin.locations.create'))
     }
 
     const locationClicked = (location) => {
         Inertia.visit(route('admin.locations.edit', { id: location.id }))
     }
+
+    const truncateDescription = description => truncate(description, {
+        length: 100,
+        omission: '...',
+        separator: ' ',
+    })
 </script>
 
 <template>
@@ -35,7 +42,7 @@
                 <div class="flex flex-col justify-between h-full">
                     <div>
                         <h4 class="font-semibold">{{ location.name }}</h4>
-                        <div>{{ location.description }}</div>
+                        <div>{{ truncateDescription(location.clean_description) }}</div>
                     </div>
                     <div>
                         <div class="border-t border-gray-100 mt-3 pt-3"></div>
