@@ -37,7 +37,6 @@
 
     watch(() => form.min_volunteers, (value, oldValue) => {
         if (value < 0) {
-            console.log('value', value, 'oldValue', oldValue)
             nextTick(() => {
                 form.min_volunteers = oldValue
             })
