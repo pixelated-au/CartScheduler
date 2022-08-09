@@ -9,7 +9,7 @@ return new class extends Migration {
     {
         Schema::create('shifts', static function (Blueprint $table) {
             $table->id();
-            $table->foreignId('location_id');
+            $table->foreignId('location_id')->constrained()->onDelete('cascade')->onUpdate('cascade');
             $table->boolean('day_monday')->default(false);
             $table->boolean('day_tuesday')->default(false);
             $table->boolean('day_wednesday')->default(false);
