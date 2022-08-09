@@ -54,7 +54,6 @@ class LocationsController extends Controller
 
     public function update(UpdateLocationRequest $request, Location $location): RedirectResponse
     {
-        ray()->showQueries();
         DB::beginTransaction();
         foreach ($request->validated('shifts') as $shift) {
             if (isset($shift['id'])) {
@@ -66,12 +65,10 @@ class LocationsController extends Controller
                 $shiftModel = new Shift();
             }
             $shiftModel->fill($shift);
-            ray($shift, $shiftModel);
             $shiftModel->save();
         }
         $location->update($request->validated());
         DB::commit();
-        ray()->stopShowingQueries();
 
         return Redirect::route('admin.locations.edit', $location);
     }

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AdminDashboardController;
+use App\Http\Controllers\DeleteShiftController;
 use App\Http\Controllers\LocationsController;
 use App\Http\Controllers\SetUserPasswordController;
 use App\Http\Controllers\UsersController;
@@ -58,6 +59,8 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
             'update'  => 'admin.locations.update',
             'destroy' => 'admin.locations.destroy',
         ]);
+
+        Route::delete('/shifts/{shift}', DeleteShiftController::class)->name('admin.shift.destroy');
         //Route::get('/', static fn() => Inertia::render('Admin/Dashboard'))->name('admin.dashboard');
 
         //Route::resource('shifts', 'Admin\ShiftsController');

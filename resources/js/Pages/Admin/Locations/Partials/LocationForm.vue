@@ -174,9 +174,9 @@
     </JetFormSection>
 
     <JetConfirmationModal :show="showConfirmationModal">
-        <template #title>Danger!</template>
+        <template #title>DANGER!</template>
         <template #content>
-            <template v-if="modalDeleteAction">Are you sure you wish to delete this user?</template>
+            <template v-if="modalDeleteAction">Are you sure you wish to delete this location?</template>
             <template v-else>Are you sure you wish to return? Your changes will be lost!</template>
         </template>
         <template #footer>

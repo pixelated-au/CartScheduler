@@ -48,6 +48,10 @@
             available_to: null,
         })
     }
+
+    const removeShift = index => {
+        form.value.shifts.splice(index, 1)
+    }
 </script>
 
 <template>
@@ -55,9 +59,16 @@
         <JetButton type="button" style-type="info" @click="addShift">Add New Shift</JetButton>
     </div>
 
-    <div class="col-span-full grid grid-cols-[auto_1fr_1fr] gap-4">
+    <div v-if="form.shifts && form.shifts.length" class="col-span-full grid grid-cols-[auto_1fr_1fr_auto] gap-4">
         <template v-for="(shift, index) in form.shifts" :key="shift.id">
-            <Shift v-model="form.shifts[index]" :index="index" :days="days" :errors="form.errors"/>
+            <Shift v-model="form.shifts[index]"
+                   :index="index"
+                   :days="days"
+                   :errors="form.errors"
+                   @delete="removeShift(index)"/>
         </template>
+    </div>
+    <div v-else class="col-span-full text-center px-5 my-5">
+        <h3>No shifts have been created. Use the Add New Shift button to create one.</h3>
     </div>
 </template>
