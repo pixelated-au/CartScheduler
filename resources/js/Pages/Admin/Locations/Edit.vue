@@ -4,8 +4,6 @@
 
     defineProps({
         location: Object,
-        availableRoles: Array,
-        permissions: Object,
     })
 
 </script>
@@ -23,8 +21,3 @@
         </div>
     </AppLayout>
 </template>
-
-<style lang="scss">
-@import 'vue3-easy-data-table/dist/style.css';
-
-</style>
