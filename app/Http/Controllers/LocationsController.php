@@ -37,10 +37,6 @@ class LocationsController extends Controller
     {
     }
 
-    public function show(Location $location)
-    {
-    }
-
     public function edit(Location $location): Response
     {
         return Inertia::render('Admin/Locations/Edit', [
@@ -73,7 +69,14 @@ class LocationsController extends Controller
         return Redirect::route('admin.locations.edit', $location);
     }
 
-    public function destroy(Location $location)
+    public function destroy(Location $location): RedirectResponse
     {
+        $name = $location->name;
+        $location->delete();
+
+        session()->flash('flash.banner', "Location $name successfully deleted.");
+        session()->flash('flash.bannerStyle', 'danger');
+
+        return Redirect::route('admin.locations.index');
     }
 }
