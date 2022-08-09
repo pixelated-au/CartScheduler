@@ -1,0 +1,21 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration {
+    public function up(): void
+    {
+        Schema::create('shift_user', static function (Blueprint $table) {
+            $table->foreignId('shift_id')->constrained()->onDelete('cascade')->onUpdate('cascade');
+            $table->foreignId('user_id');
+            $table->enum('day', ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']);
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('shift_user');
+    }
+};
