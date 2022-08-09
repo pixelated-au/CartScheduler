@@ -11,7 +11,7 @@
 </script>
 
 <template>
-    <AppLayout :title="`User: ${location.name}`">
+    <AppLayout :title="`Location: ${location.name}`">
         <template #header>
             <h1 class="font-semibold text-2xl text-gray-800 leading-tight">Location {{ location.name }}</h1>
         </template>
