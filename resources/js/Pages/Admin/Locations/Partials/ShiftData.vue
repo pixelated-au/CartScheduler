@@ -34,7 +34,7 @@
 
     const addShift = () => {
         form.value.shifts.unshift({
-            location_id: form.value.id,
+            location_id: form.value?.id,
             day_monday: false,
             day_tuesday: false,
             day_wednesday: false,

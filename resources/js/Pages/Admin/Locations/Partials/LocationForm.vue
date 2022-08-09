@@ -23,16 +23,16 @@
     ])
 
     const form = useForm({
-        id: props.location.data.id,
-        name: props.location.data.name,
-        description: props.location.data.description,
-        min_volunteers: props.location.data.min_volunteers,
-        max_volunteers: props.location.data.max_volunteers,
-        requires_brother: props.location.data.requires_brother,
-        latitude: props.location.data.latitude,
-        longitude: props.location.data.longitude,
-        is_enabled: props.location.data.is_enabled,
-        shifts: props.location.data.shifts,
+        id: props.location?.data?.id,
+        name: props.location?.data?.name,
+        description: props.location?.data?.description,
+        min_volunteers: props.location?.data?.min_volunteers,
+        max_volunteers: props.location?.data?.max_volunteers,
+        requires_brother: props.location?.data?.requires_brother,
+        latitude: props.location?.data?.latitude,
+        longitude: props.location?.data?.longitude,
+        is_enabled: props.location?.data?.is_enabled,
+        shifts: props.location?.data?.shifts,
     })
 
     watch(() => form.min_volunteers, (value, oldValue) => {
