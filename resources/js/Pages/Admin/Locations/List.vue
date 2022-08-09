@@ -1,17 +1,11 @@
 <script setup>
     import JetButton from '@/Jetstream/Button.vue'
-    import JetHelpText from '@/Jetstream/HelpText.vue'
-    import JetInput from '@/Jetstream/Input.vue'
-    import JetLabel from '@/Jetstream/Label.vue'
     import AppLayout from '@/Layouts/AppLayout.vue'
     import { Inertia } from '@inertiajs/inertia'
-    import { ref } from 'vue'
 
     defineProps({
         locations: Object.data,
     })
-
-    const userSearch = ref('')
 
     const onNewLocation = () => {
         Inertia.visit(route('admin.users.create'))
@@ -33,15 +27,7 @@
             </div>
         </template>
 
-        <div class="max-w-7xl mx-auto pt-10 pb-5 sm:px-6 lg:px-8">
-            <div class="bg-white shadow-xl sm:rounded-lg sm:p-6">
-                <JetLabel for="search" value="Search for a user"/>
-                <JetInput id="search" v-model="userSearch" type="text" class="mt-1 block w-full"/>
-                <JetHelpText>Search on name, email, phone, role or any field</JetHelpText>
-            </div>
-        </div>
-
-        <div class="max-w-7xl mx-auto pb-10 sm:px-6 lg:px-8 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 sm:gap-4">
+        <div class="max-w-7xl mx-auto pt-10 sm:px-6 lg:px-8 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 sm:gap-4">
             <div v-for="location in locations.data"
                  :key="location.id"
                  class="bg-white shadow-xl sm:rounded-lg sm:p-6 cursor-pointer hover:bg-violet-100 hover:transition-colors"
