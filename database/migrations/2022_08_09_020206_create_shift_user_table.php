@@ -10,7 +10,7 @@ return new class extends Migration {
         Schema::create('shift_user', static function (Blueprint $table) {
             $table->foreignId('shift_id')->constrained()->onDelete('cascade')->onUpdate('cascade');
             $table->foreignId('user_id');
-            $table->enum('day', ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']);
+            $table->date('shift_date');
         });
     }
 

@@ -57,6 +57,6 @@ class Shift extends Model
 
     public function users(): BelongsToMany
     {
-        return $this->belongsToMany(User::class)->withPivot('day');
+        return $this->belongsToMany(User::class)->withPivot('shift_date');
     }
 }
