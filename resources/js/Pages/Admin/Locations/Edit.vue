@@ -14,10 +14,10 @@
 </script>
 
 <template>
-    <AppLayout :title="`Location: ${location.name}`">
+    <AppLayout :title="`Location: ${location.data.name}`">
         <template #header>
             <div class="flex justify-between">
-                <h1 class="font-semibold text-2xl text-gray-800 leading-tight">Location {{ location.name }}</h1>
+                <h1 class="font-semibold text-2xl text-gray-800 leading-tight">Location {{ location.data.name }}</h1>
                 <JetButton class="mx-3" type="button" style-type="secondary" outline @click.prevent="listRouteAction">
                     Back
                 </JetButton>
