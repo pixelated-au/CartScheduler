@@ -84,28 +84,23 @@
                         range
                         auto-apply
                         v-model="shiftTimeRange"
-                        :name="`shift-range-${fieldUnique}`"
+                        :id="`shift-range-${fieldUnique}`"
                         :enable-seconds="false"
                         :clearable="false"
                         :minutes-increment="5"/>
             <JetInputError :message="errors[`shifts.${index}.start_time`]" class="mt-2"/>
             <JetInputError :message="errors[`shifts.${index}.end_time`]" class="mt-2"/>
         </div>
-        <div class="row-span-2 self-end">
-            <JetButton type="button" style-type="warning" outline @click="showModal = true">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16">
-                    <path fill="none" d="M0 0h24v24H0z"/>
-                    <path class="fill-red-600"
-                          d="M4 8h16v13a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V8zm2 2v10h12V10H6zm3 2h2v6H9v-6zm4 0h2v6h-2v-6zM7 5V3a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v2h5v2H2V5h5zm2-1v1h6V4H9z"/>
-                </svg>
-            </JetButton>
+        <div>
+            <JetLabel :for="`is-enabled-${fieldUnique}`" value="Enabled?"/>
+            <JetCheckbox :id="`is-enabled-${fieldUnique}`" v-model:checked="shift.is_enabled" class="mt-3"/>
         </div>
         <div class="col-start-2">
             <JetLabel :for="`available-from-${fieldUnique}`" value="Shift Available From"/>
             <Datepicker auto-apply
                         enable-time-picker
                         v-model="shift.available_from"
-                        :name="`available-from-${fieldUnique}`"
+                        :id="`available-from-${fieldUnique}`"
                         :close-on-auto-apply="false"
                         :enable-seconds="false"
                         :minutes-grid-increment="5"/>
@@ -117,10 +112,19 @@
             <Datepicker auto-apply
                         enable-time-picker
                         v-model="shift.available_to"
-                        :name="`available-to-${fieldUnique}`"
+                        :id="`available-to-${fieldUnique}`"
                         :enable-seconds="false"
                         :minutes-grid-increment="5"/>
             <JetInputError :message="errors[`shifts.${index}.available_to`]" class="mt-2"/>
+        </div>
+        <div class="self-end">
+            <JetButton type="button" style-type="warning" outline @click="showModal = true">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16">
+                    <path fill="none" d="M0 0h24v24H0z"/>
+                    <path class="fill-red-600"
+                          d="M4 8h16v13a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V8zm2 2v10h12V10H6zm3 2h2v6H9v-6zm4 0h2v6h-2v-6zM7 5V3a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v2h5v2H2V5h5zm2-1v1h6V4H9z"/>
+                </svg>
+            </JetButton>
         </div>
         <JetSectionBorder class="col-span-full"/>
     </template>
