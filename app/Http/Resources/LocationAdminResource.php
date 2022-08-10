@@ -31,7 +31,7 @@ class LocationAdminResource extends JsonResource
             'latitude'          => $this->latitude,
             'longitude'         => $this->longitude,
             'is_enabled'        => $this->is_enabled,
-            'shifts'            => ShiftResource::collection($this->shifts),
+            'shifts'            => ShiftAdminResource::collection($this->shifts),
         ];
     }
 }
