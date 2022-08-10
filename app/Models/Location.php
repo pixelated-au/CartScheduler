@@ -31,6 +31,8 @@ class Location extends Model
     ];
 
     protected $casts = [
+        'min_volunteers'   => 'integer',
+        'max_volunteers'   => 'integer',
         'requires_brother' => 'boolean',
         'latitude'         => 'decimal:8',
         'longitude'        => 'decimal:8',
