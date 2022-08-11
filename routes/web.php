@@ -5,6 +5,7 @@ use App\Http\Controllers\AvailableShiftsForMonthController;
 use App\Http\Controllers\DeleteShiftController;
 use App\Http\Controllers\LocationsController;
 use App\Http\Controllers\SetUserPasswordController;
+use App\Http\Controllers\ToggleShiftReservationController;
 use App\Http\Controllers\UsersController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -39,6 +40,8 @@ Route::get('/mail', static fn() => new App\Mail\UserAccountCreated(App\Models\Us
 Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified'])->group(function () {
     Route::get('/', static fn() => Inertia::render('Dashboard'))->name('dashboard');
     Route::get('/shifts', AvailableShiftsForMonthController::class);
+    Route::post('/reserve-shift', ToggleShiftReservationController::class);
+    Route::post('/un-reserve-shift', ToggleShiftReservationController::class);
 
     Route::prefix('admin')->group(static function () {
         Route::get('/', AdminDashboardController::class)->name('admin.dashboard');

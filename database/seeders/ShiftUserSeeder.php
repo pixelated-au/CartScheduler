@@ -21,7 +21,9 @@ class ShiftUserSeeder extends Seeder
 
         $locations = Location::with('shifts')->where('is_enabled', true)->get();
 
-        $locations->each(function (Location $location) {
+        $locations->each(/**
+         * @throws \Exception
+         */ function (Location $location) {
             $maxUsers = $location->max_volunteers;
             $shifts   = $location->shifts;
             /** @var \App\Models\Shift $shift */
@@ -30,6 +32,10 @@ class ShiftUserSeeder extends Seeder
                 $dates = $this->mapDates($shift);
                 foreach ($dates as $date) {
                     for ($i = 0; $i < $maxUsers; $i++) {
+                        if (($i === $maxUsers - 1) && random_int(0, 1) === 1) {
+                            break; // this allows for the possibility of one user to be left out
+                        }
+
                         $userId = User::inRandomOrder()->first()->id;
                         if ($users->search($userId) !== false) {
                             $i--;

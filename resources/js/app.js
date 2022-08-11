@@ -2,8 +2,12 @@ import { createInertiaApp } from '@inertiajs/inertia-vue3'
 import { InertiaProgress } from '@inertiajs/progress'
 
 import 'flowbite'
+
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers'
 import { createApp, h } from 'vue'
+
+import Toast from 'vue-toastification'
+import 'vue-toastification/dist/index.css'
 import { ZiggyVue } from '../../vendor/tightenco/ziggy/dist/vue.m'
 import '../css/app.css'
 import './bootstrap'
@@ -18,6 +22,7 @@ createInertiaApp({
         return createApp({ render: () => h(app, props) })
             .use(plugin)
             .use(ZiggyVue)
+            .use(Toast)
             .mount(el)
     },
 })

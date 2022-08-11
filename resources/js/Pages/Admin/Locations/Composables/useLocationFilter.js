@@ -41,6 +41,29 @@ export default function useLocationFilter () {
         return false
     }
 
+    const setReservations = (maxVolunteers, shift) => {
+        const volunteers = shift.filterVolunteers?.sort((a, b) => {
+            if (a.gender > b.gender) {
+                return -1
+            }
+            if (a.gender < b.gender) {
+                return 1
+            }
+            if (a.name < b.name) {
+                return -1
+            }
+            if (a.name > b.name) {
+                return 1
+            }
+            return 0
+        })
+        const length = maxVolunteers >= volunteers.length ? maxVolunteers - volunteers.length : maxVolunteers
+        if (length) {
+            const nullArray = Array(length).fill(null)
+            shift.filterVolunteers = [...volunteers, ...nullArray]
+        }
+    }
+
     const addShift = (shifts, shift) => {
         if (shift.available_from) {
             const from = new Date(shift.available_from)
@@ -82,6 +105,7 @@ export default function useLocationFilter () {
                 const volunteers = shift.volunteers
                 if (foundVolunteer(volunteers)) {
                     shift.filterVolunteers = volunteers.filter(volunteer => volunteer.shift_date === selectedDate.value)
+                    setReservations(location.max_volunteers, shift)
                 }
                 const dayOfWeek = date.value.getDay()
                 const mappedDay = shift.js_days[dayOfWeek]
@@ -96,5 +120,6 @@ export default function useLocationFilter () {
     return {
         date,
         locations,
+        getShifts,
     }
 }

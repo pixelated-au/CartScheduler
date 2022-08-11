@@ -39,8 +39,8 @@
 
     const options = {
         alwaysOpen: false,
-        activeClasses: 'bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white',
-        inactiveClasses: 'text-gray-500 dark:text-gray-400',
+        activeClasses: 'bg-gray-200 dark:bg-gray-800 text-gray-900 dark:text-white rounded',
+        inactiveClasses: 'text-gray-300 dark:text-gray-400',
     }
 
     const initAccordion = items => {
@@ -62,14 +62,14 @@
 </script>
 
 <template>
-    <div class="px-3 py-2 border-md rounded-lg border border-gray-100">
+    <div class="px-3 py-2 border-md rounded-lg border border-gray-300">
         <div data-accordion="collapse">
             <!-- data-active-classes="bg-purple-400 dark:bg-gray-900 text-gray-900 dark:text-white"
              data-inactive-classes="text-gray-500 dark:text-gray-400" -->
             <div v-for="item in parentNodes" :key="item.key" :ref="skipUnwrap.myTabs" :data-key="item.key">
                 <h2 :id="`accordion-label-${item.key}-${compId}`" class="text-xl">
                     <button type="button"
-                            class="flex items-center justify-between w-full py-2 px-3 font-medium text-left text-gray-500 border-b border-gray-200 dark:border-gray-700 dark:text-gray-400"
+                            class="flex items-center justify-between w-full py-2 px-3 font-bold text-base text-left text-gray-600 border-b border-gray-200 last:border-b-0 dark:border-gray-700 dark:text-gray-400"
                             data-accordion-target="#accordion-flush-body-1"
                             aria-expanded="true"
                             aria-controls="accordion-flush-body-1">
@@ -88,7 +88,7 @@
                 <div :id="`accordion-body-${item.key}-${compId}`"
                      class="hidden"
                      aria-labelledby="accordion-flush-heading-1">
-                    <div class="py-5 font-light border-b border-gray-200 dark:border-gray-700">
+                    <div class="py-5 font-light border-b border-gray-200 dark:border-gray-700 flex">
                         <slot :location="item.data"/>
                     </div>
                 </div>
