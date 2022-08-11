@@ -1,5 +1,6 @@
 import 'floating-vue/dist/style.css'
 import { useToast as ut } from 'vue-toastification'
+//https://vue-toastification.maronato.dev/
 
 const options = {
     position: 'top-center',
