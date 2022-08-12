@@ -38,8 +38,8 @@ class CreateLocationRequest extends FormRequest
             'shifts.*.day_sunday'     => ['boolean'],
             'shifts.*.start_time'     => ['required', 'date_format:H:i:s'],
             'shifts.*.end_time'       => ['required', 'date_format:H:i:s'],
-            'shifts.*.available_from' => ['nullable', 'date'],
-            'shifts.*.available_to'   => ['nullable', 'date'],
+            'shifts.*.available_from' => ['nullable', 'date', 'before_or_equal:shifts.*.available_to'],
+            'shifts.*.available_to'   => ['nullable', 'date', 'after_or_equal:shifts.*.available_from'],
             'shifts.*.is_enabled'     => ['boolean'],
         ];
     }
@@ -54,8 +54,8 @@ class CreateLocationRequest extends FormRequest
             'mobile_phone.max'                => $formatMsg,
             'shifts.*.start_time.date_format' => 'Please use the format HH:mm:ss',
             'shifts.*.end_time.date_format'   => 'Please use the format HH:mm:ss',
-            'shifts.*.available_from.date'    => "The 'available from' date must be a valid date and time",
-            'shifts.*.available_to.date'      => "The 'available to' date must be a valid date and time",
+            'shifts.*.available_from'         => "The 'available from' date must be a valid date and time and needs to be before the 'available to' date",
+            'shifts.*.available_to'           => "The 'available to' date must be a valid date and time and needs to be after the 'available from' date",
         ];
     }
 

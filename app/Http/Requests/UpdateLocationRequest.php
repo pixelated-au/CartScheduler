@@ -40,8 +40,8 @@ class UpdateLocationRequest extends FormRequest
             'shifts.*.day_sunday'     => ['boolean'],
             'shifts.*.start_time'     => ['required', 'date_format:H:i:s'],
             'shifts.*.end_time'       => ['required', 'date_format:H:i:s'],
-            'shifts.*.available_from' => ['nullable', 'date'],
-            'shifts.*.available_to'   => ['nullable', 'date'],
+            'shifts.*.available_from' => ['nullable', 'date', 'before_or_equal:shifts.*.available_to'],
+            'shifts.*.available_to'   => ['nullable', 'date', 'after_or_equal:shifts.*.available_from'],
             'shifts.*.is_enabled'     => ['boolean'],
         ];
     }
@@ -51,13 +51,15 @@ class UpdateLocationRequest extends FormRequest
         $formatMsg = 'Please use the format 04xx xxx xxx';
 
         return [
-            'mobile_phone.regex'              => "The mobile phone can contain only numbers and spaces. $formatMsg",
-            'mobile_phone.min'                => $formatMsg,
-            'mobile_phone.max'                => $formatMsg,
-            'shifts.*.start_time.date_format' => 'Please use the format HH:mm:ss',
-            'shifts.*.end_time.date_format'   => 'Please use the format HH:mm:ss',
-            'shifts.*.available_from.date'    => "The 'available from' date must be a valid date and time",
-            'shifts.*.available_to.date'      => "The 'available to' date must be a valid date and time",
+            'mobile_phone.regex'                      => "The mobile phone can contain only numbers and spaces. $formatMsg",
+            'mobile_phone.min'                        => $formatMsg,
+            'mobile_phone.max'                        => $formatMsg,
+            'shifts.*.start_time.date_format'         => 'Please use the format HH:mm:ss',
+            'shifts.*.end_time.date_format'           => 'Please use the format HH:mm:ss',
+            'shifts.*.available_from.date'            => "The 'available from' date must be a valid date and time",
+            'shifts.*.available_to.date'              => "The 'available to' date must be a valid date and time",
+            'shifts.*.available_from.before_or_equal' => "The 'available from' date must be before the 'available to' date",
+            'shifts.*.available_to.after_or_equal'    => "The 'available to' date must be after the 'available from' date",
         ];
     }
 
