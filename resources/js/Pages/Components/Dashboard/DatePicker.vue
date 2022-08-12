@@ -1,7 +1,7 @@
 <script setup>
     //https://vue3datepicker.com/
     import Datepicker from '@vuepic/vue-datepicker'
-    import { addDays, addMonths, endOfMonth, isSameDay, parseISO, startOfDay } from 'date-fns'
+    import { addDays, addMonths, endOfMonth, formatISO, parseISO, startOfDay } from 'date-fns'
     import { computed, defineEmits, defineProps, onMounted, ref, watchEffect } from 'vue'
 
     const props = defineProps({
@@ -96,7 +96,14 @@
 
         for (const allDate of allDates) {
             // fill in the rest of the empty dates
-            if (highlighted.findIndex(date => isSameDay(date, allDate)) < 0) {
+            let found = false
+            for (const markerDatesKey in props.markerDates) {
+                if (markerDatesKey === formatISO(allDate, { representation: 'date' })) {
+                    found = true
+                    break
+                }
+            }
+            if (!found) {
                 highlighted.push(allDate)
             }
         }
