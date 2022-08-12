@@ -26,7 +26,7 @@
         "@tiptap/extension-text-align": "^2.0.0-beta.31",
         "@tiptap/starter-kit": "^2.0.0-beta.191",
         "@tiptap/vue-3": "^2.0.0-beta.96",
-        "@vuepic/vue-datepicker": "^3.3.1",
+        "@vuepic/vue-datepicker": "^3.4.1",
         "date-fns": "^2.29.1",
         "floating-vue": "^2.0.0-beta.19",
         "flowbite": "^1.5.1",
