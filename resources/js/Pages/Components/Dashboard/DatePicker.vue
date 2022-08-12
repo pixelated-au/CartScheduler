@@ -1,7 +1,7 @@
 <script setup>
     //https://vue3datepicker.com/
     import Datepicker from '@vuepic/vue-datepicker'
-    import { addDays, addMonths, endOfMonth, formatISO, parseISO, startOfDay } from 'date-fns'
+    import { addDays, addMonths, endOfMonth, formatISO, isAfter, isBefore, parseISO, startOfDay } from 'date-fns'
     import { computed, defineEmits, defineProps, onMounted, ref, watchEffect } from 'vue'
 
     const props = defineProps({
@@ -59,6 +59,8 @@
             let foundMe = false
             const shiftDateGroup = props.markerDates[date]
 
+            const isoDate = parseISO(date)
+
             for (const shiftId in shiftDateGroup) {
                 if (!shiftDateGroup.hasOwnProperty(shiftId)) {
                     continue
@@ -69,6 +71,12 @@
                 let volunteerCount = 0
                 for (let i = 0; i < shifts.length; i++) {
                     const shift = shifts[i]
+                    if (isAfter(isoDate, parseISO(shift.available_from))) {
+                        break
+                    }
+                    if (isBefore(isoDate, parseISO(shift.available_to))) {
+                        break
+                    }
                     if (i === 0) {
                         maxVolunteers = shift.max_volunteers
                     }
@@ -82,11 +90,11 @@
                 }
             }
             if (freeShiftCount > 0) {
-                highlighted.push(parseISO(date))
+                highlighted.push(isoDate)
             }
             if (foundMe) {
                 marks.push({
-                    date: parseISO(date),
+                    date: isoDate,
                     type: 'line',
                     color: 'orange',
                     tooltip: [{ text: `You have a shift today`, color: 'orange' }],
