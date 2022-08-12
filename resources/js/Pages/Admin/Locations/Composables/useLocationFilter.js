@@ -1,11 +1,9 @@
 import { isAfter, isBefore } from 'date-fns'
 import formatISO from 'date-fns/formatISO'
 import { cloneDeep } from 'lodash'
-import { computed, getCurrentInstance, onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 
 export default function useLocationFilter () {
-    const instance = getCurrentInstance()
-    const props = instance.props
     /**
      * @param {Date} date
      */
@@ -105,10 +103,10 @@ export default function useLocationFilter () {
         for (const location of myLocations) {
             for (const shift of location.shifts) {
                 const volunteers = shift.volunteers
-                if (foundVolunteer(volunteers)) {
-                    shift.filterVolunteers = volunteers.filter(volunteer => volunteer.shift_date === selectedDate.value)
-                    setReservations(location.max_volunteers, shift)
-                }
+                // if (foundVolunteer(volunteers)) {
+                shift.filterVolunteers = volunteers.filter(volunteer => volunteer.shift_date === selectedDate.value)
+                setReservations(location.max_volunteers, shift)
+                // }
                 const dayOfWeek = date.value.getDay()
                 const mappedDay = shift.js_days[dayOfWeek]
                 if (mappedDay === true) {

@@ -15,19 +15,13 @@ class AvailableShiftsForMonthController extends Controller
     {
         $this->validations($request);
 
-        $month = $request->input('month');
-        $year  = $request->input('year');
-        if (!$year) {
-            $year = Carbon::now()->year;
-        }
-        if (!$month) {
-            $month = Carbon::now()->month;
-        }
+        $year       = Carbon::now()->year;
+        $month      = Carbon::now()->month;
         $monthStart = Carbon::create($year, $month);
         if ($monthStart->isPast()) {
             $monthStart = Carbon::today();
         }
-        $monthEnd = $monthStart->copy()->endOfMonth();
+        $monthEnd = $monthStart->copy()->addMonth()->endOfMonth();
 
         $locations = Location::with([
             'shifts.users'
@@ -56,16 +50,16 @@ class AvailableShiftsForMonthController extends Controller
 
     protected function validations(Request $request): void
     {
-        $date      = Carbon::now();
-        $thisMonth = $date->month;
-        $thisYear  = $date->year;
-        $date->addMonth();
-        $nextMonth = $date->month;
-        $nextYear  = $date->year;
-        $request->validate([
-            'month' => ['integer', "between:$thisMonth,$nextMonth"],
-            'year'  => ['integer', "between:$thisYear,$nextYear"],
-        ]);
+        //$date      = Carbon::now();
+        //$thisMonth = $date->month;
+        //$thisYear  = $date->year;
+        //$date->addMonth();
+        //$nextMonth = $date->month;
+        //$nextYear  = $date->year;
+        //$request->validate([
+        //    'month' => ['integer', "between:$thisMonth,$nextMonth"],
+        //    'year'  => ['integer', "between:$thisYear,$nextYear"],
+        //]);
         if (!Auth::user()) {
             abort(403);
         }

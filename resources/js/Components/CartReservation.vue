@@ -55,6 +55,15 @@
         <div class="bg-white pb-3 justify-self-center">
             <DatePicker v-model:date="date" :locations="locations" :user="user" :marker-dates="serverDates"/>
         </div>
+        <!--
+        TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
+
+        IF THE SHIFT REQUIRES A BLOKE AND THERE'S ONE MORE SLOT WITH ONLY SISTERS IN THE OTHER SLOTS, ONLY ALLOW A BLOKE TO ROSTER
+        IF A USER HAS ALREADY ROSTERED, DON'T ALLOW THEM TO ROSTER AGAIN
+        IF A USER HAS ALREADY ROSTERED, DON'T ALLOW THEM TO OVERLAP ON ANOTHER SHIFT
+
+        TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
+        -->
 
         <div class="text-sm">
             <Accordion :items="locations" label="name" uid="id">

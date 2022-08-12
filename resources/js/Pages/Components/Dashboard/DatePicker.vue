@@ -1,8 +1,8 @@
 <script setup>
     //https://vue3datepicker.com/
     import Datepicker from '@vuepic/vue-datepicker'
-    import { parseISO } from 'date-fns'
-    import { computed, defineEmits, defineProps, ref, watchEffect } from 'vue'
+    import { addDays, addMonths, endOfMonth, isSameDay, parseISO, startOfDay } from 'date-fns'
+    import { computed, defineEmits, defineProps, onMounted, ref, watchEffect } from 'vue'
 
     const props = defineProps({
         date: Date,
@@ -22,6 +22,20 @@
         set (value) {
             emit('update:date', value)
         },
+    })
+
+    const notBefore = startOfDay(new Date())
+    const notAfter = endOfMonth(addMonths(notBefore, 1))
+
+    const allDates = []
+    const getAllDates = () => {
+        for (let i = notBefore; i < notAfter; i = addDays(i, 1)) {
+            allDates.push(i)
+        }
+    }
+
+    onMounted(() => {
+        getAllDates()
     })
 
     const markers = ref([])
@@ -80,18 +94,27 @@
             }
         }
 
+        for (const allDate of allDates) {
+            // fill in the rest of the empty dates
+            if (highlighted.findIndex(date => isSameDay(date, allDate)) < 0) {
+                highlighted.push(allDate)
+            }
+        }
+
         markers.value = marks
         highlights.value = highlighted
     })
-
 </script>
 <template>
     <Datepicker inline
                 auto-apply
+                prevent-min-max-navigation
                 :enable-time-picker="false"
                 v-model="selectedDate"
                 :markers="markers"
-                :highlight="highlights">
+                :highlight="highlights"
+                :min-date="notBefore"
+                :max-date="notAfter">
         <template #day="{day, date}">
             <pre class="text-sm">{{ day }}</pre>
         </template>
