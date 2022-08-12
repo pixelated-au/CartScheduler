@@ -41,7 +41,6 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     Route::get('/', static fn() => Inertia::render('Dashboard'))->name('dashboard');
     Route::get('/shifts', AvailableShiftsForMonthController::class);
     Route::post('/reserve-shift', ToggleShiftReservationController::class);
-    Route::post('/un-reserve-shift', ToggleShiftReservationController::class);
 
     Route::prefix('admin')->group(static function () {
         Route::get('/', AdminDashboardController::class)->name('admin.dashboard');
@@ -65,7 +64,6 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
             'destroy' => 'admin.locations.destroy',
         ]);
 
-        Route::delete('/shifts/{shift}', DeleteShiftController::class)->name('admin.shift.destroy');
         //Route::get('/', static fn() => Inertia::render('Admin/Dashboard'))->name('admin.dashboard');
 
         //Route::resource('shifts', 'Admin\ShiftsController');
