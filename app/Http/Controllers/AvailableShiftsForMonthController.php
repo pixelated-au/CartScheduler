@@ -33,6 +33,8 @@ class AvailableShiftsForMonthController extends Controller
                         'shift_user.user_id as volunteer_id',
                         'shifts.start_time',
                         'shifts.location_id',
+                        'shifts.available_from',
+                        'shifts.available_to',
                         'locations.max_volunteers')
                     ->from('shift_user')
                     ->join('shifts', 'shift_user.shift_id', '=', 'shifts.id')
