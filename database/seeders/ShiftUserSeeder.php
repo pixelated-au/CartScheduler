@@ -28,21 +28,23 @@ class ShiftUserSeeder extends Seeder
             $shifts   = $location->shifts;
             /** @var \App\Models\Shift $shift */
             foreach ($shifts as $shift) {
-                $users = collect();
                 $dates = $this->mapDates($shift);
+
                 foreach ($dates as $date) {
+                    $alreadyMappedUsers = collect();
                     for ($i = 0; $i < $maxUsers; $i++) {
                         if (($i === $maxUsers - 1) && random_int(0, 1) === 1) {
                             break; // this allows for the possibility of one user to be left out
                         }
 
                         $userId = User::inRandomOrder()->first()->id;
-                        if ($users->search($userId) !== false) {
-                            $i--;
+                        if ($alreadyMappedUsers->search($userId) !== false) {
+                            // user has already been mapped to this shift
+                            --$i;
                             continue;
                         }
 
-                        $users->push($userId);
+                        $alreadyMappedUsers->push($userId);
                         $shift->users()->attach($userId, ['shift_date' => $date]);
                     }
                 }
