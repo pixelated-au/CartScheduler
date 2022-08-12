@@ -13,10 +13,12 @@ export default function useLocationFilter () {
     const month = ref()
 
     const serverLocations = ref([])
+    const serverDates = ref([])
 
     const getShifts = async () => {
         const response = await axios.get('/shifts')
-        serverLocations.value = response.data.data
+        serverLocations.value = response.data.locations
+        serverDates.value = response.data.shifts
     }
 
     onMounted(() => {
@@ -120,6 +122,7 @@ export default function useLocationFilter () {
     return {
         date,
         locations,
+        serverDates,
         getShifts,
     }
 }

@@ -7,6 +7,7 @@ use App\Models\Location;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class AvailableShiftsForMonthController extends Controller
 {
@@ -23,28 +24,34 @@ class AvailableShiftsForMonthController extends Controller
             $month = Carbon::now()->month;
         }
         $monthStart = Carbon::create($year, $month);
-        $monthEnd   = $monthStart->copy()->endOfMonth();
+        if ($monthStart->isPast()) {
+            $monthStart = Carbon::today();
+        }
+        $monthEnd = $monthStart->copy()->endOfMonth();
 
-        //$locations = Location::with(['shifts.users'])->get();
         $locations = Location::with([
-            //'shifts' => function (HasMany $query) use ($monthEnd, $monthStart) {
-            //    $query->where(function ($query) use ($monthEnd, $monthStart) {
-            //        $query->whereNull('shifts.available_from')
-            //              ->orWhere('shifts.available_from', '>=', $monthStart);
-            //    });
-            //    $query->where(function ($query) use ($monthEnd, $monthStart) {
-            //        $query->whereNull('shifts.available_to')
-            //              ->orWhere('shifts.available_to', '<=', $monthEnd);
-            //    });
-            //    //$query->whereNull('shift.available_from')
-            //    //      ->orWhere('shifts.available_from', '>=', $monthStart)
-            //    //      ->whereNull('shifts.available_to', '<=', $monthEnd)
-            //    //      ->orWhere('shifts.available_to', '<=', $monthEnd);
-            //},
             'shifts.users'
         ])->get();
 
-        return LocationResource::collection($locations);
+        $shifts = DB::query()
+                    ->select('shift_user.shift_date',
+                        'shift_user.shift_id',
+                        'shift_user.user_id as volunteer_id',
+                        'shifts.start_time',
+                        'shifts.location_id',
+                        'locations.max_volunteers')
+                    ->from('shift_user')
+                    ->join('shifts', 'shift_user.shift_id', '=', 'shifts.id')
+                    ->join('locations', 'shifts.location_id', '=', 'locations.id')
+                    ->where('shift_date', '>=', $monthStart)
+                    ->where('shift_date', '<=', $monthEnd)
+                    ->where('shifts.is_enabled', true)
+                    ->where('locations.is_enabled', true)
+                    ->get()
+                    ->groupBy(['shift_date', 'shift_id'])
+                    ->sortKeys();
+
+        return ['shifts' => $shifts, 'locations' => LocationResource::collection($locations)];
     }
 
     protected function validations(Request $request): void

@@ -9,7 +9,7 @@ return new class extends Migration {
     {
         Schema::create('shift_user', static function (Blueprint $table) {
             $table->foreignId('shift_id')->constrained()->onDelete('cascade')->onUpdate('cascade');
-            $table->foreignId('user_id');
+            $table->foreignId('user_id')->constrained()->onDelete('cascade')->onUpdate('cascade');
             $table->date('shift_date');
         });
     }

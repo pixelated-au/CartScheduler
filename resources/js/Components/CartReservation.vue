@@ -6,12 +6,9 @@
     import Male from '@/Components/Icons/Male.vue'
     import useToast from '@/Composables/useToast'
     import useLocationFilter from '@/Pages/Admin/Locations/Composables/useLocationFilter'
-    //https://vue3datepicker.com/
-    import Datepicker from '@vuepic/vue-datepicker'
+    import DatePicker from '@/Pages/Components/Dashboard/DatePicker.vue'
     // noinspection ES6UnusedImports
     import { VTooltip } from 'floating-vue'
-    // import 'floating-vue/dist/style.css'
-    // import { useToast } from 'vue-toastification'
 
     defineProps({
         user: Object,
@@ -19,7 +16,7 @@
 
     const toast = useToast()
 
-    const { date, locations, getShifts } = useLocationFilter()
+    const { date, locations, serverDates, getShifts } = useLocationFilter()
 
     const gridCols = {
         // See tailwind.config.js
@@ -56,11 +53,7 @@
 <template>
     <div class="p-3 grid gap-3 grid-cols-1 sm:grid-cols-[min-content_auto]">
         <div class="bg-white pb-3 justify-self-center">
-            <Datepicker inline auto-apply :enable-time-picker="false" v-model="date">
-                <template #day="{day, date}">
-                    <pre class="text-sm">{{ day }}</pre>
-                </template>
-            </Datepicker>
+            <DatePicker v-model:date="date" :locations="locations" :user="user" :marker-dates="serverDates"/>
         </div>
 
         <div class="text-sm">
@@ -111,24 +104,6 @@
                     </div>
                 </template>
             </Accordion>
-
-
-            <!--            <pre>{{ locations }}</pre>-->
-            <!--                        <ul>-->
-            <!--                            <li v-for="location in locations" class="mb-6">-->
-            <!--                                <div class="font-bold">{{ location.name }}</div>-->
-            <!--                                <ul class="pl-6">-->
-            <!--                                    <li v-for="shift in location.filterShifts" class="list-disc mb-2">-->
-            <!--                                        <div>{{ shift.start_time }} - {{ shift.end_time }}</div>-->
-            <!--                                        <ul class="pl-6">-->
-            <!--                                            <li v-for="volunteer in shift.filterVolunteers" class="list-disc">-->
-            <!--                                                <div>{{ volunteer.name }}</div>-->
-            <!--                                            </li>-->
-            <!--                                        </ul>-->
-            <!--                                    </li>-->
-            <!--                                </ul>-->
-            <!--                            </li>-->
-            <!--                        </ul>-->
         </div>
     </div>
 </template>
