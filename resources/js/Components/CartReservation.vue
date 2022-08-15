@@ -55,22 +55,14 @@
         <div class="bg-white pb-3 justify-self-center">
             <DatePicker v-model:date="date" :locations="locations" :user="user" :marker-dates="serverDates"/>
         </div>
-        <!--
-        TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
-
-        IF THE SHIFT REQUIRES A BLOKE AND THERE'S ONE MORE SLOT WITH ONLY SISTERS IN THE OTHER SLOTS, ONLY ALLOW A BLOKE TO ROSTER
-        IF A USER HAS ALREADY ROSTERED, DON'T ALLOW THEM TO ROSTER AGAIN
-        IF A USER HAS ALREADY ROSTERED, DON'T ALLOW THEM TO OVERLAP ON ANOTHER SHIFT
-
-        TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
-        -->
-
         <div class="text-sm">
             <Accordion :items="locations" label="name" uid="id">
                 <template v-slot="{location}">
                     <div class="w-full grid gap-x-2 gap-y-4" :class="gridCols[location.max_volunteers]">
                         <template v-for="shift in location.filterShifts" :key="shift.id">
-                            <div class="self-center pl-3">{{ shift.start_time }} - {{ shift.end_time }}</div>
+                            <div class="self-center pl-3">{{ shift.start_time }} - {{ shift.end_time }}
+                                {{ shift.maxedFemales }}
+                            </div>
                             <div v-for="(volunteer, index) in shift.filterVolunteers"
                                  :key="index"
                                  class="self-center justify-self-center">
@@ -84,6 +76,9 @@
                                     <Male v-else-if="volunteer.gender === 'male'" v-tooltip="volunteer.name"/>
                                     <Female v-else-if="volunteer.gender === 'female'" v-tooltip="volunteer.name"/>
                                 </template>
+                                <EmptySlot v-else-if="index === shift.filterVolunteers.length - 1 && shift.maxedFemales && user.gender === 'female'"
+                                           color="#79B9ED"
+                                           v-tooltip="'This slot can only be reserved by a brother'"/>
                                 <button v-else
                                         type="button"
                                         class="block"

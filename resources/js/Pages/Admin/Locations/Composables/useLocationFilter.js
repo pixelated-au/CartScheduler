@@ -105,6 +105,15 @@ export default function useLocationFilter () {
                 const volunteers = shift.volunteers
                 // if (foundVolunteer(volunteers)) {
                 shift.filterVolunteers = volunteers.filter(volunteer => volunteer.shift_date === selectedDate.value)
+                if (location.requires_brother) {
+                    let femaleCount = 0
+                    for (const filVolunteer of shift.filterVolunteers) {
+                        if (filVolunteer.gender === 'female') {
+                            femaleCount++
+                        }
+                    }
+                    shift.maxedFemales = femaleCount >= location.max_volunteers - 1
+                }
                 setReservations(location.max_volunteers, shift)
                 // }
                 const dayOfWeek = date.value.getDay()
