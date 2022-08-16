@@ -88,7 +88,7 @@ class ShiftUserSeeder extends Seeder
             $dates[$day] = collect(new DatePeriod(
                 Carbon::parse("first $day of this month"),
                 CarbonInterval::week(),
-                Carbon::parse("first $day of next month")
+                Carbon::parse("last $day of next month")
             ))->map(static fn($date) => $date->format('Y-m-d'))->toArray();
         }
         $this->dates = $dates;
