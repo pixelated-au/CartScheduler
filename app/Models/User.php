@@ -99,6 +99,6 @@ class User extends Authenticatable
 
     public function shifts(): BelongsToMany
     {
-        return $this->belongsToMany(Shift::class)->withPivot('shift_date');
+        return $this->belongsToMany(Shift::class)->withPivot('shift_user');
     }
 }
