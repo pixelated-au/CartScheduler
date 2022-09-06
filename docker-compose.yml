@@ -24,9 +24,9 @@ services:
             - sail
         depends_on:
             - mysql
-            - redis
-            - meilisearch
-            - selenium
+    #            - redis
+    #            - meilisearch
+    #            - selenium
     mysql:
         image: 'mysql/mysql-server:8.0'
         ports:
@@ -45,7 +45,7 @@ services:
         networks:
             - sail
         healthcheck:
-            test: ["CMD", "mysqladmin", "ping", "-p${DB_PASSWORD}"]
+            test: [ "CMD", "mysqladmin", "ping", "-p${DB_PASSWORD}" ]
             retries: 3
             timeout: 5s
     phpmyadmin:
@@ -62,29 +62,29 @@ services:
         networks:
             - sail
     #    redis:
-#        image: 'redis:alpine'
-#        ports:
-#            - '${FORWARD_REDIS_PORT:-6379}:6379'
-#        volumes:
-#            - 'sail-redis:/data'
-#        networks:
-#            - sail
-#        healthcheck:
-#            test: ["CMD", "redis-cli", "ping"]
-#            retries: 3
-#            timeout: 5s
-#    meilisearch:
-#        image: 'getmeili/meilisearch:latest'
-#        ports:
-#            - '${FORWARD_MEILISEARCH_PORT:-7700}:7700'
-#        volumes:
-#            - 'sail-meilisearch:/meili_data'
-#        networks:
-#            - sail
-#        healthcheck:
-#            test: ["CMD", "wget", "--no-verbose", "--spider",  "http://localhost:7700/health"]
-#            retries: 3
-#            timeout: 5s
+    #        image: 'redis:alpine'
+    #        ports:
+    #            - '${FORWARD_REDIS_PORT:-6379}:6379'
+    #        volumes:
+    #            - 'sail-redis:/data'
+    #        networks:
+    #            - sail
+    #        healthcheck:
+    #            test: ["CMD", "redis-cli", "ping"]
+    #            retries: 3
+    #            timeout: 5s
+    #    meilisearch:
+    #        image: 'getmeili/meilisearch:latest'
+    #        ports:
+    #            - '${FORWARD_MEILISEARCH_PORT:-7700}:7700'
+    #        volumes:
+    #            - 'sail-meilisearch:/meili_data'
+    #        networks:
+    #            - sail
+    #        healthcheck:
+    #            test: ["CMD", "wget", "--no-verbose", "--spider",  "http://localhost:7700/health"]
+    #            retries: 3
+    #            timeout: 5s
 
 
     mailhog:
