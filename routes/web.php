@@ -4,6 +4,7 @@ use App\Http\Controllers\AdminDashboardController;
 use App\Http\Controllers\AvailableShiftsForMonthController;
 use App\Http\Controllers\LocationsController;
 use App\Http\Controllers\MissingReportsForUserController;
+use App\Http\Controllers\SaveShiftReportController;
 use App\Http\Controllers\SetUserPasswordController;
 use App\Http\Controllers\ToggleShiftReservationController;
 use App\Http\Controllers\UsersController;
@@ -42,6 +43,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     Route::get('/shifts', AvailableShiftsForMonthController::class);
     Route::get('/outstanding-reports', MissingReportsForUserController::class);
     Route::post('/reserve-shift', ToggleShiftReservationController::class);
+    Route::post('/save-report', SaveShiftReportController::class)->name('save.report');
 
     Route::prefix('admin')->group(static function () {
         Route::get('/', AdminDashboardController::class)->name('admin.dashboard');

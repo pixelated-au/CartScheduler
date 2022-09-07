@@ -13,7 +13,13 @@ class MissingReportsForUserController extends Controller
         $user = $request->user();
 
         return DB::query()
-                 ->select(['su.*', 'shifts.start_time', 'shifts.end_time', 'locations.requires_brother'])
+                 ->select([
+                     'su.*',
+                     'shifts.start_time',
+                     'shifts.end_time',
+                     'locations.requires_brother',
+                     'locations.name as location_name'
+                 ])
                  ->from('shift_user', 'su')
                  ->leftJoin('shifts', 'shifts.id', '=', 'su.shift_id')
                  ->leftJoin('locations', 'locations.id', '=', 'shifts.location_id')
