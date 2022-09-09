@@ -7,8 +7,10 @@
     import useToast from '@/Composables/useToast'
     import useLocationFilter from '@/Pages/Admin/Locations/Composables/useLocationFilter'
     import DatePicker from '@/Pages/Components/Dashboard/DatePicker.vue'
+    import { isSameDay } from 'date-fns'
     // noinspection ES6UnusedImports
     import { VTooltip } from 'floating-vue'
+    import { computed, ref } from 'vue'
 
     defineProps({
         user: Object,
@@ -48,20 +50,38 @@
             }
         }
     }
+
+    const locationsOnDays = ref([])
+    const flagDate = computed(() => locationsOnDays.value.find(location => isSameDay(location.date, date.value)))
+
+    const setLocationMarkers = locations => locationsOnDays.value = locations
+    const isMyShift = location => flagDate.value?.location === location.id
 </script>
 
 <template>
     <div class="p-3 grid gap-3 grid-cols-1 sm:grid-cols-[min-content_auto]">
         <div class="bg-white pb-3 justify-self-center">
-            <DatePicker v-model:date="date" :locations="locations" :user="user" :marker-dates="serverDates"/>
+            <DatePicker v-model:date="date"
+                        :locations="locations"
+                        :user="user"
+                        :marker-dates="serverDates"
+                        @locations-for-day="setLocationMarkers"/>
         </div>
         <div class="text-sm">
             <Accordion :items="locations" label="name" uid="id">
+                <template #label="{label, location}">
+                    <span v-if="isMyShift(location)"
+                          class="text-green-800 border-b-2 border-green-500"
+                          v-tooltip="'You have at least one shift'">
+                        {{ label }}
+                    </span>
+                    <span v-else>{{ label }}</span>
+                </template>
                 <template v-slot="{location}">
                     <div class="w-full grid gap-x-2 gap-y-4" :class="gridCols[location.max_volunteers]">
                         <template v-for="shift in location.filterShifts" :key="shift.id">
-                            <div class="self-center pl-3">{{ shift.start_time }} - {{ shift.end_time }}
-                                {{ shift.maxedFemales }}
+                            <div class="self-center pl-3">
+                                {{ shift.start_time }} - {{ shift.end_time }}
                             </div>
                             <div v-for="(volunteer, index) in shift.filterVolunteers"
                                  :key="index"

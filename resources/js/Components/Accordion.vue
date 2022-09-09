@@ -1,11 +1,15 @@
 <script setup>
-    import { computed, nextTick, ref, watch } from 'vue'
+    import { computed, nextTick, ref, useSlots, watch } from 'vue'
 
     const props = defineProps({
         items: Array,
         label: String,
         uid: String,
     })
+
+    const slots = useSlots()
+
+    const useLabelSlot = computed(() => !!slots.label)
 
     const parentNodes = computed(() => {
         return props.items.map(item => ({
@@ -73,7 +77,8 @@
                             data-accordion-target="#accordion-flush-body-1"
                             aria-expanded="true"
                             aria-controls="accordion-flush-body-1">
-                        <span>{{ item.label }}</span>
+                        <slot v-if="useLabelSlot" :label="item.label" :location="item.data" name="label"/>
+                        <span v-else>{{ item.label }}</span>
                         <svg data-accordion-icon
                              class="w-6 h-6 rotate-180 shrink-0"
                              fill="currentColor"

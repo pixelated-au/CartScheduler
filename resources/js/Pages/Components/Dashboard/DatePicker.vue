@@ -13,6 +13,7 @@
 
     const emit = defineEmits([
         'update:date',
+        'locations-for-day',
     ])
 
     const selectedDate = computed({
@@ -56,7 +57,7 @@
                 continue
             }
             let freeShiftCount = 0
-            let foundMe = false
+            let foundAtLocation = 0
             const shiftDateGroup = props.markerDates[date]
 
             const isoDate = parseISO(date)
@@ -82,7 +83,7 @@
                     }
                     volunteerCount++
                     if (shift.volunteer_id === props.user.id) {
-                        foundMe = true
+                        foundAtLocation = shift.location_id
                     }
                 }
                 if (volunteerCount < maxVolunteers) {
@@ -92,12 +93,13 @@
             if (freeShiftCount > 0) {
                 highlighted.push(isoDate)
             }
-            if (foundMe) {
+            if (foundAtLocation) {
                 marks.push({
                     date: isoDate,
                     type: 'line',
-                    color: 'orange',
-                    tooltip: [{ text: `You have a shift today`, color: 'orange' }],
+                    color: '#0E9F6E',
+                    tooltip: [{ text: `You have a shift`, color: '#0E9F6E' }],
+                    location: foundAtLocation,
                 })
             }
         }
@@ -118,6 +120,8 @@
 
         markers.value = marks
         highlights.value = highlighted
+
+        emit('locations-for-day', marks.map(marker => ({ location: marker.location, date: marker.date })))
     })
 </script>
 <template>
