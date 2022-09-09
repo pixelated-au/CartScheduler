@@ -2,7 +2,7 @@
     // noinspection ES6UnusedImports
     import { VTooltip } from 'floating-vue'
     import 'floating-vue/dist/style.css'
-    import { defineEmits, defineProps, inject } from 'vue'
+    import { inject } from 'vue'
 
     const editor = inject('editor')
 

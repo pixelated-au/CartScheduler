@@ -12,7 +12,7 @@
     import TextAlign from '@tiptap/extension-text-align'
     import StarterKit from '@tiptap/starter-kit'
     import { EditorContent, useEditor } from '@tiptap/vue-3'
-    import { defineEmits, defineProps, provide, watch } from 'vue'
+    import { provide, watch } from 'vue'
 
     const props = defineProps({
         modelValue: {
