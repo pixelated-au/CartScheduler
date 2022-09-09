@@ -6,9 +6,11 @@ use App\Enums\Role;
 use App\Models\Location;
 use App\Models\User;
 use App\Policies\LocationPolicy;
+use App\Policies\TagPolicy;
 use App\Policies\UserPolicy;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Gate;
+use Spatie\Tags\Tag;
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -20,6 +22,7 @@ class AuthServiceProvider extends ServiceProvider
     protected $policies = [
         User::class     => UserPolicy::class,
         Location::class => LocationPolicy::class,
+        Tag::class      => TagPolicy::class,
     ];
 
     /**

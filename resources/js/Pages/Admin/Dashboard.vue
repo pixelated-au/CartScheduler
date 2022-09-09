@@ -1,5 +1,6 @@
 <script setup>
     import AppLayout from '@/Layouts/AppLayout.vue'
+    import Tags from '@/Pages/Components/Dashboard/Tags.vue'
     import { Link } from '@inertiajs/inertia-vue3'
 
     defineProps({
@@ -28,8 +29,7 @@
                                 </Link>
                             </h3>
                             <p class="text-gray-700">
-                                Total number of users in the system.
-                            </p>
+                                Total number of users in the system. </p>
                         </div>
                         <div class="bg-gray-100 p-6 rounded-lg shadow-lg">
                             <h3 class="text-lg font-semibold text-gray-900">
@@ -37,8 +37,7 @@
                                 <span class="text-gray-500 ml-1">Locations</span>
                             </h3>
                             <p class="text-gray-700">
-                                Total number of locations in the system.
-                            </p>
+                                Total number of locations in the system. </p>
                         </div>
                         <div class="bg-gray-100 p-6 rounded-lg shadow-lg">
                             <h3 class="text-lg font-semibold text-gray-900">
@@ -47,8 +46,7 @@
                                 <span class="text-gray-500 ml-1">Empty Shifts</span>
                             </h3>
                             <p class="text-gray-700">
-                                Total number of orders in the system.
-                            </p>
+                                Total number of orders in the system. </p>
                         </div>
                         <div class="bg-gray-100 p-6 rounded-lg shadow-lg">
                             <h3 class="text-lg font-semibold text-gray-900">
@@ -57,8 +55,7 @@
                                 <span class="text-gray-500 ml-1">Completed Reports</span>
                             </h3>
                             <p class="text-gray-700">
-                                Total number of orders in the system.
-                            </p>
+                                Total number of orders in the system. </p>
                         </div>
                         <div class="bg-gray-100 p-6 rounded-lg shadow-lg">
                             <h3 class="text-lg font-semibold text-gray-900">
@@ -67,9 +64,9 @@
                                 <span class="text-gray-500 ml-1">Announcements</span>
                             </h3>
                             <p class="text-gray-700">
-                                Total number of orders in the system.
-                            </p>
+                                Total number of orders in the system. </p>
                         </div>
+                        <Tags/>
                     </div>
                 </div>
             </div>
