@@ -6,7 +6,7 @@
     import JetInputError from '@/Jetstream/InputError.vue'
     import JetLabel from '@/Jetstream/Label.vue'
     import axios from 'axios'
-    import { format } from 'date-fns'
+    import { format, parse } from 'date-fns'
     import { computed, nextTick, reactive, ref, watch } from 'vue'
 
     const props = defineProps({
@@ -74,11 +74,13 @@
     })
 
     const disableFields = computed(() => !!formData.shift_was_cancelled)
+
+    const formatTime = time => format(parse(time, 'HH:mm:ss', new Date()), 'hh:mm a')
 </script>
 
 <template>
-    <h4><span class="mr-3">{{ formatDate(report.shift_date) }}:</span> {{ report.location_name }}</h4>
-    <div class="mb-3">{{ report.start_time }} - {{ report.end_time }}</div>
+    <h4><span class="mr-1">{{ formatDate(report.shift_date) }}:</span> {{ report.location_name }}</h4>
+    <div class="mb-3">{{ formatTime(report.start_time) }} - {{ formatTime(report.end_time) }}</div>
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-6">
         <div class="sm:col-span-2 flex items-center">
             <JetCheckbox :id="`${fieldUnique}-cancelled`"
