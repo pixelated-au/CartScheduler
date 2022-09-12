@@ -1,6 +1,6 @@
 <script setup>
     import AppLayout from '@/Layouts/AppLayout.vue'
-    import Tags from '@/Pages/Components/Dashboard/Tags.vue'
+    import Tags from '@/Pages/Admin/Dashboard/Tags.vue'
     import { Link } from '@inertiajs/inertia-vue3'
 
     defineProps({
