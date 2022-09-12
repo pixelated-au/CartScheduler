@@ -49,8 +49,8 @@ class HandleInertiaRequests extends Middleware
     protected function getPageAccessPermissions(): array
     {
         $permissions = [];
-        if (Gate::check('adminDashboard')) {
-            $permissions['canAdminDashboard'] = true;
+        if (Gate::check('admin')) {
+            $permissions['canAdmin'] = true;
         }
 
         return $permissions;

@@ -11,6 +11,7 @@
 
     defineProps({
         title: String,
+        user: Object,
     })
 
     const showingNavigationDropdown = ref(false)
@@ -46,7 +47,7 @@
                                 </JetNavLink>
 
                                 <!-- Settings Dropdown -->
-                                <AdminMenu/>
+                                <AdminMenu v-if="permissions.canAdmin"/>
                             </div>
                         </div>
 
