@@ -23,7 +23,7 @@ class MissingReportsForUserController extends Controller
                  ->from('shift_user', 'su')
                  ->leftJoin('shifts', 'shifts.id', '=', 'su.shift_id')
                  ->leftJoin('locations', 'locations.id', '=', 'shifts.location_id')
-                 ->where('shift_date', '<=', DB::raw('NOW()'))
+                 ->where('shift_date', '<=', DB::raw('CURRENT_DATE()'))
                  ->where('user_id', $user->id)
                  ->whereRaw('
                     (SELECT COUNT(*)
