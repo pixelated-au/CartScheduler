@@ -22,6 +22,8 @@ class CreateShiftReportRequest extends FormRequest
             'videos_count'        => ['integer'],
             'requests_count'      => ['integer'],
             'comments'            => ['string', 'max:500'],
+            'tags'                => ['array'],
+            'tags.*'              => ['required', 'string'],
         ];
     }
 

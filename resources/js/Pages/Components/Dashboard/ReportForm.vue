@@ -5,6 +5,7 @@
     import JetInput from '@/Jetstream/Input.vue'
     import JetInputError from '@/Jetstream/InputError.vue'
     import JetLabel from '@/Jetstream/Label.vue'
+    import ReportTags from '@/Pages/Components/Dashboard/ReportTags.vue'
     import axios from 'axios'
     import { format, parse } from 'date-fns'
     import { computed, nextTick, reactive, ref, watch } from 'vue'
@@ -24,6 +25,7 @@
         videos_count: props.location?.data?.videos_count,
         requests_count: props.location?.data?.requests_count,
         comments: props.location?.data?.comments,
+        tags: [],
     })
 
     const errors = ref({})
@@ -81,6 +83,7 @@
 <template>
     <h4><span class="mr-1">{{ formatDate(report.shift_date) }}:</span> {{ report.location_name }}</h4>
     <div class="mb-3">{{ formatTime(report.start_time) }} - {{ formatTime(report.end_time) }}</div>
+
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-6">
         <div class="sm:col-span-2 flex items-center">
             <JetCheckbox :id="`${fieldUnique}-cancelled`"
@@ -89,6 +92,11 @@
                          class="mr-3"/>
             <JetLabel :for="`${fieldUnique}-cancelled`" value="Shift was Canceled"/>
         </div>
+
+        <div class="sm:col-span-2 mb-3 text-left">
+            <ReportTags @toggled="formData.tags = $event"/>
+        </div>
+
         <div class="mb-3 text-left text-left">
             <JetLabel :for="`${fieldUnique}-placements`" value="Placements" :is-disabled="disableFields"/>
             <JetInput :id="`${fieldUnique}-placements`"

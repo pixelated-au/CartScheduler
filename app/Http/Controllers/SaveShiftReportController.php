@@ -10,7 +10,7 @@ class SaveShiftReportController extends Controller
 {
     public function __invoke(CreateShiftReportRequest $request)
     {
-        $shiftUser = ShiftUser::with('shift')
+        $shiftUser = ShiftUser::with('shift.location')
                               ->where('shift_id', $request->get('shift_id'))
                               ->where('shift_date', $request->get('shift_date'))
                               ->first();
@@ -19,6 +19,10 @@ class SaveShiftReportController extends Controller
                 ['message' => 'The supplied data does not match a shift. Please contact the administrator and cite this message'],
                 422
             );
+        }
+
+        if ($shiftUser->shift->location->requires_brother && $request->user()->gender === 'female') {
+            return response()->json(['message' => 'A brother is required to report on this shift.'], 422);
         }
 
         $cancelled = $request->get('shift_was_cancelled', false);
@@ -33,6 +37,8 @@ class SaveShiftReportController extends Controller
         $report->requests_count           = $cancelled ? 0 : $request->get('requests_count', 0);
         $report->comments                 = $request->get('comments');
         $report->save();
+
+        $report->syncTagsWithType($request->get('tags', []), 'reports');
 
         return response()->json(['message' => 'Report saved successfully']);
     }
