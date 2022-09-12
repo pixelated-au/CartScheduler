@@ -114,7 +114,7 @@
                                    type="button"
                                    style-type="primary"
                                    @click.prevent="updateTag">
-                            Edit
+                            Save
                         </JetButton>
                         <JetButton v-else class="" type="button" style-type="primary" @click.prevent="addTag">
                             Add
