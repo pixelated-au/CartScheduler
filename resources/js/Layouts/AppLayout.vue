@@ -91,6 +91,29 @@
                         <JetResponsiveNavLink :href="route('dashboard')" :active="route().current('dashboard')">
                             Dashboard
                         </JetResponsiveNavLink>
+
+                        <div v-if="permissions.canAdmin" class="pt-4 pb-1 border-t border-gray-200">
+                            <div class="font-medium text-base px-4">Administration</div>
+                            <div class="px-4">
+                                <JetResponsiveNavLink :href="route('admin.dashboard')">
+                                    Dashboard
+                                </JetResponsiveNavLink>
+
+                                <div class="border-t border-gray-100"/>
+
+                                <JetResponsiveNavLink :href="route('admin.users.index')">
+                                    Users
+                                </JetResponsiveNavLink>
+
+                                <JetResponsiveNavLink :href="route('admin.locations.index')">
+                                    Locations
+                                </JetResponsiveNavLink>
+
+                                <JetResponsiveNavLink :href="route('admin.reports.index')">
+                                    Reports
+                                </JetResponsiveNavLink>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Responsive Settings Options -->
