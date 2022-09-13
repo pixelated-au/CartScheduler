@@ -8,6 +8,7 @@
         totalUsers: Number,
         totalLocations: Number,
         shiftFilledData: Array,
+        outstandingReports: Array,
     })
 
 </script>
@@ -25,11 +26,12 @@
                     <div class="grid gap-3 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 m-6">
                         <div class="bg-gray-100 p-6 rounded-lg shadow-lg">
                             <h3 class="text-lg font-semibold text-gray-900">
-                                <span class="text-gray-600">44</span>
-                                <span class="text-gray-600 ml-1">Incomplete Reports</span>
+                                <span class="text-gray-600">{{ outstandingReports.length }}</span>
+                                <Link :href="route('admin.users.index')">
+                                    Incomplete Reports
+                                </Link>
                             </h3>
-                            <p class="text-gray-700">
-                                Total number of orders in the system. </p>
+                            <p class="text-gray-700">The number of reports that participants are yet to submit.</p>
                         </div>
                         <div class="bg-gray-100 p-6 rounded-lg shadow-lg">
                             <h3 class="text-lg font-semibold text-gray-900">
@@ -39,16 +41,14 @@
                                     Users
                                 </Link>
                             </h3>
-                            <p class="text-gray-700">
-                                Total number of users in the system. </p>
+                            <p class="text-gray-700">Total number of users in the system.</p>
                         </div>
                         <div class="bg-gray-100 p-6 rounded-lg shadow-lg">
                             <h3 class="text-lg font-semibold text-gray-900">
                                 <span class="text-gray-600">{{ totalLocations }}</span>
                                 <span class="text-gray-600 ml-1">Locations</span>
                             </h3>
-                            <p class="text-gray-700">
-                                Total number of locations in the system. </p>
+                            <p class="text-gray-700">Total number of locations in the system.</p>
                         </div>
                         <div class="col-span-full bg-gray-100 p-6 rounded-lg shadow-lg grid grid-cols-1">
                             <h3 class="text-lg font-semibold text-gray-900">

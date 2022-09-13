@@ -4,7 +4,7 @@ namespace App\Actions;
 
 use Illuminate\Support\Facades\DB;
 
-class ShiftFilledData
+class GetShiftFilledData
 {
     public function execute(string $duration = null): array
     {
