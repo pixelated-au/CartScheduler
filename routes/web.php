@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AdminDashboardController;
 use App\Http\Controllers\AvailableShiftsForMonthController;
+use App\Http\Controllers\GetEmptyShiftsController;
 use App\Http\Controllers\GetReportTagsController;
 use App\Http\Controllers\LocationsController;
 use App\Http\Controllers\MissingReportsForUserController;
@@ -77,8 +78,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
             'update'  => 'admin.report-tags.update',
             'destroy' => 'admin.report-tags.destroy',
         ]);
-        Route::put('/report-tag-sort-order', ReportTagsSortOrderController::class)
-             ->name('update.report-tag-sort-order');
+        Route::put('/report-tag-sort-order', ReportTagsSortOrderController::class);
 
         //Route::get('/', static fn() => Inertia::render('Admin/Dashboard'))->name('admin.dashboard');
 

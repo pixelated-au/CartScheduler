@@ -1,0 +1,59 @@
+<script setup>
+    import { BarChart } from 'echarts/charts.js'
+    import { GridComponent, LegendComponent, TitleComponent, TooltipComponent } from 'echarts/components.js'
+    import { use } from 'echarts/core.js'
+    import { CanvasRenderer } from 'echarts/renderers.js'
+    import { computed, provide } from 'vue'
+    import VChart, { THEME_KEY } from 'vue-echarts'
+
+    const props = defineProps({
+        shiftData: Array,
+    })
+
+    use([CanvasRenderer, TitleComponent, TooltipComponent, LegendComponent, BarChart, GridComponent])
+
+    provide(THEME_KEY, 'light')
+    // provide(THEME_KEY, {
+    //     color: ['#3398DB'],
+    //     backgroundColor: '#fff',
+    // })
+
+    const shiftsData = computed(() => ({
+        // title: {
+        //     text: 'Filled Shifts',
+        //     left: 'center',
+        // },
+        responsive: true,
+        maintainAspectRatio: false,
+        tooltip: {
+            trigger: 'item',
+            formatter: '{a} <br/>{b}: {c}',
+        },
+        xAxis: {
+            data: props.shiftData.map((item) => item.date),
+            axisLabel: {
+                interval: 0,
+                rotate: 45,
+            },
+        },
+        yAxis: {},
+        series: [
+            {
+                data: props.shiftData.map((item) => item.shifts_filled),
+                type: 'bar',
+                stack: 'x',
+                name: 'Filled Shifts',
+            },
+            {
+                data: props.shiftData.map((item) => item.shifts_available - item.shifts_filled),
+                type: 'bar',
+                stack: 'x',
+                name: 'Shifts Available',
+            },
+        ],
+    }))
+</script>
+
+<template>
+    <VChart class="shifts-chart" :option="shiftsData"/>
+</template>
