@@ -8,7 +8,6 @@ export default function useLocationFilter () {
      * @param {Date} date
      */
     const date = ref(new Date())
-    const month = ref()
 
     const serverLocations = ref([])
     const serverDates = ref([])
