@@ -18,7 +18,7 @@ class GetOutstandingReports
                      'shifts.start_time',
                      'shifts.end_time',
                      'locations.requires_brother',
-                     'locations.name as location_name'
+                     'locations.name as location_name',
                  ])
                  ->when($user !== null, fn(Builder $query) => $query->addSelect('su.user_id'))
                  ->from('shift_user', 'su')
@@ -38,7 +38,7 @@ class GetOutstandingReports
                      'shifts.start_time',
                      'shifts.end_time',
                      'locations.requires_brother',
-                     'locations.name'
+                     'locations.name',
                  ]))
                  ->orderBy('shift_date')
                  ->orderBy('shifts.start_time')

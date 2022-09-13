@@ -27,9 +27,9 @@
                         <div class="bg-gray-100 p-6 rounded-lg shadow-lg">
                             <h3 class="text-lg font-semibold text-gray-900">
                                 <span class="text-gray-600">{{ outstandingReports.length }}</span>
-                                <Link :href="route('admin.users.index')">
+                                <span class="text-gray-600">
                                     Incomplete Reports
-                                </Link>
+                                </span>
                             </h3>
                             <p class="text-gray-700">The number of reports that participants are yet to submit.</p>
                         </div>
