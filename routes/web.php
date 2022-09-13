@@ -44,7 +44,7 @@ Route::get('/mail', static fn() => new App\Mail\UserAccountCreated(App\Models\Us
 
 Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified'])->group(function () {
     Route::get('/', static fn() => Inertia::render('Dashboard'))->name('dashboard');
-    Route::get('/shifts', AvailableShiftsForMonthController::class);
+    Route::get('/shifts/{canViewHistorical?}', AvailableShiftsForMonthController::class);
     Route::get('/outstanding-reports', MissingReportsForUserController::class);
     Route::post('/reserve-shift', ToggleShiftReservationController::class);
     Route::post('/save-report', SaveShiftReportController::class)->name('save.report');

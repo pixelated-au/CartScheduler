@@ -3,7 +3,7 @@ import formatISO from 'date-fns/formatISO'
 import { cloneDeep } from 'lodash'
 import { computed, onMounted, ref } from 'vue'
 
-export default function useLocationFilter () {
+export default function useLocationFilter (canViewHistorical = false) {
     /**
      * @param {Date} date
      */
@@ -13,7 +13,8 @@ export default function useLocationFilter () {
     const serverDates = ref([])
 
     const getShifts = async () => {
-        const response = await axios.get('/shifts')
+        const extra = canViewHistorical ? '/1' : ''
+        const response = await axios.get(`/shifts${extra}`)
         serverLocations.value = response.data.locations
         serverDates.value = response.data.shifts
     }

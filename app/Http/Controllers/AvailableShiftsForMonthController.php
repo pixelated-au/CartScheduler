@@ -11,17 +11,16 @@ use Illuminate\Support\Facades\DB;
 
 class AvailableShiftsForMonthController extends Controller
 {
-    public function __invoke(Request $request)
+    public function __invoke(Request $request, bool $canViewHistorical = false)
     {
-        $this->validations($request);
-
-        $year       = Carbon::now()->year;
-        $month      = Carbon::now()->month;
-        $monthStart = Carbon::create($year, $month);
-        if ($monthStart->isPast()) {
-            $monthStart = Carbon::today();
+        if (!Auth::user()) {
+            abort(403);
         }
-        $monthEnd = $monthStart->copy()->addMonth()->endOfMonth();
+
+        $monthStart = $canViewHistorical
+            ? Carbon::today()->subMonths(6)->startOfMonth()
+            : Carbon::today();
+        $monthEnd   = $monthStart->copy()->addMonth()->endOfMonth();
 
         $locations = Location::with([
             'shifts.users'
@@ -48,22 +47,5 @@ class AvailableShiftsForMonthController extends Controller
                     ->sortKeys();
 
         return ['shifts' => $shifts, 'locations' => LocationResource::collection($locations)];
-    }
-
-    protected function validations(Request $request): void
-    {
-        //$date      = Carbon::now();
-        //$thisMonth = $date->month;
-        //$thisYear  = $date->year;
-        //$date->addMonth();
-        //$nextMonth = $date->month;
-        //$nextYear  = $date->year;
-        //$request->validate([
-        //    'month' => ['integer', "between:$thisMonth,$nextMonth"],
-        //    'year'  => ['integer', "between:$thisYear,$nextYear"],
-        //]);
-        if (!Auth::user()) {
-            abort(403);
-        }
     }
 }

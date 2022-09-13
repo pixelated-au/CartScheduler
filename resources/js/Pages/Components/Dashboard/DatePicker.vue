@@ -1,7 +1,7 @@
 <script setup>
     //https://vue3datepicker.com/
     import Datepicker from '@vuepic/vue-datepicker'
-    import { addDays, addMonths, endOfMonth, formatISO, isAfter, isBefore, parseISO, startOfDay } from 'date-fns'
+    import { addDays, addMonths, endOfMonth, formatISO, isAfter, isBefore, parseISO, startOfDay, startOfMonth, subMonths } from 'date-fns'
     import { computed, defineEmits, defineProps, onMounted, ref, watchEffect } from 'vue'
 
     const props = defineProps({
@@ -9,6 +9,7 @@
         locations: Array,
         markerDates: Object,
         user: Object,
+        canViewHistorical: Boolean,
     })
 
     const emit = defineEmits([
@@ -25,8 +26,13 @@
         },
     })
 
-    const notBefore = startOfDay(new Date())
-    const notAfter = endOfMonth(addMonths(notBefore, 1))
+    const today = new Date()
+    const notBefore = props.canViewHistorical
+        ? startOfDay(startOfMonth(subMonths(today, 6)))
+        : startOfDay(today)
+    const notAfter = props.canViewHistorical
+        ? endOfMonth(addMonths(notBefore, 7))
+        : endOfMonth(addMonths(notBefore, 1))
 
     const allDates = []
     const getAllDates = () => {
@@ -82,7 +88,7 @@
                         maxVolunteers = shift.max_volunteers
                     }
                     volunteerCount++
-                    if (shift.volunteer_id === props.user.id) {
+                    if (shift.volunteer_id === props.user?.id) {
                         foundAtLocation = shift.location_id
                     }
                 }

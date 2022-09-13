@@ -1,4 +1,5 @@
 <script setup>
+    import CartReservationManagement from '@/Components/CartReservationManagement.vue'
     import AppLayout from '@/Layouts/AppLayout.vue'
     import FilledShiftsChart from '@/Pages/Admin/Dashboard/FilledShiftsChart.vue'
     import Tags from '@/Pages/Admin/Dashboard/Tags.vue'
@@ -50,28 +51,16 @@
                             </h3>
                             <p class="text-gray-700">Total number of locations in the system.</p>
                         </div>
+                        <div class="col-span-full p-6 rounded-lg shadow-lg grid grid-cols-1 bg-white">
+                            <CartReservationManagement/>
+                        </div>
                         <div class="col-span-full bg-gray-100 p-6 rounded-lg shadow-lg grid grid-cols-1">
                             <h3 class="text-lg font-semibold text-gray-900">
                                 <span class="text-gray-600">Filled Shifts</span>
                             </h3>
                             <p class="text-gray-700">For the next 14 days.</p>
                             <FilledShiftsChart :shiftData="shiftFilledData"/>
-                            <!--                            <h3 class="text-lg font-semibold text-gray-900">-->
-                            <!--                                <span class="text-gray-600">{{ emptyShiftCount }}</span>-->
-                            <!--                                <span class="text-gray-500 ml-1">Empty Shifts</span>-->
-                            <!--                            </h3>-->
-                            <!--                            <p class="text-gray-700">-->
-                            <!--                                Total number of orders in the system. </p>-->
                         </div>
-                        <!--                        <div class="bg-gray-100 p-6 rounded-lg shadow-lg">-->
-                        <!--                            <h3 class="text-lg font-semibold text-gray-900">-->
-                        <!--                                <span class="text-gray-600">44</span>-->
-                        <!--                                &lt;!&ndash;                                <span class="text-gray-600">{{ totalOrders }}</span>&ndash;&gt;-->
-                        <!--                                <span class="text-gray-500 ml-1">Announcements</span>-->
-                        <!--                            </h3>-->
-                        <!--                            <p class="text-gray-700">-->
-                        <!--                                Total number of orders in the system. </p>-->
-                        <!--                        </div>-->
                         <Tags/>
                     </div>
                 </div>
