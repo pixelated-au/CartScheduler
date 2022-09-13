@@ -58,17 +58,7 @@
                         Reports
                     </JetDropdownLink>
 
-                    <!--            <JetDropdownLink v-if="$page.props.jetstream.hasApiFeatures" :href="route('api-tokens.index')">-->
-                    <!--                API Tokens-->
-                    <!--            </JetDropdownLink>-->
-
                     <div class="border-t border-gray-100"/>
-
-                    <!--            <form @submit.prevent="logout">-->
-                    <!--                <JetDropdownLink as="button">-->
-                    <!--                    Log Out-->
-                    <!--                </JetDropdownLink>-->
-                    <!--            </form>-->
                 </template>
             </JetDropdown>
         </div>
