@@ -6,7 +6,6 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
  * @property mixed id
- * @property mixed location_id
  * @property mixed day_monday
  * @property mixed day_tuesday
  * @property mixed day_wednesday
@@ -27,18 +26,10 @@ class ShiftResource extends JsonResource
     {
         return [
             'id'             => $this->id,
-            //'day_monday'     => $this->day_monday,
-            //'day_tuesday'    => $this->day_tuesday,
-            //'day_wednesday'  => $this->day_wednesday,
-            //'day_thursday'   => $this->day_thursday,
-            //'day_friday'     => $this->day_friday,
-            //'day_saturday'   => $this->day_saturday,
-            //'day_sunday'     => $this->day_sunday,
             'start_time'     => $this->start_time,
             'end_time'       => $this->end_time,
             'available_from' => $this->available_from,
             'available_to'   => $this->available_to,
-            //'users'      => $this->users,
             'js_days'        => [ // These will map to JavaScript date() days
                                   0 => $this->day_sunday,
                                   1 => $this->day_monday,
@@ -48,7 +39,8 @@ class ShiftResource extends JsonResource
                                   5 => $this->day_friday,
                                   6 => $this->day_saturday,
             ],
-            'volunteers'     => UserResource::collection($this->users),
+            'volunteers'     => UserResource::collection($this->whenLoaded('users')),
+            'location'       => LocationResource::make($this->whenLoaded('location')),
         ];
     }
 }

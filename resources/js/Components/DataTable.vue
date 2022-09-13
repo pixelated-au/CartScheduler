@@ -1,15 +1,23 @@
 <script setup>
+    import { computed } from 'vue'
     import EasyDataTable from 'vue3-easy-data-table'
 
-    defineProps({
+    const props = defineProps({
         headers: Array,
         items: Array,
+        filterOptions: Array,
         searchField: String,
         searchValue: String,
+        showHover: {
+            type: Boolean,
+            default: true,
+        },
     })
 
     defineEmits(['click-row'])
-    // Based on: https://tiptap.dev/
+
+    const cursor = computed(() => props.showHover ? 'pointer' : 'default')
+    const rowHoverColor = computed(() => props.showHover ? 'var(--tw-bg-200)' : 'transparent')
 </script>
 
 <template>
@@ -18,6 +26,7 @@
                    :items="items"
                    :search-field="searchField"
                    :search-value="searchValue"
+                   :filter-options="filterOptions"
                    theme-color="rgb(55 65 81)"
                    table-class-name="data-table"
                    body-row-class-name="data-table-row"
@@ -46,13 +55,13 @@
     --easy-table-row-border: none;
     --easy-table-body-item-padding: .8rem 15px;
 
-    --easy-table-body-row-hover-background-color: var(--tw-bg-200);
+    --easy-table-body-row-hover-background-color: v-bind(rowHoverColor);
     --easy-table-body-row-hover-font-color: var(--tw-bg-900);
 
     --easy-table-footer-font-size: 1rem;
 
     table {
-        cursor: pointer;
+        cursor: v-bind(cursor);
         border-collapse: separate;
 
         thead tr {

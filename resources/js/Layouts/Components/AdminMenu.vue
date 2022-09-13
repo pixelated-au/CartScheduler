@@ -54,6 +54,10 @@
                         Locations
                     </JetDropdownLink>
 
+                    <JetDropdownLink :href="route('admin.reports.index')">
+                        Reports
+                    </JetDropdownLink>
+
                     <!--            <JetDropdownLink v-if="$page.props.jetstream.hasApiFeatures" :href="route('api-tokens.index')">-->
                     <!--                API Tokens-->
                     <!--            </JetDropdownLink>-->

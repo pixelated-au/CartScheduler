@@ -23,7 +23,8 @@ class UserResource extends JsonResource
             'name'         => $this->name,
             'gender'       => $this->gender,
             'mobile_phone' => $this->mobile_phone,
-            'shift_date'   => $this->pivot['shift_date'],
+            'email'        => $this->email,
+            'shift_date'   => $this->whenPivotLoaded('shift_user', fn() => $this->pivot['shift_date']),
         ];
     }
 }

@@ -2,10 +2,10 @@
 
 use App\Http\Controllers\AdminDashboardController;
 use App\Http\Controllers\AvailableShiftsForMonthController;
-use App\Http\Controllers\GetEmptyShiftsController;
 use App\Http\Controllers\GetReportTagsController;
 use App\Http\Controllers\LocationsController;
 use App\Http\Controllers\MissingReportsForUserController;
+use App\Http\Controllers\ReportsController;
 use App\Http\Controllers\ReportTagsController;
 use App\Http\Controllers\ReportTagsSortOrderController;
 use App\Http\Controllers\SaveShiftReportController;
@@ -71,6 +71,11 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
             'update'  => 'admin.locations.update',
             'destroy' => 'admin.locations.destroy',
         ]);
+
+        Route::resource('/reports', ReportsController::class)->names([
+            'index' => 'admin.reports.index',
+            'show'  => 'admin.reports.show',
+        ])->only(['index', 'show']);
 
         Route::resource('/report-tags', ReportTagsController::class)->parameter('report-tags', 'tag')->names([
             'index'   => 'admin.report-tags.index',
