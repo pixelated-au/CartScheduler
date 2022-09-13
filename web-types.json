@@ -1,0 +1,16 @@
+{
+    "$schema": "https://raw.githubusercontent.com/JetBrains/web-types/master/v2-preview/web-types.json",
+    "name": "cart-app",
+    "framework": "vue",
+    "version": "1.0.0",
+    "contributions": {
+        "html": {
+            "vue-directives": [
+                {
+                    "name": "tooltip",
+                    "description": "Tooltip directive for Vue.js"
+                }
+            ]
+        }
+    }
+}
