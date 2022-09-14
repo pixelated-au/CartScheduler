@@ -5,6 +5,7 @@ use App\Http\Controllers\AvailableShiftsForMonthController;
 use App\Http\Controllers\GetReportTagsController;
 use App\Http\Controllers\LocationsController;
 use App\Http\Controllers\MissingReportsForUserController;
+use App\Http\Controllers\MoveUserToNewShiftController;
 use App\Http\Controllers\ReportsController;
 use App\Http\Controllers\ReportTagsController;
 use App\Http\Controllers\ReportTagsSortOrderController;
@@ -84,6 +85,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
             'destroy' => 'admin.report-tags.destroy',
         ]);
         Route::put('/report-tag-sort-order', ReportTagsSortOrderController::class);
+        Route::put('/move-user-to-shift', MoveUserToNewShiftController::class);
 
         //Route::get('/', static fn() => Inertia::render('Admin/Dashboard'))->name('admin.dashboard');
 

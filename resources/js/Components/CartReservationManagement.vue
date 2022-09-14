@@ -3,13 +3,16 @@
     import EmptySlot from '@/Components/Icons/EmptySlot.vue'
     import Female from '@/Components/Icons/Female.vue'
     import Male from '@/Components/Icons/Male.vue'
+    import SelectField from '@/Components/SelectField.vue'
     import useToast from '@/Composables/useToast'
+    import JetButton from '@/Jetstream/Button.vue'
+    import JetConfirmModal from '@/Jetstream/ConfirmationModal.vue'
     import useLocationFilter from '@/Pages/Admin/Locations/Composables/useLocationFilter'
     import DatePicker from '@/Pages/Components/Dashboard/DatePicker.vue'
-    import { isSameDay } from 'date-fns'
+    import axios from 'axios'
     // noinspection ES6UnusedImports
     import { VTooltip } from 'floating-vue'
-    import { computed, ref } from 'vue'
+    import { ref } from 'vue'
 
     defineProps({
         user: Object,
@@ -17,7 +20,7 @@
 
     const toast = useToast()
 
-    const { date, locations, serverDates, getShifts } = useLocationFilter(true)
+    const { date, locations, serverDates, getShifts, emptyShiftsForTime } = useLocationFilter(true)
 
     const gridCols = {
         // See tailwind.config.js
@@ -27,34 +30,33 @@
         4: 'grid-cols-reservation-4',
     }
 
-    const toggleReservation = async (locationId, shiftId, toggleOn) => {
-        try {
-            await axios.post('/reserve-shift', {
-                location: locationId,
-                shift: shiftId,
-                do_reserve: toggleOn,
-                date: date.value,
-            })
-            if (toggleOn) {
-                toast.success('Reservation made')
-            } else {
-                toast.warning('Reservation removed')
-            }
-            await getShifts()
-
-        } catch (e) {
-            toast.error(e.response.data.message)
-            if (e.response.data.error_code === 100) {
-                await getShifts()
-            }
-        }
-    }
-
     const locationsOnDays = ref([])
-    const flagDate = computed(() => locationsOnDays.value.find(location => isSameDay(location.date, date.value)))
 
     const setLocationMarkers = locations => locationsOnDays.value = locations
-    const isMyShift = location => flagDate.value?.location === location.id
+
+    const hasShiftsForTime = (shiftTime, locationId) =>
+        !!emptyShiftsForTime.value?.find((shiftData) =>
+            shiftTime === shiftData.time && locationId !== shiftData.locationId)
+
+    const shiftsForTime = (shiftTime, locationId) => emptyShiftsForTime.value
+        ?.filter((shiftData) => shiftTime === shiftData.time && locationId !== shiftData.locationId)
+        ?.map(({ location, locationId }) => ({ label: location, id: locationId }))
+
+    const selectedMoveUser = ref(null)
+
+    const promptMoveUser = (selection, volunteer, shift) => selectedMoveUser.value = { selection, volunteer, shift }
+
+    const doMoveUser = async (userId, locationId, shiftId) => {
+        selectedMoveUser.value = null
+        await axios.put('/admin/move-user-to-shift', {
+            user_id: userId,
+            location_id: locationId,
+            old_shift_id: shiftId,
+            date: date.value,
+        })
+        toast.success('User was moved!')
+        getShifts()
+    }
 </script>
 
 <template>
@@ -70,12 +72,7 @@
         <div class="text-sm">
             <Accordion :items="locations" label="name" uid="id">
                 <template #label="{label, location}">
-                    <span v-if="isMyShift(location)"
-                          class="text-green-800 border-b-2 border-green-500"
-                          v-tooltip="'You have at least one shift'">
-                        {{ label }}
-                    </span>
-                    <span v-else>{{ label }}</span>
+                    <span>{{ label }}</span>
                 </template>
                 <template v-slot="{location}">
                     <div class="w-full grid gap-x-2 gap-y-4" :class="gridCols[location.max_volunteers]">
@@ -99,7 +96,19 @@
                                         :key="index"
                                         class="border-b border-gray-400 last:border-b-0 py-2 flex justify-between">
                                         <template v-if="volunteer">
-                                            <div>{{ volunteer.name }}</div>
+                                            <div class=" flex items-center">
+                                                <div class="w-full md:w-auto md:mr-3">{{ volunteer.name }}</div>
+                                                <div class="w-full md:w-auto">
+                                                    <template v-if="hasShiftsForTime(shift.start_time, location.id)">
+                                                        <SelectField @update:modelValue="promptMoveUser($event, volunteer, shift)"
+                                                                     :options="shiftsForTime(shift.start_time, location.id)"
+                                                                     select-label="Change location"/>
+                                                    </template>
+                                                    <template v-else>
+                                                        <span class="text-red-500">No shifts available</span>
+                                                    </template>
+                                                </div>
+                                            </div>
                                             <div>Ph: <a :href="`tel:${volunteer.mobile_phone}`"
                                                         class="underline underline-offset-4 decoration-dotted decoration-1 decoration-blue-800 visited:decoration-blue-800">{{ volunteer.mobile_phone
                                                 }}</a></div>
@@ -116,4 +125,24 @@
             </Accordion>
         </div>
     </div>
+    <JetConfirmModal v-model:show="selectedMoveUser">
+        <template #title>
+            <h2 class="text-lg font-medium text-gray-900">Move user</h2>
+        </template>
+        <template #content>
+            <div>
+                Are you sure you want to move {{ selectedMoveUser.volunteer.name }} to
+                {{ selectedMoveUser.selection.label }}?
+            </div>
+        </template>
+        <template #footer>
+            <div class="flex justify-end">
+                <JetButton style-type="secondary" @click="selectedMoveUser = null">Cancel</JetButton>
+                <JetButton @click="doMoveUser(selectedMoveUser?.volunteer.id, selectedMoveUser?.selection.id, selectedMoveUser?.shift.id)"
+                           class="ml-2">
+                    Move
+                </JetButton>
+            </div>
+        </template>
+    </JetConfirmModal>
 </template>

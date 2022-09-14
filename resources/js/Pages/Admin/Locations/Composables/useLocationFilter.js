@@ -3,7 +3,7 @@ import formatISO from 'date-fns/formatISO'
 import { cloneDeep } from 'lodash'
 import { computed, onMounted, ref } from 'vue'
 
-export default function useLocationFilter (canViewHistorical = false) {
+export default function useLocationFilter (canAdmin = false) {
     /**
      * @param {Date} date
      */
@@ -13,7 +13,7 @@ export default function useLocationFilter (canViewHistorical = false) {
     const serverDates = ref([])
 
     const getShifts = async () => {
-        const extra = canViewHistorical ? '/1' : ''
+        const extra = canAdmin ? '/1' : ''
         const response = await axios.get(`/shifts${extra}`)
         serverLocations.value = response.data.locations
         serverDates.value = response.data.shifts
@@ -32,7 +32,9 @@ export default function useLocationFilter (canViewHistorical = false) {
         },
     })
 
-    const setReservations = (maxVolunteers, shift) => {
+    const emptyShiftsForTime = ref([])
+
+    const setReservations = (maxVolunteers, shift, location) => {
         const volunteers = shift.filterVolunteers?.sort((a, b) => {
             if (a.gender > b.gender) {
                 return -1
@@ -52,6 +54,7 @@ export default function useLocationFilter (canViewHistorical = false) {
         if (length) {
             const nullArray = Array(length).fill(null)
             shift.filterVolunteers = [...volunteers, ...nullArray]
+            emptyShiftsForTime.value.push({ time: shift.start_time, location: location.name, locationId: location.id })
         }
     }
 
@@ -91,6 +94,7 @@ export default function useLocationFilter (canViewHistorical = false) {
         }
         const mappedLocations = []
         const myLocations = cloneDeep(serverLocations.value)
+        emptyShiftsForTime.value = []
         for (const location of myLocations) {
             for (const shift of location.shifts) {
                 const volunteers = shift.volunteers
@@ -105,7 +109,7 @@ export default function useLocationFilter (canViewHistorical = false) {
                     }
                     shift.maxedFemales = femaleCount >= location.max_volunteers - 1
                 }
-                setReservations(location.max_volunteers, shift)
+                setReservations(location.max_volunteers, shift, location)
                 const dayOfWeek = date.value.getDay()
                 const mappedDay = shift.js_days[dayOfWeek]
                 if (mappedDay === true) {
@@ -119,6 +123,7 @@ export default function useLocationFilter (canViewHistorical = false) {
 
     return {
         date,
+        emptyShiftsForTime,
         locations,
         serverDates,
         getShifts,
