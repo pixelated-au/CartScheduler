@@ -32,15 +32,6 @@ export default function useLocationFilter (canViewHistorical = false) {
         },
     })
 
-    const foundVolunteer = (volunteers) => {
-        for (const volunteer of volunteers) {
-            if (volunteer.shift_date === selectedDate.value) {
-                return true
-            }
-        }
-        return false
-    }
-
     const setReservations = (maxVolunteers, shift) => {
         const volunteers = shift.filterVolunteers?.sort((a, b) => {
             if (a.gender > b.gender) {
@@ -103,7 +94,6 @@ export default function useLocationFilter (canViewHistorical = false) {
         for (const location of myLocations) {
             for (const shift of location.shifts) {
                 const volunteers = shift.volunteers
-                // if (foundVolunteer(volunteers)) {
                 shift.filterVolunteers = volunteers.filter(volunteer => volunteer.shift_date === selectedDate.value)
                 if (location.requires_brother) {
                     let femaleCount = 0
@@ -115,7 +105,6 @@ export default function useLocationFilter (canViewHistorical = false) {
                     shift.maxedFemales = femaleCount >= location.max_volunteers - 1
                 }
                 setReservations(location.max_volunteers, shift)
-                // }
                 const dayOfWeek = date.value.getDay()
                 const mappedDay = shift.js_days[dayOfWeek]
                 if (mappedDay === true) {
