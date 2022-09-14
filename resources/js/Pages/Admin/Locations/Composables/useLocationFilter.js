@@ -95,6 +95,7 @@ export default function useLocationFilter (canViewHistorical = false) {
             for (const shift of location.shifts) {
                 const volunteers = shift.volunteers
                 shift.filterVolunteers = volunteers.filter(volunteer => volunteer.shift_date === selectedDate.value)
+                delete shift.volunteers
                 if (location.requires_brother) {
                     let femaleCount = 0
                     for (const filVolunteer of shift.filterVolunteers) {
@@ -111,6 +112,7 @@ export default function useLocationFilter (canViewHistorical = false) {
                     addLocation(mappedLocations, location, shift)
                 }
             }
+            delete location.shifts
         }
         return mappedLocations
     })
