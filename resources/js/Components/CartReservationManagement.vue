@@ -10,6 +10,7 @@
     import useLocationFilter from '@/Pages/Admin/Locations/Composables/useLocationFilter'
     import DatePicker from '@/Pages/Components/Dashboard/DatePicker.vue'
     import axios from 'axios'
+    import { format } from 'date-fns'
     // noinspection ES6UnusedImports
     import { VTooltip } from 'floating-vue'
     import { ref } from 'vue'
@@ -40,7 +41,19 @@
 
     const shiftsForTime = (shiftTime, locationId) => emptyShiftsForTime.value
         ?.filter((shiftData) => shiftTime === shiftData.time && locationId !== shiftData.locationId)
-        ?.map(({ location, locationId }) => ({ label: location, id: locationId }))
+        ?.map(({ location, locationId, currentVolunteers }) => {
+            const label = location
+
+            const volunteers = currentVolunteers.map(volunteer => {
+                const prefix = volunteer.gender === 'male' ? 'Bro' : 'Sis'
+                return `${prefix} ${volunteer.name}`
+            })
+            // const label = `<strong class="font-bold">${location}</strong>` + '<ul class="pl-3">' + currentVolunteers.map(volunteer => {
+            //     const prefix = volunteer.gender === 'male' ? 'Bro' : 'Sis'
+            //     return `<li class="list-disc">${prefix} ${volunteer.name}</li>`
+            // }).join('')
+            return { label, volunteers, id: locationId }
+        })
 
     const selectedMoveUser = ref(null)
 
@@ -48,14 +61,21 @@
 
     const doMoveUser = async (userId, locationId, shiftId) => {
         selectedMoveUser.value = null
-        await axios.put('/admin/move-user-to-shift', {
-            user_id: userId,
-            location_id: locationId,
-            old_shift_id: shiftId,
-            date: date.value,
-        })
-        toast.success('User was moved!')
-        getShifts()
+        try {
+            await axios.put('/admin/move-user-to-shift', {
+                user_id: userId,
+                location_id: locationId,
+                old_shift_id: shiftId,
+                date: format(date.value, 'yyyy-MM-dd'),
+            })
+            toast.success('User was moved!')
+        } catch (e) {
+            console.log(e)
+            toast.error(e.response.data.message)
+
+        } finally {
+            getShifts()
+        }
     }
 </script>
 
@@ -97,12 +117,25 @@
                                         class="border-b border-gray-400 last:border-b-0 py-2 flex justify-between">
                                         <template v-if="volunteer">
                                             <div class=" flex items-center">
-                                                <div class="w-full md:w-auto md:mr-3">{{ volunteer.name }}</div>
+                                                <div class="w-full md:w-auto md:mr-3">
+                                                    {{ volunteer.gender === 'male' ? 'Bro' : 'Sis' }}
+                                                    {{ volunteer.name }}
+                                                </div>
                                                 <div class="w-full md:w-auto">
                                                     <template v-if="hasShiftsForTime(shift.start_time, location.id)">
                                                         <SelectField @update:modelValue="promptMoveUser($event, volunteer, shift)"
                                                                      :options="shiftsForTime(shift.start_time, location.id)"
-                                                                     select-label="Change location"/>
+                                                                     select-label="Change location">
+                                                            <template #extra="{option}">
+                                                                <ul class="pl-3 font-normal">
+                                                                    <li v-for="volunteer in option.volunteers"
+                                                                        :key="volunteer"
+                                                                        class="list-disc">
+                                                                        {{ volunteer }}
+                                                                    </li>
+                                                                </ul>
+                                                            </template>
+                                                        </SelectField>
                                                     </template>
                                                     <template v-else>
                                                         <span class="text-red-500">No shifts available</span>
