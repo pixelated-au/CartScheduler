@@ -91,7 +91,7 @@
 </script>
 
 <template>
-    <JetFormSection @submitted="updateUserData">
+    <JetFormSection @submitted="saveAction">
         <template #title>
             Profile Information
         </template>
