@@ -13,6 +13,7 @@ use App\Http\Controllers\SaveShiftReportController;
 use App\Http\Controllers\SetUserPasswordController;
 use App\Http\Controllers\ToggleShiftReservationController;
 use App\Http\Controllers\UsersController;
+use App\Http\Controllers\UsersImportController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -53,6 +54,10 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
 
     Route::prefix('admin')->group(static function () {
         Route::get('/', AdminDashboardController::class)->name('admin.dashboard');
+
+        Route::get('/users/import', [UsersImportController::class, 'show'])->name('admin.users.import.show');
+        Route::post('/users/import', [UsersImportController::class, 'import'])->name('admin.users.import.import');
+
         Route::resource('/users', UsersController::class)->names([
             'index'   => 'admin.users.index',
             'create'  => 'admin.users.create',

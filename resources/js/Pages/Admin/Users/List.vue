@@ -21,6 +21,10 @@
         Inertia.visit(route('admin.users.create'))
     }
 
+    const onImportUsers = () => {
+        Inertia.visit(route('admin.users.import.show'))
+    }
+
     const handleSelection = (selection) => {
         Inertia.visit(route('admin.users.edit', selection.id))
     }
@@ -31,9 +35,14 @@
         <template #header>
             <div class="flex justify-between">
                 <h1 class="font-semibold text-2xl text-gray-800 leading-tight">Users</h1>
-                <JetButton class="mx-3" style-type="primary" @click="onNewUser">
-                    New User
-                </JetButton>
+                <div>
+                    <JetButton class="mx-3" style-type="secondary" outline @click="onImportUsers">
+                        Import Users
+                    </JetButton>
+                    <JetButton class="mx-3" style-type="primary" @click="onNewUser">
+                        New User
+                    </JetButton>
+                </div>
             </div>
         </template>
 

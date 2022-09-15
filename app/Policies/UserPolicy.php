@@ -66,4 +66,9 @@ class UserPolicy
 
         return $user->role === Role::Admin->value;
     }
+
+    public function import(User $user): bool
+    {
+        return $user->role === Role::Admin->value;
+    }
 }

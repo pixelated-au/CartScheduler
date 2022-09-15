@@ -5,10 +5,8 @@ namespace App\Http\Controllers;
 use App\Http\Requests\CreateUserRequest;
 use App\Http\Requests\UpdateUserRequest;
 use App\Http\Resources\UserAdminResource;
-use App\Mail\UserAccountCreated;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
@@ -39,9 +37,8 @@ class UsersController extends Controller
         $data['password'] = null; // Set it to null. Once set, the user will be unable to log in
         $data['uuid']     = Str::uuid();
 
+        // The users model will automatically send a welcome email via the created event
         $user = User::unguarded(static fn() => User::create($data));
-
-        Mail::to($user->email)->send(new UserAccountCreated($user));
 
         session()->flash('flash.banner', "User $user->name successfully created.");
         session()->flash('flash.bannerStyle', 'success');
