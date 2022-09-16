@@ -81,7 +81,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-span-2">
+        <div class="sm:col-span-2">
             <JetLabel :for="`shift-range-${fieldUnique}`" value="Shift Time From & To"/>
             <Datepicker time-picker
                         range
@@ -99,8 +99,8 @@
             <JetLabel :for="`is-enabled-${fieldUnique}`" value="Enabled?"/>
             <JetCheckbox :id="`is-enabled-${fieldUnique}`" v-model:checked="shift.is_enabled" class="mt-3"/>
         </div>
-        <div class="col-start-2">
-            <JetLabel :for="`available-from-${fieldUnique}`" value="Shift Available From"/>
+        <div class="sm:col-start-2">
+            <JetLabel :for="`available-from-${fieldUnique}`" value="Available From"/>
             <Datepicker auto-apply
                         enable-time-picker
                         v-model="shift.available_from"

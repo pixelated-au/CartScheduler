@@ -72,6 +72,8 @@
 
                         <!-- Hamburger -->
                         <div class="-mr-2 flex items-center sm:hidden">
+                            <DarkMode @is-dark-mode="isDarkMode = $event"/>
+
                             <button class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 focus:text-gray-500 transition"
                                     @click="showingNavigationDropdown = ! showingNavigationDropdown">
                                 <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
@@ -100,23 +102,27 @@
                         </JetResponsiveNavLink>
 
                         <div v-if="permissions.canAdmin" class="pt-4 pb-1 border-t border-gray-200">
-                            <div class="font-medium text-base px-4">Administration</div>
+                            <div class="font-medium text-base px-4 dark:text-gray-100">Administration</div>
                             <div class="px-4">
-                                <JetResponsiveNavLink :href="route('admin.dashboard')">
+                                <JetResponsiveNavLink :href="route('admin.dashboard')"
+                                                      :active="route().current('admin.dashboard')">
                                     Dashboard
                                 </JetResponsiveNavLink>
 
                                 <div class="border-t border-gray-100"/>
 
-                                <JetResponsiveNavLink :href="route('admin.users.index')">
+                                <JetResponsiveNavLink :href="route('admin.users.index')"
+                                                      :active="route().current('admin.users.index')">
                                     Users
                                 </JetResponsiveNavLink>
 
-                                <JetResponsiveNavLink :href="route('admin.locations.index')">
+                                <JetResponsiveNavLink :href="route('admin.locations.index')"
+                                                      :active="route().current('admin.locations.index')">
                                     Locations
                                 </JetResponsiveNavLink>
 
-                                <JetResponsiveNavLink :href="route('admin.reports.index')">
+                                <JetResponsiveNavLink :href="route('admin.reports.index')"
+                                                      :active="route().current('admin.reports.index')">
                                     Reports
                                 </JetResponsiveNavLink>
                             </div>

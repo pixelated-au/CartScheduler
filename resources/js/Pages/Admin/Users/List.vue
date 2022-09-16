@@ -33,13 +33,17 @@
 <template>
     <AppLayout title="Users">
         <template #header>
-            <div class="flex justify-between">
-                <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">Users</h2>
-                <div>
-                    <JetButton class="mx-3" style-type="secondary" outline @click="onImportUsers">
+            <div class="flex justify-between flex-wrap md:flex-nowrap">
+                <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight w-full md:w-auto">
+                    Users</h2>
+                <div class="w-full md:w-auto">
+                    <JetButton class="md:mx-3 w-full md:w-auto my-3 md:my-0"
+                               style-type="secondary"
+                               outline
+                               @click="onImportUsers">
                         Import Users
                     </JetButton>
-                    <JetButton class="mx-3" style-type="primary" @click="onNewUser">
+                    <JetButton class="md:mx-3 w-full md:w-auto" style-type="primary" @click="onNewUser">
                         New User
                     </JetButton>
                 </div>

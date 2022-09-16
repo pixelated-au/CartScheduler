@@ -24,7 +24,7 @@
     <AppLayout title="Create a new Location">
         <template #header>
             <div class="flex justify-between">
-                <h1 class="font-semibold text-2xl text-gray-800 leading-tight">New Location</h1>
+                <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">New Location</h2>
                 <JetButton class="mx-3" type="button" style-type="secondary" outline @click.prevent="listRouteAction">
                     Back
                 </JetButton>
