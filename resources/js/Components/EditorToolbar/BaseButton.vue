@@ -27,12 +27,9 @@
     const actionCall = (e) => {
         if (!props.action) {
             emit('click', e)
-            return
         }
 
-        console.log('action call', props.action, props.actionProps)
         const call = editor?.value?.chain()?.focus()[props?.action](props?.actionProps)?.run()
-        console.log(call, props.actionProps)
         return call || (() => {
         })
     }
