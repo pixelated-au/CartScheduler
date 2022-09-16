@@ -74,13 +74,16 @@ class LocationsController extends Controller
                 if (!$shiftModel) {
                     throw new RuntimeException("Shift with an ID of {$shift['id']} belonging to $location->name not found");
                 }
+                unset($shift['id']);
             } else {
                 $shiftModel = new Shift();
             }
             $shiftModel->fill($shift);
             $shiftModel->save();
         }
-        $location->update($request->validated());
+        $locationData = $request->validated();
+        unset($locationData['shifts']);
+        $location->update($locationData);
         DB::commit();
 
         return Redirect::route('admin.locations.edit', $location);

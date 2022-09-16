@@ -19,7 +19,6 @@ class UpdateLocationRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'id'                      => ['required', 'integer'],
             'name'                    => ['required', 'string', 'max:255'],
             'description'             => ['required', 'string', 'max:4000000000'],
             'min_volunteers'          => ['required', 'integer', 'min:0'],
