@@ -78,53 +78,56 @@
                     <span v-else class="dark:text-gray-200">{{ label }}</span>
                 </template>
                 <template v-slot="{location}">
-                    <div class="w-full grid gap-x-2 gap-y-4" :class="gridCols[location.max_volunteers]">
-                        <template v-for="shift in location.filterShifts" :key="shift.id">
-                            <div class="self-center pl-3 dark:text-gray-100">
-                                {{ shift.start_time }} - {{ shift.end_time }}
-                            </div>
-                            <div v-for="(volunteer, index) in shift.filterVolunteers"
-                                 :key="index"
-                                 class="self-center justify-self-center">
-                                <template v-if="volunteer">
-                                    <button v-if="volunteer.id === user.id"
+                    <div class="w-full">
+                        <div v-html="location.description" class="w-full p-3 pt-0"></div>
+                        <div class="w-full grid gap-x-2 gap-y-4" :class="gridCols[location.max_volunteers]">
+                            <template v-for="shift in location.filterShifts" :key="shift.id">
+                                <div class="self-center pl-3 dark:text-gray-100">
+                                    {{ shift.start_time }} - {{ shift.end_time }}
+                                </div>
+                                <div v-for="(volunteer, index) in shift.filterVolunteers"
+                                     :key="index"
+                                     class="self-center justify-self-center">
+                                    <template v-if="volunteer">
+                                        <button v-if="volunteer.id === user.id"
+                                                type="button"
+                                                class="block"
+                                                @click="toggleReservation(location.id, shift.id, false)">
+                                            <BookedSlot v-tooltip="`${volunteer.name}: Tap to un-reserve this shift`"/>
+                                        </button>
+                                        <Male v-else-if="volunteer.gender === 'male'" v-tooltip="volunteer.name"/>
+                                        <Female v-else-if="volunteer.gender === 'female'" v-tooltip="volunteer.name"/>
+                                    </template>
+                                    <EmptySlot v-else-if="index === shift.filterVolunteers.length - 1 && shift.maxedFemales && user.gender === 'female'"
+                                               color="#79B9ED"
+                                               v-tooltip="'This slot can only be reserved by a brother'"/>
+                                    <button v-else
                                             type="button"
                                             class="block"
-                                            @click="toggleReservation(location.id, shift.id, false)">
-                                        <BookedSlot v-tooltip="`${volunteer.name}: Tap to un-reserve this shift`"/>
+                                            @click="toggleReservation(location.id, shift.id, true)">
+                                        <EmptySlot v-tooltip="'Tap to reserve this shift'"/>
                                     </button>
-                                    <Male v-else-if="volunteer.gender === 'male'" v-tooltip="volunteer.name"/>
-                                    <Female v-else-if="volunteer.gender === 'female'" v-tooltip="volunteer.name"/>
-                                </template>
-                                <EmptySlot v-else-if="index === shift.filterVolunteers.length - 1 && shift.maxedFemales && user.gender === 'female'"
-                                           color="#79B9ED"
-                                           v-tooltip="'This slot can only be reserved by a brother'"/>
-                                <button v-else
-                                        type="button"
-                                        class="block"
-                                        @click="toggleReservation(location.id, shift.id, true)">
-                                    <EmptySlot v-tooltip="'Tap to reserve this shift'"/>
-                                </button>
-                            </div>
-                            <div></div>
-                            <div class="col-span-full bg-slate-200 dark:bg-slate-700 dark:text-gray-50 rounded px-3 py-2">
-                                <ul>
-                                    <li v-for="(volunteer, index) in shift.filterVolunteers"
-                                        :key="index"
-                                        class="border-b border-gray-400 last:border-b-0 py-2 flex justify-between">
-                                        <template v-if="volunteer">
-                                            <div>{{ volunteer.name }}</div>
-                                            <div>Ph: <a :href="`tel:${volunteer.mobile_phone}`"
-                                                        class="underline underline-offset-4 decoration-dotted decoration-1 decoration-blue-800 visited:decoration-blue-800">{{ volunteer.mobile_phone
-                                                }}</a></div>
-                                        </template>
-                                        <template v-else>
-                                            <div>—</div>
-                                        </template>
-                                    </li>
-                                </ul>
-                            </div>
-                        </template>
+                                </div>
+                                <div></div>
+                                <div class="col-span-full bg-slate-200 dark:bg-slate-700 dark:text-gray-50 rounded px-3 py-2">
+                                    <ul>
+                                        <li v-for="(volunteer, index) in shift.filterVolunteers"
+                                            :key="index"
+                                            class="border-b border-gray-400 last:border-b-0 py-2 flex justify-between">
+                                            <template v-if="volunteer">
+                                                <div>{{ volunteer.name }}</div>
+                                                <div>Ph: <a :href="`tel:${volunteer.mobile_phone}`"
+                                                            class="underline underline-offset-4 decoration-dotted decoration-1 decoration-blue-800 visited:decoration-blue-800">{{ volunteer.mobile_phone
+                                                    }}</a></div>
+                                            </template>
+                                            <template v-else>
+                                                <div>—</div>
+                                            </template>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </template>
+                        </div>
                     </div>
                 </template>
             </Accordion>
