@@ -23,6 +23,8 @@ class DeleteAccountTest extends TestCase
             'password' => 'password',
         ]);
 
+        var_dump($response);
+
         $this->assertModelMissing($user);
     }
 
