@@ -30,7 +30,7 @@ class ToggleShiftReservationController extends Controller
         $shift = $location->shifts->first();
 
         if ($data['do_reserve']) {
-            return $doShiftReservation->execute($shift, $location, $request->user(), $shiftDate);
+            return $doShiftReservation->execute($shift, $location, $request->user()->id, $shiftDate);
         }
 
         $shift->users()->detach($request->user()->id);
