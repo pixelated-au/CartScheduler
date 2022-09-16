@@ -48,10 +48,6 @@
                 const prefix = volunteer.gender === 'male' ? 'Bro' : 'Sis'
                 return `${prefix} ${volunteer.name}`
             })
-            // const label = `<strong class="font-bold">${location}</strong>` + '<ul class="pl-3">' + currentVolunteers.map(volunteer => {
-            //     const prefix = volunteer.gender === 'male' ? 'Bro' : 'Sis'
-            //     return `<li class="list-disc">${prefix} ${volunteer.name}</li>`
-            // }).join('')
             return { label, volunteers, id: locationId }
         })
 
@@ -114,9 +110,9 @@
                                 <ul>
                                     <li v-for="(volunteer, index) in shift.filterVolunteers"
                                         :key="index"
-                                        class="border-b border-gray-400 last:border-b-0 py-2 flex justify-between">
+                                        class="border-b border-gray-400 last:border-b-0 py-2 flex justify-between flex-wrap sm:flex-nowrap">
                                         <template v-if="volunteer">
-                                            <div class=" flex items-center">
+                                            <div class=" flex items-center flex-wrap sm:flex-nowrap">
                                                 <div class="w-full md:w-auto md:mr-3">
                                                     {{ volunteer.gender === 'male' ? 'Bro' : 'Sis' }}
                                                     {{ volunteer.name }}
