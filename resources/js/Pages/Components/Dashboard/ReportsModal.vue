@@ -56,7 +56,7 @@
                     </div>
                 </div>
                 <div v-else>
-                    <h4 class="my-3 text-green-700">No more reports outstanding 🎉</h4>
+                    <h4 class="my-3 text-green-700 dark:text-green-400">No more reports outstanding 🎉</h4>
                 </div>
             </div>
         </template>

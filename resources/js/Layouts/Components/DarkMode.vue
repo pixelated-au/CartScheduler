@@ -7,6 +7,7 @@
         },
     })
 
+    const emit = defineEmits(['is-dark-mode'])
 
     const isDarkMode = ref(false)
 
@@ -34,6 +35,7 @@
                 isDarkMode.value = true
             }
         }
+        emit('is-dark-mode', isDarkMode.value)
     }
 
     const setDarkMode = () => {
@@ -43,6 +45,7 @@
                 !('color-theme' in localStorage)
                 && window.matchMedia('(prefers-color-scheme: dark)').matches
             )
+        emit('is-dark-mode', isDarkMode.value)
     }
 
     onMounted(() => {

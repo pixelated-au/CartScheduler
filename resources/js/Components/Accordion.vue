@@ -66,10 +66,11 @@
 </script>
 
 <template>
-    <div class="px-3 py-2 border-md rounded-lg border border-gray-300">
-        <div data-accordion="collapse">
-            <!-- data-active-classes="bg-purple-400 dark:bg-gray-900 text-gray-900 dark:text-white"
-             data-inactive-classes="text-gray-500 dark:text-gray-400" -->
+    <div class="px-3 py-2 border-md rounded-lg border border-gray-300 dark:border-gray-600">
+        <div data-accordion="collapse"
+             data-active-classes="bg-purple-400 dark:bg-gray-900 text-gray-900 dark:text-white"
+             data-inactive-classes="text-gray-500 dark:text-gray-400">
+
             <div v-for="item in parentNodes" :key="item.key" :ref="skipUnwrap.myTabs" :data-key="item.key">
                 <h2 :id="`accordion-label-${item.key}-${compId}`" class="text-xl">
                     <button type="button"

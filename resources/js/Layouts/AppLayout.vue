@@ -4,10 +4,11 @@
     import JetNavLink from '@/Jetstream/NavLink.vue'
     import JetResponsiveNavLink from '@/Jetstream/ResponsiveNavLink.vue'
     import AdminMenu from '@/Layouts/Components/AdminMenu.vue'
+    import DarkMode from '@/Layouts/Components/DarkMode.vue'
     import ProfileSettingsMenu from '@/Layouts/Components/ProfileSettingsMenu.vue'
     import TeamsMenu from '@/Layouts/Components/TeamsMenu.vue'
     import { Head, Link, usePage } from '@inertiajs/inertia-vue3'
-    import { computed, ref } from 'vue'
+    import { computed, provide, ref } from 'vue'
 
     defineProps({
         title: String,
@@ -19,6 +20,10 @@
     const permissions = computed(() => {
         return usePage().props.value.pagePermissions
     })
+
+    const isDarkMode = ref(false)
+
+    provide('darkMode', isDarkMode)
 </script>
 
 <template>
@@ -27,8 +32,8 @@
 
         <JetBanner/>
 
-        <div class="min-h-screen bg-gray-100">
-            <nav class="bg-white border-b border-gray-100">
+        <div class="min-h-screen bg-gray-100 dark:bg-slate-800">
+            <nav class="bg-white dark:bg-slate-900 border-b border-gray-100">
                 <!-- Primary Navigation Menu -->
                 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div class="flex justify-between h-16">
@@ -56,6 +61,8 @@
                                 <!-- Teams Dropdown -->
                                 <TeamsMenu/>
                             </div>
+
+                            <DarkMode @is-dark-mode="isDarkMode = $event"/>
 
                             <!-- Settings Dropdown -->
                             <div class="ml-3 relative">
@@ -207,8 +214,8 @@
             </nav>
 
             <!-- Page Heading -->
-            <header v-if="$slots.header" class="bg-white shadow">
-                <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+            <header v-if="$slots.header" class="bg-white dark:bg-slate-900 shadow">
+                <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 dark:text-gray-100">
                     <slot name="header"/>
                 </div>
             </header>

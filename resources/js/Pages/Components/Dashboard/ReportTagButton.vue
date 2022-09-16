@@ -16,10 +16,10 @@
 
     const classes = computed(() => {
         return {
-            'bg-gray-200': !isActive.value,
-            'text-gray-700': !isActive.value,
-            'bg-green-200': isActive.value,
-            'text-green-800': isActive.value,
+            'bg-gray-200 dark:bg-gray-700': !isActive.value,
+            'text-gray-700 dark:text-gray-300': !isActive.value,
+            'bg-green-200 dark:bg-green-700': isActive.value,
+            'text-green-800 dark:text-green-200': isActive.value,
         }
     })
 </script>

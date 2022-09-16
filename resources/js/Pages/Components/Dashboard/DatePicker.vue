@@ -2,7 +2,7 @@
     //https://vue3datepicker.com/
     import Datepicker from '@vuepic/vue-datepicker'
     import { addDays, addMonths, endOfMonth, formatISO, isAfter, isBefore, parseISO, startOfDay, startOfMonth, subMonths } from 'date-fns'
-    import { computed, defineEmits, defineProps, onMounted, ref, watchEffect } from 'vue'
+    import { computed, defineEmits, defineProps, inject, onMounted, ref, watchEffect } from 'vue'
 
     const props = defineProps({
         date: Date,
@@ -11,6 +11,8 @@
         user: Object,
         canViewHistorical: Boolean,
     })
+
+    const isDarkMode = inject('darkMode', false)
 
     const emit = defineEmits([
         'update:date',
@@ -139,7 +141,8 @@
                 :markers="markers"
                 :highlight="highlights"
                 :min-date="notBefore"
-                :max-date="notAfter">
+                :max-date="notAfter"
+                :dark="isDarkMode">
         <template #day="{day, date}">
             <pre class="text-sm">{{ day }}</pre>
         </template>

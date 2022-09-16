@@ -60,7 +60,7 @@
 
 <template>
     <div class="p-3 grid gap-3 grid-cols-1 sm:grid-cols-[min-content_auto]">
-        <div class="bg-white pb-3 justify-self-center">
+        <div class="bg-white dark:bg-gray-900 pb-3 justify-self-center">
             <DatePicker v-model:date="date"
                         :locations="locations"
                         :user="user"
@@ -71,16 +71,16 @@
             <Accordion :items="locations" label="name" uid="id">
                 <template #label="{label, location}">
                     <span v-if="isMyShift(location)"
-                          class="text-green-800 border-b-2 border-green-500"
+                          class="text-green-800 dark:text-green-300 border-b-2 border-green-500"
                           v-tooltip="'You have at least one shift'">
                         {{ label }}
                     </span>
-                    <span v-else>{{ label }}</span>
+                    <span v-else class="dark:text-gray-200">{{ label }}</span>
                 </template>
                 <template v-slot="{location}">
                     <div class="w-full grid gap-x-2 gap-y-4" :class="gridCols[location.max_volunteers]">
                         <template v-for="shift in location.filterShifts" :key="shift.id">
-                            <div class="self-center pl-3">
+                            <div class="self-center pl-3 dark:text-gray-100">
                                 {{ shift.start_time }} - {{ shift.end_time }}
                             </div>
                             <div v-for="(volunteer, index) in shift.filterVolunteers"
@@ -107,7 +107,7 @@
                                 </button>
                             </div>
                             <div></div>
-                            <div class="col-span-full bg-slate-200 rounded px-3 py-2">
+                            <div class="col-span-full bg-slate-200 dark:bg-slate-700 dark:text-gray-50 rounded px-3 py-2">
                                 <ul>
                                     <li v-for="(volunteer, index) in shift.filterVolunteers"
                                         :key="index"

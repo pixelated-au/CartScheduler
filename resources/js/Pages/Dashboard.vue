@@ -23,7 +23,7 @@
     <AppLayout title="Dashboard">
         <template #header>
             <div class="flex flex-col md:flex-row justify-between w-full">
-                <h2 class="font-semibold text-xl text-gray-800 leading-tight">Dashboard</h2>
+                <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">Dashboard</h2>
                 <div>
                     <JetButton v-if="outstandingReportCount"
                                type="button"
@@ -39,7 +39,7 @@
 
         <div class="py-12">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg">
+                <div class="bg-white dark:bg-gray-900 overflow-hidden shadow-xl sm:rounded-lg">
                     <CartReservation :user="user"/>
                 </div>
             </div>
