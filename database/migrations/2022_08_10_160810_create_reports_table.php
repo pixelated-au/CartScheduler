@@ -10,7 +10,7 @@ return new class extends Migration {
         Schema::create('reports', static function (Blueprint $table) {
             $table->id();
             $table->foreignId('shift_id')->constrained()->onDelete('cascade')->onUpdate('cascade');
-            $table->foreignId('report_submitted_user_id')->constrained('shift_user', 'user_id');
+            $table->foreignId('report_submitted_user_id')->constrained('shift_user', 'user_id')->onDelete('set null');
             $table->date('shift_date');
             $table->smallInteger('placements_count')->unsigned()->default(0);
             $table->smallInteger('videos_count')->unsigned()->default(0);
