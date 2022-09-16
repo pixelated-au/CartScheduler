@@ -28,7 +28,7 @@ class LocationResource extends JsonResource
             'requires_brother' => $this->requires_brother,
             'latitude'         => $this->latitude,
             'longitude'        => $this->longitude,
-            'shifts'           => ShiftResource::collection($this->shifts),
+            'shifts'           => ShiftResource::collection($this->whenLoaded('shifts')),
         ];
     }
 }
