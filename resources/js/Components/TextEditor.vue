@@ -47,8 +47,8 @@
 </script>
 
 <template>
-    <div v-if="editor" class="border border-gray-300 rounded-md">
-        <div class="border-b p-1">
+    <div v-if="editor" class="border border-gray-300 dark:border-gray-700 rounded-md">
+        <div class="border-b p-1 dark:border-gray-500">
             <HeadingButton :heading="3"/>
             <HeadingButton :heading="4"/>
             <HeadingButton :heading="5"/>
@@ -67,7 +67,7 @@
             <LinkUnsetButton/>
         </div>
 
-        <editor-content :editor="editor" class="p-3 min-h-[300px]"/>
+        <editor-content :editor="editor" class="p-3 min-h-[300px] dark:text-gray-100"/>
         <!--        <div>{{ modelValue }}</div>-->
     </div>
 

@@ -43,15 +43,18 @@
 <template>
     <Dropdown @show="getPreviousLink" v-model:shown="doShow" class="inline-block">
         <BaseButton tooltip="Add Link" @click="">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16">
+            <svg xmlns="http://www.w3.org/2000/svg"
+                 viewBox="0 0 24 24"
+                 width="16"
+                 height="16"
+                 class="dark:fill-gray-100">
                 <path fill="none" d="M0 0h24v24H0z"/>
-                <path d="M18.364 15.536L16.95 14.12l1.414-1.414a5 5 0 1 0-7.071-7.071L9.879 7.05 8.464 5.636 9.88 4.222a7 7 0 0 1 9.9 9.9l-1.415 1.414zm-2.828 2.828l-1.415 1.414a7 7 0 0 1-9.9-9.9l1.415-1.414L7.05 9.88l-1.414 1.414a5 5 0 1 0 7.071 7.071l1.414-1.414 1.415 1.414zm-.708-10.607l1.415 1.415-7.071 7.07-1.415-1.414 7.071-7.07z"
-                      fill="rgba(0,0,0,1)"/>
+                <path d="M18.364 15.536L16.95 14.12l1.414-1.414a5 5 0 1 0-7.071-7.071L9.879 7.05 8.464 5.636 9.88 4.222a7 7 0 0 1 9.9 9.9l-1.415 1.414zm-2.828 2.828l-1.415 1.414a7 7 0 0 1-9.9-9.9l1.415-1.414L7.05 9.88l-1.414 1.414a5 5 0 1 0 7.071 7.071l1.414-1.414 1.415 1.414zm-.708-10.607l1.415 1.415-7.071 7.07-1.415-1.414 7.071-7.07z"/>
             </svg>
         </BaseButton>
 
         <template #popper>
-            <div class="flex items-center p-3">
+            <div class="flex items-center p-3 dark:bg-slate-900">
                 <JetLabel for="url" value="Url:"/>
                 <JetInput id="url" v-model="url" type="text" class="block mx-3" autocomplete="name"/>
                 <JetButton outline type="button" style-type="success" @click.prevent="setLink">

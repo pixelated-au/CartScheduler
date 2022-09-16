@@ -54,11 +54,19 @@ export default function () {
     }
 
     const getOutlineColours = colours => {
-        return 'bg-transparent border-2 ' + mapColours('border-', 600, colours) + ' ' + mapColours('text-', 600, colours)
+        return 'bg-transparent border-2 '
+            + mapColours('border-', 600, colours)
+            + ' ' + mapColours('dark:border-', 300, colours)
+            + ' ' + mapColours('text-', 600, colours)
+            + ' ' + mapColours('dark:text-', 300, colours)
     }
 
     const getOutlineHoverColours = colours => {
-        return 'hover:border-transparent hover:text-red-900 ' + mapColours('hover:bg-', 300, colours)
+        return 'hover:border-transparent'
+            + ' ' + mapColours('hover:bg-', 300, colours)
+            + ' ' + mapColours('hover:text-', 900, colours)
+            + ' ' + mapColours('dark:hover:bg-', 900, colours)
+            + ' ' + mapColours('dark:hover:text-', 300, colours)
     }
 
     return {

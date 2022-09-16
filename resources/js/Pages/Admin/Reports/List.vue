@@ -50,12 +50,12 @@
     <AppLayout title="Reports">
         <template #header>
             <div>
-                <h1 class="font-semibold text-2xl text-gray-800 leading-tight">Reports</h1>
+                <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">Reports</h2>
             </div>
         </template>
 
         <div class="max-w-7xl mx-auto pt-10 pb-5 sm:px-6 lg:px-8">
-            <div class="bg-white shadow-xl sm:rounded-lg sm:p-6">
+            <div class="bg-white dark:bg-gray-900 shadow-xl sm:rounded-lg sm:p-6">
                 <JetLabel for="search" value="Search on Reports"/>
                 <JetInput id="search" v-model="userSearch" type="text" class="mt-1 block w-full"/>
                 <JetHelpText>Search on location, user name, date, etc</JetHelpText>
@@ -63,7 +63,7 @@
         </div>
 
         <div class="max-w-7xl mx-auto pb-10 sm:px-6 lg:px-8">
-            <div class="bg-white shadow-xl sm:rounded-lg sm:p-6">
+            <div class="bg-white dark:bg-gray-900 shadow-xl sm:rounded-lg sm:p-6">
                 <data-table :headers="headers"
                             :items="reportData"
                             :search-value="userSearch"
@@ -93,7 +93,7 @@
                         {{ cancelled ? 'Yes' : 'No' }}
                     </template>
                     <template #expand="{comments, tags, username, userPhone, userEmail}">
-                        <div class="bg-gray-100 p-3 rounded-lg">
+                        <div class="bg-gray-100 dark:bg-gray-800 p-3 rounded-lg">
                             <ul v-if="tags?.length" class="w-full p-0 m-0 mb-3">
                                 <li v-for="(tag, i) in tags"
                                     :key="i"
@@ -104,7 +104,7 @@
                                 <div class="md:mr-5">
                                     <h5>Comments</h5>
                                     <div v-if="comments">{{ comments }}</div>
-                                    <div v-else class="text-gray-500"><em>None entered</em></div>
+                                    <div v-else class="text-gray-500 dark:text-gray-300"><em>None entered</em></div>
                                 </div>
                                 <div>
                                     <h5>Submitted by: {{ username }}<br></h5>

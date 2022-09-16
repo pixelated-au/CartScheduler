@@ -37,15 +37,15 @@
         <div class="max-w-7xl mx-auto pt-10 sm:px-6 lg:px-8 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 sm:gap-4">
             <div v-for="location in locations.data"
                  :key="location.id"
-                 class="bg-white shadow-xl sm:rounded-lg sm:p-6 cursor-pointer hover:bg-violet-100 hover:transition-colors"
+                 class="bg-white dark:bg-slate-700 shadow-xl sm:rounded-lg sm:p-6 cursor-pointer hover:bg-violet-100 hover:transition-colors"
                  @click="locationClicked(location)">
-                <div class="flex flex-col justify-between h-full">
+                <div class="flex flex-col justify-between h-full dark:text-gray-100">
                     <div>
                         <h4 class="font-semibold">{{ location.name }}</h4>
                         <div>{{ truncateDescription(location.clean_description) }}</div>
                     </div>
                     <div>
-                        <div class="border-t border-gray-100 mt-3 pt-3"></div>
+                        <div class="border-t border-gray-100 dark:border-gray-700 mt-3 pt-3"></div>
                         <h5 class="font-semibold text-center">Shifts</h5>
                         <div class="text-center text-4xl">{{ location.shifts.length }}</div>
                     </div>

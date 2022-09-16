@@ -65,7 +65,7 @@
                 </ul>
             </div>
 
-            <div class="flex items-center justify-start px-4 py-3 bg-gray-50 sm:px-6 shadow sm:rounded-bl-md sm:rounded-br-md">
+            <div class="flex items-center justify-start px-4 py-3 bg-gray-50 dark:bg-gray-900 px-6 shadow rounded-lg rounded-lg">
                 <form class="w-full" @submit.prevent="uploadFile">
                     <div class="w-full">
                         <div class="flex items-center">

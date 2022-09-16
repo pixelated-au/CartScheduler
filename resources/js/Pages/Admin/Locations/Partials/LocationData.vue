@@ -64,7 +64,7 @@
 
     <!-- Requires Brother -->
     <div class="col-span-6 sm:col-span-4">
-        <div class="font-medium text-sm text-gray-700">
+        <div class="font-medium text-gray-700 dark:text-gray-100">
             Requires Brother to be on shifts for this location?
         </div>
         <HorizontalRadioButtons name="role" v-model="form.requires_brother" :options="[
@@ -76,7 +76,7 @@
 
     <!-- Location Status -->
     <div class="col-span-6 sm:col-span-4">
-        <div class="font-medium text-sm text-gray-700">
+        <div class="font-medium text-gray-700 dark:text-gray-100">
             Location Status
         </div>
         <HorizontalRadioButtons name="is-enabled" v-model="form.is_enabled" :options="[

@@ -7,7 +7,7 @@
     import JetSectionBorder from '@/Jetstream/SectionBorder.vue'
     //https://vue3datepicker.com/
     import Datepicker from '@vuepic/vue-datepicker'
-    import { computed, defineProps, ref } from 'vue'
+    import { computed, defineProps, inject, ref } from 'vue'
 
     const props = defineProps({
         modelValue: Object,
@@ -63,6 +63,9 @@
 
         emit('delete', props.index)
     }
+
+    const darkMode = inject('darkMode', false)
+
 </script>
 
 <template>
@@ -87,7 +90,8 @@
                         :id="`shift-range-${fieldUnique}`"
                         :enable-seconds="false"
                         :clearable="false"
-                        :minutes-increment="5"/>
+                        :minutes-increment="5"
+                        :dark="darkMode"/>
             <JetInputError :message="errors[`shifts.${index}.start_time`]" class="mt-2"/>
             <JetInputError :message="errors[`shifts.${index}.end_time`]" class="mt-2"/>
         </div>
@@ -103,7 +107,8 @@
                         :id="`available-from-${fieldUnique}`"
                         :close-on-auto-apply="false"
                         :enable-seconds="false"
-                        :minutes-grid-increment="5"/>
+                        :minutes-grid-increment="5"
+                        :dark="darkMode"/>
             <JetInputError :message="errors[`shifts.${index}.available_from`]" class="mt-2"/>
 
         </div>
@@ -114,7 +119,8 @@
                         v-model="shift.available_to"
                         :id="`available-to-${fieldUnique}`"
                         :enable-seconds="false"
-                        :minutes-grid-increment="5"/>
+                        :minutes-grid-increment="5"
+                        :dark="darkMode"/>
             <JetInputError :message="errors[`shifts.${index}.available_to`]" class="mt-2"/>
         </div>
         <div class="self-end">

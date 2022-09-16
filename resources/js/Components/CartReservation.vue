@@ -60,7 +60,7 @@
 
 <template>
     <div class="p-3 grid gap-3 grid-cols-1 sm:grid-cols-[min-content_auto]">
-        <div class="bg-white dark:bg-gray-900 pb-3 justify-self-center">
+        <div class="pb-3 justify-self-center">
             <DatePicker v-model:date="date"
                         :locations="locations"
                         :user="user"

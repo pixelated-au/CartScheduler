@@ -34,7 +34,7 @@
     <AppLayout title="Users">
         <template #header>
             <div class="flex justify-between">
-                <h1 class="font-semibold text-2xl text-gray-800 leading-tight">Users</h1>
+                <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">Users</h2>
                 <div>
                     <JetButton class="mx-3" style-type="secondary" outline @click="onImportUsers">
                         Import Users
@@ -47,7 +47,7 @@
         </template>
 
         <div class="max-w-7xl mx-auto pt-10 pb-5 sm:px-6 lg:px-8">
-            <div class="bg-white shadow-xl sm:rounded-lg sm:p-6">
+            <div class="bg-white dark:bg-slate-900 shadow-xl sm:rounded-lg sm:p-6">
                 <JetLabel for="search" value="Search for a user"/>
                 <JetInput id="search" v-model="userSearch" type="text" class="mt-1 block w-full"/>
                 <JetHelpText>Search on name, email, phone, role or any field</JetHelpText>
@@ -55,7 +55,7 @@
         </div>
 
         <div class="max-w-7xl mx-auto pb-10 sm:px-6 lg:px-8">
-            <div class="bg-white shadow-xl sm:rounded-lg sm:p-6">
+            <div class="bg-white dark:bg-slate-900 shadow-xl sm:rounded-lg sm:p-6">
                 <data-table :headers="headers"
                             :items="users.data"
                             :search-value="userSearch"

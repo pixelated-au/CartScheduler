@@ -17,7 +17,8 @@
     <AppLayout :title="`Location: ${location.data.name}`">
         <template #header>
             <div class="flex justify-between">
-                <h1 class="font-semibold text-2xl text-gray-800 leading-tight">Location {{ location.data.name }}</h1>
+                <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
+                    Location {{ location.data.name }}</h2>
                 <JetButton class="mx-3" type="button" style-type="secondary" outline @click.prevent="listRouteAction">
                     Back
                 </JetButton>

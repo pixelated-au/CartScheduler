@@ -124,7 +124,7 @@
 
             <!-- Role -->
             <div class="col-span-6 sm:col-span-4">
-                <div class="font-medium text-sm text-gray-700">
+                <div class="font-medium text-gray-700 dark:text-gray-100">
                     Role
                 </div>
                 <VerticalRadioButtons name="role" v-model="form.role" :options="[
@@ -136,7 +136,7 @@
 
             <!-- Activate User -->
             <div class="col-span-6 sm:col-span-4">
-                <div class="font-medium text-sm text-gray-700">
+                <div class="font-medium text-gray-700 dark:text-gray-100">
                     Account Status
                 </div>
                 <VerticalRadioButtons name="is-enabled" v-model="form.is_enabled" :options="[
@@ -148,7 +148,7 @@
 
             <div class="col-span-6 sm:col-span-4">
                 <!-- Gender -->
-                <div class="font-medium text-sm text-gray-700">
+                <div class="font-medium text-gray-700 dark:text-gray-100">
                     Gender
                 </div>
                 <VerticalRadioButtons name="gender" v-model="form.gender" :options="[

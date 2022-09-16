@@ -38,7 +38,7 @@ module.exports = {
         'active:text-white',
         {
             pattern: /(violet|slate|green|blue|amber|purple|red)-(300|500|600|900)/,
-            variants: ['hover', 'focus'],
+            variants: ['hover', 'focus', 'dark:hover', 'dark:focus'],
         },
     ],
 

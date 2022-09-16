@@ -3,7 +3,7 @@
     import { GridComponent, LegendComponent, TitleComponent, TooltipComponent } from 'echarts/components.js'
     import { use } from 'echarts/core.js'
     import { CanvasRenderer } from 'echarts/renderers.js'
-    import { computed, provide } from 'vue'
+    import { computed, inject, provide } from 'vue'
     import VChart, { THEME_KEY } from 'vue-echarts'
 
     const props = defineProps({
@@ -12,7 +12,13 @@
 
     use([CanvasRenderer, TitleComponent, TooltipComponent, LegendComponent, BarChart, GridComponent])
 
-    provide(THEME_KEY, 'light')
+    const isDarkMode = inject('darkMode', false)
+
+    const themeKey = computed(() => {
+        return isDarkMode.value ? 'dark' : 'light'
+    })
+
+    provide(THEME_KEY, themeKey)
     // provide(THEME_KEY, {
     //     color: ['#3398DB'],
     //     backgroundColor: '#fff',

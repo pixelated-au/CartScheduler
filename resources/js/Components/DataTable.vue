@@ -55,6 +55,7 @@
     --easy-table-row-border: none;
     --easy-table-body-item-padding: .8rem 15px;
 
+    --easy-table-body-row-background-color: transparent;
     --easy-table-body-row-hover-background-color: v-bind(rowHoverColor);
     --easy-table-body-row-hover-font-color: var(--tw-bg-900);
 
@@ -105,6 +106,27 @@
                 &:last-child {
                     @apply rounded-b-lg;
                 }
+            }
+        }
+    }
+}
+
+.dark .data-table {
+    --tw-dark-text-col: rgb(243 244 246);
+    --tw-bg-200: rgb(71 85 105);
+
+    --easy-table-header-background-color: rgb(51 65 85);
+    --easy-table-header-font-color: rgb(243 244 246);
+    --easy-table-body-row-font-color: rgb(243 244 246);
+    --easy-table-body-row-hover-background-color: v-bind(rowHoverColor);
+    --easy-table-body-row-hover-font-color: rgb(243 244 246);
+    --easy-table-footer-background-color: transparent;
+    --easy-table-footer-font-color: var(--tw-dark-text-col);
+
+    .vue3-easy-data-table__footer {
+        .buttons-pagination {
+            .item.button.active {
+                border-color: var(--easy-table-buttons-pagination-border) !important;
             }
         }
     }

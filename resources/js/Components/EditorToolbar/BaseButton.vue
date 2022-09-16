@@ -40,7 +40,7 @@
 <template>
     <button type="button"
             v-tooltip="tooltip"
-            class="rounded-sm p-1.5 mx-0.5 first:ml-0 border border-white last:mr-0 hover:bg-slate-300 hover:border-gray-400"
+            class="rounded-sm p-1.5 mx-0.5 first:ml-0 border border-white last:mr-0 hover:bg-slate-300 hover:border-gray-400 dark:border-gray-500 dark:hover:bg-slate-700 dark:hover:border-gray-600"
             @click="actionCall">
         <slot></slot>
     </button>

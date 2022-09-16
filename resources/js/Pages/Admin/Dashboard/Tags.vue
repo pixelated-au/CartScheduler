@@ -63,28 +63,32 @@
 </script>
 
 <template>
-    <div class="col-span-full bg-gray-100 p-6 rounded-lg shadow-lg grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+    <div class="col-span-full bg-gray-100 dark:bg-slate-700 p-6 rounded-lg shadow-lg grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
         <div>
             <h3 class="text-lg font-semibold text-gray-900">
-                <span class="text-gray-600">{{ allTags.length }}</span>
-                <span class="text-gray-500 ml-1">Tags</span>
+                <span class="text-gray-600 dark:text-gray-200">{{ allTags.length }}</span>
+                <span class="text-gray-500 dark:text-gray-300 ml-1">Tags</span>
             </h3>
-            <p class="text-gray-700">Total number of tags in the system.</p>
-            <p class="text-gray-700"><em>Used for quickly filling out reports.</em></p>
+            <p class="text-gray-700 dark:text-gray-300">Total number of tags in the system.</p>
+            <p class="text-gray-700 dark:text-gray-300"><em>Used for quickly filling out reports.</em></p>
         </div>
         <div class="px-3">
             <SlickList axis="xy" v-model:list="allTags">
                 <SlickItem v-for="(tag, i) in allTags"
                            :key="tag.id"
                            :index="i"
-                           class="inline-flex items-center mr-2 mb-2 border border-1 border-gray-400 rounded">
+                           class="inline-flex items-center mr-2 mb-2 border border-1 border-gray-400 dark:border-gray-500 rounded">
                     <div v-handle class="px-1 cursor-grab">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16">
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                             viewBox="0 0 24 24"
+                             width="16"
+                             height="16"
+                             class="dark:fill-gray-100">
                             <path fill="none" d="M0 0h24v24H0z"/>
                             <path d="M12 3c-.825 0-1.5.675-1.5 1.5S11.175 6 12 6s1.5-.675 1.5-1.5S12.825 3 12 3zm0 15c-.825 0-1.5.675-1.5 1.5S11.175 21 12 21s1.5-.675 1.5-1.5S12.825 18 12 18zm0-7.5c-.825 0-1.5.675-1.5 1.5s.675 1.5 1.5 1.5 1.5-.675 1.5-1.5-.675-1.5-1.5-1.5z"/>
                         </svg>
                     </div>
-                    <button class="px-2 py-1 focus:outline-none focus:border-gray-900 focus:ring focus:ring-gray-300 leading-none hover:bg-gray-600 hover:text-gray-100 active:bg-gray-900"
+                    <button class="px-2 py-1 focus:outline-none dark:text-gray-100 focus:border-gray-900 dark:focus:border-slate-200 focus:ring focus:ring-gray-300 dark:focus:ring-gray-700 leading-none hover:bg-gray-600 hover:text-gray-100 active:bg-gray-900 dark:hover:bg-slate-400 dark:hover:text-gray-800 dark:active:bg-gray-200"
                             @click="selectTag(tag)">
                         {{ tag.name }}
                     </button>
@@ -92,7 +96,7 @@
             </SlickList>
         </div>
         <div class="px-6">
-            <h4>Add new Tag</h4>
+            <h4 class="dark:text-gray-100">Add new Tag</h4>
             <JetLabel for="name" value="Name"/>
             <form class="flex flex-wrap" @submit.prevent="addTag">
                 <JetInput id="name" v-model="currentTag.name" type="text" class="w-full mb-3" autocomplete="name"/>
@@ -103,7 +107,11 @@
                                type="button"
                                style-type="warning"
                                @click.prevent="showDeleteModal = true">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16">
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                             viewBox="0 0 24 24"
+                             width="16"
+                             height="16"
+                             class="fill-red-600 dark:fill-red-400">
                             <path fill="none" d="M0 0h24v24H0z"/>
                             <path d="M17 6h5v2h-2v13a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V8H2V6h5V3a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v3zm1 2H6v12h12V8zm-4.586 6l1.768 1.768-1.414 1.414L12 15.414l-1.768 1.768-1.414-1.414L10.586 14l-1.768-1.768 1.414-1.414L12 12.586l1.768-1.768 1.414 1.414L13.414 14zM9 4v2h6V4H9z"/>
                         </svg>
@@ -124,7 +132,11 @@
                                    type="button"
                                    style-type="secondary"
                                    @click.prevent="currentTag = {}">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16">
+                            <svg xmlns="http://www.w3.org/2000/svg"
+                                 viewBox="0 0 24 24"
+                                 width="16"
+                                 height="16"
+                                 class="dark:fill-gray-100">
                                 <path fill="none" d="M0 0h24v24H0z"/>
                                 <path d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10zm0-2a8 8 0 1 0 0-16 8 8 0 0 0 0 16zm0-9.414l2.828-2.829 1.415 1.415L13.414 12l2.829 2.828-1.415 1.415L12 13.414l-2.828 2.829-1.415-1.415L10.586 12 7.757 9.172l1.415-1.415L12 10.586z"/>
                             </svg>
