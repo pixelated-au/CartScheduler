@@ -28,6 +28,13 @@ jobs:
       run: |
         mkdir -p database
         touch database/database.sqlite
+    - name: Setup Node.js
+      uses: actions/setup-node@v2-beta
+      with:
+        node-version: 16
+        check-latest: true
+    - name: Install NPM dependencies
+      run: npm install
     - name: Compile front-end assets
       run: npm run build
     - name: Execute tests (Unit and Feature tests) via PHPUnit
