@@ -79,7 +79,7 @@
                 </template>
                 <template v-slot="{location}">
                     <div class="w-full">
-                        <div v-html="location.description" class="w-full p-3 pt-0"></div>
+                        <div v-html="location.description" class="w-full p-3 pt-0 dark:text-gray-100"></div>
                         <div class="w-full grid gap-x-2 gap-y-4" :class="gridCols[location.max_volunteers]">
                             <template v-for="shift in location.filterShifts" :key="shift.id">
                                 <div class="self-center pl-3 dark:text-gray-100">
