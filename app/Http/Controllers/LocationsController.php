@@ -37,8 +37,9 @@ class LocationsController extends Controller
     {
         $data = $request->validated();
         DB::beginTransaction();
+        $shifts = $request->validated('shifts');
+        unset($data['shifts']);
         $location = Location::create($data);
-        $shifts   = $request->validated('shifts');
         foreach ($shifts as $shift) {
             $shiftModel = new Shift();
             $shiftModel->fill($shift);
