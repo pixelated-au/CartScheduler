@@ -1,0 +1,43 @@
+name: Laravel
+
+on:
+  push:
+    branches: [ "master" ]
+    tags:
+      - "v*"
+
+jobs:
+  tar-release:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install Dependencies
+        run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist --ignore-platform-req=php+
+      - name: Directory Permissions
+        run: chmod -R 777 storage bootstrap/cache
+      - name: Setup Node.js
+        uses: actions/setup-node@v2-beta
+        with:
+          node-version: 16
+          check-latest: true
+      - name: Install NPM dependencies
+        run: npm install
+      - name: Compile front-end assets
+        run: npm run build
+      - name: Archive Release
+        uses: thedoctor0/zip-release@main
+        with:
+          type: 'tar'
+          filename: 'release.tar.gz'
+          exclusions: '*.git* /*node_modules/* .editorconfig'
+
+  create-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Upload Release
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: "release.tar.gz"
+          token: ${{ secrets.GITHUB_TOKEN }}
