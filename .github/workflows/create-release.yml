@@ -29,11 +29,6 @@ jobs:
           type: 'zip'
           filename: 'release.zip'
           exclusions: '*.git* /*node_modules/* .editorconfig /resources/css /resources/js /queries'
-
-  create-release:
-    needs: zip-release
-    runs-on: ubuntu-latest
-    steps:
       - name: Upload Release
         uses: ncipollo/release-action@v1
         with:
