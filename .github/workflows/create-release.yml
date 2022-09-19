@@ -28,7 +28,7 @@ jobs:
         with:
           type: 'zip'
           filename: 'release.zip'
-          exclusions: '*.git* /*node_modules/* .editorconfig /*resources/css/* /*resources/js/* /*queries/*'
+          exclusions: '*.git* /*node_modules/* .editorconfig vite.config.js /*resources/css/* /*resources/js/* /*queries/* /*storage/debugbar/* /*database/factories/* /*database/seeders/* /*tests/*'
       - name: Upload Release
         uses: ncipollo/release-action@v1
         with:
