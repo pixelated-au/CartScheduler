@@ -48,10 +48,10 @@
 
         <JetValidationErrors class="mb-4"/>
 
-        <h1 class="font-semibold text-xl text-gray-800 leading-tight mb-3">
-            Welcome {{ editUser.name }}, to {{ siteName }} Public Witnessing! </h1>
+        <h1 class="font-semibold text-xl text-gray-800 dark:text-gray-100 leading-tight mb-3">
+            Welcome {{ editUser.name }}, to {{ siteName }}! </h1>
 
-        <div>Please use the below form to set your password</div>
+        <div class="text-gray-200">Please use the below form to set your password</div>
 
         <form @submit.prevent="submit">
             <div class="mt-4">
