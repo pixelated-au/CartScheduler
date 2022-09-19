@@ -1,8 +1,7 @@
-name: Laravel
+name: Laravel Release
 
 on:
   push:
-    branches: [ "master" ]
     tags:
       - "v*"
 
