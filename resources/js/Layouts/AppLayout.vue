@@ -40,7 +40,7 @@
                         <div class="flex">
                             <!-- Logo -->
                             <div class="shrink-0 flex items-center">
-                                <Link :href="route('dashboard')">
+                                <Link :href="route('dashboard')" class="dark:bg-white/10 rounded p-1">
                                     <JetApplicationMark class="block h-9 w-auto"/>
                                 </Link>
                             </div>

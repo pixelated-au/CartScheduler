@@ -8,7 +8,7 @@
     import JetLabel from '@/Jetstream/Label.vue'
     import JetValidationErrors from '@/Jetstream/ValidationErrors.vue'
     import { Head, Link, useForm, usePage } from '@inertiajs/inertia-vue3'
-    import { computed } from 'vue'
+    import { computed, onMounted } from 'vue'
 
     defineProps({
         canResetPassword: Boolean,
@@ -16,8 +16,8 @@
     })
 
     const form = useForm({
-        email: 'admin@example.com',
-        password: 'password',
+        email: '',
+        password: '',
         remember: true,
     })
 
@@ -31,6 +31,13 @@
     }
 
     const setPasswordSuccess = computed(() => usePage().props.value.jetstream.flash?.setPassword || '')
+
+    onMounted(() => {
+        if (import.meta.env.DEV) {
+            form.email = 'admin@example.com'
+            form.password = 'password'
+        }
+    })
 
 </script>
 

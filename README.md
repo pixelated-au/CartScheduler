@@ -1,12 +1,25 @@
 # CartApp
 
-## Email Testing
+***
 
-For development, the system uses [MailHog](https://github.com/mailhog/MailHog) that can be accessed
-at http://localhost:8025. All emails sent from the system
-will be available in this interface.
+# Please Note, these directions assume you are a developer and understand advanced concepts such as hosting, setting up a database, and using the command line. If these concepts are foreign to you, please find someone who can help you.
+
+***
 
 ## Deployment
+
+### cPanel Hosting
+
+cPanel Hosting is a little problematic because the root domain typically needs to be served from the
+directory `~/public_html`. This means the default laravel directory structure which is served
+from `/public`. If you are serving from an addon domain, it's easier because you can setup a directory structure to
+suit. For example, you could setup a domain `mydomain.example.com` and set the directory
+to `~/mydomain.example.com/public`.
+
+To get some advice on bypassing this use this
+resource: https://filippotoso.medium.com/how-to-host-a-laravel-app-on-a-cpanel-shared-hosting-a45793be73c3
+
+### Standard Deployment
 
 To deploy a release requires the following steps:
 
@@ -28,6 +41,14 @@ To deploy a release requires the following steps:
     - `php artisan key:generate`
 1. Run the following command to migrate/install the database:
     - `php artisan migrate`
+1. Setup the cron job to run the following command every minute:
+    - `php artisan schedule:run >> /dev/null 2>&1`
+
+## Email Testing
+
+For development, the system uses [MailHog](https://github.com/mailhog/MailHog) that can be accessed
+at http://localhost:8025. All emails sent from the system
+will be available in this interface.
 
 ## Notes:
 

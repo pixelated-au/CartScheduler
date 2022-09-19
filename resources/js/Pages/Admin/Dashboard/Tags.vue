@@ -57,7 +57,10 @@
         showDeleteModal.value = false
     }
 
-    watch(allTags, async () => {
+    watch(allTags, async (val, oldVal) => {
+        if (!oldVal || !val.length) {
+            return
+        }
         await axios.put('/admin/report-tag-sort-order', { ids: allTags.value.map(tag => tag.id) })
     })
 </script>
