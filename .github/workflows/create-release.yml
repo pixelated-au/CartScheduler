@@ -7,7 +7,7 @@ on:
       - "v*"
 
 jobs:
-  tar-release:
+  zip-release:
 
     runs-on: ubuntu-latest
 
@@ -29,9 +29,9 @@ jobs:
       - name: Archive Release
         uses: thedoctor0/zip-release@main
         with:
-          type: 'tar'
-          filename: 'release.tar.gz'
-          exclusions: '*.git* /*node_modules/* .editorconfig'
+          type: 'zip'
+          filename: 'release.zip'
+          exclusions: '*.git* /*node_modules/* .editorconfig /resources/css /resources/js /queries'
 
   create-release:
     runs-on: ubuntu-latest
@@ -39,5 +39,5 @@ jobs:
       - name: Upload Release
         uses: ncipollo/release-action@v1
         with:
-          artifacts: "release.tar.gz"
+          artifacts: "release.zip"
           token: ${{ secrets.GITHUB_TOKEN }}
