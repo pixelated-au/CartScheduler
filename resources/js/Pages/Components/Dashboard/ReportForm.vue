@@ -127,7 +127,7 @@
         <div class="sm:col-span-2 mb-3 text-left">
             <JetLabel :for="`${fieldUnique}-comments`" value="Comments"/>
             <textarea :id="`${fieldUnique}-comments`"
-                      class="border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 rounded-md shadow-sm w-full h-40"
+                      class="border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 rounded-md shadow-sm w-full h-40 dark:bg-slate-800 dark:border-slate-700 dark:text-white"
                       v-model="formData.comments"/>
             <div class="text-sm">{{ commentsRemainingCharacters }} characters remaining</div>
             <JetInputError :message="errorMessages.comments" class="mt-2"/>
