@@ -238,6 +238,10 @@
 $dp__cell_size: auto;
 @import '@vuepic/vue-datepicker/src/VueDatePicker/style/main.scss';
 
+.dp__theme_dark {
+    --dp-background-color: #1E293B;
+}
+
 .dp__main.dp__flex_display {
     width: 100%;
     @media (min-width: 460px) and (max-width: 639px) {
@@ -276,10 +280,4 @@ $dp__cell_size: auto;
         }
     }
 }
-
-/*@media (min-width: 640px) { ... }
-md	768px	@media (min-width: 768px) { ... }
-lg	1024px	@media (min-width: 1024px) { ... }
-xl	1280px	@media (min-width: 1280px) { ... }
-2xl	1536px	@media (min-width: 1536px) { ... }*/
 </style>
