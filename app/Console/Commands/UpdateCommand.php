@@ -21,13 +21,14 @@ class UpdateCommand extends Command
 
     public function handle(): void
     {
+        $this->info('Checking for updates...');
         // Check if new version is available
         if (!$this->updater->source()->isNewVersionAvailable()) {
             $this->info('No new version available');
 
             return;
         }
-        
+
         // Get the current installed version
         $current = $this->updater->source()->getVersionInstalled();
         $this->info("Current version: $current");
