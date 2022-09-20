@@ -27,12 +27,14 @@ class UpdateCommand extends Command
 
             return;
         }
+        
         // Get the current installed version
-        $this->info('Current version: ' . $this->updater->source()->getVersionInstalled());
+        $current = $this->updater->source()->getVersionInstalled();
+        $this->info("Current version: $current");
 
         // Get the new version available
-        $versionAvailable = $this->updater->source()->getVersionAvailable();
-        $this->info('New version: ' . $versionAvailable);
+        $new = $this->updater->source()->getVersionAvailable();
+        $this->info('New version: ' . $new);
 
         if (config('app.env') !== 'production') {
             $this->warn('Not in production, aborting update');
@@ -43,9 +45,10 @@ class UpdateCommand extends Command
         $this->info('Updating...');
 
         // Create a release
-        $release = $this->updater->source()->fetch($versionAvailable);
+        $release = $this->updater->source()->fetch($new);
 
         // Run the update process
         $this->updater->source()->update($release);
+        $this->info("Finished! Updated from $current to $new");
     }
 }

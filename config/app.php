@@ -3,7 +3,7 @@
 use Illuminate\Support\Facades\Facade;
 
 return [
-
+    'foo' => 'bar',
     /*
     |--------------------------------------------------------------------------
     | Application Name
