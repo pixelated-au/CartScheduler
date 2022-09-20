@@ -235,5 +235,51 @@
 </template>
 
 <style lang="scss">
+$dp__cell_size: auto;
 @import '@vuepic/vue-datepicker/src/VueDatePicker/style/main.scss';
+
+.dp__main.dp__flex_display {
+    width: 100%;
+    @media (min-width: 460px) and (max-width: 639px) {
+        width: 80%;
+        margin: 0 auto;
+    }
+    @media only screen and (max-width: 639px) {
+        flex-direction: column !important;
+    }
+
+}
+
+.dp__calendar_header {
+    width: 100%;
+
+    .dp__calendar_header_item {
+        flex: 1 1 0;
+        margin: 0 2px;
+    }
+}
+
+.dp__calendar {
+    width: 100%;
+
+    .dp__calendar_item {
+        flex: 1 1 0;
+        margin: 0 2px;
+
+        .dp__cell_inner {
+            @media (max-width: 500px) {
+                min-height: calc(100vw / 9);
+            }
+            @media (min-width: 500px) and (max-width: 639px) {
+                min-height: calc(100vw / 10);
+            }
+        }
+    }
+}
+
+/*@media (min-width: 640px) { ... }
+md	768px	@media (min-width: 768px) { ... }
+lg	1024px	@media (min-width: 1024px) { ... }
+xl	1280px	@media (min-width: 1280px) { ... }
+2xl	1536px	@media (min-width: 1536px) { ... }*/
 </style>

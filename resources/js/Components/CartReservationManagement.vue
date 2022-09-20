@@ -77,7 +77,7 @@
 
 <template>
     <div class="grid gap-3 grid-cols-1 sm:grid-cols-[min-content_auto]">
-        <div class="pb-3 md:pb-0 justify-self-center">
+        <div class="pb-3 md:pb-0">
             <DatePicker can-view-historical
                         v-model:date="date"
                         :locations="locations"
