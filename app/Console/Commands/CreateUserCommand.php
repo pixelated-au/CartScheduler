@@ -23,6 +23,7 @@ class CreateUserCommand extends Command
 
             return;
         }
+
         $user               = new User();
         $user->uuid         = Str::uuid()->toString();
         $user->name         = $this->argument('name');
