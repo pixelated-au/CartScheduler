@@ -139,10 +139,10 @@
                             </div>
 
                             <div>
-                                <div class="font-medium text-base text-gray-800">
+                                <div class="font-medium text-base text-gray-800 dark:text-gray-100">
                                     {{ $page.props.user.name }}
                                 </div>
-                                <div class="font-medium text-sm text-gray-500">
+                                <div class="font-medium text-sm text-gray-500 dark:text-gray-300">
                                     {{ $page.props.user.email }}
                                 </div>
                             </div>
