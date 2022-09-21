@@ -8,6 +8,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use stdClass;
 
 class AvailableShiftsForMonthController extends Controller
 {
@@ -43,9 +44,22 @@ class AvailableShiftsForMonthController extends Controller
                     ->where('shifts.is_enabled', true)
                     ->where('locations.is_enabled', true)
                     ->get()
+                    ->map(fn(stdClass $shift) => [
+                        'shift_date'     => $shift->shift_date,
+                        'shift_id'       => $shift->shift_id,
+                        'volunteer_id'   => $shift->volunteer_id,
+                        'start_time'     => $shift->start_time,
+                        'location_id'    => $shift->location_id,
+                        'available_from' => Carbon::parse($shift->available_from),
+                        'available_to'   => Carbon::parse($shift->available_to),
+                        'max_volunteers' => $shift->max_volunteers,
+                    ])
                     ->groupBy(['shift_date', 'shift_id'])
                     ->sortKeys();
 
-        return ['shifts' => $shifts, 'locations' => LocationResource::collection($locations)];
+        return [
+            'shifts'    => $shifts,
+            'locations' => LocationResource::collection($locations)
+        ];
     }
 }

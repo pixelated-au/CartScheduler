@@ -1,7 +1,7 @@
 <script setup>
     //https://vue3datepicker.com/
     import Datepicker from '@vuepic/vue-datepicker'
-    import { addDays, addMonths, endOfMonth, formatISO, isAfter, isBefore, parseISO, startOfDay, startOfMonth, subMonths } from 'date-fns'
+    import { addDays, addMonths, endOfDay, endOfMonth, formatISO, isAfter, isBefore, parseISO, startOfDay, startOfMonth, subMonths } from 'date-fns'
     import { computed, defineEmits, defineProps, inject, onMounted, ref, watchEffect } from 'vue'
 
     const props = defineProps({
@@ -80,10 +80,10 @@
                 let volunteerCount = 0
                 for (let i = 0; i < shifts.length; i++) {
                     const shift = shifts[i]
-                    if (isAfter(isoDate, parseISO(shift.available_from))) {
+                    if (isBefore(isoDate, startOfDay(parseISO(shift.available_from)))) {
                         break
                     }
-                    if (isBefore(isoDate, parseISO(shift.available_to))) {
+                    if (isAfter(isoDate, endOfDay(parseISO(shift.available_to)))) {
                         break
                     }
                     if (i === 0) {
