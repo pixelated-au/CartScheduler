@@ -7,7 +7,7 @@ use Illuminate\Console\Command;
 
 class UpdateCommand extends Command
 {
-    protected $signature = 'update';
+    protected $signature = 'update {--force : Force update}';
 
     protected              $description = 'CLI update';
     private UpdaterManager $updater;
@@ -21,12 +21,20 @@ class UpdateCommand extends Command
 
     public function handle(): void
     {
+        $doForce = $this->option('force');
+
         $this->info('Checking for updates...');
         // Check if new version is available
         if (!$this->updater->source()->isNewVersionAvailable()) {
-            $this->warn('No new version available. Aborting.');
+            if ($doForce) {
+                $this->warn('No new updates available. Forcing an update...');
 
-            return;
+            } else {
+                $this->warn('No updates available. Use --force to force update.');
+
+                return;
+            }
+
         }
 
         // Get the current installed version
@@ -39,8 +47,12 @@ class UpdateCommand extends Command
 
         if (version_compare($new, $current, '>')) {
             $this->info('Versions are not the same. Updating...');
+
+        } elseif ($doForce) {
+            $this->info('Versions are the same. Forcing update...');
+
         } else {
-            $this->info('The new version is older. Aborting.');
+            $this->warn('Versions are the same. Aborting.');
 
             return;
         }
