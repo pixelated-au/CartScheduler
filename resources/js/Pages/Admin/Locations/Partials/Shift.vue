@@ -103,6 +103,7 @@
             <JetLabel :for="`available-from-${fieldUnique}`" value="Available From"/>
             <Datepicker auto-apply
                         enable-time-picker
+                        format="dd/MM/yyyy HH:mm"
                         v-model="shift.available_from"
                         :id="`available-from-${fieldUnique}`"
                         :close-on-auto-apply="false"
@@ -116,6 +117,7 @@
             <JetLabel :for="`available-to-${fieldUnique}`" value="Available To"/>
             <Datepicker auto-apply
                         enable-time-picker
+                        format="dd/MM/yyyy HH:mm"
                         v-model="shift.available_to"
                         :id="`available-to-${fieldUnique}`"
                         :enable-seconds="false"
