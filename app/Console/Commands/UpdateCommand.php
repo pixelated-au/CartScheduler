@@ -24,7 +24,7 @@ class UpdateCommand extends Command
         $this->info('Checking for updates...');
         // Check if new version is available
         if (!$this->updater->source()->isNewVersionAvailable()) {
-            $this->info('No new version available');
+            $this->warn('No new version available. Aborting.');
 
             return;
         }
@@ -36,6 +36,14 @@ class UpdateCommand extends Command
         // Get the new version available
         $new = $this->updater->source()->getVersionAvailable();
         $this->info('New version: ' . $new);
+
+        if (version_compare($new, $current, '>')) {
+            $this->info('Versions are not the same. Updating...');
+        } else {
+            $this->info('The new version is older. Aborting.');
+
+            return;
+        }
 
         if (config('app.env') !== 'production') {
             $this->warn('Not in production, aborting update');
@@ -52,18 +60,23 @@ class UpdateCommand extends Command
         $this->updater->source()->update($release);
 
         $this->info('Updating configuration to new version...');
-        $this->setEnv('SELF_UPDATER_VERSION_INSTALLED', $new);
+        $this->setEnv($current, $new);
         $this->call('config:cache'); // Clear config cache
+
+        $this->info('DB Migration starting...');
+        $this->call('migrate', ['--force' => true]); // Run migrations
+        $this->info('DB Migration done');
+        $this->call('cache:clear'); // Clear cache
 
         $this->info("Finished! Updated from $current to $new");
     }
 
-    private function setEnv(string $key, string $value): void
+    private function setEnv(string $old, string $new): void
     {
-        /** @noinspection LaravelFunctionsInspection */
+        $key = 'SELF_UPDATER_VERSION_INSTALLED';
         file_put_contents(app()->environmentFilePath(), str_replace(
-            $key . '=' . env($value),
-            $key . '=' . $value,
+            $key . '=' . $old,
+            $key . '=' . $new,
             file_get_contents(app()->environmentFilePath())
         ));
     }
