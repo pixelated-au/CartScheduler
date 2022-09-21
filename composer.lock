@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "9480e3d38b082df4871a39e81720f011",
+    "content-hash": "37bc8e973dfcb2971b546bdd7ad4ad19",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -118,16 +118,16 @@
         },
         {
             "name": "codedge/laravel-selfupdater",
-            "version": "dev-updatelaravelversion",
+            "version": "dev-dev/github-release-files",
             "source": {
                 "type": "git",
                 "url": "https://github.com/pixelated-au/laravel-selfupdater.git",
-                "reference": "2b17bd450ff184438f4bab5fd24a73b2ab705fdc"
+                "reference": "af3dd4145ad3589fd616aa8c158cb5c1dd94d533"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pixelated-au/laravel-selfupdater/zipball/2b17bd450ff184438f4bab5fd24a73b2ab705fdc",
-                "reference": "2b17bd450ff184438f4bab5fd24a73b2ab705fdc",
+                "url": "https://api.github.com/repos/pixelated-au/laravel-selfupdater/zipball/af3dd4145ad3589fd616aa8c158cb5c1dd94d533",
+                "reference": "af3dd4145ad3589fd616aa8c158cb5c1dd94d533",
                 "shasum": ""
             },
             "require": {
@@ -173,7 +173,7 @@
             },
             "scripts": {
                 "phpstan": [
-                    "./vendor/bin/phpstan"
+                    "./vendor/bin/phpstan --memory-limit=1G"
                 ],
                 "test": [
                     "./vendor/bin/phpunit"
@@ -214,7 +214,7 @@
                     "url": "https://github.com/codedge"
                 }
             ],
-            "time": "2022-09-20T02:37:37+00:00"
+            "time": "2022-09-21T01:22:33+00:00"
         },
         {
             "name": "dasprid/enum",
