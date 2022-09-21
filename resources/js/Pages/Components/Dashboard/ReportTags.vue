@@ -21,7 +21,7 @@
 </script>
 
 <template>
-    <div class="inline-flex">
+    <div class="inline-flex flex-wrap">
         <ReportTagButton v-for="tag in tags" :key="tag.id" :name="tag.name" @toggled="handleToggle(tag.name, $event)"/>
     </div>
 </template>

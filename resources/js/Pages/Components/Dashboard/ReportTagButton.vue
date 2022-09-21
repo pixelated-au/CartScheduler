@@ -25,7 +25,7 @@
 </script>
 
 <template>
-    <button class="px-2.5 py-0.5 mr-1 rounded-full text-sm font-medium" :class="classes" @click="toggleActive">
+    <button class="px-2.5 py-0.5 mr-1 mb-1 rounded-full text-sm font-medium" :class="classes" @click="toggleActive">
             <span>
                 {{ name }}
             </span>
