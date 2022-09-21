@@ -71,8 +71,8 @@ class AvailableShiftsForMonthController extends Controller
                         'volunteer_id'   => $shift->volunteer_id,
                         'start_time'     => $shift->start_time,
                         'location_id'    => $shift->location_id,
-                        'available_from' => Carbon::parse($shift->available_from),
-                        'available_to'   => Carbon::parse($shift->available_to),
+                        'available_from' => $shift->available_from ? Carbon::parse($shift->available_from) : null,
+                        'available_to'   => $shift->available_to ? Carbon::parse($shift->available_to) : null,
                         'max_volunteers' => $shift->max_volunteers,
                     ])
                     ->groupBy(['shift_date', 'shift_id'])
