@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Resources\LocationResource;
 use App\Models\Location;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -22,10 +23,22 @@ class AvailableShiftsForMonthController extends Controller
             ? Carbon::today()->subMonths(6)->startOfMonth()
             : Carbon::today();
         $monthEnd   = $monthStart->copy()->addMonth()->endOfMonth();
-
-        $locations = Location::with([
-            'shifts.users'
-        ])->get();
+        $locations  = Location::with([
+            'shifts' => function (HasMany $query) {
+                $query->where('shifts.is_enabled', true);
+                $query->where(function ($query) {
+                    $query->whereNull('shifts.available_from');
+                    $query->orWhere('shifts.available_from', '<=', Carbon::today());
+                });
+                $query->where(function ($query) {
+                    $query->whereNull('shifts.available_to');
+                    $query->orWhere('shifts.available_to', '>=', Carbon::today());
+                });
+            },
+            'shifts.users',
+        ])
+                              ->where('is_enabled', true)
+                              ->get();
 
         $shifts = DB::query()
                     ->select('shift_user.shift_date',
@@ -42,6 +55,14 @@ class AvailableShiftsForMonthController extends Controller
                     ->where('shift_date', '>=', $monthStart)
                     ->where('shift_date', '<=', $monthEnd)
                     ->where('shifts.is_enabled', true)
+                    ->where(function ($query) {
+                        $query->whereNull('shifts.available_from');
+                        $query->orWhere('shifts.available_from', '<=', Carbon::today());
+                    })
+                    ->where(function ($query) {
+                        $query->whereNull('shifts.available_to');
+                        $query->orWhere('shifts.available_to', '>=', Carbon::today());
+                    })
                     ->where('locations.is_enabled', true)
                     ->get()
                     ->map(fn(stdClass $shift) => [
