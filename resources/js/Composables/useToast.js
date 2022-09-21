@@ -4,7 +4,7 @@ import { useToast as ut } from 'vue-toastification'
 
 const options = {
     position: 'top-center',
-    timeout: 5000,
+    timeout: 2000,
     closeOnClick: true,
     pauseOnFocusLoss: true,
     pauseOnHover: true,
