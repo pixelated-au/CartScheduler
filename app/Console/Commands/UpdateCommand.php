@@ -58,8 +58,9 @@ class UpdateCommand extends Command
         $this->info("Finished! Updated from $current to $new");
     }
 
-    private function setEnv($key, $value)
+    private function setEnv(string $key, string $value): void
     {
+        /** @noinspection LaravelFunctionsInspection */
         file_put_contents(app()->environmentFilePath(), str_replace(
             $key . '=' . env($value),
             $key . '=' . $value,
