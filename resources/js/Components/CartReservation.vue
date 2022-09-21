@@ -56,6 +56,8 @@
 
     const setLocationMarkers = locations => locationsOnDays.value = locations
     const isMyShift = location => flagDate.value?.location === location.id
+
+    const formatTime = time => time.replace(/:00$/, '')
 </script>
 
 <template>
@@ -83,7 +85,7 @@
                         <div class="w-full grid gap-x-2 gap-y-4" :class="gridCols[location.max_volunteers]">
                             <template v-for="shift in location.filterShifts" :key="shift.id">
                                 <div class="self-center pl-3 dark:text-gray-100">
-                                    {{ shift.start_time }} - {{ shift.end_time }}
+                                    {{ formatTime(shift.start_time) }} - {{ formatTime(shift.end_time) }}
                                 </div>
                                 <div v-for="(volunteer, index) in shift.filterVolunteers"
                                      :key="index"
