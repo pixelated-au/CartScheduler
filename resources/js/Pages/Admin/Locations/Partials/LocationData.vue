@@ -90,12 +90,14 @@
     <div class="col-span-6 sm:col-span-4 md:col-span-3">
         <JetLabel for="latitude" value="Location Latitude"/>
         <JetInput id="latitude" v-model="form.latitude" type="number" inputmode="decimal" class="mt-1 block w-full"/>
+        <div class="text-xs text-yellow-500">Not in use</div>
         <JetInputError :message="form.errors.latitude" class="mt-2"/>
     </div>
     <!-- Maximum Volunteers -->
     <div class="col-span-6 sm:col-span-4 md:col-span-3">
         <JetLabel for="longitude" value="Location Longitude"/>
         <JetInput id="longitude" v-model="form.longitude" type="number" inputmode="decimal" class="mt-1 block w-full"/>
+        <div class="text-xs text-yellow-500">Not in use</div>
         <JetInputError :message="form.errors.longitude" class="mt-2"/>
     </div>
 

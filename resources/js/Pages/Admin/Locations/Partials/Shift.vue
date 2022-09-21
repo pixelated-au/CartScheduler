@@ -110,6 +110,7 @@
                         :enable-seconds="false"
                         :minutes-grid-increment="5"
                         :dark="darkMode"/>
+            <div class="text-xs text-gray-500">Optional</div>
             <JetInputError :message="errors[`shifts.${index}.available_from`]" class="mt-2"/>
 
         </div>
@@ -123,6 +124,7 @@
                         :enable-seconds="false"
                         :minutes-grid-increment="5"
                         :dark="darkMode"/>
+            <div class="text-xs text-gray-500">Optional</div>
             <JetInputError :message="errors[`shifts.${index}.available_to`]" class="mt-2"/>
         </div>
         <div class="self-end">
