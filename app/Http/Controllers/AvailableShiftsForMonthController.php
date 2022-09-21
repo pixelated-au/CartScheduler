@@ -23,7 +23,9 @@ class AvailableShiftsForMonthController extends Controller
             ? Carbon::today()->subMonths(6)->startOfMonth()
             : Carbon::today();
         $monthEnd   = $monthStart->copy()->addMonth()->endOfMonth();
-        $locations  = Location::with([
+
+        // Locations are the list of locations in the 'accordion' menu
+        $locations = Location::with([
             'shifts' => function (HasMany $query) {
                 $query->where('shifts.is_enabled', true);
                 $query->where(function ($query) {
@@ -34,12 +36,14 @@ class AvailableShiftsForMonthController extends Controller
                     $query->whereNull('shifts.available_to');
                     $query->orWhere('shifts.available_to', '>=', Carbon::today());
                 });
+                $query->orderBy('shifts.start_time');
             },
             'shifts.users',
         ])
-                              ->where('is_enabled', true)
-                              ->get();
+                             ->where('is_enabled', true)
+                             ->get();
 
+        // Shifts are the locked in shifts for all users. In the future, it may be worth considering caching this...
         $shifts = DB::query()
                     ->select('shift_user.shift_date',
                         'shift_user.shift_id',
