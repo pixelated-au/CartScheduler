@@ -2,6 +2,11 @@
 
 declare(strict_types=1);
 
+use Codedge\Updater\Notifications\Notifiable;
+use Codedge\Updater\Notifications\Notifications\UpdateAvailable;
+use Codedge\Updater\Notifications\Notifications\UpdateFailed;
+use Codedge\Updater\Notifications\Notifications\UpdateSucceeded;
+
 return [
 
     /*
@@ -48,6 +53,7 @@ return [
             'download_path'        => env('SELF_UPDATER_DOWNLOAD_PATH', '/tmp'),
             'private_access_token' => env('SELF_UPDATER_GITHUB_PRIVATE_ACCESS_TOKEN', ''),
             'use_branch'           => env('SELF_UPDATER_USE_BRANCH', ''),
+            'package_file_name'    => env('SELF_UPDATER_PACKAGE_FILE_NAME'),
         ],
         'gitlab' => [
             'type'                 => 'gitlab',
@@ -55,14 +61,14 @@ return [
             'download_path'        => env('SELF_UPDATER_DOWNLOAD_PATH', '/tmp'),
             'private_access_token' => env('SELF_UPDATER_GITLAB_PRIVATE_ACCESS_TOKEN', ''),
         ],
-        'http' => [
+        'http'   => [
             'type'                 => 'http',
             'repository_url'       => env('SELF_UPDATER_REPO_URL', ''),
             'pkg_filename_format'  => env('SELF_UPDATER_PKG_FILENAME_FORMAT', 'v_VERSION_'),
             'download_path'        => env('SELF_UPDATER_DOWNLOAD_PATH', '/tmp'),
             'private_access_token' => env('SELF_UPDATER_HTTP_PRIVATE_ACCESS_TOKEN', ''),
         ],
-        'gitea' => [
+        'gitea'  => [
             'type'                 => 'gitea',
             'repository_vendor'    => env('SELF_UPDATER_REPO_VENDOR', ''),
             'gitea_url'            => env('SELF_UPDATER_GITEA_URL', ''),
@@ -118,16 +124,16 @@ return [
 
     'notifications' => [
         'notifications' => [
-            \Codedge\Updater\Notifications\Notifications\UpdateSucceeded::class => ['mail'],
-            \Codedge\Updater\Notifications\Notifications\UpdateFailed::class    => ['mail'],
-            \Codedge\Updater\Notifications\Notifications\UpdateAvailable::class => ['mail'],
+            UpdateSucceeded::class => ['mail'],
+            UpdateFailed::class    => ['mail'],
+            UpdateAvailable::class => ['mail'],
         ],
 
         /*
          * Here you can specify the notifiable to which the notifications should be sent. The default
          * notifiable will use the variables specified in this config file.
          */
-        'notifiable' => \Codedge\Updater\Notifications\Notifiable::class,
+        'notifiable'    => Notifiable::class,
 
         'mail' => [
             'to' => [
@@ -149,7 +155,7 @@ return [
     */
 
     'artisan_commands' => [
-        'pre_update' => [
+        'pre_update'  => [
             //'command:signature' => [
             //    'class' => Command class
             //    'params' => []
