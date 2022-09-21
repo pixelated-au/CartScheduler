@@ -50,6 +50,20 @@ class UpdateCommand extends Command
 
         // Run the update process
         $this->updater->source()->update($release);
+
+        $this->info('Updating configuration to new version...');
+        $this->setEnv('SELF_UPDATER_VERSION_INSTALLED', $new);
+        $this->call('config:cache'); // Clear config cache
+
         $this->info("Finished! Updated from $current to $new");
+    }
+
+    private function setEnv($key, $value)
+    {
+        file_put_contents(app()->environmentFilePath(), str_replace(
+            $key . '=' . env($value),
+            $key . '=' . $value,
+            file_get_contents(app()->environmentFilePath())
+        ));
     }
 }
