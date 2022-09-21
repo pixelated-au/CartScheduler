@@ -3,7 +3,7 @@
 use Illuminate\Support\Facades\Facade;
 
 return [
-    'foo' => 'bar',
+    'is_https' => env('FORCE_HTTPS', false),
     /*
     |--------------------------------------------------------------------------
     | Application Name
