@@ -7,7 +7,7 @@
     import useToast from '@/Composables/useToast'
     import useLocationFilter from '@/Pages/Admin/Locations/Composables/useLocationFilter'
     import DatePicker from '@/Pages/Components/Dashboard/DatePicker.vue'
-    import { isSameDay } from 'date-fns'
+    import { format, isSameDay, parse } from 'date-fns'
     // noinspection ES6UnusedImports
     import { VTooltip } from 'floating-vue'
     import { computed, ref } from 'vue'
@@ -57,7 +57,8 @@
     const setLocationMarkers = locations => locationsOnDays.value = locations
     const isMyShift = location => flagDate.value?.location === location.id
 
-    const formatTime = time => time.replace(/:00$/, '')
+    const today = new Date()
+    const formatTime = time => format(parse(time, 'HH:mm:ss', today), 'hh:mm a')
 </script>
 
 <template>

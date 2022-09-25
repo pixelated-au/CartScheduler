@@ -10,7 +10,7 @@
     import useLocationFilter from '@/Pages/Admin/Locations/Composables/useLocationFilter'
     import DatePicker from '@/Pages/Components/Dashboard/DatePicker.vue'
     import axios from 'axios'
-    import { format } from 'date-fns'
+    import { format, parse } from 'date-fns'
     // noinspection ES6UnusedImports
     import { VTooltip } from 'floating-vue'
     import { ref } from 'vue'
@@ -73,6 +73,9 @@
             getShifts()
         }
     }
+
+    const today = new Date()
+    const formatTime = time => format(parse(time, 'HH:mm:ss', today), 'hh:mm a')
 </script>
 
 <template>
@@ -94,7 +97,7 @@
                     <div class="w-full grid gap-x-2 gap-y-4" :class="gridCols[location.max_volunteers]">
                         <template v-for="shift in location.filterShifts" :key="shift.id">
                             <div class="self-center pl-3 dark:text-gray-100">
-                                {{ shift.start_time }} - {{ shift.end_time }}
+                                {{ formatTime(shift.start_time) }} - {{ formatTime(shift.end_time) }}
                             </div>
                             <div v-for="(volunteer, index) in shift.filterVolunteers"
                                  :key="index"
