@@ -1,8 +1,8 @@
 <script setup>
-    import CartReservation from '@/Components/CartReservation.vue'
     import Bell from '@/Components/Icons/Bell.vue'
     import JetButton from '@/Jetstream/Button.vue'
     import AppLayout from '@/Layouts/AppLayout.vue'
+    import CartReservation from '@/Pages/Components/Dashboard/CartReservation.vue'
     import ReportsModal from '@/Pages/Components/Dashboard/ReportsModal.vue'
     import { computed, ref } from 'vue'
 
