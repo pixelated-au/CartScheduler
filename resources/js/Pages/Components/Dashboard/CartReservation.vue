@@ -69,6 +69,7 @@
                         :user="user"
                         :marker-dates="serverDates"
                         @locations-for-day="setLocationMarkers"/>
+            <div class="text-sm text-gray-500 text-center">Blue squares indicate free shifts</div>
         </div>
         <div class="text-sm">
             <Accordion :items="locations" label="name" uid="id">
