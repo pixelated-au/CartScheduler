@@ -75,7 +75,7 @@
     }
 
     const today = new Date()
-    const formatTime = time => format(parse(time, 'HH:mm:ss', today), 'hh:mm a')
+    const formatTime = time => format(parse(time, 'HH:mm:ss', today), 'h:mm a')
 </script>
 
 <template>
