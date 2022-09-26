@@ -19,6 +19,7 @@ class MissingReportsForUserController extends Controller
                                          }
 
                                          return true;
-                                     });
+                                     })
+                                     ->values();
     }
 }

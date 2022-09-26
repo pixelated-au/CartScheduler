@@ -24,7 +24,10 @@
 
     const getData = async () => {
         try {
-            const [reportsResponse, tagsResponse] = await Promise.all([axios.get('/outstanding-reports'), axios.get('/get-report-tags')])
+            const [reportsResponse, tagsResponse] = await Promise.all([
+                axios.get('/outstanding-reports'),
+                axios.get('/get-report-tags'),
+            ])
             outstandingReports.value = reportsResponse.data
             emit('has-outstanding-reports', outstandingReports.value.length)
 
