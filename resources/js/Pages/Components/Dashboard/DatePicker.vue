@@ -65,7 +65,7 @@
                 continue
             }
             let freeShiftCount = 0
-            let foundAtLocation = 0
+            const foundAtLocation = []
             const shiftDateGroup = props.markerDates[date]
 
             const isoDate = parseISO(date)
@@ -91,7 +91,7 @@
                     }
                     volunteerCount++
                     if (shift.volunteer_id === props.user?.id) {
-                        foundAtLocation = shift.location_id
+                        foundAtLocation.push(shift.location_id)
                     }
                 }
                 if (volunteerCount < maxVolunteers) {
@@ -101,13 +101,13 @@
             if (freeShiftCount > 0) {
                 highlighted.push(isoDate)
             }
-            if (foundAtLocation) {
+            if (foundAtLocation.length) {
                 marks.push({
                     date: isoDate,
                     type: 'line',
                     color: '#0E9F6E',
                     tooltip: [{ text: `You have a shift`, color: '#0E9F6E' }],
-                    location: foundAtLocation,
+                    locations: foundAtLocation,
                 })
             }
         }
@@ -129,7 +129,7 @@
         markers.value = marks
         highlights.value = highlighted
 
-        emit('locations-for-day', marks.map(marker => ({ location: marker.location, date: marker.date })))
+        emit('locations-for-day', marks.map(marker => ({ locations: marker.locations, date: marker.date })))
     })
 </script>
 <template>

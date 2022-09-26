@@ -52,10 +52,12 @@
     }
 
     const locationsOnDays = ref([])
-    const flagDate = computed(() => locationsOnDays.value.find(location => isSameDay(location.date, date.value)))
+    const flagDates = computed(() => locationsOnDays.value.filter(location => isSameDay(location.date, date.value)))
 
     const setLocationMarkers = locations => locationsOnDays.value = locations
-    const isMyShift = location => flagDate.value?.location === location.id
+    const isMyShift = location => {
+        return flagDates.value?.findIndex(d => d?.locations.includes(location.id)) >= 0
+    }
 
     const today = new Date()
     const formatTime = time => format(parse(time, 'HH:mm:ss', today), 'hh:mm a')
