@@ -43,7 +43,7 @@
             day_saturday: false,
             day_sunday: false,
             start_time: '00:00:00',
-            end_time: '12:00:00',
+            end_time: '20:00:00',
             available_from: null,
             available_to: null,
         })
