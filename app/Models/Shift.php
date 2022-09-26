@@ -3,10 +3,12 @@
 namespace App\Models;
 
 use Database\Factories\ShiftFactory;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Support\Carbon;
 
 /**
  * @method ShiftFactory factory()
@@ -49,6 +51,22 @@ class Shift extends Model
         'available_from' => 'datetime',
         'available_to'   => 'datetime',
     ];
+
+    protected function availableFrom(): Attribute
+    {
+        return Attribute::make(
+            get: static fn(?string $value) => $value ? Carbon::parse($value)->format('Y-m-d') : null,
+            set: static fn(?string $value) => $value ? Carbon::parse($value)->startOfDay() : null,
+        );
+    }
+
+    protected function availableTo(): Attribute
+    {
+        return Attribute::make(
+            get: static fn(?string $value) => $value ? Carbon::parse($value)->format('Y-m-d') : null,
+            set: static fn(?string $value) => $value ? Carbon::parse($value)->endOfDay() : null,
+        );
+    }
 
     public function location(): BelongsTo
     {

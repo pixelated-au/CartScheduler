@@ -57,8 +57,8 @@ class UpdateLocationRequest extends FormRequest
             'shifts.*.end_time.date_format'           => 'Please use the format HH:mm:ss',
             'shifts.*.available_from.date'            => "The 'available from' date must be a valid date and time",
             'shifts.*.available_to.date'              => "The 'available to' date must be a valid date and time",
-            'shifts.*.available_from.before_or_equal' => "The 'available from' date must be before the 'available to' date",
-            'shifts.*.available_to.after_or_equal'    => "The 'available to' date must be after the 'available from' date",
+            'shifts.*.available_from.before_or_equal' => "The 'available from' date must be before or the same as the 'available to' date",
+            'shifts.*.available_to.after_or_equal'    => "The 'available to' date must be after or the same the 'available from' date",
         ];
     }
 

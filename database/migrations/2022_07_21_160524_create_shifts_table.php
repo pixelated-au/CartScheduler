@@ -19,8 +19,8 @@ return new class extends Migration {
             $table->boolean('day_sunday')->default(false);
             $table->time('start_time');
             $table->time('end_time');
-            $table->date('available_from')->nullable();
-            $table->date('available_to')->nullable();
+            $table->dateTime('available_from')->nullable();
+            $table->dateTime('available_to')->nullable();
             $table->boolean('is_enabled')->nullable();
             $table->timestamps();
             $table->softDeletes();

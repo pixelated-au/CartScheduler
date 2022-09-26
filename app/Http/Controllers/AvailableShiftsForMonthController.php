@@ -28,21 +28,12 @@ class AvailableShiftsForMonthController extends Controller
         $locations = Location::with([
             'shifts' => function (HasMany $query) {
                 $query->where('shifts.is_enabled', true);
-                $query->where(function ($query) {
-                    $query->whereNull('shifts.available_from');
-                    $query->orWhere('shifts.available_from', '<=', Carbon::today());
-                });
-                $query->where(function ($query) {
-                    $query->whereNull('shifts.available_to');
-                    $query->orWhere('shifts.available_to', '>=', Carbon::today());
-                });
                 $query->orderBy('shifts.start_time');
             },
             'shifts.users',
         ])
                              ->where('is_enabled', true)
                              ->get();
-
         // Shifts are the locked in shifts for all users. In the future, it may be worth considering caching this...
         $shifts = DB::query()
                     ->select('shift_user.shift_date',

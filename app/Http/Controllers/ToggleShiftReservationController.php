@@ -15,8 +15,7 @@ class ToggleShiftReservationController extends Controller
 {
     public function __invoke(Request $request, DoShiftReservation $doShiftReservation)
     {
-        $data = $this->getValidated($request);
-
+        $data      = $this->getValidated($request);
         $shiftDate = Carbon::parse($data['date']);
 
         $location = Location::with([
@@ -58,7 +57,8 @@ class ToggleShiftReservationController extends Controller
                         $theShift   = Shift::find($data['shift']);
                         $shiftStart = $theShift->start_time;
                         $shiftEnd   = $theShift->end_time;
-                        $foundMatch = $currentShiftsOnDate->first(fn(ShiftUser $currentShift) => $currentShift->shift->start_time >= $shiftStart && $currentShift->shift->end_time <= $shiftEnd);
+                        $foundMatch = $currentShiftsOnDate->first(fn(ShiftUser $currentShift
+                        ) => $currentShift->shift->start_time >= $shiftStart && $currentShift->shift->end_time <= $shiftEnd);
                         if ($foundMatch) {
                             $fail("Sorry, You already have another shift at this time on this day at {$foundMatch->shift->location->name}.");
                         }

@@ -1,4 +1,4 @@
-import { isAfter, isBefore } from 'date-fns'
+import { isAfter, isBefore, parse, parseISO } from 'date-fns'
 import formatISO from 'date-fns/formatISO'
 import { cloneDeep } from 'lodash'
 import { computed, onMounted, ref } from 'vue'
@@ -7,7 +7,7 @@ export default function useLocationFilter (canAdmin = false) {
     /**
      * @param {Date} date
      */
-    const date = ref(new Date())
+    const date = ref(parse('12:00:00', 'HH:mm:ss', new Date()))
 
     const serverLocations = ref([])
     const serverDates = ref([])
@@ -65,26 +65,29 @@ export default function useLocationFilter (canAdmin = false) {
 
     const addShift = (shifts, shift) => {
         if (shift.available_from) {
-            const from = new Date(shift.available_from)
+            const from = parseISO(shift.available_from)
             if (isBefore(date.value, from)) {
-                return
+                return false
             }
         }
         if (shift.available_to) {
-            const to = new Date(shift.available_to)
+            // const to = parseISO(shift.available_to)
+            const to = parseISO(`${shift.available_to}T23:59:59`)
             if (isAfter(date.value, to)) {
-                return
+                return false
             }
         }
         shifts.push(shift)
+        return true
     }
 
     const addLocation = (mappedLocations, location, shift) => {
         const alreadyAddedLocation = mappedLocations.find(l => l.id === location.id)
         if (!alreadyAddedLocation) {
             location.filterShifts = []
-            addShift(location.filterShifts, shift)
-            mappedLocations.push(location)
+            if (addShift(location.filterShifts, shift)) {
+                mappedLocations.push(location)
+            }
         } else {
             if (!alreadyAddedLocation.filterShifts.find(s => s.id === shift.id)) {
                 addShift(alreadyAddedLocation.filterShifts, shift)

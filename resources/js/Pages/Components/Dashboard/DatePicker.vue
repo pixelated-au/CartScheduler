@@ -1,7 +1,7 @@
 <script setup>
     //https://vue3datepicker.com/
     import Datepicker from '@vuepic/vue-datepicker'
-    import { addDays, addMonths, endOfDay, endOfMonth, formatISO, isAfter, isBefore, parseISO, startOfDay, startOfMonth, subMonths } from 'date-fns'
+    import { addDays, addMonths, endOfDay, endOfMonth, formatISO, isAfter, isBefore, parse, parseISO, startOfDay, startOfMonth, subMonths } from 'date-fns'
     import { computed, defineEmits, defineProps, inject, onMounted, ref, watchEffect } from 'vue'
 
     const props = defineProps({
@@ -24,7 +24,7 @@
             return props.date
         },
         set (value) {
-            emit('update:date', value)
+            emit('update:date', parse('12:00:00', 'HH:mm:ss', value))
         },
     })
 
