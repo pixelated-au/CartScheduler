@@ -59,6 +59,8 @@ To deploy a release requires the following steps:
     - `php artisan migrate`
 1. Setup the cron job to run the following command every minute:
     - `php artisan schedule:run >> /dev/null 2>&1`
+        - eg: `* * * * * cd /home/[MY_ACCOUNT]/[MY_APP] && php artisan schedule:run >> /dev/null 2>&1`
+          <- Note, you may need to replace `php` with `ea-php81` if you're using cPanel
 1. Create the admin user. Note, this can only be run once.:
     - `php artisan carts:create-user <name> <email> <phone> <gender> [<password>]`
 1. Navigate to the site and login with the admin user you just created.
