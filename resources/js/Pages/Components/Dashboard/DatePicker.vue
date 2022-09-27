@@ -135,6 +135,7 @@
 <template>
     <Datepicker inline
                 auto-apply
+                no-swipe
                 prevent-min-max-navigation
                 :enable-time-picker="false"
                 v-model="selectedDate"
