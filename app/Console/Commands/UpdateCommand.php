@@ -78,7 +78,7 @@ class UpdateCommand extends Command
         $this->info('DB Migration starting...');
         $this->call('migrate', ['--force' => true]); // Run migrations
         $this->info('DB Migration done');
-        $this->call('cache:clear'); // Clear cache
+        $this->call('optimize:clear'); // Clear cache
 
         $this->info("Finished! Updated from $current to $new");
     }
