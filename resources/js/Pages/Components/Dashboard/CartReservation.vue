@@ -22,10 +22,10 @@
 
     const gridCols = {
         // See tailwind.config.js
-        1: 'grid-cols-reservation-1',
-        2: 'grid-cols-reservation-2',
-        3: 'grid-cols-reservation-3',
-        4: 'grid-cols-reservation-4',
+        1: 'grid-cols-sm-reservation-1 sm:grid-cols-reservation-1',
+        2: 'grid-cols-sm-reservation-2 sm:grid-cols-reservation-2',
+        3: 'grid-cols-sm-reservation-3 sm:grid-cols-reservation-3',
+        4: 'grid-cols-sm-reservation-4 sm:grid-cols-reservation-4',
     }
 
     const toggleReservation = async (locationId, shiftId, toggleOn) => {
@@ -88,7 +88,7 @@
                         <div v-html="location.description" class="w-full p-3 pt-0 dark:text-gray-100"></div>
                         <div class="w-full grid gap-x-2 gap-y-4" :class="gridCols[location.max_volunteers]">
                             <template v-for="shift in location.filterShifts" :key="shift.id">
-                                <div class="self-center pl-3 dark:text-gray-100">
+                                <div class="self-center pl-3 dark:text-gray-100 sm:pr-4">
                                     {{ formatTime(shift.start_time) }} - {{ formatTime(shift.end_time) }}
                                 </div>
                                 <div v-for="(volunteer, index) in shift.filterVolunteers"
