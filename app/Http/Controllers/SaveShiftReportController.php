@@ -38,7 +38,7 @@ class SaveShiftReportController extends Controller
         $report->comments                 = $request->get('comments');
         $report->save();
 
-        $report->syncTagsWithType($request->get('tags', []), 'reports');
+        $report->attachTags($request->get('tags', []), 'reports');
 
         return response()->json(['message' => 'Report saved successfully']);
     }
