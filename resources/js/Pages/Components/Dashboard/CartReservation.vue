@@ -86,14 +86,14 @@
                 <template v-slot="{location}">
                     <div class="w-full">
                         <div v-html="location.description" class="w-full p-3 pt-0 dark:text-gray-100"></div>
-                        <div class="w-full grid gap-x-2 gap-y-4" :class="gridCols[location.max_volunteers]">
+                        <div class="w-full grid gap-x-2 gap-y-2 sm:gap-y-4" :class="gridCols[location.max_volunteers]">
                             <template v-for="shift in location.filterShifts" :key="shift.id">
-                                <div class="self-center pl-3 dark:text-gray-100 sm:pr-4">
+                                <div class="self-center pl-3 sm:pr-4 pt-4 dark:text-gray-100">
                                     {{ formatTime(shift.start_time) }} - {{ formatTime(shift.end_time) }}
                                 </div>
                                 <div v-for="(volunteer, index) in shift.filterVolunteers"
                                      :key="index"
-                                     class="self-center justify-self-center">
+                                     class="self-center justify-self-center pt-4">
                                     <template v-if="volunteer">
                                         <button v-if="volunteer.id === user.id"
                                                 type="button"
@@ -114,8 +114,7 @@
                                         <EmptySlot v-tooltip="'Tap to reserve this shift'"/>
                                     </button>
                                 </div>
-                                <div></div>
-                                <div class="col-span-full bg-slate-200 dark:bg-slate-700 dark:text-gray-50 rounded px-3 py-2">
+                                <div class="col-span-full bg-slate-200 dark:bg-slate-700 dark:text-gray-50 rounded px-3 sm:py-2">
                                     <ul>
                                         <li v-for="(volunteer, index) in shift.filterVolunteers"
                                             :key="index"
