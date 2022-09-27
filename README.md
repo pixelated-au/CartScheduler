@@ -16,33 +16,55 @@ from `/public`. If you are serving from an addon domain, it's easier because you
 suit. For example, you could setup a domain `mydomain.example.com` and set the directory
 to `~/mydomain.example.com/public`.
 
-To get some advice on bypassing this use this
-resource: https://filippotoso.medium.com/how-to-host-a-laravel-app-on-a-cpanel-shared-hosting-a45793be73c3
+To get some advice on bypassing this, here are some resources:
+
+- https://hafizmohammed.medium.com/how-to-deploy-laravel-in-cpanel-the-right-way-78d0a767d5a2
+- https://filippotoso.medium.com/how-to-host-a-laravel-app-on-a-cpanel-shared-hosting-a45793be73c3
 
 ### Standard Deployment
 
 To deploy a release requires the following steps:
 
 1. Download the release from the [releases page](https://github.com/pixelated-au/CartApp/releases)
-2. Extract the release to a folder on the server
+1. Extract the release to a folder on the server
+1. *Note: Make sure you are running PHP 8.1 or higher*
 1. Unzip the release.
     - If using cPanel, you can do this via the File Manager
 1. Copy the `.env.example` file to `.env` and update the values as required.
-2. SSH into the server if you haven't yet already.
-2. Run the following command for Composer. Note, you'll need PHP 8.1 installed on the server.
-    - cPanel: `ea-php81 /opt/cpanel/composer/bin/composer install --optimize-autoloader --no-dev`
-    - Regular: `composer install --optimize-autoloader --no-dev`
-2. Run the following command to enable the Laravel cache:
-    - `php artisan config:cache`
-    - `php artisan route:cache`
-    - `php artisan view:cache`
-    - `php artisan event:cache`
-    - `php artisan storage:link`
-    - `php artisan key:generate`
+    - For cPanel, you can often use sendmail as the mail server. The following settings often work in the mail section:
+    - ```dotenv
+      MAIL_MAILER=sendmail
+      MAIL_HOST=localhost
+      ``` 
+1. SSH into the server if you haven't yet already.
+1. Run the following command to enable the Laravel cache:
+    ```bash
+    php artisan key:generate \
+    && php artisan config:cache \
+    && php artisan route:cache \
+    && php artisan view:cache \
+    && php artisan event:cache \
+    && php artisan storage:link
+    ```
+1. Or for cPanel, if the default system PHP version is not PHP 8.1, you may be able to use the following:
+    ```bash
+    ea-php81 artisan key:generate \
+    && ea-php81 artisan config:cache \
+    && ea-php81 artisan route:cache \
+    && ea-php81 artisan view:cache \
+    && ea-php81 artisan event:cache \
+    && ea-php81 artisan storage:link
+    ```
 1. Run the following command to migrate/install the database:
     - `php artisan migrate`
 1. Setup the cron job to run the following command every minute:
     - `php artisan schedule:run >> /dev/null 2>&1`
+1. Create the admin user. Note, this can only be run once.:
+    - `php artisan carts:create-user <name> <email> <phone> <gender> [<password>]`
+1. Navigate to the site and login with the admin user you just created.
+    - If you are having a server issue (eg 500 error), review the log file at `storage/logs/laravel.log`.
+    - If you have this issue: `Your serialized closure might have been modified or it's unsafe to be unserialized`,
+      you may need to run the following command: `php artisan route:clear`
 
 ## Email Testing
 
