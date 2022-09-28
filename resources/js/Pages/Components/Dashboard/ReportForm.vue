@@ -93,8 +93,10 @@
             <JetLabel :for="`${fieldUnique}-cancelled`" value="Shift was Canceled"/>
         </div>
 
-        <div class="sm:col-span-2 mb-3 text-left">
+        <div class="sm:col-span-2 mb-4 text-left">
+            <div class="block font-medium mb-2">Quick Tags</div>
             <ReportTags @toggled="formData.tags = $event"/>
+            <div class="text-sm text-gray-500">Select any relevant tags</div>
         </div>
 
         <div class="mb-3 text-left text-left">
