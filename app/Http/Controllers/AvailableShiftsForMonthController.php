@@ -34,6 +34,7 @@ class AvailableShiftsForMonthController extends Controller
         ])
                              ->where('is_enabled', true)
                              ->get();
+
         // Shifts are the locked in shifts for all users. In the future, it may be worth considering caching this...
         $shifts = DB::query()
                     ->select('shift_user.shift_date',

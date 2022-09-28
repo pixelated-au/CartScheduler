@@ -6,6 +6,7 @@ use App\Actions\DoShiftReservation;
 use App\Models\Location;
 use App\Models\Shift;
 use App\Models\ShiftUser;
+use Carbon\CarbonPeriod;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Http\Request;
@@ -47,20 +48,31 @@ class ToggleShiftReservationController extends Controller
                 'exists:shifts,id',
                 function ($attribute, $value, $fail) use ($request) {
                     $data = $request->all();
+                    // only validate if adding a shift
                     if ($data['do_reserve']) {
-                        $shiftDate           = Carbon::parse($data['date']);
-                        $currentShiftsOnDate = ShiftUser::with(['shift', 'shift.location'])
-                                                        ->where('user_id', $request->user()->id)
-                                                        ->where('shift_date', $shiftDate->toDateString())
-                                                        ->get();
-                        // only validate if adding a shift
-                        $theShift   = Shift::find($data['shift']);
-                        $shiftStart = $theShift->start_time;
-                        $shiftEnd   = $theShift->end_time;
-                        $foundMatch = $currentShiftsOnDate->first(fn(ShiftUser $currentShift
-                        ) => $currentShift->shift->start_time >= $shiftStart && $currentShift->shift->end_time <= $shiftEnd);
-                        if ($foundMatch) {
-                            $fail("Sorry, You already have another shift at this time on this day at {$foundMatch->shift->location->name}.");
+                        $shiftDate        = Carbon::parse($data['date']);
+                        $userShiftsOnDate = ShiftUser::with(['shift', 'shift.location'])
+                                                     ->where('user_id', $request->user()->id)
+                                                     ->where('shift_date', $shiftDate->toDateString())
+                                                     ->get();
+
+                        $requestedShift       = Shift::find($data['shift']);
+                        $requestedShiftPeriod = CarbonPeriod::create(
+                            $requestedShift->start_time,
+                            $requestedShift->end_time
+                        );
+
+                        $foundOverlappingShift = $userShiftsOnDate->first(
+                            fn(ShiftUser $currentShift) => $requestedShiftPeriod->overlaps(CarbonPeriod::create(
+                                $currentShift->shift->start_time,
+                                $currentShift->shift->end_time
+                            ))
+                        );
+
+                        if ($foundOverlappingShift) {
+                            $start = Carbon::parse($foundOverlappingShift->shift->start_time)->format('h:i a');
+                            $end   = Carbon::parse($foundOverlappingShift->shift->end_time)->format('h:i a');
+                            $fail("Sorry, you already have another shift that overlaps this shift at {$foundOverlappingShift->shift->location->name} between $start and $end.");
                         }
                     }
                 }
