@@ -9,11 +9,11 @@
 
     const enabledTags = ref([])
 
-    const handleToggle = (name, value) => {
-        if (value) {
-            enabledTags.value.push(name)
+    const handleToggle = (tagId, isEnabled) => {
+        if (isEnabled) {
+            enabledTags.value.push(tagId)
         } else {
-            enabledTags.value = enabledTags.value.filter(tag => tag !== name)
+            enabledTags.value = enabledTags.value.filter(tag => tag !== tagId)
         }
 
         emit('toggled', enabledTags.value)
@@ -22,6 +22,6 @@
 
 <template>
     <div class="inline-flex flex-wrap">
-        <ReportTagButton v-for="tag in tags" :key="tag.id" :name="tag.name" @toggled="handleToggle(tag.name, $event)"/>
+        <ReportTagButton v-for="tag in tags" :key="tag.id" :name="tag.name" @toggled="handleToggle(tag.id, $event)"/>
     </div>
 </template>

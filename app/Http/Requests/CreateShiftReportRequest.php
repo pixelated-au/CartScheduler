@@ -23,7 +23,7 @@ class CreateShiftReportRequest extends FormRequest
             'requests_count'      => ['integer'],
             'comments'            => ['string', 'max:500'],
             'tags'                => ['array'],
-            'tags.*'              => ['required', 'string'],
+            'tags.*'              => ['required', 'integer', 'exists:tags,id'],
         ];
     }
 
