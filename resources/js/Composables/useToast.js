@@ -20,16 +20,16 @@ const options = {
 export default function useToast () {
     const toast = ut()
 
-    const error = message => {
-        toast.error(message, options)
+    const error = (message, itemOptions = null) => {
+        toast.error(message, { ...options, ...itemOptions })
     }
 
-    const success = message => {
-        toast.success(message, options)
+    const success = (message, itemOptions = null) => {
+        toast.success(message, { ...options, ...itemOptions })
     }
 
-    const warning = message => {
-        toast.warning(message, options)
+    const warning = (message, itemOptions = null) => {
+        toast.warning(message, { ...options, ...itemOptions })
     }
 
     return {
