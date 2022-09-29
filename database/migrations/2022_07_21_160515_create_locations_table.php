@@ -11,8 +11,8 @@ return new class extends Migration {
             $table->id();
             $table->string('name');
             $table->longText('description');
-            $table->enum('min_volunteers', [1, 2, 3]);
-            $table->enum('max_volunteers', [1, 2, 3]);
+            $table->enum('min_volunteers', [1, 2, 3, 4]);
+            $table->enum('max_volunteers', [1, 2, 3, 4]);
             $table->boolean('requires_brother')->default(false);
             $table->string('latitude')->nullable();
             $table->string('longitude')->nullable();
