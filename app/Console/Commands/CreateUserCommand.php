@@ -28,7 +28,7 @@ class CreateUserCommand extends Command
         $user->uuid         = Str::uuid()->toString();
         $user->name         = $this->argument('name');
         $user->email        = $this->argument('email');
-        $user->password     = $this->hasArgument('password') ? bcrypt($this->argument('password')) : null;
+        $user->password     = $this->argument('password') ? bcrypt($this->argument('password')) : null;
         $user->mobile_phone = $this->argument('phone');
         $user->gender       = ($this->argument('gender') === 'male' || $this->argument('gender') === 'm') ? 'male' : 'female';
         $user->role         = 'admin';
