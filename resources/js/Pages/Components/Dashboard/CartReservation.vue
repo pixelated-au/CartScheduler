@@ -30,16 +30,16 @@
 
     const toggleReservation = async (locationId, shiftId, toggleOn) => {
         try {
-            await axios.post('/reserve-shift', {
+            const response = await axios.post('/reserve-shift', {
                 location: locationId,
                 shift: shiftId,
                 do_reserve: toggleOn,
                 date: date.value,
             })
             if (toggleOn) {
-                toast.success('Reservation made')
+                toast.success(response.data)
             } else {
-                toast.warning('Reservation removed')
+                toast.warning(response.data)
             }
             await getShifts()
 

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Actions\DoShiftReservation;
+use App\Actions\ErrorApiResource;
 use App\Models\Location;
 use App\Models\Shift;
 use App\Models\ShiftUser;
@@ -30,12 +31,16 @@ class ToggleShiftReservationController extends Controller
         $shift = $location->shifts->first();
 
         if ($data['do_reserve']) {
-            return $doShiftReservation->execute($shift, $location, $request->user()->id, $shiftDate);
+            $didReserve = $doShiftReservation->execute($shift, $location, $request->user()->id, $shiftDate);
+
+            return $didReserve ? response('Reservation made', 200)
+                : ErrorApiResource::create('No available shifts', ErrorApiResource::CODE_NO_AVAILABLE_SHIFTS, 422);
+
         }
 
         $shift->users()->detach($request->user()->id);
 
-        return response(200);
+        return response('Reservation removed', 200);
     }
 
     protected function getValidated(Request $request): array
