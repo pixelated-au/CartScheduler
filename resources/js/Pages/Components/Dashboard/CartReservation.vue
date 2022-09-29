@@ -44,7 +44,7 @@
             await getShifts()
 
         } catch (e) {
-            toast.error(e.response.data.message)
+            toast.error(e.response.data.message, { timeout: 4000 })
             if (e.response.data.error_code === 100) {
                 await getShifts()
             }
