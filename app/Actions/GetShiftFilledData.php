@@ -38,7 +38,7 @@ class GetShiftFilledData
                                       WHEN DAYOFWEEK(dates.date) = 5 THEN shifts.day_thursday
                                       WHEN DAYOFWEEK(dates.date) = 6 THEN shifts.day_friday
                                       WHEN DAYOFWEEK(dates.date) = 7 THEN shifts.day_saturday END = 1
-                            GROUP BY locations.max_volunteers) as shifts_available) AS shifts_available
+                            GROUP BY locations.id) as shifts_available) AS shifts_available
                     FROM dates
                              LEFT JOIN shift_user ON dates.date = shift_user.shift_date
                              LEFT JOIN shifts ON shifts.id = shift_user.shift_id
