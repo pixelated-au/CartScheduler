@@ -97,7 +97,8 @@
                             <ul v-if="tags?.length" class="w-full p-0 m-0 mb-3">
                                 <li v-for="(tag, i) in tags"
                                     :key="i"
-                                    class="inline-flex px-2 bg-green-200 mr-1 mb-1 rounded-full">{{ tag }}
+                                    class="inline-flex px-2 bg-green-200 dark:bg-green-800 mr-1 mb-1 rounded-full dark:text-gray-50">
+                                    {{ tag }}
                                 </li>
                             </ul>
                             <div class="flex justify-start">
