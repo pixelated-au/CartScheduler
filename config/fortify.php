@@ -137,11 +137,12 @@ return [
         // Features::emailVerification(),
         Features::updateProfileInformation(),
         Features::updatePasswords(),
-        Features::twoFactorAuthentication([
-            'confirm'         => true,
-            'confirmPassword' => true,
-            // 'window' => 0,
-        ]),
+        // Disabled 2Factor Authentication - ian
+        //Features::twoFactorAuthentication([
+        //    'confirm'         => true,
+        //    'confirmPassword' => true,
+        //    // 'window' => 0,
+        //]),
     ],
 
 ];
