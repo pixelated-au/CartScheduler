@@ -1,5 +1,6 @@
 <script setup>
     import VerticalRadioButtons from '@/Components/VerticalRadioButtons.vue'
+    import useToast from '@/Composables/useToast.js'
     import JetActionMessage from '@/Jetstream/ActionMessage.vue'
     import JetButton from '@/Jetstream/Button.vue'
     import JetConfirmationModal from '@/Jetstream/ConfirmationModal.vue'
@@ -87,6 +88,18 @@
         }
     }
 
+    const toast = useToast()
+
+    const performResendWelcomeAction = async () => {
+        try {
+            const response = await axios.post(route('admin.resend-welcome-email', { user_id: props.user.id }))
+            toast.success(response.data.message)
+        } catch (e) {
+            toast.error(e.response.data.message, { timeout: 3000 })
+        }
+
+    }
+
     const cancelButtonText = computed(() => form.isDirty ? 'Cancel' : 'Back')
 </script>
 
@@ -97,7 +110,12 @@
         </template>
 
         <template #description>
-            Update the user's personal information.
+            <div>Update the user's personal information.</div>
+            <JetButton outline class="mt-5" style-type="info" @click="performResendWelcomeAction">
+                <template v-if="user.has_logged_in">Send Password Reset Email</template>
+                <template v-else>Resend Welcome Email</template>
+            </JetButton>
+
         </template>
 
         <template #form>

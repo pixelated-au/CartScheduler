@@ -9,6 +9,7 @@ use App\Http\Controllers\MoveUserToNewShiftController;
 use App\Http\Controllers\ReportsController;
 use App\Http\Controllers\ReportTagsController;
 use App\Http\Controllers\ReportTagsSortOrderController;
+use App\Http\Controllers\ResendWelcomeEmailController;
 use App\Http\Controllers\SaveShiftReportController;
 use App\Http\Controllers\SetUserPasswordController;
 use App\Http\Controllers\ToggleShiftReservationController;
@@ -42,7 +43,7 @@ Route::get('/', static fn() => Inertia::render('Auth/Login'));
 Route::get('/set-password/{user}/{hashedEmail}', [SetUserPasswordController::class, 'show'])->name('set.password.show');
 Route::post('/set-password', [SetUserPasswordController::class, 'update'])->name('set.password.update');
 
-Route::get('/mail', static fn() => new App\Mail\UserAccountCreated(App\Models\User::find(1)));
+//Route::get('/mail', static fn() => new App\Mail\UserAccountCreated(App\Models\User::find(1)));
 
 Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified'])->group(function () {
     Route::get('/', static fn() => Inertia::render('Dashboard'))->name('dashboard');
@@ -91,6 +92,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
         ]);
         Route::put('/report-tag-sort-order', ReportTagsSortOrderController::class);
         Route::put('/move-user-to-shift', MoveUserToNewShiftController::class);
+        Route::post('/resend-welcome-email', ResendWelcomeEmailController::class)->name('admin.resend-welcome-email');
 
         //Route::get('/', static fn() => Inertia::render('Admin/Dashboard'))->name('admin.dashboard');
 

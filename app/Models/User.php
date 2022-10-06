@@ -77,6 +77,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $appends = [
+        'has_logged_in', // Used to determine if the user has logged in before by checking the password field
         'profile_photo_url',
     ];
 
@@ -101,6 +102,18 @@ class User extends Authenticatable
                 $value = preg_replace('/\D+/', '', $value); // remove all non-digits
 
                 return preg_replace('/^614/', '04', $value); // If the number starts with 614, replace with 04
+            },
+        );
+    }
+
+    /**
+     * @noinspection PhpUnused
+     */
+    protected function hasLoggedIn(): Attribute
+    {
+        return Attribute::make(
+            get: static function ($value, $attributes) {
+                return isset($attributes['password']) && $attributes['password'];
             },
         );
     }
