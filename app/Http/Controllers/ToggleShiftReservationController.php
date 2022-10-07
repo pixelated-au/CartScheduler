@@ -38,7 +38,7 @@ class ToggleShiftReservationController extends Controller
 
         }
 
-        $shift->users()->detach($request->user()->id);
+        $shift->users()->wherePivot('shift_date', '=', $shiftDate->format('Y-m-d'))->detach($request->user()->id);
 
         return response('Reservation removed', 200);
     }
