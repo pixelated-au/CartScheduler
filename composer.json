@@ -10,6 +10,7 @@
     "require": {
         "php": "^8.1.0",
         "ext-zip": "*",
+        "bugsnag/bugsnag-laravel": "^2.0",
         "codedge/laravel-selfupdater": "dev-dev/github-release-files",
         "guzzlehttp/guzzle": "^7.2",
         "inertiajs/inertia-laravel": "^0.5.2",
