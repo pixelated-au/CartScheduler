@@ -1,3 +1,5 @@
+import Bugsnag from '@bugsnag/js'
+import BugsnagPluginVue from '@bugsnag/plugin-vue'
 import { createInertiaApp } from '@inertiajs/inertia-vue3'
 import { InertiaProgress } from '@inertiajs/progress'
 
@@ -14,16 +16,29 @@ import './bootstrap'
 
 const appName = window.document.getElementsByTagName('title')[0]?.innerText || 'Laravel'
 
+const bugsnagKey = import.meta.env.VITE_BUGSNAG_FRONT_END_API_KEY
+
+if (bugsnagKey) {
+    Bugsnag.start({
+        apiKey: bugsnagKey, plugins: [new BugsnagPluginVue()],
+    })
+}
+
 // noinspection JSIgnoredPromiseFromCall
 createInertiaApp({
     title: (title) => `${title} - ${appName}`,
     resolve: (name) => resolvePageComponent(`./Pages/${name}.vue`, import.meta.glob('./Pages/**/*.vue')),
     setup ({ el, app, props, plugin }) {
-        return createApp({ render: () => h(app, props) })
+        const vueApp = createApp({ render: () => h(app, props) })
             .use(plugin)
             .use(ZiggyVue)
             .use(Toast)
-            .mount(el)
+
+        if (bugsnagKey) {
+            vueApp.use(Bugsnag.getPlugin('vue'))
+        }
+        vueApp.mount(el)
+        return vueApp
     },
 })
 

@@ -7,12 +7,20 @@
     import DarkMode from '@/Layouts/Components/DarkMode.vue'
     import ProfileSettingsMenu from '@/Layouts/Components/ProfileSettingsMenu.vue'
     import TeamsMenu from '@/Layouts/Components/TeamsMenu.vue'
+    import Bugsnag from '@bugsnag/js'
     import { Head, Link, usePage } from '@inertiajs/inertia-vue3'
-    import { computed, provide, ref } from 'vue'
+    import { computed, onMounted, provide, ref } from 'vue'
 
     defineProps({
         title: String,
         user: Object,
+    })
+
+    onMounted(() => {
+        const user = usePage().props.value.user
+        if (user && user.id) {
+            Bugsnag.setUser(user.id, user.email, user.name)
+        }
     })
 
     const showingNavigationDropdown = ref(false)
