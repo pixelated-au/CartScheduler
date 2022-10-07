@@ -3,7 +3,7 @@
     import EmptySlot from '@/Components/Icons/EmptySlot.vue'
     import Female from '@/Components/Icons/Female.vue'
     import Male from '@/Components/Icons/Male.vue'
-    import SelectField from '@/Components/SelectField.vue'
+    import MoveUserSelectField from '@/Components/MoveUserSelectField.vue'
     import useToast from '@/Composables/useToast'
     import JetButton from '@/Jetstream/Button.vue'
     import JetConfirmModal from '@/Jetstream/ConfirmationModal.vue'
@@ -35,22 +35,6 @@
 
     const setLocationMarkers = locations => locationsOnDays.value = locations
 
-    const hasShiftsForTime = (shiftTime, locationId) =>
-        !!emptyShiftsForTime.value?.find((shiftData) =>
-            shiftTime === shiftData.time && locationId !== shiftData.locationId)
-
-    const shiftsForTime = (shiftTime, locationId) => emptyShiftsForTime.value
-        ?.filter((shiftData) => shiftTime === shiftData.time && locationId !== shiftData.locationId)
-        ?.map(({ location, locationId, currentVolunteers }) => {
-            const label = location
-
-            const volunteers = currentVolunteers.map(volunteer => {
-                const prefix = volunteer.gender === 'male' ? 'Bro' : 'Sis'
-                return `${prefix} ${volunteer.name}`
-            })
-            return { label, volunteers, id: locationId }
-        })
-
     const selectedMoveUser = ref(null)
 
     const promptMoveUser = (selection, volunteer, shift) => selectedMoveUser.value = { selection, volunteer, shift }
@@ -66,7 +50,6 @@
             })
             toast.success('User was moved!')
         } catch (e) {
-            console.log(e)
             toast.error(e.response.data.message)
 
         } finally {
@@ -121,24 +104,11 @@
                                                     {{ volunteer.name }}
                                                 </div>
                                                 <div class="w-full md:w-auto">
-                                                    <template v-if="hasShiftsForTime(shift.start_time, location.id)">
-                                                        <SelectField @update:modelValue="promptMoveUser($event, volunteer, shift)"
-                                                                     :options="shiftsForTime(shift.start_time, location.id)"
-                                                                     select-label="Change location">
-                                                            <template #extra="{option}">
-                                                                <ul class="pl-3 font-normal">
-                                                                    <li v-for="volunteer in option.volunteers"
-                                                                        :key="volunteer"
-                                                                        class="list-disc">
-                                                                        {{ volunteer }}
-                                                                    </li>
-                                                                </ul>
-                                                            </template>
-                                                        </SelectField>
-                                                    </template>
-                                                    <template v-else>
-                                                        <span class="text-red-500">No shifts available</span>
-                                                    </template>
+                                                    <MoveUserSelectField :date="date"
+                                                                         :shift="shift"
+                                                                         :location-id="location.id"
+                                                                         :empty-shifts-for-time="emptyShiftsForTime"
+                                                                         @update:modelValue="promptMoveUser($event, volunteer, shift)"/>
                                                 </div>
                                             </div>
                                             <div>Ph: <a :href="`tel:${volunteer.mobile_phone}`"

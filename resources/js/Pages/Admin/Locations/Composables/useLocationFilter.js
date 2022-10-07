@@ -55,7 +55,8 @@ export default function useLocationFilter (canAdmin = false) {
             const nullArray = Array(length).fill(null)
             shift.filterVolunteers = [...volunteers, ...nullArray]
             emptyShiftsForTime.value.push({
-                time: shift.start_time,
+                startTime: parse(shift.start_time, 'HH:mm:ss', date.value),
+                endTime: parse(shift.end_time, 'HH:mm:ss', date.value),
                 location: location.name,
                 locationId: location.id,
                 currentVolunteers: volunteers,
