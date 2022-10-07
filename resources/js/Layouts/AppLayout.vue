@@ -18,8 +18,6 @@
 
     const bugsnagKey = import.meta.env.VITE_BUGSNAG_FRONT_END_API_KEY
     onMounted(() => {
-        console.log('env', import.meta.env)
-        console.log('bugsnagKey', bugsnagKey)
         if (bugsnagKey) {
             const user = usePage().props.value.user
             if (user && user.id) {
