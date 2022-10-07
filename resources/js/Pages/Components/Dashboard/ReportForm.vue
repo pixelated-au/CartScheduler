@@ -77,7 +77,7 @@
 
     const disableFields = computed(() => !!formData.shift_was_cancelled)
 
-    const formatTime = time => format(parse(time, 'HH:mm:ss', new Date()), 'hh:mm a')
+    const formatTime = time => format(parse(time, 'HH:mm:ss', new Date()), 'h:mm a')
 </script>
 
 <template>
