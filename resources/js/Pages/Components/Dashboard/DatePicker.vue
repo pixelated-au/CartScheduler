@@ -78,15 +78,16 @@
                 const shifts = shiftDateGroup[shiftId]
                 let maxVolunteers = 0
                 let volunteerCount = 0
-                for (let i = 0; i < shifts.length; i++) {
-                    const shift = shifts[i]
+                for (let shiftCount = 0; shiftCount < shifts.length; shiftCount++) {
+                    const shift = shifts[shiftCount]
                     if (isBefore(isoDate, startOfDay(parseISO(shift.available_from)))) {
                         break
                     }
                     if (isAfter(isoDate, endOfDay(parseISO(shift.available_to)))) {
                         break
                     }
-                    if (i === 0) {
+                    if (shiftCount === 0) {
+                        // This is set on the first iteration of the loop
                         maxVolunteers = shift.max_volunteers
                     }
                     volunteerCount++
