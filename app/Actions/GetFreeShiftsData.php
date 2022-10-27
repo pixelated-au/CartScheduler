@@ -2,6 +2,7 @@
 
 namespace App\Actions;
 
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use stdClass;
@@ -57,7 +58,11 @@ class GetFreeShiftsData
                 ORDER BY dates.date,
                          locations.name,
                          shifts.start_time
-                "), ['startDate' => $startDate]))
+                ",
+        ),
+            ['startDate' => $startDate],
+        ),
+        )
             ->map(fn(stdClass $shift) => collect([
                 'shift_date'     => $shift->date,
                 'shift_id'       => $shift->shift_id,
