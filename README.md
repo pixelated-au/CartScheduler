@@ -79,3 +79,8 @@ will be available in this interface.
 - If the link to `/storage/example-user-import.xlsx` isn't working (found on the admin, import users page), make sure
   the symlink has been created. Run `php artisan storage:link` to create the symlink.
 
+## TODO:
+
+- [ ] Implement Testing
+- [ ] Implement feature for admin to remove a user from a shift in addition to moving them to another shift
+- [ ] Allow users to book another user onto a shift
