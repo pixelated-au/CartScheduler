@@ -54,34 +54,36 @@ class ToggleShiftReservationController extends Controller
                 'exists:shifts,id',
                 function ($attribute, $value, $fail) use ($request) {
                     $data = $request->all();
-                    // only validate if adding a shift
-                    if ($data['do_reserve']) {
-                        $shiftDate        = Carbon::parse($data['date']);
-                        $userShiftsOnDate = ShiftUser::with(['shift', 'shift.location'])
-                                                     ->where('user_id', $request->user()->id)
-                                                     ->where('shift_date', $shiftDate->toDateString())
-                                                     ->get();
+                    if (!$data['do_reserve']) {
+                        // only validate if adding a shift
+                        return;
+                    }
 
-                        $requestedShift       = Shift::find($data['shift']);
-                        $requestedShiftPeriod = CarbonPeriod::create(
-                            $requestedShift->start_time,
-                            $requestedShift->end_time,
+                    $shiftDate        = Carbon::parse($data['date']);
+                    $userShiftsOnDate = ShiftUser::with(['shift', 'shift.location'])
+                                                 ->where('user_id', $request->user()->id)
+                                                 ->where('shift_date', $shiftDate->toDateString())
+                                                 ->get();
+
+                    $requestedShift       = Shift::find($data['shift']);
+                    $requestedShiftPeriod = CarbonPeriod::create(
+                        $requestedShift->start_time,
+                        $requestedShift->end_time,
+                    );
+
+                    $foundOverlappingShift = $userShiftsOnDate->first(
+                        fn(ShiftUser $currentShift) => $requestedShiftPeriod->overlaps(CarbonPeriod::create(
+                            $currentShift->shift->start_time,
+                            $currentShift->shift->end_time,
+                        ),
+                        ),
+                    );
+
+                    if ($foundOverlappingShift) {
+                        $start = Carbon::parse($foundOverlappingShift->shift->start_time)->format('h:i a');
+                        $end   = Carbon::parse($foundOverlappingShift->shift->end_time)->format('h:i a');
+                        $fail("Sorry, you already have another shift that overlaps this shift at {$foundOverlappingShift->shift->location->name} between $start and $end.",
                         );
-
-                        $foundOverlappingShift = $userShiftsOnDate->first(
-                            fn(ShiftUser $currentShift) => $requestedShiftPeriod->overlaps(CarbonPeriod::create(
-                                $currentShift->shift->start_time,
-                                $currentShift->shift->end_time,
-                            ),
-                            ),
-                        );
-
-                        if ($foundOverlappingShift) {
-                            $start = Carbon::parse($foundOverlappingShift->shift->start_time)->format('h:i a');
-                            $end   = Carbon::parse($foundOverlappingShift->shift->end_time)->format('h:i a');
-                            $fail("Sorry, you already have another shift that overlaps this shift at {$foundOverlappingShift->shift->location->name} between $start and $end.",
-                            );
-                        }
                     }
                 },
             ],
