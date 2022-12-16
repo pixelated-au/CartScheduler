@@ -11,7 +11,8 @@ class ShiftFactory extends Factory
     public function definition(): array
     {
         $available = CarbonPeriod::between(
-            $this->faker->dateTimeBetween('now', '+1 month'), $this->faker->dateTimeBetween('+1 month', '+2 months')
+            $this->faker->dateTimeBetween('now', '+1 month'),
+            $this->faker->dateTimeBetween('+1 month', '+2 months'),
         );
 
         return [
@@ -30,4 +31,22 @@ class ShiftFactory extends Factory
             'is_enabled'     => true,
         ];
     }
+
+    public function everyDay(): Factory
+    {
+        return $this->state(function (array $attributes) {
+            return [
+                'day_monday'     => true,
+                'day_tuesday'    => true,
+                'day_wednesday'  => true,
+                'day_thursday'   => true,
+                'day_friday'     => true,
+                'day_saturday'   => true,
+                'day_sunday'     => true,
+                'available_from' => null,
+                'available_to'   => null,
+            ];
+        });
+    }
+
 }
