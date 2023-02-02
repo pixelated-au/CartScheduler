@@ -12,36 +12,39 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Cache;
 
 class ToggleShiftReservationController extends Controller
 {
     public function __invoke(Request $request, DoShiftReservation $doShiftReservation)
     {
-        $data      = $this->getValidated($request);
-        $shiftDate = Carbon::parse($data['date']);
+        return Cache::lock('shift_reservation', 10)->block(10, function () use ($request, $doShiftReservation) {
+            $data      = $this->getValidated($request);
+            $shiftDate = Carbon::parse($data['date']);
 
-        $location = Location::with([
-            'shifts'       => fn(HasMany $query) => $query->where('shifts.id', '=', $data['shift']),
-            'shifts.users' => fn(BelongsToMany $query) => $query->wherePivot(
-                'shift_date',
-                $shiftDate->toDateString(),
-            ),
-        ])->findOrFail($data['location']);
+            $location = Location::with([
+                'shifts'       => fn(HasMany $query) => $query->where('shifts.id', '=', $data['shift']),
+                'shifts.users' => fn(BelongsToMany $query) => $query->wherePivot(
+                    'shift_date',
+                    $shiftDate->toDateString(),
+                ),
+            ])->findOrFail($data['location']);
 
-        /** @var \App\Models\Shift $shift */
-        $shift = $location->shifts->first();
+            /** @var \App\Models\Shift $shift */
+            $shift = $location->shifts->first();
 
-        if ($data['do_reserve']) {
-            $didReserve = $doShiftReservation->execute($shift, $location, $request->user()->id, $shiftDate);
+            if ($data['do_reserve']) {
+                $didReserve = $doShiftReservation->execute($shift, $location, $request->user()->id, $shiftDate);
 
-            return $didReserve ? response('Reservation made', 200)
-                : ErrorApiResource::create('No available shifts', ErrorApiResource::CODE_NO_AVAILABLE_SHIFTS, 422);
+                return $didReserve
+                    ? response('Reservation made', 200)
+                    : ErrorApiResource::create('No available shifts', ErrorApiResource::CODE_NO_AVAILABLE_SHIFTS, 422);
+            }
 
-        }
+            $shift->users()->wherePivot('shift_date', '=', $shiftDate->format('Y-m-d'))->detach($request->user()->id);
 
-        $shift->users()->wherePivot('shift_date', '=', $shiftDate->format('Y-m-d'))->detach($request->user()->id);
-
-        return response('Reservation removed', 200);
+            return response('Reservation removed', 200);
+        });
     }
 
     protected function getValidated(Request $request): array
