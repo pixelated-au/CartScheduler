@@ -23,7 +23,6 @@ return new class extends Migration {
             $table->dateTime('available_to')->nullable();
             $table->boolean('is_enabled')->nullable();
             $table->timestamps();
-            $table->softDeletes();
         });
     }
 
