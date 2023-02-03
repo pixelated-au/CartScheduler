@@ -39,7 +39,6 @@ class GetFreeShiftsData
         $interval = "$durationLength $period->value";
 
         $lastDay = $this->getDurationQuery($interval, $doReleaseShiftsDaily, $period, $releaseShiftsOnDay);
-        ray($lastDay);
 
         $query = DB::raw(/** @lang MySQL */ "
                 WITH RECURSIVE dates (date) AS
