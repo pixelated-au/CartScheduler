@@ -72,7 +72,18 @@ class ToggleShiftReservationController extends Controller
                 'required',
                 'date',
                 'after_or_equal:today',
-                'before_or_equal:last day of next month zulu',
+                //'before_or_equal:last day of next month zulu',
+                function ($attribute, $value, $fail) use ($request) {
+                    $data = $request->all();
+                    // only validate if adding a shift
+                    if (!$data['do_reserve']) {
+                        return;
+                    }
+                    $this->isShiftInAllowedPeriod(
+                        Carbon::parse($value, config('app.timezone'))->setTime(12, 0),
+                        $fail,
+                    );
+                },
             ],
         ]);
     }
@@ -107,51 +118,54 @@ class ToggleShiftReservationController extends Controller
     /**
      * @throws \Exception
      */
-    private function isShiftInAllowedPeriod(Request $request, Carbon $shiftDate, $shift, $fail): void
+    private function isShiftInAllowedPeriod(Carbon $shiftDate, $fail): void
     {
+        $now                  = Carbon::now()->setTime(23, 59, 59);
         $period               = DBPeriod::getConfigPeriod();
         $duration             = config('cart-scheduler.shift_reservation_duration');
         $releaseShiftsOnDay   = config('cart-scheduler.release_weekly_shifts_on_day');
         $doReleaseShiftsDaily = config('cart-scheduler.do_release_shifts_daily');
 
         if ($doReleaseShiftsDaily) {
-            if ($period->value === 'week') {
-                if ($shiftDate->isAfter(Carbon::now()->addWeeks($duration))) {
+            if ($period->value === DBPeriod::Week->value) {
+                /** @noinspection NestedPositiveIfStatementsInspection */
+                if ($shiftDate->isAfter($now->addWeeks($duration))) {
                     $fail('Sorry, you can only reserve shifts up to ' . $duration . ' week(s) in advance.');
 
                     return;
                 }
             }
-            if ($shiftDate->isAfter(Carbon::now()->addMonths($duration))) {
+            if ($shiftDate->isAfter($now->addMonths($duration))) {
                 $fail('Sorry, you can only reserve shifts up to ' . $duration . ' month(s) in advance.');
             }
 
             return;
         }
 
-        if ($period->value === 'week') {
-            // Adding 1 to the duration because Carbon::now()->startOfWeek(Carbon::SUNDAY) is the start of the week so we're going back in time...
-            if ($shiftDate->isAfter(Carbon::now()->startOfWeek($releaseShiftsOnDay - 1)->addWeeks($duration + 1))) {
+        if ($period->value === DBPeriod::Week->value) {
+            // Adding 1 to the duration because $now->startOfWeek(Carbon::SUNDAY) is the start of the week, so we're going back in time...
+            /** @noinspection NestedPositiveIfStatementsInspection */
+            if ($shiftDate->isAfter($now->startOfWeek($releaseShiftsOnDay - 1)->addWeeks($duration + 1))) {
                 $fail(
-                    "Sorry, you can only reserve shifts up to $duration week(s) in advance, starting each {$this->mapDayOfWeek($releaseShiftsOnDay, true)}.",
+                    "Sorry, you can only reserve shifts up to $duration week(s) in advance, starting each {$this->mapDayOfWeek($releaseShiftsOnDay)}.",
                 );
 
                 return;
             }
-            if ($shiftDate->isAfter(Carbon::now()->endOfMonth()->addMonths($duration))) {
-                $fail(
-                    "Sorry, you can only reserve shifts up to $duration month(s) in advance, starting at the beginning of 'next' month.",
-                );
-            }
+        }
+        if ($shiftDate->isAfter($now->addMonths($duration)->endOfMonth())) {
+            $fail(
+                "Sorry, you can only reserve shifts up to $duration month(s) in advance, after this month",
+            );
         }
     }
 
-    private function mapDayOfWeek(int $dayOfWeek, bool $mySql): string
+    /**
+     * @throws \Exception
+     */
+    private function mapDayOfWeek(int $dayOfWeek): string
     {
-        // mysql starts at 1, Carbon starts at 0
-        if ($mySql) {
-            ++$dayOfWeek;
-        }
+        --$dayOfWeek; // MySQL: Sunday starts on 1, Carbon: Sunday starts on 0
 
         return match ($dayOfWeek) {
             0 => 'Sunday',

@@ -53,8 +53,6 @@ class AvailableShiftsForMonthController extends Controller
             $doReleaseShiftsDaily,
         );
 
-        ray($shifts);
-
         return [
             'shifts'    => $shifts,
             'locations' => LocationResource::collection($locations),
