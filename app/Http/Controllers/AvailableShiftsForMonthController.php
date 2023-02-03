@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Actions\GetFreeShiftsData;
+use App\Enums\DBPeriod;
 use App\Http\Resources\LocationResource;
 use App\Models\Location;
 use Carbon\Carbon;
@@ -12,11 +13,8 @@ use Illuminate\Support\Facades\Auth;
 
 class AvailableShiftsForMonthController extends Controller
 {
-    private GetFreeShiftsData $getFreeShiftsData;
-
-    public function __construct(GetFreeShiftsData $getFreeShiftsData)
+    public function __construct(private readonly GetFreeShiftsData $getFreeShiftsData)
     {
-        $this->getFreeShiftsData = $getFreeShiftsData;
     }
 
     public function __invoke(Request $request, bool $canViewHistorical = false)
@@ -42,11 +40,24 @@ class AvailableShiftsForMonthController extends Controller
                              ->get();
 
         // Shifts are the locked in shifts for all users. In the future, it may be worth considering caching this...
-        $shifts = $this->getFreeShiftsData->execute($monthStart);
+
+        $period               = DBPeriod::getConfigPeriod();
+        $duration             = config('cart-scheduler.shift_reservation_duration');
+        $releaseShiftsOnDay   = config('cart-scheduler.release_weekly_shifts_on_day');
+        $doReleaseShiftsDaily = config('cart-scheduler.do_release_shifts_daily');
+
+        $shifts = $this->getFreeShiftsData->execute($monthStart,
+            $period,
+            $duration,
+            $releaseShiftsOnDay,
+            $doReleaseShiftsDaily,
+        );
+
+        ray($shifts);
 
         return [
             'shifts'    => $shifts,
-            'locations' => LocationResource::collection($locations)
+            'locations' => LocationResource::collection($locations),
         ];
     }
 }
