@@ -1,4 +1,6 @@
 <script setup>
+    import { usePage } from '@inertiajs/inertia-vue3'
+
     //https://vue3datepicker.com/
     import Datepicker from '@vuepic/vue-datepicker'
     import { addDays, addMonths, endOfDay, endOfMonth, formatISO, isAfter, isBefore, parse, parseISO, startOfDay, startOfMonth, subMonths } from 'date-fns'
@@ -28,13 +30,21 @@
         },
     })
 
+    const foo = computed(() => {
+        console.log(usePage().props.value.shiftAvailability)
+        return usePage().props.value.shiftAvailability
+    })
+
+    console.log(foo.value)
+
+
     const today = new Date()
     const notBefore = props.canViewHistorical
         ? startOfDay(startOfMonth(subMonths(today, 6)))
         : startOfDay(today)
     const notAfter = props.canViewHistorical
-        ? endOfMonth(addMonths(notBefore, 7))
-        : endOfMonth(addMonths(notBefore, 1))
+        ? endOfMonth(addMonths(notBefore, 12))
+        : parseISO(foo.value.maxDateReservation)
 
     const allDates = []
     const getAllDates = () => {

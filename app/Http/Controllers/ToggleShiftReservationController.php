@@ -4,12 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Actions\DoShiftReservation;
 use App\Actions\ErrorApiResource;
-use App\Enums\DBPeriod;
+use App\Actions\GetMaxShiftReservationDateAllowed;
 use App\Models\Location;
 use App\Models\Shift;
 use App\Models\ShiftUser;
 use Carbon\CarbonPeriod;
-use Exception;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Http\Request;
@@ -18,9 +17,15 @@ use Illuminate\Support\Facades\Cache;
 
 class ToggleShiftReservationController extends Controller
 {
-    public function __invoke(Request $request, DoShiftReservation $doShiftReservation)
+    public function __construct(
+        private readonly DoShiftReservation $doShiftReservation,
+        private readonly GetMaxShiftReservationDateAllowed $getMaxShiftReservationDateAllowed,
+    ) {
+    }
+
+    public function __invoke(Request $request)
     {
-        return Cache::lock('shift_reservation', 10)->block(10, function () use ($request, $doShiftReservation) {
+        return Cache::lock('shift_reservation', 10)->block(10, function () use ($request) {
             $data      = $this->getValidated($request);
             $shiftDate = Carbon::parse($data['date']);
 
@@ -36,7 +41,7 @@ class ToggleShiftReservationController extends Controller
             $shift = $location->shifts->first();
 
             if ($data['do_reserve']) {
-                $didReserve = $doShiftReservation->execute($shift, $location, $request->user()->id, $shiftDate);
+                $didReserve = $this->doShiftReservation->execute($shift, $location, $request->user()->id, $shiftDate);
 
                 return $didReserve
                     ? response('Reservation made', 200)
@@ -120,62 +125,10 @@ class ToggleShiftReservationController extends Controller
      */
     private function isShiftInAllowedPeriod(Carbon $shiftDate, $fail): void
     {
-        $now                  = Carbon::now()->setTime(23, 59, 59);
-        $period               = DBPeriod::getConfigPeriod();
-        $duration             = config('cart-scheduler.shift_reservation_duration');
-        $releaseShiftsOnDay   = config('cart-scheduler.release_weekly_shifts_on_day');
-        $doReleaseShiftsDaily = config('cart-scheduler.do_release_shifts_daily');
+        $maxShiftReservationDateAllowed = $this->getMaxShiftReservationDateAllowed->execute();
 
-        if ($doReleaseShiftsDaily) {
-            if ($period->value === DBPeriod::Week->value) {
-                /** @noinspection NestedPositiveIfStatementsInspection */
-                if ($shiftDate->isAfter($now->addWeeks($duration))) {
-                    $fail('Sorry, you can only reserve shifts up to ' . $duration . ' week(s) in advance.');
-
-                    return;
-                }
-            }
-            if ($shiftDate->isAfter($now->addMonths($duration))) {
-                $fail('Sorry, you can only reserve shifts up to ' . $duration . ' month(s) in advance.');
-            }
-
-            return;
+        if ($shiftDate->isAfter($maxShiftReservationDateAllowed)) {
+            $fail($this->getMaxShiftReservationDateAllowed->getFailMessage());
         }
-
-        if ($period->value === DBPeriod::Week->value) {
-            // Adding 1 to the duration because $now->startOfWeek(Carbon::SUNDAY) is the start of the week, so we're going back in time...
-            /** @noinspection NestedPositiveIfStatementsInspection */
-            if ($shiftDate->isAfter($now->startOfWeek($releaseShiftsOnDay - 1)->addWeeks($duration + 1))) {
-                $fail(
-                    "Sorry, you can only reserve shifts up to $duration week(s) in advance, starting each {$this->mapDayOfWeek($releaseShiftsOnDay)}.",
-                );
-
-                return;
-            }
-        }
-        if ($shiftDate->isAfter($now->addMonths($duration)->endOfMonth())) {
-            $fail(
-                "Sorry, you can only reserve shifts up to $duration month(s) in advance, after this month",
-            );
-        }
-    }
-
-    /**
-     * @throws \Exception
-     */
-    private function mapDayOfWeek(int $dayOfWeek): string
-    {
-        --$dayOfWeek; // MySQL: Sunday starts on 1, Carbon: Sunday starts on 0
-
-        return match ($dayOfWeek) {
-            0 => 'Sunday',
-            1 => 'Monday',
-            2 => 'Tuesday',
-            3 => 'Wednesday',
-            4 => 'Thursday',
-            5 => 'Friday',
-            6 => 'Saturday',
-            default => throw new Exception('Invalid day of week'),
-        };
     }
 }
