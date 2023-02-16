@@ -34,7 +34,7 @@
                 location: locationId,
                 shift: shiftId,
                 do_reserve: toggleOn,
-                date: date.value,
+                date: format(date.value, 'yyyy-MM-dd'),
             })
             if (toggleOn) {
                 toast.success(response.data)

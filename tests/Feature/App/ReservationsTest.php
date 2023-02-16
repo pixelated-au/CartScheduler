@@ -141,7 +141,7 @@ class ReservationsTest extends TestCase
         $this->seed(LocationAndShiftsSeeder::class);
         $locationId = Location::first(['id'])->id;
         $shiftId    = Shift::inRandomOrder()->first(['id'])->id;
-        $date       = date('Y-m-d', strtotime('tomorrow'));
+        $date       = date('Y-m-d');
 
         ShiftUser::factory()->create([
             'shift_id'   => $shiftId,
@@ -161,8 +161,9 @@ class ReservationsTest extends TestCase
             'do_reserve' => true,
             'date'       => $date,
         ]);
-        // TODO this is failing because it's not implemented. I'll fix it asap - Ian.
         $response->assertInvalid();
+
+        $this->assertDatabaseCount('shift_user', 2);
 
         $this->assertDatabaseMissing('shift_user', [
             'shift_id'   => $shiftId,
@@ -293,7 +294,7 @@ class ReservationsTest extends TestCase
             'location'   => $locationId,
             'shift'      => $shiftId,
             'do_reserve' => true,
-            'date'       => '2023-03-09T01:00:00.000Z',
+            'date'       => '2023-03-09',
         ]);
 
         $response->assertStatus(422);
@@ -303,7 +304,7 @@ class ReservationsTest extends TestCase
             'location'   => $locationId,
             'shift'      => $shiftId,
             'do_reserve' => true,
-            'date'       => '2023-03-08T01:00:00.000Z',
+            'date'       => '2023-03-08',
         ]);
 
         // The user can only reserve shifts for today plus ~30/31 days (1 month)
@@ -328,7 +329,7 @@ class ReservationsTest extends TestCase
             'location'   => $locationId,
             'shift'      => $shiftId,
             'do_reserve' => true,
-            'date'       => '2023-02-24T01:00:00.000Z', // 8 days away
+            'date'       => '2023-02-24', // 8 days away
         ]);
 
         $response->assertStatus(422);
@@ -338,7 +339,7 @@ class ReservationsTest extends TestCase
             'location'   => $locationId,
             'shift'      => $shiftId,
             'do_reserve' => true,
-            'date'       => '2023-02-23T01:00:00.000Z', // 7 days away
+            'date'       => '2023-02-23', // 7 days away
         ]);
 
         // The user can only reserve shifts for today plus 7 days (1 week)
@@ -363,7 +364,7 @@ class ReservationsTest extends TestCase
             'location'   => $locationId,
             'shift'      => $shiftId,
             'do_reserve' => true,
-            'date'       => '2023-04-01T01:00:00.000Z',
+            'date'       => '2023-04-01',
         ]);
 
         $response->assertStatus(422);
@@ -373,7 +374,7 @@ class ReservationsTest extends TestCase
             'location'   => $locationId,
             'shift'      => $shiftId,
             'do_reserve' => true,
-            'date'       => '2023-03-31T01:00:00.000Z',
+            'date'       => '2023-03-31',
         ]);
 
         // The user can only reserve shifts for today plus the rest of the month plus 1 month
@@ -383,11 +384,20 @@ class ReservationsTest extends TestCase
 
     public function test_user_cannot_reserve_period_shifts_released_shifts_beyond_two_weeks(): void
     {
+        /*
+          February 2023
+          Su Mo Tu We Th Fr Sa
+                    1  2  3  4
+           5  6  7  8  9 10 11 <- Wednesday 8th
+          12 13 14 15 16 17 18 <- Yes, allowed. Rest of month, not allowed
+  Nope -> 19 20 21 22 23 24 25 <- Sunday 19th shouldn't be allowed
+          26 27 28
+        */
         // Set the date and time to create predictable tests (Wednesday)
-        $this->travelTo('2023-02-08 00:00:00');
-        Config::set('cart-scheduler.shift_reservation_duration', 1);
+        $this->travelTo('2023-02-08 03:00:00');
+        Config::set('cart-scheduler.shift_reservation_duration', 1); // 1 week
         Config::set('cart-scheduler.shift_reservation_duration_period', 'WEEK');
-        Config::set('cart-scheduler.do_release_shifts_daily', false);
+        Config::set('cart-scheduler.do_release_shifts_daily', false); // Released once per week
         Config::set('cart-scheduler.release_weekly_shifts_on_day', 1); // Sunday
 
         $user = User::factory()->create();
@@ -399,7 +409,7 @@ class ReservationsTest extends TestCase
             'location'   => $locationId,
             'shift'      => $shiftId,
             'do_reserve' => true,
-            'date'       => '2023-02-19T01:00:00.000Z',
+            'date'       => '2023-02-19',
         ]);
 
         $response->assertStatus(422);
@@ -409,7 +419,7 @@ class ReservationsTest extends TestCase
             'location'   => $locationId,
             'shift'      => $shiftId,
             'do_reserve' => true,
-            'date'       => '2023-02-18T01:00:00.000Z', // 7 days away
+            'date'       => '2023-02-18', // 3 days of rest of current week plus 7 days of next week
         ]);
 
         // The user can only reserve shifts for today plus the rest of the week plus 1 week

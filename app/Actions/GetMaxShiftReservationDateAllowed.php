@@ -26,7 +26,7 @@ class GetMaxShiftReservationDateAllowed
 
         if ($period->value === DBPeriod::Week->value) {
             // Adding 1 to the duration because $now->startOfWeek(Carbon::SUNDAY) is the start of the week, so we're going back in time...
-            return $now->startOfWeek($releaseShiftsOnDay - 1)->addWeeks($duration + 1)->endOfDay();
+            return $now->startOfWeek($releaseShiftsOnDay - 1)->subDay()->addWeeks($duration + 1)->endOfDay();
         }
 
         return $now->addMonths($duration)->endOfMonth()->endOfDay();

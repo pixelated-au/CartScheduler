@@ -9,11 +9,13 @@ use App\Models\Location;
 use App\Models\Shift;
 use App\Models\ShiftUser;
 use Carbon\CarbonPeriod;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
+use RuntimeException;
 
 class ToggleShiftReservationController extends Controller
 {
@@ -26,8 +28,8 @@ class ToggleShiftReservationController extends Controller
     public function __invoke(Request $request)
     {
         return Cache::lock('shift_reservation', 10)->block(10, function () use ($request) {
-            $data      = $this->getValidated($request);
-            $shiftDate = Carbon::parse($data['date']);
+            $data      = $this->doValidate($request);
+            $shiftDate = Carbon::createFromFormat('Y-m-d', $data['date'])->setTime(12, 0);
 
             $location = Location::with([
                 'shifts'       => fn(HasMany $query) => $query->where('shifts.id', '=', $data['shift']),
@@ -54,7 +56,7 @@ class ToggleShiftReservationController extends Controller
         });
     }
 
-    protected function getValidated(Request $request): array
+    protected function doValidate(Request $request): array
     {
         return $this->validate($request, [
             'location'   => ['required', 'integer', 'exists:locations,id'],
@@ -70,6 +72,7 @@ class ToggleShiftReservationController extends Controller
                     }
                     $shiftDate = Carbon::parse($data['date']);
                     $this->isOverlappingShift($request, $shiftDate, $data['shift'], $fail);
+                    $this->isUserAllowedToReserveShifts($request, $shiftDate, $data['shift'], $fail);
                 },
             ],
             'do_reserve' => ['required', 'boolean'],
@@ -84,16 +87,15 @@ class ToggleShiftReservationController extends Controller
                     if (!$data['do_reserve']) {
                         return;
                     }
-                    $this->isShiftInAllowedPeriod(
-                        Carbon::parse($value, config('app.timezone'))->setTime(12, 0),
-                        $fail,
-                    );
+                    $date = Carbon::createFromFormat('Y-m-d', $value);
+                    /** @noinspection PhpParamsInspection - will always parse because of previous validation */
+                    $this->isShiftInAllowedPeriod($date, $fail);
                 },
             ],
         ]);
     }
 
-    private function isOverlappingShift(Request $request, Carbon $shiftDate, $shift, $fail): void
+    private function isOverlappingShift(Request $request, Carbon $shiftDate, int $shift, $fail): void
     {
         $userShiftsOnDate = ShiftUser::with(['shift', 'shift.location'])
                                      ->where('user_id', $request->user()->id)
@@ -120,13 +122,39 @@ class ToggleShiftReservationController extends Controller
         }
     }
 
+    private function isUserAllowedToReserveShifts(Request $request, Carbon $shiftDate, int $shiftId, $fail): void
+    {
+        $location = Location::whereRelation('shifts', 'id', $shiftId)->first();
+        if (!$location) {
+            throw new RuntimeException('Location not found for shift');
+        }
+        if (!$location->requires_brother) {
+            return;
+        }
+
+        $shifts = ShiftUser::with(['user' => fn(BelongsTo $query) => $query->select(['id', 'gender'])])
+                           ->where('shift_id', $shiftId)
+                           ->where('shift_date', $shiftDate->toDateString())
+                           ->get();
+
+        if ($shifts->count() < $location->max_volunteers - 1) {
+            // not enough volunteers to require a brother
+            return;
+        }
+
+        // check if user is a sister. If so, fail
+        $hasSisters = $shifts->contains(fn(ShiftUser $shiftUser) => $shiftUser->user->gender === 'female');
+        if ($hasSisters) {
+            $fail('Sorry, you cannot reserve this shift because the last shift requires a brother');
+        }
+    }
+
     /**
      * @throws \Exception
      */
     private function isShiftInAllowedPeriod(Carbon $shiftDate, $fail): void
     {
         $maxShiftReservationDateAllowed = $this->getMaxShiftReservationDateAllowed->execute();
-
         if ($shiftDate->isAfter($maxShiftReservationDateAllowed)) {
             $fail($this->getMaxShiftReservationDateAllowed->getFailMessage());
         }

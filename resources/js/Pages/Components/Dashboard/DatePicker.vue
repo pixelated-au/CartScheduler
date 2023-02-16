@@ -30,12 +30,9 @@
         },
     })
 
-    const foo = computed(() => {
-        console.log(usePage().props.value.shiftAvailability)
+    const shiftAvailability = computed(() => {
         return usePage().props.value.shiftAvailability
     })
-
-    console.log(foo.value)
 
 
     const today = new Date()
@@ -44,7 +41,7 @@
         : startOfDay(today)
     const notAfter = props.canViewHistorical
         ? endOfMonth(addMonths(notBefore, 12))
-        : parseISO(foo.value.maxDateReservation)
+        : parseISO(shiftAvailability.value.maxDateReservation)
 
     const allDates = []
     const getAllDates = () => {
@@ -154,6 +151,7 @@
                 :highlight="highlights"
                 :min-date="notBefore"
                 :max-date="notAfter"
+                :timezone="shiftAvailability.timezone"
                 :dark="isDarkMode">
         <template #day="{day, date}">
             <pre class="text-sm">{{ day }}</pre>
