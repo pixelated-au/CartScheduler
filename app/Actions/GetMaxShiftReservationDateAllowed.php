@@ -8,28 +8,45 @@ use Illuminate\Support\Carbon;
 
 class GetMaxShiftReservationDateAllowed
 {
+    private DBPeriod $period;
+    private mixed    $duration;
+    private mixed    $releaseShiftsOnDay;
+    private mixed    $releaseShiftsAtTime;
+    private mixed    $doReleaseShiftsDaily;
+
+    public function __construct()
+    {
+        $this->period               = DBPeriod::getConfigPeriod();
+        $this->duration             = config('cart-scheduler.shift_reservation_duration');
+        $this->releaseShiftsOnDay   = config('cart-scheduler.release_weekly_shifts_on_day');
+        $this->releaseShiftsAtTime  = config('cart-scheduler.release_weekly_shifts_at_time');
+        $this->doReleaseShiftsDaily = config('cart-scheduler.do_release_shifts_daily');
+    }
+
     public function execute(): Carbon
     {
-        $now                  = Carbon::now()->setTime(23, 59, 59);
-        $period               = DBPeriod::getConfigPeriod();
-        $duration             = config('cart-scheduler.shift_reservation_duration');
-        $releaseShiftsOnDay   = config('cart-scheduler.release_weekly_shifts_on_day');
-        $doReleaseShiftsDaily = config('cart-scheduler.do_release_shifts_daily');
+        $now = Carbon::now();
 
-        if ($doReleaseShiftsDaily) {
-            if ($period->value === DBPeriod::Week->value) {
-                return $now->addWeeks($duration)->endOfDay();
+        if ($this->doReleaseShiftsDaily) {
+            if ($this->period->value === DBPeriod::Week->value) {
+                return $now->addWeeks($this->duration)->endOfDay();
             }
 
-            return $now->addMonths($duration)->endOfDay();
+            return $now->addMonths($this->duration)->endOfDay();
         }
 
-        if ($period->value === DBPeriod::Week->value) {
-            // Adding 1 to the duration because $now->startOfWeek(Carbon::SUNDAY) is the start of the week, so we're going back in time...
-            return $now->startOfWeek($releaseShiftsOnDay - 1)->subDay()->addWeeks($duration + 1)->endOfDay();
+        if ($this->period->value === DBPeriod::Week->value) {
+            return $now->startOfWeek($this->releaseShiftsOnDay - 1)
+                       ->when(
+                           fn(Carbon $date) => $this->isCurrentDayButAfterTime($date),
+                           fn(Carbon $date) => $date->addWeeks($this->duration),
+                           fn(Carbon $date) => $date->addWeeks($this->duration + 1),
+                       )
+                       ->subDay()
+                       ->endOfDay();
         }
 
-        return $now->addMonths($duration)->endOfMonth()->endOfDay();
+        return $now->addMonths($this->duration)->endOfMonth()->endOfDay();
     }
 
     public function getFailMessage(): string
@@ -37,6 +54,7 @@ class GetMaxShiftReservationDateAllowed
         $period               = DBPeriod::getConfigPeriod();
         $duration             = config('cart-scheduler.shift_reservation_duration');
         $releaseShiftsOnDay   = config('cart-scheduler.release_weekly_shifts_on_day');
+        $releaseShiftsAtTime  = config('cart-scheduler.release_weekly_shifts_at_time');
         $doReleaseShiftsDaily = config('cart-scheduler.do_release_shifts_daily');
 
         if ($doReleaseShiftsDaily) {
@@ -48,7 +66,9 @@ class GetMaxShiftReservationDateAllowed
         }
 
         if ($period->value === DBPeriod::Week->value) {
-            return "Sorry, you can only reserve shifts up to $duration week(s) in advance, starting each {$this->mapDayOfWeek($releaseShiftsOnDay)}.";
+            $time = Carbon::now()->setTimeFromTimeString($releaseShiftsAtTime)->format('g:i A');
+
+            return "Sorry, you can only reserve shifts up to $duration week(s) in advance, starting each {$this->mapDayOfWeek($releaseShiftsOnDay)} at $time";
         }
 
         return "Sorry, you can only reserve shifts up to $duration month(s) in advance, after this month";
@@ -68,5 +88,16 @@ class GetMaxShiftReservationDateAllowed
             6 => 'Saturday',
             default => throw new InvalidArgumentException('Invalid day of week'),
         };
+    }
+
+    /**
+     * Determine if the given date is the current day but after the given time.
+     * For example, if the current day is Monday and the given time is 10:00 AM,
+     * this method will return true if the given date is Monday at 10:00 AM or later.
+     */
+    private function isCurrentDayButAfterTime(Carbon $date): bool
+    {
+        return $date->startOfWeek($this->releaseShiftsOnDay - 1)->isSameDay($date)
+               && $date->setTimeFromTimeString($this->releaseShiftsAtTime)->isFuture();
     }
 }

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Actions\DoShiftReservation;
 use App\Actions\ErrorApiResource;
 use App\Actions\GetMaxShiftReservationDateAllowed;
+use App\Enums\DBPeriod;
 use App\Models\Location;
 use App\Models\Shift;
 use App\Models\ShiftUser;
@@ -72,7 +73,7 @@ class ToggleShiftReservationController extends Controller
                     }
                     $shiftDate = Carbon::parse($data['date']);
                     $this->isOverlappingShift($request, $shiftDate, $data['shift'], $fail);
-                    $this->isUserAllowedToReserveShifts($request, $shiftDate, $data['shift'], $fail);
+                    $this->isUserAllowedToReserveShifts($shiftDate, $data['shift'], $fail);
                 },
             ],
             'do_reserve' => ['required', 'boolean'],
@@ -122,7 +123,7 @@ class ToggleShiftReservationController extends Controller
         }
     }
 
-    private function isUserAllowedToReserveShifts(Request $request, Carbon $shiftDate, int $shiftId, $fail): void
+    private function isUserAllowedToReserveShifts(Carbon $shiftDate, int $shiftId, $fail): void
     {
         $location = Location::whereRelation('shifts', 'id', $shiftId)->first();
         if (!$location) {
@@ -154,7 +155,23 @@ class ToggleShiftReservationController extends Controller
      */
     private function isShiftInAllowedPeriod(Carbon $shiftDate, $fail): void
     {
+        $dbPeriod                       = DBPeriod::getConfigPeriod();
+        $doReleaseShiftsDaily           = config('cart-scheduler.do_release_shifts_daily');
         $maxShiftReservationDateAllowed = $this->getMaxShiftReservationDateAllowed->execute();
+
+        if (
+            $dbPeriod->value === DBPeriod::Week->value
+            && !$doReleaseShiftsDaily
+            && $shiftDate->isSameDay($maxShiftReservationDateAllowed)
+            && Carbon::now()->format('Gis.u') > $maxShiftReservationDateAllowed
+                ->addDay()
+                ->format('Gis.u')
+        ) {
+            $fail($this->getMaxShiftReservationDateAllowed->getFailMessage());
+
+            return;
+        }
+
         if ($shiftDate->isAfter($maxShiftReservationDateAllowed)) {
             $fail($this->getMaxShiftReservationDateAllowed->getFailMessage());
         }

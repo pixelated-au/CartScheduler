@@ -25,7 +25,7 @@ class AvailableShiftsForMonthController extends Controller
             abort(403);
         }
 
-        $monthStart = ($canViewHistorical
+        $startDate = ($canViewHistorical
             ? Carbon::today()->subMonths(6)->startOfMonth()
             : Carbon::today())
             ->format('Y-m-d');
@@ -42,11 +42,12 @@ class AvailableShiftsForMonthController extends Controller
                              ->get();
 
         $endDate = $this->getMaxShiftReservationDateAllowed->execute()->format('Y-m-d');
-        $shifts  = $this->getFreeShiftsData->execute($monthStart, $endDate);
+        $shifts  = $this->getFreeShiftsData->execute($startDate, $endDate);
 
         return [
-            'shifts'    => $shifts,
-            'locations' => LocationResource::collection($locations),
+            'shifts'             => $shifts,
+            'locations'          => LocationResource::collection($locations),
+            'maxDateReservation' => $endDate,
         ];
     }
 }
