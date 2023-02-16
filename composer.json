@@ -9,6 +9,7 @@
     "license": "MIT",
     "require": {
         "php": "^8.1.0",
+        "ext-http": "*",
         "ext-pdo": "*",
         "ext-zip": "*",
         "bugsnag/bugsnag-laravel": "^2.0",
