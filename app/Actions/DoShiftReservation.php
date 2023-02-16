@@ -8,7 +8,7 @@ use Illuminate\Support\Carbon;
 
 class DoShiftReservation
 {
-    public function execute(Shift $shift, Location $location, int $userId, Carbon $shiftDate): bool
+    public function execute(Shift $shift, Location $location, int $userId, Carbon|\Carbon\Carbon $shiftDate): bool
     {
         $assignedUsers = $shift->users;
         // using >= just in case we've had some type of data error
