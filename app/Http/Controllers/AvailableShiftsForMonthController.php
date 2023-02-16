@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Actions\GetFreeShiftsData;
-use App\Enums\DBPeriod;
+use App\Actions\GetMaxShiftReservationDateAllowed;
 use App\Http\Resources\LocationResource;
 use App\Models\Location;
 use Carbon\Carbon;
@@ -13,7 +13,9 @@ use Illuminate\Support\Facades\Auth;
 
 class AvailableShiftsForMonthController extends Controller
 {
-    public function __construct(private readonly GetFreeShiftsData $getFreeShiftsData)
+    public function __construct(
+        private readonly GetFreeShiftsData $getFreeShiftsData,
+        private readonly GetMaxShiftReservationDateAllowed $getMaxShiftReservationDateAllowed)
     {
     }
 
@@ -39,19 +41,8 @@ class AvailableShiftsForMonthController extends Controller
                              ->where('is_enabled', true)
                              ->get();
 
-        // Shifts are the locked in shifts for all users. In the future, it may be worth considering caching this...
-
-        $period               = DBPeriod::getConfigPeriod();
-        $duration             = config('cart-scheduler.shift_reservation_duration');
-        $releaseShiftsOnDay   = config('cart-scheduler.release_weekly_shifts_on_day');
-        $doReleaseShiftsDaily = config('cart-scheduler.do_release_shifts_daily');
-
-        $shifts = $this->getFreeShiftsData->execute($monthStart,
-            $period,
-            $duration,
-            $releaseShiftsOnDay,
-            $doReleaseShiftsDaily,
-        );
+        $endDate = $this->getMaxShiftReservationDateAllowed->execute()->format('Y-m-d');
+        $shifts  = $this->getFreeShiftsData->execute($monthStart, $endDate);
 
         return [
             'shifts'    => $shifts,

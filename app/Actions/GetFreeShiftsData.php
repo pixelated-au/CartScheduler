@@ -2,11 +2,9 @@
 
 namespace App\Actions;
 
-use App\Enums\DBPeriod;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
-use InvalidArgumentException;
 use stdClass;
 
 class GetFreeShiftsData
@@ -18,35 +16,20 @@ class GetFreeShiftsData
      *
      * Parameters line up with those in cart-scheduler config
      *
-     * @param string   $startDate YYYY-MM-DD
-     * @param DBPeriod $period month, week, day
-     * @param int      $durationLength any number that corresponds to the duration
-     * @param int      $releaseShiftsOnDay the day of the week to release the shifts. 1 for Sunday, 2 for Monday, etc
-     * @param bool     $doReleaseShiftsDaily - if true, the shifts will be released each period. Eg if the period is month, and the duration is 1, then the 1 month of shifts will be released on the first of each month.
+     * @param string $startDate YYYY-MM-DD
+     * @param string $endDate YYYY-MM-DD
      *
      * @return \Illuminate\Support\Collection
      */
-    public function execute(
-        string $startDate,
-        DBPeriod $period,
-        int $durationLength,
-        int $releaseShiftsOnDay,
-        bool $doReleaseShiftsDaily): Collection
+    public function execute(string $startDate, string $endDate): Collection
     {
-        if ($releaseShiftsOnDay < 1 || $releaseShiftsOnDay > 7) {
-            throw new InvalidArgumentException('release_shifts_on_day must be between 1 and 7');
-        }
-        $interval = "$durationLength $period->value";
-
-        $lastDay = $this->getDurationQuery($interval, $doReleaseShiftsDaily, $period, $releaseShiftsOnDay);
-
         $query = DB::raw(/** @lang MySQL */ "
                 WITH RECURSIVE dates (date) AS
                    (SELECT :startDate
                     UNION ALL
                     SELECT date + INTERVAL 1 DAY
                     FROM dates
-                    WHERE date + INTERVAL 1 DAY <= ($lastDay))
+                    WHERE date + INTERVAL 1 DAY <= :endDate)
 
                 SELECT dates.date,
                        shift_user.shift_date,
@@ -90,7 +73,7 @@ class GetFreeShiftsData
                 ",
         );
 
-        $results = DB::select($query, ['startDate' => $startDate]);
+        $results = DB::select($query, ['startDate' => $startDate, 'endDate' => $endDate]);
 
         return collect($results)
             ->map(fn(stdClass $shift) => collect([
@@ -108,28 +91,5 @@ class GetFreeShiftsData
                 'shift_id',
             ])
             ->sortKeys();
-    }
-
-    protected function getDurationQuery(
-        string $interval,
-        bool $doReleaseShiftsDaily,
-        DBPeriod $period,
-        int $releaseShiftsOnDay): string
-    {
-        $lastDay = "SELECT DATE_ADD(:startDate, INTERVAL $interval)";
-        if (!$doReleaseShiftsDaily) {
-            if ($period === DBPeriod::Month) {
-                $lastDay = "SELECT LAST_DAY(DATE_ADD(:startDate, INTERVAL $interval))";
-            } elseif ($period === DBPeriod::Week) {
-                /**
-                 * This releases the shifts on the specified day of the week plus 1 week.
-                 *
-                 * @noinspection SpellCheckingInspection
-                 */
-                $lastDay = "select DATE_ADD(DATE_ADD(:startDate, INTERVAL ($releaseShiftsOnDay - DAYOFWEEK(:startDate)) DAY ), INTERVAL 2 WEEK)";
-            }
-        }
-
-        return $lastDay;
     }
 }
