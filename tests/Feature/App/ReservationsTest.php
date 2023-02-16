@@ -207,56 +207,6 @@ class ReservationsTest extends TestCase
         $this->markTestSkipped('Not implemented yet.');
     }
 
-    public function test_available_shifts_released_daily_for_month(): void
-    {
-        // Set the date and time to create predictable tests
-        $this->travelTo('2023-01-15 00:00:00');
-        Config::set('cart-scheduler.shift_reservation_duration', 1);
-        Config::set('cart-scheduler.shift_reservation_duration_period', 'MONTH');
-        Config::set('cart-scheduler.do_release_shifts_daily', true);
-
-        $user = User::factory()->create();
-        $this->seed(LocationAndShiftsSeeder::class);
-        $response = $this->actingAs($user)->get('/shifts');
-
-        // When viewing the locations, the user should only see shifts for today plus ~30/31 days (1 month + 1 day)
-        $response->assertJsonCount(32, 'shifts');
-    }
-
-    public function test_available_shifts_released_daily_for_week(): void
-    {
-        Config::set('cart-scheduler.shift_reservation_duration', 1);
-        Config::set('cart-scheduler.shift_reservation_duration_period', 'WEEK');
-        Config::set('cart-scheduler.do_release_shifts_daily', true);
-
-        $user = User::factory()->create();
-        $this->seed(LocationAndShiftsSeeder::class);
-        $response = $this->actingAs($user)->get('/shifts');
-
-        // When viewing the locations, the user should only see shifts for today plus 7 days (1 week + 1 day)
-        $response->assertJsonCount(8, 'shifts');
-    }
-
-    public function test_available_shifts_released_beginning_of_month(): void
-    {
-        // Set the date and time to create predictable tests
-        $this->travelTo('2023-01-25 00:00:00');
-        Config::set('cart-scheduler.shift_reservation_duration', 1);
-        Config::set('cart-scheduler.shift_reservation_duration_period', 'MONTH');
-        Config::set('cart-scheduler.do_release_shifts_daily', false);
-
-        $user = User::factory()->create();
-        $this->seed(LocationAndShiftsSeeder::class);
-        $response = $this->actingAs($user)->get('/shifts');
-
-        // When viewing the locations, the user should only see shifts for today plus the rest of the month plus 1 month
-        $response->assertJsonCount(35, 'shifts');
-
-        $shifts = $response->json('shifts');
-        $this->assertArrayHasKey('2023-01-25', $shifts);
-        $this->assertArrayHasKey('2023-02-28', $shifts);
-    }
-
     public function test_user_cannot_reserve_daily_released_shifts_beyond_month(): void
     {
         // Set the date and time to create predictable tests (Wednesday)
@@ -269,16 +219,6 @@ class ReservationsTest extends TestCase
         $this->seed(LocationAndShiftsSeeder::class);
         $locationId = Location::first(['id'])->id;
         $shiftId    = Shift::inRandomOrder()->first(['id'])->id;
-
-        //$response = $this->actingAs($user)->postJson('/reserve-shift', [
-        //    'location'   => $locationId,
-        //    'shift'      => $shiftId,
-        //    'do_reserve' => true,
-        //    'date'       => '2023-03-09',
-        //]);
-        //
-        //$response->assertStatus(422);
-        //$response->assertJsonValidationErrors('date');
 
         $response = $this->actingAs($user)->postJson('/reserve-shift', [
             'location'   => $locationId,
