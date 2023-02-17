@@ -26,12 +26,10 @@ class GetOutstandingReports
                  ->leftJoin('locations', 'locations.id', '=', 'shifts.location_id')
                  ->where('shift_date', '<=', DB::raw('CURRENT_DATE()'))
                  ->when($user !== null, fn(Builder $query) => $query->where('user_id', $user->id))
-                 ->whereRaw('
-                    (SELECT COUNT(*)
+                 ->whereRaw('(SELECT COUNT(*)
                     FROM reports r
                     WHERE r.shift_id = su.shift_id
-                    AND r.shift_date = su.shift_date) = 0
-                  ')
+                    AND r.shift_date = su.shift_date) = 0')
                  ->when($user === null, fn(Builder $query) => $query->groupBy([
                      'su.shift_id',
                      'su.shift_date',
