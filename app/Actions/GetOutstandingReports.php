@@ -4,6 +4,7 @@ namespace App\Actions;
 
 use App\Models\User;
 use Illuminate\Database\Query\Builder;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
@@ -24,7 +25,7 @@ class GetOutstandingReports
                  ->from('shift_user', 'su')
                  ->leftJoin('shifts', 'shifts.id', '=', 'su.shift_id')
                  ->leftJoin('locations', 'locations.id', '=', 'shifts.location_id')
-                 ->where('shift_date', '<=', DB::raw('CURRENT_DATE()'))
+                 ->where('shift_date', '<=', Carbon::now()->format('Y-m-d'))
                  ->when($user !== null, fn(Builder $query) => $query->where('user_id', $user->id))
                  ->whereRaw('(SELECT COUNT(*)
                     FROM reports r
