@@ -8,6 +8,7 @@
 
     const props = defineProps({
         date: Date,
+        maxDate: Date,
         locations: Array,
         markerDates: Object,
         user: Object,
@@ -34,18 +35,20 @@
         return usePage().props.value.shiftAvailability
     })
 
-
     const today = new Date()
     const notBefore = props.canViewHistorical
         ? startOfDay(startOfMonth(subMonths(today, 6)))
         : startOfDay(today)
-    const notAfter = props.canViewHistorical
-        ? endOfMonth(addMonths(notBefore, 12))
-        : parseISO(shiftAvailability.value.maxDateReservation)
+
+    const notAfter = computed(() => {
+        return props.canViewHistorical
+            ? endOfMonth(addMonths(notBefore, 12))
+            : props.maxDate
+    })
 
     const allDates = []
     const getAllDates = () => {
-        for (let i = notBefore; i < notAfter; i = addDays(i, 1)) {
+        for (let i = notBefore; i < notAfter.value; i = addDays(i, 1)) {
             allDates.push(i)
         }
     }

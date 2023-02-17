@@ -18,7 +18,7 @@
 
     const toast = useToast()
 
-    const { date, locations, serverDates, getShifts } = useLocationFilter()
+    const { date, locations, maxReservationDate, serverDates, getShifts } = useLocationFilter()
 
     const gridCols = {
         // See tailwind.config.js
@@ -67,6 +67,7 @@
     <div class="p-3 grid gap-3 grid-cols-1 sm:grid-cols-[min-content_auto]">
         <div class="pb-3">
             <DatePicker v-model:date="date"
+                        :max-date="maxReservationDate"
                         :locations="locations"
                         :user="user"
                         :marker-dates="serverDates"

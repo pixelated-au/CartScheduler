@@ -49,12 +49,11 @@ class HandleInertiaRequests extends Middleware
         return array_merge(parent::share($request), [
             'pagePermissions'   => $this->getPageAccessPermissions(),
             'shiftAvailability' => [
-                'timezone'           => config('app.timezone'),
-                'duration'           => (int)config('cart-scheduler.shift_reservation_duration'),
-                'period'             => config('cart-scheduler.shift_reservation_duration_period'),
-                'releasedDaily'      => config('cart-scheduler.do_release_shifts_daily'),
-                'weekDayRelease'     => (int)config('cart-scheduler.release_weekly_shifts_on_day'),
-                'maxDateReservation' => $this->getMaxShiftReservationDateAllowed->execute()->format('Y-m-d\TH:i:s'),
+                'timezone'       => config('app.timezone'),
+                'duration'       => (int)config('cart-scheduler.shift_reservation_duration'),
+                'period'         => config('cart-scheduler.shift_reservation_duration_period'),
+                'releasedDaily'  => config('cart-scheduler.do_release_shifts_daily'),
+                'weekDayRelease' => (int)config('cart-scheduler.release_weekly_shifts_on_day'),
             ],
         ]);
     }

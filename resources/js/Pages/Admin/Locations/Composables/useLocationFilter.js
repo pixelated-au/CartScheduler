@@ -9,6 +9,7 @@ export default function useLocationFilter (canAdmin = false) {
      */
     const date = ref(parse('12:00:00', 'HH:mm:ss', new Date()))
 
+    const maxReservationDate = ref(new Date())
     const serverLocations = ref([])
     const serverDates = ref([])
 
@@ -17,6 +18,7 @@ export default function useLocationFilter (canAdmin = false) {
         const response = await axios.get(`/shifts${extra}`)
         serverLocations.value = response.data.locations
         serverDates.value = response.data.shifts
+        maxReservationDate.value = parseISO(response.data.maxDateReservation)
     }
 
     onMounted(() => {
@@ -134,6 +136,7 @@ export default function useLocationFilter (canAdmin = false) {
         date,
         emptyShiftsForTime,
         locations,
+        maxReservationDate,
         serverDates,
         getShifts,
     }
