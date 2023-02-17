@@ -35,7 +35,7 @@ class ShiftsTest extends TestCase
         $this->seed(LocationAndShiftsSeeder::class);
 
         $this->travelTo('2023-02-02 12:30:00');
-        $response = $this->actingAs($user)->get('/shifts');
+        $response = $this->actingAs($user)->getJson('/shifts');
         $response->assertJsonCount(3);
         $response->assertJsonCount(25, 'shifts');
         $response->assertJsonFragment(['maxDateReservation' => '2023-02-26']);
@@ -45,7 +45,7 @@ class ShiftsTest extends TestCase
         $this->assertJsonHasKeys($response, 'shifts', '2023-02-02', '2023-02-26');
 
         $this->travelTo('2023-02-06 13:59:59');
-        $response = $this->actingAs($user)->get('/shifts');
+        $response = $this->actingAs($user)->getJson('/shifts');
         $response->assertJsonCount(3);
         $response->assertJsonCount(21, 'shifts');
         $response->assertJsonFragment(['maxDateReservation' => '2023-02-26']);
@@ -55,7 +55,7 @@ class ShiftsTest extends TestCase
         $this->assertJsonHasKeys($response, 'shifts', '2023-02-06', '2023-02-26');
 
         $this->travelTo('2023-02-06 14:00:00');
-        $response = $this->actingAs($user)->get('/shifts');
+        $response = $this->actingAs($user)->getJson('/shifts');
         $response->assertJsonCount(3);
         $response->assertJsonCount(28, 'shifts');
         $response->assertJsonFragment(['maxDateReservation' => '2023-03-05']);
@@ -86,7 +86,7 @@ class ShiftsTest extends TestCase
         $this->seed(LocationAndShiftsSeeder::class);
 
         $this->travelTo('2023-02-02 12:30:00');
-        $response = $this->actingAs($user)->get('/shifts');
+        $response = $this->actingAs($user)->getJson('/shifts');
         $response->assertJsonCount(3);
         $response->assertJsonCount(11, 'shifts');
         $response->assertJsonFragment(['maxDateReservation' => '2023-02-12']);
@@ -96,7 +96,7 @@ class ShiftsTest extends TestCase
         $this->assertJsonHasKeys($response, 'shifts', '2023-02-02', '2023-02-12');
 
         $this->travelTo('2023-02-06 12:29:00');
-        $response = $this->actingAs($user)->get('/shifts');
+        $response = $this->actingAs($user)->getJson('/shifts');
         $response->assertJsonCount(3);
         $response->assertJsonCount(7, 'shifts');
         $response->assertJsonFragment(['maxDateReservation' => '2023-02-12']);
@@ -106,7 +106,7 @@ class ShiftsTest extends TestCase
         $this->assertJsonHasKeys($response, 'shifts', '2023-02-06', '2023-02-12');
 
         $this->travelTo('2023-02-06 12:30:00');
-        $response = $this->actingAs($user)->get('/shifts');
+        $response = $this->actingAs($user)->getJson('/shifts');
         $response->assertJsonCount(3);
         $response->assertJsonCount(14, 'shifts');
         $response->assertJsonFragment(['maxDateReservation' => '2023-02-19']);
@@ -116,7 +116,7 @@ class ShiftsTest extends TestCase
         $this->assertJsonHasKeys($response, 'shifts', '2023-02-06', '2023-02-19');
 
         $this->travelTo('2023-02-25 12:30:00');
-        $response = $this->actingAs($user)->get('/shifts');
+        $response = $this->actingAs($user)->getJson('/shifts');
         $response->assertJsonCount(3);
         $response->assertJsonCount(9, 'shifts');
         $response->assertJsonFragment(['maxDateReservation' => '2023-03-05']);
@@ -136,7 +136,7 @@ class ShiftsTest extends TestCase
 
         $user = User::factory()->create();
         $this->seed(LocationAndShiftsSeeder::class);
-        $response = $this->actingAs($user)->get('/shifts');
+        $response = $this->actingAs($user)->getJson('/shifts');
 
         $response->assertJsonCount(32, 'shifts');
         $response->assertJsonFragment(['maxDateReservation' => '2023-02-15']);
@@ -154,7 +154,7 @@ class ShiftsTest extends TestCase
 
         $user = User::factory()->create();
         $this->seed(LocationAndShiftsSeeder::class);
-        $response = $this->actingAs($user)->get('/shifts');
+        $response = $this->actingAs($user)->getJson('/shifts');
 
         $response->assertJsonCount(60, 'shifts');
         $response->assertJsonFragment(['maxDateReservation' => '2023-03-15']);
@@ -171,7 +171,7 @@ class ShiftsTest extends TestCase
 
         $user = User::factory()->create();
         $this->seed(LocationAndShiftsSeeder::class);
-        $response = $this->actingAs($user)->get('/shifts');
+        $response = $this->actingAs($user)->getJson('/shifts');
 
         // When viewing the locations, the user should only see shifts for today plus 7 days (1 week + 1 day)
         $response->assertJsonCount(8, 'shifts');
@@ -189,7 +189,7 @@ class ShiftsTest extends TestCase
 
         $user = User::factory()->create();
         $this->seed(LocationAndShiftsSeeder::class);
-        $response = $this->actingAs($user)->get('/shifts');
+        $response = $this->actingAs($user)->getJson('/shifts');
 
         // When viewing the locations, the user should only see shifts for today plus 7 days (1 week + 1 day)
         $response->assertJsonCount(22, 'shifts');
@@ -208,7 +208,7 @@ class ShiftsTest extends TestCase
 
         $user = User::factory()->create();
         $this->seed(LocationAndShiftsSeeder::class);
-        $response = $this->actingAs($user)->get('/shifts');
+        $response = $this->actingAs($user)->getJson('/shifts');
 
         // When viewing the locations, the user should only see shifts for today plus the rest of the month plus 1 month
         $response->assertJsonCount(35, 'shifts');
@@ -227,7 +227,7 @@ class ShiftsTest extends TestCase
 
         $user = User::factory()->create();
         $this->seed(LocationAndShiftsSeeder::class);
-        $response = $this->actingAs($user)->get('/shifts');
+        $response = $this->actingAs($user)->getJson('/shifts');
 
         // When viewing the locations, the user should only see shifts for today plus the rest of the month plus 1 month
         $response->assertJsonCount(96, 'shifts');
