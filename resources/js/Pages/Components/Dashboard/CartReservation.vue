@@ -1,5 +1,6 @@
 <script setup>
     import Accordion from '@/Components/Accordion.vue'
+    import ComponentSpinner from '@/Components/ComponentSpinner.vue'
     import BookedSlot from '@/Components/Icons/BookedSlot.vue'
     import EmptySlot from '@/Components/Icons/EmptySlot.vue'
     import Female from '@/Components/Icons/Female.vue'
@@ -66,12 +67,14 @@
 <template>
     <div class="p-3 grid gap-3 grid-cols-1 sm:grid-cols-[min-content_auto]">
         <div class="pb-3">
-            <DatePicker v-model:date="date"
-                        :max-date="maxReservationDate"
-                        :locations="locations"
-                        :user="user"
-                        :marker-dates="serverDates"
-                        @locations-for-day="setLocationMarkers"/>
+            <ComponentSpinner :show="!locations?.length">
+                <DatePicker v-model:date="date"
+                            :max-date="maxReservationDate"
+                            :locations="locations"
+                            :user="user"
+                            :marker-dates="serverDates"
+                            @locations-for-day="setLocationMarkers"/>
+            </ComponentSpinner>
             <div class="text-sm text-gray-500 text-center">Blue squares indicate free shifts</div>
         </div>
         <div class="text-sm">

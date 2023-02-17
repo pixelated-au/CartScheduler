@@ -11,10 +11,11 @@ export default function useLocationFilter (canAdmin = false) {
 
     const maxReservationDate = ref(new Date())
     const serverLocations = ref([])
-    const serverDates = ref([])
+    const serverDates = ref({})
 
     const getShifts = async () => {
         const extra = canAdmin ? '/1' : ''
+
         const response = await axios.get(`/shifts${extra}`)
         serverLocations.value = response.data.locations
         serverDates.value = response.data.shifts
