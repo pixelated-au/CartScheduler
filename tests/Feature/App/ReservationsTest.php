@@ -214,6 +214,7 @@ class ReservationsTest extends TestCase
         Config::set('cart-scheduler.shift_reservation_duration', 1);
         Config::set('cart-scheduler.shift_reservation_duration_period', 'MONTH');
         Config::set('cart-scheduler.do_release_shifts_daily', true);
+        Config::set('cart-scheduler.release_new_shifts_at_time', '00:00');
 
         $user = User::factory()->create();
         $this->seed(LocationAndShiftsSeeder::class);
@@ -224,10 +225,44 @@ class ReservationsTest extends TestCase
             'location'   => $locationId,
             'shift'      => $shiftId,
             'do_reserve' => true,
-            'date'       => '2023-03-08',
+            'date'       => '2023-03-07',
         ]);
 
         // The user can only reserve shifts for today plus ~30/31 days (1 month)
+        $response->assertOk();
+        $this->assertEquals('Reservation made', $response->content());
+    }
+
+    public function test_user_cannot_reserve_daily_released_at_time_shifts_beyond_month(): void
+    {
+        // Set the date and time to create predictable tests (Wednesday)
+        Config::set('cart-scheduler.shift_reservation_duration', 1);
+        Config::set('cart-scheduler.shift_reservation_duration_period', 'MONTH');
+        Config::set('cart-scheduler.do_release_shifts_daily', true);
+        Config::set('cart-scheduler.release_new_shifts_at_time', '12:00');
+
+        $user = User::factory()->create();
+        $this->seed(LocationAndShiftsSeeder::class);
+        $locationId = Location::first(['id'])->id;
+        $shiftId    = Shift::inRandomOrder()->first(['id'])->id;
+
+        $this->travelTo('2023-02-08 11:59:55');
+        $response = $this->actingAs($user)->postJson('/reserve-shift', [
+            'location'   => $locationId,
+            'shift'      => $shiftId,
+            'do_reserve' => true,
+            'date'       => '2023-03-07',
+        ]);
+        $response->assertStatus(422);
+        $response->assertJsonValidationErrors('date');
+
+        $this->travelTo('2023-02-08 12:00:00');
+        $response = $this->actingAs($user)->postJson('/reserve-shift', [
+            'location'   => $locationId,
+            'shift'      => $shiftId,
+            'do_reserve' => true,
+            'date'       => '2023-03-07',
+        ]);
         $response->assertOk();
         $this->assertEquals('Reservation made', $response->content());
     }
@@ -239,6 +274,7 @@ class ReservationsTest extends TestCase
         Config::set('cart-scheduler.shift_reservation_duration', 1);
         Config::set('cart-scheduler.shift_reservation_duration_period', 'WEEK');
         Config::set('cart-scheduler.do_release_shifts_daily', true);
+        Config::set('cart-scheduler.release_new_shifts_at_time', '00:00');
 
         $user = User::factory()->create();
         $this->seed(LocationAndShiftsSeeder::class);
@@ -249,7 +285,7 @@ class ReservationsTest extends TestCase
             'location'   => $locationId,
             'shift'      => $shiftId,
             'do_reserve' => true,
-            'date'       => '2023-02-24', // 8 days away
+            'date'       => '2023-02-23', // 8 days away
         ]);
 
         $response->assertStatus(422);
@@ -259,7 +295,43 @@ class ReservationsTest extends TestCase
             'location'   => $locationId,
             'shift'      => $shiftId,
             'do_reserve' => true,
-            'date'       => '2023-02-23', // 7 days away
+            'date'       => '2023-02-22', // 7 days away
+        ]);
+
+        // The user can only reserve shifts for today plus 7 days (1 week)
+        $response->assertOk();
+        $this->assertEquals('Reservation made', $response->content());
+    }
+
+    public function test_user_cannot_reserve_daily_released_at_time_shifts_beyond_week(): void
+    {
+        Config::set('cart-scheduler.shift_reservation_duration', 1);
+        Config::set('cart-scheduler.shift_reservation_duration_period', 'WEEK');
+        Config::set('cart-scheduler.do_release_shifts_daily', true);
+        Config::set('cart-scheduler.release_new_shifts_at_time', '12:00');
+
+        $user = User::factory()->create();
+        $this->seed(LocationAndShiftsSeeder::class);
+        $locationId = Location::first(['id'])->id;
+        $shiftId    = Shift::inRandomOrder()->first(['id'])->id;
+
+        $this->travelTo('2023-02-16 11:59:55');
+        $response = $this->actingAs($user)->postJson('/reserve-shift', [
+            'location'   => $locationId,
+            'shift'      => $shiftId,
+            'do_reserve' => true,
+            'date'       => '2023-02-22', // 7 days away but before 12:00
+        ]);
+
+        $response->assertStatus(422);
+        $response->assertJsonValidationErrors('date');
+
+        $this->travelTo('2023-02-16 12:00:00');
+        $response = $this->actingAs($user)->postJson('/reserve-shift', [
+            'location'   => $locationId,
+            'shift'      => $shiftId,
+            'do_reserve' => true,
+            'date'       => '2023-02-22', // 7 days away and after 12:00
         ]);
 
         // The user can only reserve shifts for today plus 7 days (1 week)
@@ -319,7 +391,7 @@ class ReservationsTest extends TestCase
         Config::set('cart-scheduler.shift_reservation_duration_period', 'WEEK');
         Config::set('cart-scheduler.do_release_shifts_daily', false); // Released once per week
         Config::set('cart-scheduler.release_weekly_shifts_on_day', 1); // Sunday
-        Config::set('cart-scheduler.release_weekly_shifts_at_time', '00:00'); // Midnight
+        Config::set('cart-scheduler.release_new_shifts_at_time', '00:00'); // Midnight
 
         $user = User::factory()->create();
         $this->seed(LocationAndShiftsSeeder::class);
@@ -364,7 +436,7 @@ class ReservationsTest extends TestCase
         Config::set('cart-scheduler.shift_reservation_duration_period', 'WEEK');
         Config::set('cart-scheduler.do_release_shifts_daily', false); // Released once per week
         Config::set('cart-scheduler.release_weekly_shifts_on_day', 2); // Monday
-        Config::set('cart-scheduler.release_weekly_shifts_at_time', '12:30'); // 12:30 PM
+        Config::set('cart-scheduler.release_new_shifts_at_time', '12:30'); // 12:30 PM
 
         $user = User::factory()->create();
         $this->seed(LocationAndShiftsSeeder::class);

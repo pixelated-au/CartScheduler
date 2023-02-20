@@ -5,6 +5,7 @@ namespace App\Actions;
 use App\Enums\DBPeriod;
 use http\Exception\InvalidArgumentException;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Str;
 
 class GetMaxShiftReservationDateAllowed
 {
@@ -19,7 +20,7 @@ class GetMaxShiftReservationDateAllowed
         $this->period               = DBPeriod::getConfigPeriod();
         $this->duration             = config('cart-scheduler.shift_reservation_duration');
         $this->releaseShiftsOnDay   = config('cart-scheduler.release_weekly_shifts_on_day');
-        $this->releaseShiftsAtTime  = config('cart-scheduler.release_weekly_shifts_at_time');
+        $this->releaseShiftsAtTime  = config('cart-scheduler.release_new_shifts_at_time');
         $this->doReleaseShiftsDaily = config('cart-scheduler.do_release_shifts_daily');
     }
 
@@ -29,16 +30,19 @@ class GetMaxShiftReservationDateAllowed
 
         if ($this->doReleaseShiftsDaily) {
             if ($this->period->value === DBPeriod::Week->value) {
-                return $now->addWeeks($this->duration)->endOfDay();
+                return $this->negateNumberOfDays($now)
+                            ->addWeeks($this->duration)
+                            ->endOfDay();
             }
 
-            return $now->addMonths($this->duration)->endOfDay();
+            return $this->negateNumberOfDays($now)
+                        ->addMonths($this->duration)->endOfDay();
         }
 
         if ($this->period->value === DBPeriod::Week->value) {
             return $now->startOfWeek($this->releaseShiftsOnDay - 1)
                        ->when(
-                           fn(Carbon $date) => $this->isCurrentDayButAfterTime($date),
+                           fn(Carbon $date) => $this->isCurrentDayButBeforeReleaseTime($date, DBPeriod::Week),
                            fn(Carbon $date) => $date->addWeeks($this->duration),
                            fn(Carbon $date) => $date->addWeeks($this->duration + 1),
                        )
@@ -46,7 +50,13 @@ class GetMaxShiftReservationDateAllowed
                        ->endOfDay();
         }
 
-        return $now->addMonths($this->duration)->endOfMonth()->endOfDay();
+        return $now
+            ->when(
+                fn(Carbon $date) => !$this->isCurrentDayButBeforeReleaseTime($date, DBPeriod::Month),
+                fn(Carbon $date) => $date->addMonths($this->duration),
+            )
+            ->endOfMonth()
+            ->endOfDay();
     }
 
     public function getFailMessage(): string
@@ -54,7 +64,7 @@ class GetMaxShiftReservationDateAllowed
         $period               = DBPeriod::getConfigPeriod();
         $duration             = config('cart-scheduler.shift_reservation_duration');
         $releaseShiftsOnDay   = config('cart-scheduler.release_weekly_shifts_on_day');
-        $releaseShiftsAtTime  = config('cart-scheduler.release_weekly_shifts_at_time');
+        $releaseShiftsAtTime  = config('cart-scheduler.release_new_shifts_at_time');
         $doReleaseShiftsDaily = config('cart-scheduler.do_release_shifts_daily');
 
         if ($doReleaseShiftsDaily) {
@@ -95,9 +105,30 @@ class GetMaxShiftReservationDateAllowed
      * For example, if the current day is Monday and the given time is 10:00 AM,
      * this method will return true if the given date is Monday at 10:00 AM or later.
      */
-    private function isCurrentDayButAfterTime(Carbon $date): bool
+    private function isCurrentDayButBeforeReleaseTime(Carbon $date, DBPeriod $period): bool
     {
-        return $date->startOfWeek($this->releaseShiftsOnDay - 1)->isSameDay($date)
+        return $date
+                   ->when(
+                       $period === DBPeriod::Week,
+                       fn(Carbon $date) => $date->startOfWeek($this->releaseShiftsOnDay - 1),
+                       fn(Carbon $date) => $date->startOfMonth(),
+                   )
+                   ->isSameDay($date)
                && $date->setTimeFromTimeString($this->releaseShiftsAtTime)->isFuture();
+    }
+
+    private function isBeforeReleaseTime(Carbon $date): bool
+    {
+        return !Str::startsWith($this->releaseShiftsAtTime, '00:00')
+               && $date->setTimeFromTimeString($this->releaseShiftsAtTime)->isFuture();
+    }
+
+    protected function negateNumberOfDays(Carbon $now): Carbon
+    {
+        return $now->when(
+            fn(Carbon $date) => $this->isBeforeReleaseTime($date),
+            fn(Carbon $date) => $date->subDays(2),
+            fn(Carbon $date) => $date->subDay(),
+        );
     }
 }

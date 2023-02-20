@@ -29,7 +29,7 @@ class ShiftsTest extends TestCase
         Config::set('cart-scheduler.shift_reservation_duration_period', 'WEEK');
         Config::set('cart-scheduler.do_release_shifts_daily', false); // Released once per week
         Config::set('cart-scheduler.release_weekly_shifts_on_day', 2); // Monday
-        Config::set('cart-scheduler.release_weekly_shifts_at_time', '14:00'); // 2:00 PM
+        Config::set('cart-scheduler.release_new_shifts_at_time', '14:00'); // 2:00 PM
 
         $user = User::factory()->create();
         $this->seed(LocationAndShiftsSeeder::class);
@@ -80,7 +80,7 @@ class ShiftsTest extends TestCase
         Config::set('cart-scheduler.shift_reservation_duration_period', 'WEEK');
         Config::set('cart-scheduler.do_release_shifts_daily', false); // Released once per week
         Config::set('cart-scheduler.release_weekly_shifts_on_day', 2); // Monday
-        Config::set('cart-scheduler.release_weekly_shifts_at_time', '12:30'); // 12:30 PM
+        Config::set('cart-scheduler.release_new_shifts_at_time', '12:30'); // 12:30 PM
 
         $user = User::factory()->create();
         $this->seed(LocationAndShiftsSeeder::class);
@@ -133,15 +133,38 @@ class ShiftsTest extends TestCase
         Config::set('cart-scheduler.shift_reservation_duration', 1);
         Config::set('cart-scheduler.shift_reservation_duration_period', 'MONTH');
         Config::set('cart-scheduler.do_release_shifts_daily', true);
+        Config::set('cart-scheduler.release_new_shifts_at_time', '00:00');
 
         $user = User::factory()->create();
         $this->seed(LocationAndShiftsSeeder::class);
         $response = $this->actingAs($user)->getJson('/shifts');
+        $response->assertJsonCount(31, 'shifts');
+        $response->assertJsonFragment(['maxDateReservation' => '2023-02-14']);
 
-        $response->assertJsonCount(32, 'shifts');
-        $response->assertJsonFragment(['maxDateReservation' => '2023-02-15']);
+        $this->assertJsonHasKeys($response, 'shifts', '2023-01-15', '2023-02-14');
+    }
 
-        $this->assertJsonHasKeys($response, 'shifts', '2023-01-15', '2023-02-15');
+    public function test_available_shifts_released_daily_for_month_after_time(): void
+    {
+        // Set the date and time to create predictable tests
+        Config::set('cart-scheduler.shift_reservation_duration', 1);
+        Config::set('cart-scheduler.shift_reservation_duration_period', 'MONTH');
+        Config::set('cart-scheduler.do_release_shifts_daily', true);
+        Config::set('cart-scheduler.release_new_shifts_at_time', '12:00');
+
+        $user = User::factory()->create();
+        $this->seed(LocationAndShiftsSeeder::class);
+        $this->travelTo('2023-01-15 11:59:55');
+        $response = $this->actingAs($user)->getJson('/shifts');
+        $response->assertJsonCount(30, 'shifts');
+        $response->assertJsonFragment(['maxDateReservation' => '2023-02-13']);
+        $this->assertJsonHasKeys($response, 'shifts', '2023-01-15', '2023-02-13');
+
+        $this->travelTo('2023-01-15 12:00:00');
+        $response = $this->actingAs($user)->getJson('/shifts');
+        $response->assertJsonCount(31, 'shifts');
+        $response->assertJsonFragment(['maxDateReservation' => '2023-02-14']);
+        $this->assertJsonHasKeys($response, 'shifts', '2023-01-15', '2023-02-14');
     }
 
     public function test_available_shifts_released_daily_for_two_months(): void
@@ -151,51 +174,77 @@ class ShiftsTest extends TestCase
         Config::set('cart-scheduler.shift_reservation_duration', 2);
         Config::set('cart-scheduler.shift_reservation_duration_period', 'MONTH');
         Config::set('cart-scheduler.do_release_shifts_daily', true);
+        Config::set('cart-scheduler.release_new_shifts_at_time', '00:00');
 
         $user = User::factory()->create();
         $this->seed(LocationAndShiftsSeeder::class);
         $response = $this->actingAs($user)->getJson('/shifts');
 
-        $response->assertJsonCount(60, 'shifts');
-        $response->assertJsonFragment(['maxDateReservation' => '2023-03-15']);
+        $response->assertJsonCount(59, 'shifts');
+        $response->assertJsonFragment(['maxDateReservation' => '2023-03-14']);
 
-        $this->assertJsonHasKeys($response, 'shifts', '2023-01-15', '2023-03-15');
+        $this->assertJsonHasKeys($response, 'shifts', '2023-01-15', '2023-03-14');
     }
 
     public function test_available_shifts_released_daily_for_week(): void
     {
-        $this->travelTo('2023-01-15 00:00:00');
+        $this->travelTo('2023-01-15 00:00:01');
         Config::set('cart-scheduler.shift_reservation_duration', 1);
         Config::set('cart-scheduler.shift_reservation_duration_period', 'WEEK');
         Config::set('cart-scheduler.do_release_shifts_daily', true);
+        Config::set('cart-scheduler.release_new_shifts_at_time', '00:00');
 
         $user = User::factory()->create();
         $this->seed(LocationAndShiftsSeeder::class);
         $response = $this->actingAs($user)->getJson('/shifts');
 
         // When viewing the locations, the user should only see shifts for today plus 7 days (1 week + 1 day)
-        $response->assertJsonCount(8, 'shifts');
-        $response->assertJsonFragment(['maxDateReservation' => '2023-01-22']);
+        $response->assertJsonCount(7, 'shifts');
+        $response->assertJsonFragment(['maxDateReservation' => '2023-01-21']);
 
-        $this->assertJsonHasKeys($response, 'shifts', '2023-01-15', '2023-01-22');
+        $this->assertJsonHasKeys($response, 'shifts', '2023-01-15', '2023-01-21');
+    }
+
+    public function test_available_shifts_released_daily_for_one_week_after_time(): void
+    {
+        Config::set('cart-scheduler.shift_reservation_duration', 1);
+        Config::set('cart-scheduler.shift_reservation_duration_period', 'WEEK');
+        Config::set('cart-scheduler.do_release_shifts_daily', true);
+        Config::set('cart-scheduler.release_new_shifts_at_time', '12:00');
+
+        $user = User::factory()->create();
+        $this->seed(LocationAndShiftsSeeder::class);
+
+        $this->travelTo('2023-01-15 11:59:55');
+        $response = $this->actingAs($user)->getJson('/shifts');
+        $response->assertJsonCount(6, 'shifts');
+        $response->assertJsonFragment(['maxDateReservation' => '2023-01-20']);
+        $this->assertJsonHasKeys($response, 'shifts', '2023-01-15', '2023-01-20');
+
+        $this->travelTo('2023-01-15 12:00:00');
+        $response = $this->actingAs($user)->getJson('/shifts');
+        $response->assertJsonCount(7, 'shifts');
+        $response->assertJsonFragment(['maxDateReservation' => '2023-01-21']);
+        $this->assertJsonHasKeys($response, 'shifts', '2023-01-15', '2023-01-21');
     }
 
     public function test_available_shifts_released_daily_for_three_weeks(): void
     {
-        $this->travelTo('2023-01-15 00:00:00');
+        $this->travelTo('2023-01-15 00:00:01');
         Config::set('cart-scheduler.shift_reservation_duration', 3);
         Config::set('cart-scheduler.shift_reservation_duration_period', 'WEEK');
         Config::set('cart-scheduler.do_release_shifts_daily', true);
+        Config::set('cart-scheduler.release_new_shifts_at_time', '00:00');
 
         $user = User::factory()->create();
         $this->seed(LocationAndShiftsSeeder::class);
         $response = $this->actingAs($user)->getJson('/shifts');
 
         // When viewing the locations, the user should only see shifts for today plus 7 days (1 week + 1 day)
-        $response->assertJsonCount(22, 'shifts');
-        $response->assertJsonFragment(['maxDateReservation' => '2023-02-05']);
+        $response->assertJsonCount(21, 'shifts');
+        $response->assertJsonFragment(['maxDateReservation' => '2023-02-04']);
 
-        $this->assertJsonHasKeys($response, 'shifts', '2023-01-15', '2023-02-05');
+        $this->assertJsonHasKeys($response, 'shifts', '2023-01-15', '2023-02-04');
     }
 
     public function test_available_shifts_released_once_per_month(): void
@@ -215,6 +264,38 @@ class ShiftsTest extends TestCase
         $response->assertJsonFragment(['maxDateReservation' => '2023-02-28']);
 
         $this->assertJsonHasKeys($response, 'shifts', '2023-01-25', '2023-02-28');
+    }
+
+    public function test_available_shifts_released_once_per_month_at_a_time(): void
+    {
+        // Set the date and time to create predictable tests
+        Config::set('cart-scheduler.shift_reservation_duration', 1);
+        Config::set('cart-scheduler.shift_reservation_duration_period', 'MONTH');
+        Config::set('cart-scheduler.do_release_shifts_daily', false);
+        Config::set('cart-scheduler.release_new_shifts_at_time', '12:00');
+
+        $user = User::factory()->create();
+        $this->seed(LocationAndShiftsSeeder::class);
+
+        $this->travelTo('2023-02-01 11:59:55');
+        $response = $this->actingAs($user)->getJson('/shifts');
+        $response->assertJsonCount(28, 'shifts');
+        $response->assertJsonFragment(['maxDateReservation' => '2023-02-28']);
+        $this->assertJsonHasKeys($response, 'shifts', '2023-02-01', '2023-02-28');
+
+        $this->travelTo('2023-02-01 12:00:00');
+        $response = $this->actingAs($user)->getJson('/shifts');
+        $response->assertJsonCount(59, 'shifts');
+        $response->assertJsonFragment(['maxDateReservation' => '2023-03-31']);
+        $this->assertJsonHasKeys($response, 'shifts', '2023-02-01', '2023-03-31');
+
+        $this->travelTo('2023-02-15 12:00:00');
+        $response = $this->actingAs($user)->getJson('/shifts');
+        $response->assertJsonCount(45, 'shifts');
+        $response->assertJsonFragment(['maxDateReservation' => '2023-03-31']);
+        $response->assertJsonMissingPath('shifts.2023-02-01');
+        $response->assertJsonMissingPath('shifts.2023-02-14');
+        $this->assertJsonHasKeys($response, 'shifts', '2023-02-15', '2023-03-31');
     }
 
     public function test_available_shifts_released_beginning_of_month_for_three_month_duration(): void
