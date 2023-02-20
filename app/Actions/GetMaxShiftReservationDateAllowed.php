@@ -3,7 +3,6 @@
 namespace App\Actions;
 
 use App\Enums\DBPeriod;
-use http\Exception\InvalidArgumentException;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 
@@ -15,7 +14,7 @@ class GetMaxShiftReservationDateAllowed
     private mixed    $releaseShiftsAtTime;
     private mixed    $doReleaseShiftsDaily;
 
-    public function __construct()
+    public function __construct(private readonly MapDayOfWeek $mapDayOfWeek)
     {
         $this->period               = DBPeriod::getConfigPeriod();
         $this->duration             = config('cart-scheduler.shift_reservation_duration');
@@ -40,7 +39,7 @@ class GetMaxShiftReservationDateAllowed
         }
 
         if ($this->period->value === DBPeriod::Week->value) {
-            return $now->startOfWeek($this->releaseShiftsOnDay - 1)
+            return $now->startOfWeek($this->mapDayOfWeek->toInteger($this->releaseShiftsOnDay))
                        ->when(
                            fn(Carbon $date) => $this->isCurrentDayButBeforeReleaseTime($date, DBPeriod::Week),
                            fn(Carbon $date) => $date->addWeeks($this->duration),
@@ -61,43 +60,21 @@ class GetMaxShiftReservationDateAllowed
 
     public function getFailMessage(): string
     {
-        $period               = DBPeriod::getConfigPeriod();
-        $duration             = config('cart-scheduler.shift_reservation_duration');
-        $releaseShiftsOnDay   = config('cart-scheduler.release_weekly_shifts_on_day');
-        $releaseShiftsAtTime  = config('cart-scheduler.release_new_shifts_at_time');
-        $doReleaseShiftsDaily = config('cart-scheduler.do_release_shifts_daily');
-
-        if ($doReleaseShiftsDaily) {
-            if ($period->value === DBPeriod::Week->value) {
-                return "Sorry, you can only reserve shifts up to $duration week(s) in advance.";
+        if ($this->doReleaseShiftsDaily) {
+            if ($this->period->value === DBPeriod::Week->value) {
+                return "Sorry, you can only reserve shifts up to $this->duration week(s) in advance.";
             }
 
-            return "Sorry, you can only reserve shifts up to $duration month(s) in advance.";
+            return "Sorry, you can only reserve shifts up to $this->duration month(s) in advance.";
         }
 
-        if ($period->value === DBPeriod::Week->value) {
-            $time = Carbon::now()->setTimeFromTimeString($releaseShiftsAtTime)->format('g:i A');
+        if ($this->period->value === DBPeriod::Week->value) {
+            $time = Carbon::now()->setTimeFromTimeString($this->releaseShiftsAtTime)->format('g:i A');
 
-            return "Sorry, you can only reserve shifts up to $duration week(s) in advance, starting each {$this->mapDayOfWeek($releaseShiftsOnDay)} at $time";
+            return "Sorry, you can only reserve shifts up to $this->duration week(s) in advance, starting each {$this->mapDayOfWeek->lengthen($this->releaseShiftsOnDay)} at $time";
         }
 
-        return "Sorry, you can only reserve shifts up to $duration month(s) in advance, after this month";
-    }
-
-    private function mapDayOfWeek(int $dayOfWeek): string
-    {
-        --$dayOfWeek; // MySQL: Sunday starts on 1, Carbon: Sunday starts on 0
-
-        return match ($dayOfWeek) {
-            0 => 'Sunday',
-            1 => 'Monday',
-            2 => 'Tuesday',
-            3 => 'Wednesday',
-            4 => 'Thursday',
-            5 => 'Friday',
-            6 => 'Saturday',
-            default => throw new InvalidArgumentException('Invalid day of week'),
-        };
+        return "Sorry, you can only reserve shifts up to $this->duration month(s) in advance, after this month";
     }
 
     /**
@@ -110,7 +87,8 @@ class GetMaxShiftReservationDateAllowed
         return $date
                    ->when(
                        $period === DBPeriod::Week,
-                       fn(Carbon $date) => $date->startOfWeek($this->releaseShiftsOnDay - 1),
+                       fn(
+                           Carbon $date) => $date->startOfWeek($this->mapDayOfWeek->toInteger($this->releaseShiftsOnDay)),
                        fn(Carbon $date) => $date->startOfMonth(),
                    )
                    ->isSameDay($date)

@@ -28,7 +28,7 @@ class ShiftsTest extends TestCase
         Config::set('cart-scheduler.shift_reservation_duration', 3); // 3 weeks
         Config::set('cart-scheduler.shift_reservation_duration_period', 'WEEK');
         Config::set('cart-scheduler.do_release_shifts_daily', false); // Released once per week
-        Config::set('cart-scheduler.release_weekly_shifts_on_day', 2); // Monday
+        Config::set('cart-scheduler.release_weekly_shifts_on_day', 'MON'); // Monday
         Config::set('cart-scheduler.release_new_shifts_at_time', '14:00'); // 2:00 PM
 
         $user = User::factory()->create();
@@ -79,7 +79,7 @@ class ShiftsTest extends TestCase
         Config::set('cart-scheduler.shift_reservation_duration', 1); // 1 week
         Config::set('cart-scheduler.shift_reservation_duration_period', 'WEEK');
         Config::set('cart-scheduler.do_release_shifts_daily', false); // Released once per week
-        Config::set('cart-scheduler.release_weekly_shifts_on_day', 2); // Monday
+        Config::set('cart-scheduler.release_weekly_shifts_on_day', 'MON');
         Config::set('cart-scheduler.release_new_shifts_at_time', '12:30'); // 12:30 PM
 
         $user = User::factory()->create();
