@@ -17,7 +17,7 @@ class SaveShiftReportController extends Controller
         if (!$shiftUser || $shiftUser->shift->start_time !== $request->get('start_time')) {
             return response()->json(
                 ['message' => 'The supplied data does not match a shift. Please contact the administrator and cite this message'],
-                422
+                422,
             );
         }
 
@@ -39,8 +39,6 @@ class SaveShiftReportController extends Controller
         $report->save();
 
         $report->tags()->sync($request->get('tags', []));
-
-        ray($report->tags);
 
         return response()->json(['message' => 'Report saved successfully']);
     }
