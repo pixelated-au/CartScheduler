@@ -9,7 +9,6 @@
     "license": "MIT",
     "require": {
         "php": "^8.1.0",
-        "ext-http": "*",
         "ext-pdo": "*",
         "ext-zip": "*",
         "bugsnag/bugsnag-laravel": "^2.0",
@@ -22,6 +21,7 @@
         "laravel/tinker": "^2.7",
         "maatwebsite/excel": "^3.1",
         "psr/simple-cache": "^2.0",
+        "spatie/laravel-activitylog": "^4.7",
         "spatie/laravel-ray": "^1.29",
         "spatie/laravel-tags": "^4.3",
         "tightenco/ziggy": "^1.0"

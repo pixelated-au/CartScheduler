@@ -13,6 +13,9 @@ use Illuminate\Support\Facades\Mail;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Jetstream\HasProfilePhoto;
 use Laravel\Sanctum\HasApiTokens;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\CausesActivity;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 /**
  * @method UserFactory factory()
@@ -24,6 +27,8 @@ class User extends Authenticatable
     use HasProfilePhoto;
     use Notifiable;
     use TwoFactorAuthenticatable;
+    use LogsActivity;
+    use CausesActivity;
 
     protected static function booted(): void
     {
@@ -121,5 +126,13 @@ class User extends Authenticatable
     public function shifts(): BelongsToMany
     {
         return $this->belongsToMany(Shift::class)->withPivot('shift_user');
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+                         ->logAll()
+                         ->logExcept(['password', 'remember_token', 'two_factor_recovery_codes', 'two_factor_secret'])
+                         ->logOnlyDirty();
     }
 }

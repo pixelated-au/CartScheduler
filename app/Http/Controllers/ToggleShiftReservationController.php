@@ -52,6 +52,15 @@ class ToggleShiftReservationController extends Controller
             }
 
             $shift->users()->wherePivot('shift_date', '=', $shiftDate->format('Y-m-d'))->detach($request->user()->id);
+            activity()
+                ->performedOn($shift)
+                ->causedBy($request->user())
+                ->withProperties([
+                    'user_id'             => $request->user()->id,
+                    'shift_date'          => $shiftDate,
+                    'shift.location.name' => $location->name,
+                ])
+                ->log('shift_unreserved');
 
             return response('Reservation removed', 200);
         });
