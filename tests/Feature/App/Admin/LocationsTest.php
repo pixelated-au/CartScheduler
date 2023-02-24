@@ -29,6 +29,11 @@ class LocationsTest extends TestCase
         $this->markTestSkipped('Not implemented yet.');
     }
 
+    public function test_admin_can_delete_a_shift(): void
+    {
+        $this->markTestSkipped('Not implemented yet.');
+    }
+
     public function test_admin_can_set_an_available_from_date(): void
     {
         // Verify that the shift is not available before the date
