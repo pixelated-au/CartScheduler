@@ -150,13 +150,13 @@ class ToggleShiftReservationController extends Controller
                            ->get();
 
         if ($shifts->count() < $location->max_volunteers - 1) {
-            // not enough volunteers to require a brother
+            // not enough volunteers to require a brother at this stage
             return;
         }
 
         // check if user is a sister. If so, fail
-        $hasSisters = $shifts->contains(fn(ShiftUser $shiftUser) => $shiftUser->user->gender === 'female');
-        if ($hasSisters) {
+        $isOnlySisters = $shifts->doesntContain(fn(ShiftUser $shiftUser) => $shiftUser->user->gender === 'male');
+        if ($isOnlySisters) {
             $fail('Sorry, you cannot reserve this shift because the last shift requires a brother');
         }
     }
