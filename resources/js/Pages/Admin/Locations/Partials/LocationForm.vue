@@ -7,7 +7,7 @@
     import ShiftData from '@/Pages/Admin/Locations/Partials/ShiftData.vue'
     import { Inertia } from '@inertiajs/inertia'
     import { useForm } from '@inertiajs/inertia-vue3'
-    import { computed, nextTick, ref, watch } from 'vue'
+    import { computed, nextTick, ref, watch, watchEffect } from 'vue'
     import LocationData from './LocationData.vue'
 
     const props = defineProps({
@@ -23,16 +23,29 @@
     ])
 
     const form = useForm({
-        id: props.location?.data?.id,
-        name: props.location?.data?.name,
-        description: props.location?.data?.description,
-        min_volunteers: props.location?.data?.min_volunteers,
-        max_volunteers: props.location?.data?.max_volunteers,
-        requires_brother: props.location?.data?.requires_brother,
-        latitude: props.location?.data?.latitude,
-        longitude: props.location?.data?.longitude,
-        is_enabled: props.location?.data?.is_enabled,
-        shifts: props.location?.data?.shifts,
+        id: '',
+        name: '',
+        description: '',
+        min_volunteers: '',
+        max_volunteers: '',
+        requires_brother: '',
+        latitude: '',
+        longitude: '',
+        is_enabled: '',
+        shifts: '',
+    })
+
+    watchEffect(() => {
+        form.id = props.location?.data?.id
+        form.name = props.location?.data?.name
+        form.description = props.location?.data?.description
+        form.min_volunteers = props.location?.data?.min_volunteers
+        form.max_volunteers = props.location?.data?.max_volunteers
+        form.requires_brother = props.location?.data?.requires_brother
+        form.latitude = props.location?.data?.latitude
+        form.longitude = props.location?.data?.longitude
+        form.is_enabled = props.location?.data?.is_enabled
+        form.shifts = props.location?.data?.shifts
     })
 
     watch(() => form.min_volunteers, (value, oldValue) => {

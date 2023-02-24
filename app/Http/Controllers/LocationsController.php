@@ -60,7 +60,7 @@ class LocationsController extends Controller
             'location' => LocationAdminResource::make($location->load([
                 'shifts' => function ($query) {
                     $query->orderBy('start_time', 'asc');
-                }
+                },
             ])),
         ]);
     }
@@ -88,6 +88,7 @@ class LocationsController extends Controller
         DB::commit();
 
         return Redirect::route('admin.locations.edit', $location);
+        //return Redirect::route('admin.locations.edit', $location, \Illuminate\Http\Response::HTTP_SEE_OTHER);
     }
 
     public function destroy(Location $location): RedirectResponse

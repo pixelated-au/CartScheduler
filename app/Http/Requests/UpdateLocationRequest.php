@@ -28,7 +28,7 @@ class UpdateLocationRequest extends FormRequest
             'requires_brother'        => ['boolean'],
             'latitude'                => ['nullable', 'numeric', 'min:-90', 'max:90.999999999999'],
             'longitude'               => ['nullable', 'numeric', 'min:-180', 'max:180.999999999999'],
-            'is_enabled'              => ['boolean'],
+            'is_enabled'              => ['nullable', 'boolean'],
             'shifts'                  => ['array'],
             'shifts.*.id'             => ['filled', 'integer'],
             'shifts.*.location_id'    => ['required', 'integer'],
@@ -43,7 +43,7 @@ class UpdateLocationRequest extends FormRequest
             'shifts.*.end_time'       => ['required', 'date_format:H:i:s'],
             'shifts.*.available_from' => ['nullable', 'date'], // Note, extra validation is done in withValidator()
             'shifts.*.available_to'   => ['nullable', 'date'], // Note, extra validation is done in withValidator()
-            'shifts.*.is_enabled'     => ['boolean'],
+            'shifts.*.is_enabled'     => ['nullable', 'boolean'],
         ];
     }
 
