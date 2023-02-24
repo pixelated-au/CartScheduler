@@ -3,7 +3,7 @@
     import AppLayout from '@/Layouts/AppLayout.vue'
     import FilledShiftsChart from '@/Pages/Admin/Dashboard/FilledShiftsChart.vue'
     import Tags from '@/Pages/Admin/Dashboard/Tags.vue'
-    import { Link } from '@inertiajs/inertia-vue3'
+    import { Inertia } from '@inertiajs/inertia'
 
     const props = defineProps({
         totalUsers: Number,
@@ -12,6 +12,7 @@
         outstandingReports: Array,
     })
 
+    const go = url => Inertia.visit(url)
 </script>
 
 <template>
@@ -26,7 +27,8 @@
                 <div class="bg-white dark:bg-slate-900 overflow-hidden shadow-xl sm:rounded-lg">
 
                     <div class="grid gap-3 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 m-6">
-                        <div class="bg-gray-100 dark:bg-slate-700 p-6 rounded-lg shadow-lg">
+                        <div class="cursor-pointer bg-gray-100 dark:bg-slate-700 p-6 rounded-lg shadow-lg hover:bg-gray-200 dark:hover:bg-slate-800 transition-colors"
+                             @click="go(route('admin.reports.index'))">
                             <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-200">
                                 <span class="text-gray-600 dark:text-gray-300">{{ outstandingReports.length }}</span>
                                 <span class="text-gray-600 dark:text-gray-300">
@@ -36,17 +38,16 @@
                             <p class="text-gray-700 dark:text-gray-300">
                                 The number of reports that participants are yet to submit. </p>
                         </div>
-                        <div class="bg-gray-100 dark:bg-slate-700 p-6 rounded-lg shadow-lg">
+                        <div class="cursor-pointer bg-gray-100 dark:bg-slate-700 p-6 rounded-lg shadow-lg hover:bg-gray-200 dark:hover:bg-slate-800 transition-colors"
+                             @click="go(route('admin.users.index'))">
                             <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-200">
-                                <span class="text-gray-600 dark:text-gray-300">{{ totalUsers }}</span>
 
-                                <Link :href="route('admin.users.index')">
-                                    Users
-                                </Link>
-                            </h3>
+                                <span class="text-gray-600 dark:text-gray-300">{{ totalUsers }}</span>
+                                Users </h3>
                             <p class="text-gray-700 dark:text-gray-300">Total number of users in the system.</p>
                         </div>
-                        <div class="bg-gray-100 dark:bg-slate-700 p-6 rounded-lg shadow-lg">
+                        <div class="cursor-pointer bg-gray-100 dark:bg-slate-700 p-6 rounded-lg shadow-lg hover:bg-gray-200 dark:hover:bg-slate-800 transition-colors"
+                             @click="go(route('admin.locations.index'))">
                             <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-200">
                                 <span class="text-gray-600 dark:text-gray-300">{{ totalLocations }}</span>
                                 <span class="text-gray-600 dark:text-gray-300 ml-1">Locations</span>
