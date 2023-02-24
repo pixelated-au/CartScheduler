@@ -28,4 +28,22 @@ class LocationsTest extends TestCase
     {
         $this->markTestSkipped('Not implemented yet.');
     }
+
+    public function test_admin_can_set_an_available_from_date(): void
+    {
+        // Verify that the shift is not available before the date
+        $this->markTestSkipped('Not implemented yet.');
+    }
+
+    public function test_admin_can_set_an_available_to_date(): void
+    {
+        // Verify that the shift is not available after the date
+        $this->markTestSkipped('Not implemented yet.');
+    }
+
+    public function test_admin_can_set_an_available_from_and_to_date(): void
+    {
+        // Verify that the shift is not available before and after the date
+        $this->markTestSkipped('Not implemented yet.');
+    }
 }
