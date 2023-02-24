@@ -34,7 +34,7 @@ jobs:
       #          mkdir -p database
       #          touch database/database.sqlite
       - name: Setup Node.js
-        uses: actions/setup-node@v2-beta
+        uses: actions/setup-node@v3
         with:
           node-version: 16
           check-latest: true
