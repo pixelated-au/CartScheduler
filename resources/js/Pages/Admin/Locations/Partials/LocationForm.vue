@@ -132,7 +132,7 @@
 
             <JetSectionBorder class="col-span-full"/>
 
-            <ShiftData v-model="form" class="col-span-full"/>
+            <ShiftData v-model="form"/>
             <div></div>
         </template>
 
