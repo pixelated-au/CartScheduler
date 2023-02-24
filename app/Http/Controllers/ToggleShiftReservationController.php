@@ -82,7 +82,9 @@ class ToggleShiftReservationController extends Controller
                     }
                     $shiftDate = Carbon::parse($data['date']);
                     $this->isOverlappingShift($request, $shiftDate, $data['shift'], $fail);
-                    $this->isUserAllowedToReserveShifts($shiftDate, $data['shift'], $fail);
+                    if ($request->user()->gender === 'female') {
+                        $this->isUserAllowedToReserveShifts($shiftDate, $data['shift'], $fail);
+                    }
                 },
             ],
             'do_reserve' => ['required', 'boolean'],
