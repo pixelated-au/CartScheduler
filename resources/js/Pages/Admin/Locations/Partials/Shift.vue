@@ -18,6 +18,7 @@
 
     const emit = defineEmits([
         'update:modelValue',
+        'delete',
     ])
 
     const shift = computed({
