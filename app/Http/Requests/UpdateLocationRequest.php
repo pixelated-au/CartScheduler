@@ -3,6 +3,8 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Fluent;
+use Illuminate\Validation\Validator;
 
 class UpdateLocationRequest extends FormRequest
 {
@@ -39,10 +41,24 @@ class UpdateLocationRequest extends FormRequest
             'shifts.*.day_sunday'     => ['boolean'],
             'shifts.*.start_time'     => ['required', 'date_format:H:i:s'],
             'shifts.*.end_time'       => ['required', 'date_format:H:i:s'],
-            'shifts.*.available_from' => ['nullable', 'date', 'before_or_equal:shifts.*.available_to'],
-            'shifts.*.available_to'   => ['nullable', 'date', 'after_or_equal:shifts.*.available_from'],
+            'shifts.*.available_from' => ['nullable', 'date'], // Note, extra validation is done in withValidator()
+            'shifts.*.available_to'   => ['nullable', 'date'], // Note, extra validation is done in withValidator()
             'shifts.*.is_enabled'     => ['boolean'],
         ];
+    }
+
+    /** @noinspection PhpUnused */
+    public function withValidator(Validator $validator): void
+    {
+        $validator->sometimes(
+            'shifts.*.available_from',
+            'before_or_equal:shifts.*.available_to',
+            fn(Fluent $input, Fluent $shiftData) => (bool)$shiftData->get('available_to'));
+
+        $validator->sometimes(
+            'shifts.*.available_to',
+            'after_or_equal:shifts.*.available_from',
+            fn(Fluent $input, Fluent $shiftData) => (bool)$shiftData->get('available_from'));
     }
 
     public function messages(): array
