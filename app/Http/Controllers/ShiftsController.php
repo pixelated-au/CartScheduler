@@ -9,12 +9,12 @@ namespace App\Http\Controllers;
 
 use App\Models\Shift;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 class ShiftsController extends Controller
 {
     public function index()
     {
-
     }
 
     public function create()
@@ -39,5 +39,10 @@ class ShiftsController extends Controller
 
     public function destroy(Shift $shift)
     {
+        if ($shift->delete()) {
+            return response('', Response::HTTP_NO_CONTENT);
+        }
+
+        return response('Shift could not be deleted! Please contact developer.', Response::HTTP_INTERNAL_SERVER_ERROR);
     }
 }

@@ -1,4 +1,5 @@
 <script setup>
+    import useToast from '@/Composables/useToast.js'
     import JetButton from '@/Jetstream/Button.vue'
     import JetCheckbox from '@/Jetstream/Checkbox.vue'
     import JetConfirmationModal from '@/Jetstream/ConfirmationModal.vue'
@@ -57,9 +58,17 @@
 
     const showModal = ref(false)
 
+    const toast = useToast()
+
     const deleteShift = async () => {
         if (shift.value.id) {
-            await axios.delete('/admin/shifts/' + shift.value.id)
+            try {
+                await axios.delete('/admin/shifts/' + shift.value.id)
+                toast.success('Shift deleted successfully')
+            } catch (e) {
+                toast.error(e.response.data)
+                return
+            }
         }
 
         emit('delete', props.index)
@@ -141,7 +150,6 @@
         </div>
         <JetSectionBorder class="col-span-full"/>
     </template>
-
 
     <JetConfirmationModal :show="showModal" :closeable="false">
         <template #title>DANGER!</template>

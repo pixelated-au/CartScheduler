@@ -12,6 +12,7 @@ use App\Http\Controllers\ReportTagsSortOrderController;
 use App\Http\Controllers\ResendWelcomeEmailController;
 use App\Http\Controllers\SaveShiftReportController;
 use App\Http\Controllers\SetUserPasswordController;
+use App\Http\Controllers\ShiftsController;
 use App\Http\Controllers\ToggleShiftReservationController;
 use App\Http\Controllers\UsersController;
 use App\Http\Controllers\UsersImportController;
@@ -94,9 +95,12 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
         Route::put('/move-user-to-shift', MoveUserToNewShiftController::class);
         Route::post('/resend-welcome-email', ResendWelcomeEmailController::class)->name('admin.resend-welcome-email');
 
+        Route::resource('shifts', ShiftsController::class)->only(['destroy'])->names([
+            'destroy' => 'admin.shifts.destroy',
+        ]);
+
         //Route::get('/', static fn() => Inertia::render('Admin/Dashboard'))->name('admin.dashboard');
 
-        //Route::resource('shifts', 'Admin\ShiftsController');
         //Route::resource('locations', 'Admin\LocationsController');
         //Route::resource('users', 'Admin\UsersController');
         //Route::resource('roles', 'Admin\RolesController');
