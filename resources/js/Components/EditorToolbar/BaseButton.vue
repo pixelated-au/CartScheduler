@@ -12,9 +12,9 @@
             required: false,
         },
         actionProps: {
-            type: Object,
+            type: [Object, String],
             required: false,
-            default: () => ({}),
+            default: null,
         },
         tooltip: {
             type: String,
@@ -29,7 +29,7 @@
             emit('click', e)
         }
 
-        const call = editor?.value?.chain()?.focus()[props?.action](props?.actionProps)?.run()
+        const call = editor?.value?.chain()?.focus()[props?.action](props?.actionProps || undefined)?.run()
         return call || (() => {
         })
     }
