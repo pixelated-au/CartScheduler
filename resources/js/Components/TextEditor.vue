@@ -56,11 +56,11 @@
             <ParagraphButton/>
             <BoldButton/>
             <ItalicButton/>
+            <StrikethroughButton/>
             <AlignButton direction="left"/>
             <AlignButton direction="right"/>
             <AlignButton direction="center"/>
             <AlignButton direction="justify"/>
-            <StrikethroughButton/>
             <ListButton list-type="ordered"/>
             <ListButton list-type="unordered"/>
             <LinkSetButton/>
@@ -82,5 +82,11 @@
 .ProseMirror:focus {
     outline: none;
     border: 0;
+}
+
+.ProseMirror ul,
+.ProseMirror ol {
+    padding-left: 1.5em;
+    list-style: auto;
 }
 </style>
