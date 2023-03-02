@@ -46,11 +46,11 @@ class GetFreeShiftsData
                          LEFT JOIN shifts ON shifts.is_enabled = true
                                           AND (
                                             shifts.available_from IS NULL
-                                            OR shifts.available_from <= :startDate
+                                            OR shifts.available_from <= dates.date
                                            )
                                           AND (
                                             shifts.available_to IS NULL
-                                            OR shifts.available_to >= :startDate
+                                            OR shifts.available_to >= dates.date
                                           )
                                           AND CASE
                                             WHEN DAYOFWEEK(dates.date) = 1 THEN shifts.day_sunday
