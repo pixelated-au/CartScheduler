@@ -68,8 +68,52 @@ class UserReservationsTest extends TestCase
         $response->assertJsonCount(2, 'data');
         $response->assertJsonMissing(['data.*.id' => $firstUser->getKey()]);
         $response->assertJsonMissing(['data.*.id' => $secondUser->getKey()]);
+    }
 
-        // TODO test that if the shift is a brother shift, only brothers are returned
+    public function test_admin_receives_gender_relevant_users(): void
+    {
+        $admin      = User::factory()->adminRoleUser()->create(['is_enabled' => true]);
+        User::factory()->male()->count(3)->create(['is_enabled' => true]);
+        $sisters = User::factory()->female()->count(3)->create(['is_enabled' => true]);
+
+        $this->assertDatabaseCount('users', 7);
+
+        $location = Location::factory()->create([
+            'max_volunteers' => 3,
+            'requires_brother' => true,
+        ]);
+
+        /** @var Shift $shift */
+        $shift = Shift::factory()->everyDay9am()->create([
+            'location_id' => $location->id,
+        ]);
+        $shiftId  = $shift->id;
+
+        $date  = '2023-01-03'; // A Tuesday
+        ShiftUser::factory()->create([
+            'shift_id' => $shift->id,
+            'user_id' => $sisters->get(0)->getKey(),
+            'shift_date' => $date,
+        ]);
+        $response = $this->actingAs($admin)
+            ->json('GET', "/admin/available-users-for-shift/$shiftId", ['date' => $date]);
+        // 4 users in the system. Should have all 7 users returned
+        $response->assertJsonCount(6, 'data');
+
+        ShiftUser::factory()->create([
+            'shift_id' => $shift->id,
+            'user_id' => $sisters->get(1)->getKey(),
+            'shift_date' => $date,
+        ]);
+
+        $response = $this->actingAs($admin)
+            ->json('GET', "/admin/available-users-for-shift/$shiftId", ['date' => $date]);
+        // 4 users in the system. Should only have male users returned
+        $response->assertJsonCount(4, 'data');
+        $response->assertJsonPath('data.0.gender', 'male');
+        $response->assertJsonPath('data.1.gender', 'male');
+        $response->assertJsonPath('data.2.gender', 'male');
+        $response->assertJsonPath('data.3.gender', 'male');
     }
 
     public function test_list_of_users_doesnt_include_disabled(): void

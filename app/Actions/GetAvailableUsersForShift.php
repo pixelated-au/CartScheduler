@@ -3,6 +3,7 @@
 namespace App\Actions;
 
 use App\Models\Shift;
+use App\Models\ShiftUser;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -12,6 +13,8 @@ class GetAvailableUsersForShift
     public function execute(Shift $shift, string $date): Collection
     {
         $overlappingShifts = $this->getOverlappingShifts($shift, $date);
+
+        $canOnlyBrothersRegister = $this->canOnlyBrothersBook($shift, $date);
 
         return User::query()
             ->distinct()
@@ -26,6 +29,9 @@ class GetAvailableUsersForShift
                 ->where('locations.is_enabled', true)
                 ->whereIn('shift_id', $overlappingShifts)
             )
+            ->when($canOnlyBrothersRegister, fn(Builder $query) => $query
+                ->where('users.gender', 'male')
+            )
             ->get();
     }
 
@@ -38,6 +44,25 @@ class GetAvailableUsersForShift
             ->where('end_time', '>', $shift->start_time)
             ->get()
             ->map(fn(Shift $shift) => $shift->getKey());
+    }
+
+    private function canOnlyBrothersBook(Shift $shift, string $date): bool
+    {
+        $location = $shift->load('location')->location;
+        if (!$location->requires_brother) {
+            return false;
+        }
+
+        $bookingCount = ShiftUser::query()
+            ->where('shift_id', $shift->id)
+            ->where('shift_date', $date)
+            ->count();
+
+        if ($bookingCount < $location->max_volunteers -1) {
+            return false;
+        }
+
+        return true;
     }
 
     /**
