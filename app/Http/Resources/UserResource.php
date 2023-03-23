@@ -13,6 +13,8 @@ use Illuminate\Http\Resources\Json\JsonResource;
  * @property mixed $mobile_phone
  * @property mixed $is_enabled
  * @property mixed $pivot
+ * @property mixed $last_shift_date
+ * @property mixed $last_shift_start_time
  */
 class UserResource extends JsonResource
 {
@@ -25,6 +27,8 @@ class UserResource extends JsonResource
             'mobile_phone' => $this->mobile_phone,
             'email'        => $this->email,
             'shift_date'   => $this->whenPivotLoaded('shift_user', fn() => $this->pivot['shift_date']),
+            'last_shift_date' => $this->whenNotNull($this->last_shift_date),
+            'last_shift_start_time' => $this->whenNotNull($this->last_shift_start_time),
         ];
     }
 }

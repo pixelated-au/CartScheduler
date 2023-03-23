@@ -7,6 +7,7 @@ use App\Models\ShiftUser;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\DB;
 
 class GetAvailableUsersForShift
 {
@@ -15,11 +16,21 @@ class GetAvailableUsersForShift
         $overlappingShifts = $this->getOverlappingShifts($shift, $date);
 
         $canOnlyBrothersRegister = $this->canOnlyBrothersBook($shift, $date);
-
         return User::query()
             ->distinct()
-            ->select('users.*')
-            ->leftJoin(table: 'shift_user', first: 'users.id', operator: '=', second: 'shift_user.user_id')
+            ->select(['users.*', 'last_shift_date', 'last_shift_start_time'])
+            ->leftJoinSub(
+                query: DB::query()
+                    ->select(['user_id'])
+                    ->selectRaw('MAX(shift_date) as last_shift_date')
+                    ->selectRaw('MAX(shifts.start_time) as last_shift_start_time')
+                    ->from('shift_user')
+                    ->join(table: 'shifts', first: 'shift_user.shift_id', operator: '=', second: 'shifts.id')
+                    ->groupBy('user_id'),
+                as: 'last_shift',
+                first: 'last_shift.user_id',
+                operator: '=',
+                second: 'users.id')
             ->where('users.is_enabled', true)
             ->whereDoesntHave('bookings', fn(Builder $query) => $query
                 ->join(table: 'shifts', first: 'shift_user.shift_id', operator: '=', second: 'shifts.id')
@@ -58,7 +69,7 @@ class GetAvailableUsersForShift
             ->where('shift_date', $date)
             ->count();
 
-        if ($bookingCount < $location->max_volunteers -1) {
+        if ($bookingCount < $location->max_volunteers - 1) {
             return false;
         }
 
