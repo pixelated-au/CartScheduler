@@ -13,19 +13,11 @@ class UserReservationsTest extends TestCase
 {
     use RefreshDatabase;
 
-    /*
-     * future tests:
-     * - admin can get a list of users - who are enabled
-     * - users returned are only those who have assigned themselves to the particular shift
-     * - admin can assign a user to a shift (reservation)
-     * - test appropriate gender restrictions
-    */
-
     public function test_admin_can_get_a_list_of_users(): void
     {
-        $admin = User::factory()->adminRoleUser()->create(['is_enabled' => true]);
-        $users = User::factory()->userRoleUser()->count(3)->create(['is_enabled' => true]);
-        $firstUser = $users->first();
+        $admin      = User::factory()->adminRoleUser()->create(['is_enabled' => true]);
+        $users      = User::factory()->userRoleUser()->count(3)->create(['is_enabled' => true]);
+        $firstUser  = $users->first();
         $secondUser = $users->get(1);
 
         $location = Location::factory()->create([
@@ -36,9 +28,9 @@ class UserReservationsTest extends TestCase
         $shift = Shift::factory()->everyDay9am()->create([
             'location_id' => $location->id,
         ]);
-        $date = '2023-01-03'; // A Tuesday
+        $date  = '2023-01-03'; // A Tuesday
 
-        $shiftId = $shift->id;
+        $shiftId  = $shift->id;
         $response = $this->actingAs($admin)
             ->json('GET', "/admin/available-users-for-shift/$shiftId", ['date' => $date]);
         // 4 users in the system. Should have 'available' 4 users returned
@@ -76,10 +68,13 @@ class UserReservationsTest extends TestCase
         $response->assertJsonCount(2, 'data');
         $response->assertJsonMissing(['data.*.id' => $firstUser->getKey()]);
         $response->assertJsonMissing(['data.*.id' => $secondUser->getKey()]);
+
+        // TODO test that if the shift is a brother shift, only brothers are returned
     }
+
     public function test_list_of_users_doesnt_include_disabled(): void
     {
-        $admin = User::factory()->adminRoleUser()->create(['is_enabled' => true]);
+        $admin       = User::factory()->adminRoleUser()->create(['is_enabled' => true]);
         $enabledUser = User::factory()->userRoleUser()->count(4)->create(['is_enabled' => true])->get(0);
         User::factory()->userRoleUser()->count(5)->create(['is_enabled' => false]);
 
@@ -93,9 +88,9 @@ class UserReservationsTest extends TestCase
         $shift = Shift::factory()->everyDay9am()->create([
             'location_id' => $location->id,
         ]);
-        $date = '2023-01-03'; // A Tuesday
+        $date  = '2023-01-03'; // A Tuesday
 
-        $shiftId = $shift->id;
+        $shiftId  = $shift->id;
         $response = $this->actingAs($admin)
             ->json('GET', "/admin/available-users-for-shift/$shiftId", ['date' => $date]);
         // 10 users in the system but should only have retrieve 5 active users because 5 are disabled
@@ -106,16 +101,115 @@ class UserReservationsTest extends TestCase
 
     public function test_admin_can_assign_a_user_to_a_shift(): void
     {
-        $this->markTestSkipped('Not implemented yet.');
-    }
+        $admin        = User::factory()->adminRoleUser()->create(['is_enabled' => true]);
+        $enabledUser  = User::factory()->userRoleUser()->count(4)->create(['is_enabled' => true])->get(0);
+        $disabledUser = User::factory()->userRoleUser()->count(5)->create(['is_enabled' => false])->get(0);
 
-    public function test_admin_can_only_assign_users_who_are_enabled(): void
-    {
-        $this->markTestSkipped('Not implemented yet.');
+        $this->assertDatabaseCount('users', 10);
+
+        $location = Location::factory()->create([
+            'requires_brother' => true,
+        ]);
+
+        /** @var Shift $shift */
+        $shift = Shift::factory()->everyDay9am()->create([
+            'location_id' => $location->id,
+        ]);
+        $this->travelTo('2023-01-02 09:00:00');
+        $date = '2023-01-03'; // A Tuesday
+
+        $this->assertDatabaseCount('shift_user', 0);
+
+        $this->actingAs($admin)
+            ->postJson("/admin/reserve-shift-for-user", [
+                    'date' => $date,
+                    'do_reserve' => true,
+                    'location' => $location->id,
+                    'shift' => $shift->id,
+                    'user_id' => $enabledUser->getKey(),
+                ]
+            )->assertOk();
+
+        $this->assertDatabaseCount('shift_user', 1);
+        $this->assertDatabaseHas('shift_user', [
+            'shift_id' => $shift->id,
+            'user_id' => $enabledUser->getKey(),
+            'shift_date' => $date,
+        ]);
+
+        $this->actingAs($admin)
+            ->postJson("/admin/reserve-shift-for-user", [
+                    'date' => $date,
+                    'do_reserve' => false,
+                    'location' => $location->id,
+                    'shift' => $shift->id,
+                    'user_id' => $enabledUser->getKey(),
+                ]
+            )->assertOk();
+
+        $this->assertDatabaseCount('shift_user', 0);
+        $this->assertDatabaseMissing('shift_user', [
+            'shift_id' => $shift->id,
+            'user_id' => $enabledUser->getKey(),
+            'shift_date' => $date,
+        ]);
+
+        // Test that adding an 'inactive' user fails
+        $this->actingAs($admin)
+            ->postJson("/admin/reserve-shift-for-user", [
+                    'date' => $date,
+                    'do_reserve' => true,
+                    'location' => $location->id,
+                    'shift' => $shift->id,
+                    'user_id' => $disabledUser->getKey(),
+                ]
+            )->assertStatus(422);
     }
 
     public function test_gender_restrictions_are_enforced(): void
     {
-        $this->markTestSkipped('Not implemented yet.');
+        $admin = User::factory()->adminRoleUser()->create(['is_enabled' => true]);
+        $users  = User::factory()->female()->count(3)->create();
+
+        $this->assertDatabaseCount('users', 4);
+
+        $location = Location::factory()->create([
+            'requires_brother' => true,
+        ]);
+
+        /** @var Shift $shift */
+        $shift = Shift::factory()->everyDay9am()->create([
+            'location_id' => $location->id,
+        ]);
+        $this->travelTo('2023-01-02 09:00:00');
+        $date  = '2023-01-03'; // A Tuesday
+
+        $this->actingAs($admin)
+            ->postJson("/admin/reserve-shift-for-user", [
+                    'date' => $date,
+                    'do_reserve' => true,
+                    'location' => $location->id,
+                    'shift' => $shift->id,
+                    'user_id' => $users->get(0)->getKey(),
+                ]
+            )->assertOk();
+        $this->actingAs($admin)
+            ->postJson("/admin/reserve-shift-for-user", [
+                    'date' => $date,
+                    'do_reserve' => true,
+                    'location' => $location->id,
+                    'shift' => $shift->id,
+                    'user_id' => $users->get(2)->getKey(),
+                ]
+            )->assertOk();
+        $this->actingAs($admin)
+            ->postJson("/admin/reserve-shift-for-user", [
+                    'date' => $date,
+                    'do_reserve' => true,
+                    'location' => $location->id,
+                    'shift' => $shift->id,
+                    'user_id' => $users->get(2)->getKey(),
+                ]
+            )->assertStatus(422);
     }
 }

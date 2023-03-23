@@ -8,7 +8,7 @@ use App\Enums\ToggleReservationStatus;
 use App\Http\Controllers\ValidationRules\ToggleShiftReservationControllerRules;
 use Illuminate\Http\Request;
 
-class ToggleShiftReservationController extends Controller
+class ToggleUserOntoShiftReservationController extends Controller
 {
     public function __construct(
         private readonly ToggleShiftReservationControllerRules $toggleShiftReservationControllerRules,
@@ -19,7 +19,10 @@ class ToggleShiftReservationController extends Controller
 
     public function __invoke(Request $request)
     {
-        $data = $this->validate($request, $this->toggleShiftReservationControllerRules->execute($request->user(), $request->all()));
+        $rules = $this->toggleShiftReservationControllerRules->execute($request->user(), $request->all());
+        $rules['user_id'] = ['required', 'integer', 'exists:users,id'];
+
+        $data = $this->validate($request, $rules);
         $status = $this->toggleUserOntoShift->execute($request->user(), $data);
 
         return match ($status) {
