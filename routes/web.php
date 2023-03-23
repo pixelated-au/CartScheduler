@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AdminDashboardController;
 use App\Http\Controllers\AvailableShiftsForMonthController;
+use App\Http\Controllers\GetAvailableUsersForShiftController;
 use App\Http\Controllers\GetReportTagsController;
 use App\Http\Controllers\LocationsController;
 use App\Http\Controllers\MissingReportsForUserController;
@@ -91,8 +92,11 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
             'destroy' => 'admin.report-tags.destroy',
         ]);
         Route::put('/report-tag-sort-order', ReportTagsSortOrderController::class);
-        Route::put('/move-user-to-shift', MoveUserToNewShiftController::class);
         Route::post('/resend-welcome-email', ResendWelcomeEmailController::class)->name('admin.resend-welcome-email');
+
+        Route::put('/move-user-to-shift', MoveUserToNewShiftController::class);
+
+        Route::get('/available-users-for-shift/{shift}', GetAvailableUsersForShiftController::class);
 
         //Route::get('/', static fn() => Inertia::render('Admin/Dashboard'))->name('admin.dashboard');
 
