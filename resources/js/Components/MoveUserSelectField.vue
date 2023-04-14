@@ -1,7 +1,9 @@
 <script setup>
     import SelectField from '@/Components/SelectField.vue'
     import { addMinutes, areIntervalsOverlapping, format, parse, subMinutes } from 'date-fns'
-    import { computed } from 'vue'
+    import {computed, inject} from 'vue'
+    import UserMove from "@/Components/Icons/UserMove.vue";
+    import UserAdd from "@/Components/Icons/UserAdd.vue";
 
     const props = defineProps({
         date: Date,
@@ -37,13 +39,16 @@
                 return { label, volunteers, id: locationId }
             })
     })
+    const isDarkMode = inject('darkMode', false)
 </script>
 <template>
     <div>
         <SelectField v-if="hasShiftsForTime"
                      @update:modelValue="$emit('update:modelValue', $event)"
-                     :options="shiftsForTime"
-                     select-label="Change location">
+                     :options="shiftsForTime">
+            <template #label="{option}">
+                <UserMove :color="isDarkMode ? '#fff' : '#000'"/>
+            </template>
             <template #extra="{option}">
                 <ul class="pl-3 font-normal">
                     <li v-for="volunteer in option.volunteers" :key="volunteer" class="list-disc">
