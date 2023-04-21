@@ -36,7 +36,7 @@
         "vue-echarts": "^6.2.3",
         "vue-slicksort": "^2.0.0-alpha.5",
         "vue-toastification": "^2.0.0-rc.5",
-        "vue3-easy-data-table": "^1.4.2"
+        "vue3-easy-data-table": "^1.5.42"
     },
     "web-types": "./web-types.json"
 }

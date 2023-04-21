@@ -11,7 +11,7 @@ class DoShiftReservation
 {
     public function execute(Shift $shift, Location $location, int $userId, Carbon|\Carbon\Carbon $shiftDate): bool
     {
-        $assignedUsers = $shift->users;
+        $assignedUsers = $shift->users()->wherePivot('shift_date', $shiftDate->toDateString())->get();
         // using >= just in case we've had some type of data error
         if ($assignedUsers->count() >= $location->max_volunteers) {
             return false;

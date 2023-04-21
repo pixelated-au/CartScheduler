@@ -95,10 +95,10 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
         Route::put('/report-tag-sort-order', ReportTagsSortOrderController::class);
         Route::post('/resend-welcome-email', ResendWelcomeEmailController::class)->name('admin.resend-welcome-email');
 
-        Route::put('/move-user-to-shift', MoveUserToNewShiftController::class);
+        Route::put('/move-volunteer-to-shift', MoveUserToNewShiftController::class);
 
         Route::get('/available-users-for-shift/{shift}', GetAvailableUsersForShiftController::class);
-        Route::post('/reserve-shift-for-user', ToggleUserOntoShiftReservationController::class);
+        Route::match(['put', 'delete'], '/toggle-shift-for-user', ToggleUserOntoShiftReservationController::class);
 
         //Route::get('/', static fn() => Inertia::render('Admin/Dashboard'))->name('admin.dashboard');
 

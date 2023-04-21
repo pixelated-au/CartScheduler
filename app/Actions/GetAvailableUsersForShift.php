@@ -60,16 +60,20 @@ class GetAvailableUsersForShift
     private function canOnlyBrothersBook(Shift $shift, string $date): bool
     {
         $location = $shift->load('location')->location;
+        $location = $shift->load('location')->location;
         if (!$location->requires_brother) {
             return false;
         }
 
-        $bookingCount = ShiftUser::query()
+        $sistersReservedCount = ShiftUser::with('user')
+            ->whereRelation(
+                'user',
+                fn(Builder $query) => $query->where('gender', '=', 'female')
+            )
             ->where('shift_id', $shift->id)
             ->where('shift_date', $date)
             ->count();
-
-        if ($bookingCount < $location->max_volunteers - 1) {
+        if ($sistersReservedCount < $location->max_volunteers - 1) {
             return false;
         }
 

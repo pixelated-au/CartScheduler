@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\ValidationRules;
 
 use App\Actions\GetMaxShiftReservationDateAllowed;
+use App\Actions\ValidateVolunteerIsAllowedToBeRosteredAction;
 use App\Enums\DBPeriod;
+use App\Exceptions\VolunteerIsAllowedException;
 use App\Models\Location;
 use App\Models\Shift;
 use App\Models\ShiftUser;
@@ -15,7 +17,9 @@ use RuntimeException;
 
 class ToggleShiftReservationControllerRules
 {
-    public function __construct(private readonly GetMaxShiftReservationDateAllowed $getMaxShiftReservationDateAllowed,
+    public function __construct(
+        private readonly GetMaxShiftReservationDateAllowed            $getMaxShiftReservationDateAllowed,
+        private readonly ValidateVolunteerIsAllowedToBeRosteredAction $validateVolunteerIsAllowedToBeRosteredAction,
     )
     {
     }
@@ -23,8 +27,8 @@ class ToggleShiftReservationControllerRules
     public function execute(User $user, array $data)
     {
         return [
-            'location' => ['required', 'integer', 'exists:locations,id'],
-            'shift' => [
+            'location'   => ['required', 'integer', 'exists:locations,id'],
+            'shift'      => [
                 'required',
                 'integer',
                 'exists:shifts,id',
@@ -35,12 +39,12 @@ class ToggleShiftReservationControllerRules
                     }
                     $shiftDate = Carbon::parse($data['date']);
                     $this->isOverlappingShift($user, $shiftDate, $data['shift'], $fail);
-                    $this->isUserAllowedToReserveShifts($shiftDate, $data['shift'], $fail);
-                    $this->isUserActive($data, $fail);
+                    $this->isUserAllowedToReserveShifts($user, $shiftDate, $data['shift'], $fail);
+                    $this->isUserActive($user, $data, $fail);
                 },
             ],
             'do_reserve' => ['required', 'boolean'],
-            'date' => [
+            'date'       => [
                 'required',
                 'date',
                 'after_or_equal:today',
@@ -65,7 +69,7 @@ class ToggleShiftReservationControllerRules
             ->where('shift_date', $shiftDate->toDateString())
             ->get();
 
-        $requestedShift = Shift::find($shift);
+        $requestedShift       = Shift::find($shift);
         $requestedShiftPeriod = CarbonPeriod::create(
             $requestedShift->start_time,
             $requestedShift->end_time,
@@ -79,14 +83,14 @@ class ToggleShiftReservationControllerRules
 
         if ($foundOverlappingShift) {
             $start = Carbon::parse($foundOverlappingShift->shift->start_time)->format('h:i a');
-            $end = Carbon::parse($foundOverlappingShift->shift->end_time)->format('h:i a');
+            $end   = Carbon::parse($foundOverlappingShift->shift->end_time)->format('h:i a');
             $fail(
-                "Sorry, you already have another shift that overlaps this shift at {$foundOverlappingShift->shift->location->name} between $start and $end.",
+                "Sorry, another shift that overlaps this shift at {$foundOverlappingShift->shift->location->name} between $start and $end.",
             );
         }
     }
 
-    private function isUserAllowedToReserveShifts(Carbon $shiftDate, int $shiftId, $fail): void
+    private function isUserAllowedToReserveShifts(User $user, Carbon $shiftDate, int $shiftId, $fail): void
     {
         $location = Location::whereRelation('shifts', 'id', $shiftId)->first();
         if (!$location) {
@@ -106,17 +110,17 @@ class ToggleShiftReservationControllerRules
             return;
         }
 
-        // check if user is a sister. If so, fail
-        $hasSisters = $shifts->contains(fn(ShiftUser $shiftUser) => $shiftUser->user->gender === 'female');
-        if ($hasSisters) {
-            $fail('Sorry, you cannot reserve this shift because the last shift requires a brother');
+        try {
+            $this->validateVolunteerIsAllowedToBeRosteredAction->execute($location, $user);
+        } catch (VolunteerIsAllowedException $e) {
+            $fail($e->getMessage());
         }
     }
 
     private function isShiftInAllowedPeriod(Carbon $shiftDate, $fail): void
     {
-        $dbPeriod = DBPeriod::getConfigPeriod();
-        $doReleaseShiftsDaily = config('cart-scheduler.do_release_shifts_daily');
+        $dbPeriod                       = DBPeriod::getConfigPeriod();
+        $doReleaseShiftsDaily           = config('cart-scheduler.do_release_shifts_daily');
         $maxShiftReservationDateAllowed = $this->getMaxShiftReservationDateAllowed->execute();
 
         if (
@@ -137,12 +141,12 @@ class ToggleShiftReservationControllerRules
         }
     }
 
-    private function isUserActive(array $data, $fail): void
+    private function isUserActive(User $user, array $data, $fail): void
     {
-        if (!$data['do_reserve'] || !isset($data['user_id'])) {
+        if (!$data['do_reserve'] || !isset($data['user'])) {
+            // test only if there is a 'user' key (admin only feature) and adding to a shift
             return;
         }
-        $user = User::find($data['user_id']);
         if (!$user->is_enabled) {
             $fail("Sorry, $user->name has been disabled. You cannot reserve a shift for them.");
         }

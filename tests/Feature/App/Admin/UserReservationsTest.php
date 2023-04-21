@@ -165,14 +165,15 @@ class UserReservationsTest extends TestCase
         $this->assertDatabaseCount('shift_user', 0);
 
         $this->actingAs($admin)
-            ->postJson("/admin/reserve-shift-for-user", [
+            ->putJson("/admin/toggle-shift-for-user", [
                     'date' => $date,
                     'do_reserve' => true,
                     'location' => $location->id,
                     'shift' => $shift->id,
-                    'user_id' => $enabledUser->getKey(),
+                    'user' => $enabledUser->getKey(),
                 ]
-            )->assertOk();
+            )
+            ->assertOk();
 
         $this->assertDatabaseCount('shift_user', 1);
         $this->assertDatabaseHas('shift_user', [
@@ -182,12 +183,12 @@ class UserReservationsTest extends TestCase
         ]);
 
         $this->actingAs($admin)
-            ->postJson("/admin/reserve-shift-for-user", [
+            ->deleteJson("/admin/toggle-shift-for-user", [
                     'date' => $date,
                     'do_reserve' => false,
                     'location' => $location->id,
                     'shift' => $shift->id,
-                    'user_id' => $enabledUser->getKey(),
+                    'user' => $enabledUser->getKey(),
                 ]
             )->assertOk();
 
@@ -198,14 +199,15 @@ class UserReservationsTest extends TestCase
             'shift_date' => $date,
         ]);
 
+        ray($disabledUser->getKey());
         // Test that adding an 'inactive' user fails
         $this->actingAs($admin)
-            ->postJson("/admin/reserve-shift-for-user", [
+            ->putJson("/admin/toggle-shift-for-user", [
                     'date' => $date,
                     'do_reserve' => true,
                     'location' => $location->id,
                     'shift' => $shift->id,
-                    'user_id' => $disabledUser->getKey(),
+                    'user' => $disabledUser->getKey(),
                 ]
             )->assertStatus(422);
     }
@@ -229,30 +231,30 @@ class UserReservationsTest extends TestCase
         $date  = '2023-01-03'; // A Tuesday
 
         $this->actingAs($admin)
-            ->postJson("/admin/reserve-shift-for-user", [
+            ->putJson("/admin/toggle-shift-for-user", [
                     'date' => $date,
                     'do_reserve' => true,
                     'location' => $location->id,
                     'shift' => $shift->id,
-                    'user_id' => $users->get(0)->getKey(),
+                    'user' => $users->get(0)->getKey(),
                 ]
             )->assertOk();
         $this->actingAs($admin)
-            ->postJson("/admin/reserve-shift-for-user", [
+            ->putJson("/admin/toggle-shift-for-user", [
                     'date' => $date,
                     'do_reserve' => true,
                     'location' => $location->id,
                     'shift' => $shift->id,
-                    'user_id' => $users->get(2)->getKey(),
+                    'user' => $users->get(1)->getKey(),
                 ]
             )->assertOk();
         $this->actingAs($admin)
-            ->postJson("/admin/reserve-shift-for-user", [
+            ->putJson("/admin/toggle-shift-for-user", [
                     'date' => $date,
                     'do_reserve' => true,
                     'location' => $location->id,
                     'shift' => $shift->id,
-                    'user_id' => $users->get(2)->getKey(),
+                    'user' => $users->get(2)->getKey(),
                 ]
             )->assertStatus(422);
     }

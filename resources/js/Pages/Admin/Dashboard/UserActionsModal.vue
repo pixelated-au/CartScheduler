@@ -2,13 +2,17 @@
     import JetButton from '@/Jetstream/Button.vue'
     import JetDialogModal from '@/Jetstream/DialogModal.vue'
     import JetSecondaryButton from '@/Jetstream/SecondaryButton.vue'
-    import {computed, inject, ref, watchEffect} from "vue";
+    import {computed, inject, ref, watch, watchEffect} from "vue";
     import UserAdd from "@/Components/Icons/UserAdd.vue";
     import {format} from "date-fns";
     import DataTable from "@/Components/DataTable.vue";
     import JetLabel from "@/Jetstream/Label.vue";
     import JetInput from "@/Jetstream/Input.vue";
     import JetHelpText from "@/Jetstream/HelpText.vue";
+    import Male from "@/Components/Icons/Male.vue";
+    import Female from "@/Components/Icons/Female.vue";
+    // noinspection ES6UnusedImports
+    import {VTooltip} from 'floating-vue'
 
     const props = defineProps({
         show: Boolean,
@@ -26,8 +30,8 @@
         set: value => emit('update:show', value)
     })
 
-    const assignVolunteer = volunteerId => {
-        emit('assignVolunteer', volunteerId)
+    const assignVolunteer = (volunteerId, volunteerName) => {
+        emit('assignVolunteer', {volunteerId, volunteerName, location: props.location, shift: props.shift})
         closeModal()
     }
 
@@ -50,12 +54,21 @@
 
     const volunteerSearch = ref('')
 
+    watch(volunteerSearch, (value) => {
+
+    })
+
     const tableHeaders = [
         {
             text: 'ID',
             value: 'id',
             sortable: true,
             width: '10%',
+        },
+        {
+            text: '',
+            value: 'gender',
+            sortable: false,
         },
         {
             text: 'Name',
@@ -74,16 +87,22 @@
         // },
     ]
 
-    // const tableRows = computed(() => {
-    //     return volunteers.value.map(volunteer => {
-    //         return {
-    //             id: volunteer.id,
-    //             name: volunteer.name,
-    //             // date: volunteer.last_rostered_at ? format(parse(volunteer.last_rostered_at, 'yyyy-MM-dd', new Date()), 'MMM d, yyyy') : 'Never',
-    //         }
-    //     })
-    // })
+    const tableRows = computed(() => {
+        return volunteers.value.map(volunteer => {
+            const prefix = volunteer.gender === 'male' ? 'Bro' : 'Sis'
+            return {
+                id: volunteer.id,
+                name: `${prefix} ${volunteer.name}`,
+                gender: volunteer.gender,
+                // date: volunteer.last_rostered_at ? format(parse(volunteer.last_rostered_at, 'yyyy-MM-dd', new Date()), 'MMM d, yyyy') : 'Never',
+            }
+        })
+    })
 
+    const bodyRowClassNameFunction = item =>
+        item.gender === 'male'
+            ? 'bg-blue-100 hover:bg-blue-200 dark:bg-blue-900/40 dark:hover:bg-blue-900/60 transition duration-150 hover:ease-in'
+            : 'bg-pink-100 hover:bg-pink-200 dark:bg-fuchsia-900/40 dark:hover:bg-fuchsia-900/60 transition duration-150 hover:ease-in';
     const bodyItemClassNameFunction = column => {
         if (column === 'action') return 'text-right';
         return '';
@@ -98,7 +117,7 @@
         </template>
 
         <template #content>
-            <div class="max-w-7xl mx-auto pt-10 pb-5 sm:px-6 lg:px-8">
+            <div class="max-w-7xl mx-auto pt-10 pb-5">
                 <div class="bg-white dark:bg-gray-900 shadow-xl sm:rounded-lg sm:p-6">
                     <JetLabel for="search" value="Search for a volunteer"/>
                     <JetInput id="search" v-model="volunteerSearch" type="text" class="mt-1 block w-full"/>
@@ -106,25 +125,32 @@
                 </div>
             </div>
 
-            <data-table :headers="tableHeaders"
-                        :items="volunteers"
-                        :search-value="volunteerSearch"
-                        :filter-options="[]"
-                        :show-hover="false"
-                        :body-item-class-name="bodyItemClassNameFunction">
-                <!--                <template #header-id="{text}">-->
-                <!--                    {{ text }}-->
-                <!--                </template>-->
-                <!--                <template #name="{ text }">-->
-                <!--                    {{ text }}-->
-                <!--                </template>-->
-                <template #item-action="{ item }">
-                    <JetButton style-type="info" @click="assignVolunteer">
-                        <UserAdd :color="isDarkMode ? '#fff' : '#000'"/>
-                    </JetButton>
-                </template>
-            </data-table>
-
+            <div class="volunteers">
+                <data-table
+                    :headers="tableHeaders"
+                    :items="tableRows"
+                    :search-value="volunteerSearch"
+                    :filter-options="[]"
+                    :show-hover="false"
+                    :body-row-class-name="bodyRowClassNameFunction"
+                    :body-item-class-name="bodyItemClassNameFunction">
+                    <!--                <template #header-id="{text}">-->
+                    <!--                    {{ text }}-->
+                    <!--                </template>-->
+                    <!--                <template #name="{ text }">-->
+                    <!--                    {{ text }}-->
+                    <!--                </template>-->
+                    <template #item-gender="{ gender }">
+                        <Male v-if="gender === 'male'" v-tooltip="'Brother'"/>
+                        <Female v-else-if="gender === 'female'" v-tooltip="'Sister'"/>
+                    </template>
+                    <template #item-action="{ id, name }">
+                        <JetButton style-type="info" @click="assignVolunteer(id, name)">
+                            <UserAdd :color="isDarkMode ? '#fff' : '#000'"/>
+                        </JetButton>
+                    </template>
+                </data-table>
+            </div>
 
         </template>
 
@@ -143,4 +169,16 @@
     </JetDialogModal>
 </template>
 <style lang="scss">
+.volunteers .data-table table {
+    border-spacing: 0 2px;
+
+    td:first-child {
+        @apply rounded-l-lg;
+    }
+
+    td:last-child {
+        @apply rounded-r-lg;
+    }
+
+}
 </style>

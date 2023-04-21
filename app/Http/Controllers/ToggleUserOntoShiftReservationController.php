@@ -6,7 +6,9 @@ use App\Actions\ErrorApiResource;
 use App\Actions\ToggleUserOntoShift;
 use App\Enums\ToggleReservationStatus;
 use App\Http\Controllers\ValidationRules\ToggleShiftReservationControllerRules;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 
 class ToggleUserOntoShiftReservationController extends Controller
 {
@@ -19,11 +21,16 @@ class ToggleUserOntoShiftReservationController extends Controller
 
     public function __invoke(Request $request)
     {
-        $rules = $this->toggleShiftReservationControllerRules->execute($request->user(), $request->all());
-        $rules['user_id'] = ['required', 'integer', 'exists:users,id'];
+        $userId = $request->integer('user');
+        if (!$userId) {
+            throw new ValidationException('Missing User ID');
+        }
+        $user = User::findOrFail($userId);
+
+        $rules = $this->toggleShiftReservationControllerRules->execute($user, $request->all());
 
         $data = $this->validate($request, $rules);
-        $status = $this->toggleUserOntoShift->execute($request->user(), $data);
+        $status = $this->toggleUserOntoShift->execute($user, $data);
 
         return match ($status) {
             ToggleReservationStatus::RESERVATION_MADE => response('Reservation made', 200),
