@@ -1,5 +1,5 @@
 <script setup>
-    import {computed, ref, useSlots} from 'vue'
+    import {computed, inject, ref, useSlots} from 'vue'
 
     const props = defineProps({
         modelValue: Object,
@@ -36,12 +36,33 @@
         ? props.options.find(option => option.value === model.value)?.label
         : props.selectLabel || 'Select one'
     )
+
+    const noOptions = computed(() => props.options.length === 0)
+
+    const isDarkMode = inject('darkMode', false)
+
+    const arrowFill = computed(() => {
+        if (isDarkMode.value) {
+            return '#fff'
+        }
+        return noOptions.value ? '#000' : '#fff'
+    })
+
+    const buttonClasses = computed(() => {
+        let classes = []
+        if (noOptions.value) {
+            classes.push('!bg-gray-300 dark:!bg-gray-700 !cursor-not-allowed')
+        }
+        return classes.join(' ')
+    })
+
 </script>
 
 <template>
     <div class="relative">
         <button id="dropdownDefault"
                 :data-dropdown-toggle="`dropdown-${fieldUnique}`"
+                :class="buttonClasses"
                 class="text-white bg-purple-700 hover:bg-purple-800 focus:ring-4 focus:outline-none focus:ring-purple-300 font-medium rounded-lg text-sm px-4 py-2.5 text-center inline-flex items-center dark:bg-purple-600 dark:hover:bg-purple-700 dark:focus:ring-purple-800"
                 type="button"
                 @click="isOpen = !isOpen">
@@ -52,8 +73,8 @@
             <svg class="ml-2 w-4 h-4"
                  aria-hidden="true"
                  fill="none"
-                 stroke="currentColor"
                  viewBox="0 0 24 24"
+                 :stroke="arrowFill"
                  xmlns="http://www.w3.org/2000/svg">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
             </svg>
