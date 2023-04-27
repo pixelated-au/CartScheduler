@@ -3,8 +3,11 @@
     import {addMinutes, areIntervalsOverlapping, format, parse, subMinutes} from 'date-fns'
     import {computed, inject} from 'vue'
     import UserMove from "@/Components/Icons/UserMove.vue";
+    // noinspection ES6UnusedImports
+    import {VTooltip} from 'floating-vue'
 
     const props = defineProps({
+        volunteer: Object,
         date: Date,
         shift: Object,
         locationId: Number,
@@ -21,10 +24,6 @@
         ) && shiftData.locationId !== props.locationId
     }
 
-    const hasShiftsForTime = computed(() => {
-        return !!props.emptyShiftsForTime?.find(shiftData => hasMatch(shiftData))
-    })
-
     const shiftsForTime = computed(() => {
         return props.emptyShiftsForTime
             ?.filter(shiftData => hasMatch(shiftData))
@@ -39,13 +38,24 @@
             })
     })
     const isDarkMode = inject('darkMode', false)
+    const iconColor = computed(() => {
+        if (shiftsForTime.value?.length === 0) {
+            return isDarkMode.value ? '#fff' : '#000'
+        }
+        return '#fff'
+    })
+    const moveTooltip = computed(() => shiftsForTime.value?.length === 0
+        ? `No other locations available`
+        : `Move ${props.volunteer.name} to another shift`)
+
 </script>
 <template>
-    <SelectField v-if="hasShiftsForTime"
-                 @update:modelValue="$emit('update:modelValue', $event)"
-                 :options="shiftsForTime">
+    <SelectField :options="shiftsForTime"
+                 v-tooltip="moveTooltip"
+                 emptyNote="No other locations available"
+                 @update:modelValue="$emit('update:modelValue', $event)">
         <template #label="{option}">
-            <UserMove color="#fff"/>
+            <UserMove :color="iconColor"/>
         </template>
         <template #extra="{option}">
             <ul class="pl-3 font-normal">
@@ -55,5 +65,4 @@
             </ul>
         </template>
     </SelectField>
-    <span v-else class="text-red-500">No shifts available</span>
 </template>
