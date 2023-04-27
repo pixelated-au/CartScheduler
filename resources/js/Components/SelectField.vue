@@ -7,6 +7,7 @@
             type: Array,
             required: true,
         },
+        emptyNote: String,
         selectLabel: String,
     })
 
@@ -81,17 +82,24 @@
         </button>
         <!-- Dropdown menu -->
         <div :id="`dropdown-${fieldUnique}`"
-             class="absolute z-10 w-64 bg-white rounded divide-y divide-gray-100 shadow dark:bg-gray-700 cursor-pointer"
+             class="absolute z-10 w-64 bg-white rounded divide-y divide-gray-100 drop-shadow-xl dark:bg-gray-700 cursor-pointer"
              :style="menuStyle">
             <ul class="py-1 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownDefault">
-                <li v-for="option in options" :key="option.id">
-                    <div
-                        class="block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white font-bold"
-                        @click="model = option">
-                        {{ option.label }}
-                        <slot name="extra" :option="option"></slot>
-                    </div>
-                </li>
+                <template v-if="noOptions">
+                    <li class="block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white font-bold">
+                        {{ emptyNote || 'No options available' }}
+                    </li>
+                </template>
+                <template v-else>
+                    <li v-for="option in options" :key="option.id">
+                        <div
+                            class="block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white font-bold"
+                            @click="model = option">
+                            {{ option.label }}
+                            <slot name="extra" :option="option"></slot>
+                        </div>
+                    </li>
+                </template>
             </ul>
         </div>
     </div>
