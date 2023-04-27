@@ -76,10 +76,19 @@ class UserFactory extends Factory
         });
     }
 
+    public function male(): Factory
+    {
+        return $this->state(function (array $attributes) {
+            return [
+                'gender' => 'male',
+            ];
+        });
+    }
+
     /**
      * Indicate that the model's email address should be unverified.
      *
-     * @return \Illuminate\Database\Eloquent\Factories\Factory
+     * @return Factory
      */
     public function unverified(): Factory
     {

@@ -49,4 +49,22 @@ class ShiftFactory extends Factory
         });
     }
 
+    public function everyDay9am(): Factory
+    {
+        return $this->state(function (array $attributes) {
+            return [
+                'day_monday'     => true,
+                'day_tuesday'    => true,
+                'day_wednesday'  => true,
+                'day_thursday'   => true,
+                'day_friday'     => true,
+                'day_saturday'   => true,
+                'day_sunday'     => true,
+                'start_time'     => '09:00:00',
+                'end_time'       => '12:00:00',
+                'available_from' => null,
+                'available_to'   => null,
+            ];
+        });
+    }
 }

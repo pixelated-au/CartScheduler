@@ -1,5 +1,5 @@
 <script setup>
-    import { computed, ref } from 'vue'
+    import {computed, ref, useSlots} from 'vue'
 
     const props = defineProps({
         modelValue: Object,
@@ -28,9 +28,14 @@
         return isOpen.value ? 'display: block' : 'display: none'
     })
 
+    const slots = useSlots()
+    const useLabelSlot = computed(() => !!slots.label)
+
+
     const label = computed(() => model.value
-        ? options.find(option => option.value === model.value)?.label
-        : props.selectLabel || 'Select one')
+        ? props.options.find(option => option.value === model.value)?.label
+        : props.selectLabel || 'Select one'
+    )
 </script>
 
 <template>
@@ -40,7 +45,10 @@
                 class="text-white bg-purple-700 hover:bg-purple-800 focus:ring-4 focus:outline-none focus:ring-purple-300 font-medium rounded-lg text-sm px-4 py-2.5 text-center inline-flex items-center dark:bg-purple-600 dark:hover:bg-purple-700 dark:focus:ring-purple-800"
                 type="button"
                 @click="isOpen = !isOpen">
-            {{ label }}
+            <slot name="label" v-if="useLabelSlot"/>
+            <template v-else>
+                {{ label }}
+            </template>
             <svg class="ml-2 w-4 h-4"
                  aria-hidden="true"
                  fill="none"
@@ -56,8 +64,9 @@
              :style="menuStyle">
             <ul class="py-1 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownDefault">
                 <li v-for="option in options" :key="option.id">
-                    <div class="block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white font-bold"
-                         @click="model = option">
+                    <div
+                        class="block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white font-bold"
+                        @click="model = option">
                         {{ option.label }}
                         <slot name="extra" :option="option"></slot>
                     </div>

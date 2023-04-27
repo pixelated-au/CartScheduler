@@ -2,18 +2,21 @@
     import Accordion from '@/Components/Accordion.vue'
     import EmptySlot from '@/Components/Icons/EmptySlot.vue'
     import Female from '@/Components/Icons/Female.vue'
-    import Male from '@/Components/Icons/Male.vue'
-    import MoveUserSelectField from '@/Components/MoveUserSelectField.vue'
-    import useToast from '@/Composables/useToast'
     import JetButton from '@/Jetstream/Button.vue'
     import JetConfirmModal from '@/Jetstream/ConfirmationModal.vue'
+    import Male from '@/Components/Icons/Male.vue'
+    import useToast from '@/Composables/useToast'
     import useLocationFilter from '@/Pages/Admin/Locations/Composables/useLocationFilter'
     import DatePicker from '@/Pages/Components/Dashboard/DatePicker.vue'
     import axios from 'axios'
-    import { format, parse } from 'date-fns'
+    import {format, parse} from 'date-fns'
     // noinspection ES6UnusedImports
-    import { VTooltip } from 'floating-vue'
-    import { ref } from 'vue'
+    import {VTooltip} from 'floating-vue'
+    import {computed, inject, reactive, ref} from 'vue'
+    import UserActionsModal from "@/Pages/Admin/Dashboard/UserActionsModal.vue";
+    import MoveUserSelectField from "@/Components/MoveUserSelectField.vue";
+    import UserAdd from "@/Components/Icons/UserAdd.vue";
+    import UserRemove from "@/Components/Icons/UserRemove.vue";
 
     defineProps({
         user: Object,
@@ -21,7 +24,7 @@
 
     const toast = useToast()
 
-    const { date, locations, serverDates, getShifts, emptyShiftsForTime } = useLocationFilter(true)
+    const {date, locations, serverDates, getShifts, emptyShiftsForTime} = useLocationFilter(true)
 
     const gridCols = {
         // See tailwind.config.js
@@ -36,14 +39,19 @@
     const setLocationMarkers = locations => locationsOnDays.value = locations
 
     const selectedMoveUser = ref(null)
+    /** Note this is a get/set computed property so we can set it to null when the modal is closed **/
+    const showMoveUserModal = computed({
+        get: () => !!selectedMoveUser.value,
+        set: value => selectedMoveUser.value = value ? selectedMoveUser.value : null,
+    })
 
-    const promptMoveUser = (selection, volunteer, shift) => selectedMoveUser.value = { selection, volunteer, shift }
+    const promptMoveVolunteer = (selection, volunteer, shift) => selectedMoveUser.value = {selection, volunteer, shift}
 
-    const doMoveUser = async (userId, locationId, shiftId) => {
+    const moveVolunteer = async (volunteerId, locationId, shiftId) => {
         selectedMoveUser.value = null
         try {
-            await axios.put('/admin/move-user-to-shift', {
-                user_id: userId,
+            await axios.put('/admin/move-volunteer-to-shift', {
+                user_id: volunteerId,
                 location_id: locationId,
                 old_shift_id: shiftId,
                 date: format(date.value, 'yyyy-MM-dd'),
@@ -53,12 +61,89 @@
             toast.error(e.response.data.message)
 
         } finally {
-            getShifts()
+            await getShifts()
+        }
+    }
+
+    const assignVolunteer = async ({volunteerId, volunteerName, location, shift}) => {
+        try {
+            await axios.put('/admin/toggle-shift-for-user', {
+                do_reserve: true,
+                user: volunteerId,
+                location: location.id,
+                shift: shift.id,
+                date: format(date.value, 'yyyy-MM-dd'),
+            })
+            toast.success(`${volunteerName} was assigned to ${location.name} at ${shift.start_time}`)
+        } catch (e) {
+            toast.error(e.response.data.message)
+
+        } finally {
+            await getShifts()
+        }
+    }
+
+    const removeVolunteer = async () => {
+        try {
+            await axios.delete('/admin/toggle-shift-for-user', {
+                data: {
+                    do_reserve: false,
+                    user: selectedRemoveUser.value.volunteer.id,
+                    location: selectedRemoveUser.value.location.id,
+                    shift: selectedRemoveUser.value.shift.id,
+                    date: format(selectedRemoveUser.value.date, 'yyyy-MM-dd'),
+                }
+            })
+            toast.warning(`${selectedRemoveUser.value.volunteer.name} was removed from ${selectedRemoveUser.value.location.name} at ${selectedRemoveUser.value.shift.start_time}`)
+            selectedRemoveUser.value = null
+        } catch (e) {
+            toast.error(e.response.data.message)
+
+        } finally {
+            await getShifts()
         }
     }
 
     const today = new Date()
     const formatTime = time => format(parse(time, 'HH:mm:ss', today), 'h:mm a')
+
+    const isDarkMode = inject('darkMode', false)
+    const showUserAddModal = ref(false)
+
+    const rowClass = gender => {
+        if (gender === 'male') {
+            return 'bg-blue-100 hover:bg-blue-200 dark:bg-blue-900/40 dark:hover:bg-blue-900/60'
+        } else if (gender === 'female') {
+            return 'bg-pink-100 hover:bg-pink-200 dark:bg-fuchsia-900/40 dark:hover:bg-fuchsia-900/60'
+        }
+        return 'bg-slate-200 dark:bg-slate-700 dark:text-gray-50'
+    };
+
+
+    const assignUserData = reactive({
+        shift: null,
+        location: null,
+    })
+
+    const doShowAssignVolunteerModal = (shift, location) => {
+        assignUserData.shift = shift
+        assignUserData.location = location
+        showUserAddModal.value = true
+    }
+
+    const selectedRemoveUser = ref(null)
+
+    const setRemoveUser = (volunteer, shift, location, date) =>
+        selectedRemoveUser.value = {volunteer, shift, location, date}
+
+    /** Note this is a get/set computed property so we can set it to null when the modal is closed **/
+    const showRemoveVolunteerModal = computed({
+        get: () => !!selectedRemoveUser.value,
+        set: value => selectedRemoveUser.value = value ? selectedRemoveUser.value : null,
+    })
+
+    const removeTooltip = name => `Remove ${name} from this shift`
+    const moveTooltip = name => `Move ${name} to another shift`
 </script>
 
 <template>
@@ -92,34 +177,49 @@
                                 <EmptySlot v-else v-tooltip="'Available shift'"/>
                             </div>
                             <div></div>
-                            <div class="col-span-full bg-slate-200 dark:bg-slate-700 dark:text-gray-50 rounded px-3 py-2">
-                                <ul>
-                                    <li v-for="(volunteer, index) in shift.filterVolunteers"
-                                        :key="index"
-                                        class="border-b border-gray-400 last:border-b-0 py-2 flex justify-between flex-wrap sm:flex-nowrap">
-                                        <template v-if="volunteer">
-                                            <div class=" flex items-center flex-wrap sm:flex-nowrap">
-                                                <div class="w-full md:w-auto md:mr-3">
-                                                    {{ volunteer.gender === 'male' ? 'Bro' : 'Sis' }}
-                                                    {{ volunteer.name }}
-                                                </div>
-                                                <div class="w-full md:w-auto">
-                                                    <MoveUserSelectField :date="date"
-                                                                         :shift="shift"
-                                                                         :location-id="location.id"
-                                                                         :empty-shifts-for-time="emptyShiftsForTime"
-                                                                         @update:modelValue="promptMoveUser($event, volunteer, shift)"/>
-                                                </div>
-                                            </div>
-                                            <div>Ph: <a :href="`tel:${volunteer.mobile_phone}`"
-                                                        class="underline underline-offset-4 decoration-dotted decoration-1 decoration-blue-800 visited:decoration-blue-800">{{ volunteer.mobile_phone
-                                                }}</a></div>
-                                        </template>
-                                        <template v-else>
-                                            <div>—</div>
-                                        </template>
-                                    </li>
-                                </ul>
+                            <div
+                                class="col-span-full dark:text-gray-50">
+                                <div v-for="(volunteer, index) in shift.filterVolunteers"
+                                     :key="index"
+                                     class="border-b border-gray-400 last:border-b-0 first:rounded-t-md last:rounded-b-md p-2 transition duration-150 hover:ease-in"
+                                     :class="rowClass(volunteer?.gender)">
+                                    <div v-if="volunteer" class="grid grid-cols-2 gap-1.5">
+                                        <div class="md:mr-3">
+                                            {{ volunteer.gender === 'male' ? 'Bro' : 'Sis' }}
+                                            {{ volunteer.name }}
+                                        </div>
+                                        <div class="text-right">Ph: <a :href="`tel:${volunteer.mobile_phone}`"
+                                                                       class="underline underline-offset-4 decoration-dotted decoration-1 decoration-blue-800 visited:decoration-blue-800">{{
+                                                volunteer.mobile_phone
+                                            }}</a>
+                                        </div>
+                                        <div class="col-span-2 grid grid-cols-2 gap-1.5 lg:flex lg:gap-3">
+                                        <MoveUserSelectField class="inline-block"
+                                                             v-tooltip="moveTooltip(volunteer.name)"
+                                                             :volunteer="volunteer"
+                                                             :date="date"
+                                                             :shift="shift"
+                                                             :location-id="location.id"
+                                                             :empty-shifts-for-time="emptyShiftsForTime"
+                                                             @update:modelValue="promptMoveVolunteer($event, volunteer, shift)"/>
+                                        <div class="text-right">
+                                            <JetButton style-type="danger"
+                                                       v-tooltip="removeTooltip(volunteer.name)"
+                                                       @click="setRemoveUser(volunteer, shift, location, date)">
+                                                <UserRemove color="#000"/>
+                                            </JetButton>
+                                        </div>
+                                        </div>
+                                    </div>
+
+                                    <div v-else>
+                                        <JetButton style-type="info"
+                                                   @click="doShowAssignVolunteerModal(shift, location)">
+                                            <UserAdd color="#fff"/>
+                                            <span class="ml-3">Add Volunteer</span>
+                                        </JetButton>
+                                    </div>
+                                </div>
                             </div>
                         </template>
                     </div>
@@ -127,7 +227,14 @@
             </Accordion>
         </div>
     </div>
-    <JetConfirmModal v-model:show="selectedMoveUser">
+    <UserActionsModal
+        v-model:show="showUserAddModal"
+        :date="date"
+        :shift="assignUserData.shift"
+        :location="assignUserData.location"
+        @assignVolunteer="assignVolunteer"/>
+
+    <JetConfirmModal v-model:show="showMoveUserModal">
         <template #title>
             <h2 class="text-lg font-medium text-gray-900">Move user</h2>
         </template>
@@ -140,9 +247,33 @@
         <template #footer>
             <div class="flex justify-end">
                 <JetButton style-type="secondary" @click="selectedMoveUser = null">Cancel</JetButton>
-                <JetButton @click="doMoveUser(selectedMoveUser?.volunteer.id, selectedMoveUser?.selection.id, selectedMoveUser?.shift.id)"
-                           class="ml-2">
+                <JetButton
+                    @click="moveVolunteer(selectedMoveUser?.volunteer.id, selectedMoveUser?.selection.id, selectedMoveUser?.shift.id)"
+                    class="ml-2">
                     Move
+                </JetButton>
+            </div>
+        </template>
+    </JetConfirmModal>
+
+    <JetConfirmModal v-model:show="showRemoveVolunteerModal">
+        <template #title>
+            <h2 class="text-lg font-medium text-gray-900">Remove user</h2>
+        </template>
+        <template #content>
+            <div>
+                Are you sure you want to remove {{ selectedRemoveUser.volunteer.name }} from
+                {{ selectedRemoveUser.location.name }}?
+            </div>
+        </template>
+        <template #footer>
+            <div class="flex justify-end">
+                <JetButton style-type="secondary" @click="selectedRemoveUser = null">Cancel</JetButton>
+                <JetButton
+                    style-type="warning"
+                    @click="removeVolunteer()"
+                    class="ml-2">
+                    Remove
                 </JetButton>
             </div>
         </template>

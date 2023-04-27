@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AdminDashboardController;
 use App\Http\Controllers\AvailableShiftsForMonthController;
+use App\Http\Controllers\GetAvailableUsersForShiftController;
 use App\Http\Controllers\GetReportTagsController;
 use App\Http\Controllers\LocationsController;
 use App\Http\Controllers\MissingReportsForUserController;
@@ -14,6 +15,7 @@ use App\Http\Controllers\SaveShiftReportController;
 use App\Http\Controllers\SetUserPasswordController;
 use App\Http\Controllers\ShiftsController;
 use App\Http\Controllers\ToggleShiftReservationController;
+use App\Http\Controllers\ToggleUserOntoShiftReservationController;
 use App\Http\Controllers\UsersController;
 use App\Http\Controllers\UsersImportController;
 use Illuminate\Support\Facades\Route;
@@ -92,12 +94,16 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
             'destroy' => 'admin.report-tags.destroy',
         ]);
         Route::put('/report-tag-sort-order', ReportTagsSortOrderController::class);
-        Route::put('/move-user-to-shift', MoveUserToNewShiftController::class);
         Route::post('/resend-welcome-email', ResendWelcomeEmailController::class)->name('admin.resend-welcome-email');
 
         Route::resource('shifts', ShiftsController::class)->only(['destroy'])->names([
             'destroy' => 'admin.shifts.destroy',
         ]);
+
+        Route::put('/move-volunteer-to-shift', MoveUserToNewShiftController::class);
+
+        Route::get('/available-users-for-shift/{shift}', GetAvailableUsersForShiftController::class);
+        Route::match(['put', 'delete'], '/toggle-shift-for-user', ToggleUserOntoShiftReservationController::class);
 
         //Route::get('/', static fn() => Inertia::render('Admin/Dashboard'))->name('admin.dashboard');
 

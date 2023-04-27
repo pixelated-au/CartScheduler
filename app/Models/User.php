@@ -4,9 +4,11 @@ namespace App\Models;
 
 use App\Mail\UserAccountCreated;
 use Database\Factories\UserFactory;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Mail;
@@ -86,6 +88,12 @@ class User extends Authenticatable
         'profile_photo_url',
     ];
 
+    /** @noinspection PhpUnused */
+    public function scopeEnabled(Builder $query): Builder
+    {
+        return $query->where('is_enabled', true);
+    }
+
     /**
      * Format the phone number
      *
@@ -126,6 +134,11 @@ class User extends Authenticatable
     public function shifts(): BelongsToMany
     {
         return $this->belongsToMany(Shift::class)->withPivot('shift_user');
+    }
+
+    public function bookings(): HasMany
+    {
+        return $this->HasMany(ShiftUser::class);
     }
 
     public function getActivitylogOptions(): LogOptions
