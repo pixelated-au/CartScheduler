@@ -199,7 +199,6 @@ class UserReservationsTest extends TestCase
             'shift_date' => $date,
         ]);
 
-        ray($disabledUser->getKey());
         // Test that adding an 'inactive' user fails
         $this->actingAs($admin)
             ->putJson("/admin/toggle-shift-for-user", [
