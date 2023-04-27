@@ -141,6 +141,9 @@
         get: () => !!selectedRemoveUser.value,
         set: value => selectedRemoveUser.value = value ? selectedRemoveUser.value : null,
     })
+
+    const removeTooltip = name => `Remove ${name} from this shift`
+    const moveTooltip = name => `Move ${name} to another shift`
 </script>
 
 <template>
@@ -192,6 +195,7 @@
                                         </div>
                                         <div class="col-span-2 grid grid-cols-2 gap-1.5 lg:flex lg:gap-3">
                                         <MoveUserSelectField class="inline-block"
+                                                             v-tooltip="moveTooltip(volunteer.name)"
                                                              :volunteer="volunteer"
                                                              :date="date"
                                                              :shift="shift"
@@ -200,8 +204,9 @@
                                                              @update:modelValue="promptMoveVolunteer($event, volunteer, shift)"/>
                                         <div class="text-right">
                                             <JetButton style-type="danger"
+                                                       v-tooltip="removeTooltip(volunteer.name)"
                                                        @click="setRemoveUser(volunteer, shift, location, date)">
-                                                <UserRemove :color="isDarkMode ? '#fff' : '#000'"/>
+                                                <UserRemove color="#000"/>
                                             </JetButton>
                                         </div>
                                         </div>
