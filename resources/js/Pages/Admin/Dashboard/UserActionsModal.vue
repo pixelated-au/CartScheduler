@@ -4,13 +4,11 @@
     import JetSecondaryButton from '@/Jetstream/SecondaryButton.vue'
     import {computed, inject, ref, watch, watchEffect} from "vue";
     import UserAdd from "@/Components/Icons/UserAdd.vue";
-    import {format} from "date-fns";
+    import {format, parse} from "date-fns";
     import DataTable from "@/Components/DataTable.vue";
     import JetLabel from "@/Jetstream/Label.vue";
     import JetInput from "@/Jetstream/Input.vue";
     import JetHelpText from "@/Jetstream/HelpText.vue";
-    import Male from "@/Components/Icons/Male.vue";
-    import Female from "@/Components/Icons/Female.vue";
     // noinspection ES6UnusedImports
     import {VTooltip} from 'floating-vue'
 
@@ -71,15 +69,15 @@
             sortable: true,
         },
         {
+            text: 'Last Rostered',
+            value: 'lastShift',
+            sortable: true,
+        },
+        {
             text: '',
             value: 'action',
             sortable: false,
-        }
-        // {
-        //     text: 'Last Rostered',
-        //     value: 'date',
-        //     sortable: true,
-        // },
+        },
     ]
 
     const tableRows = computed(() => {
@@ -89,7 +87,9 @@
                 id: volunteer.id,
                 name: `${prefix} ${volunteer.name}`,
                 gender: volunteer.gender,
-                // date: volunteer.last_rostered_at ? format(parse(volunteer.last_rostered_at, 'yyyy-MM-dd', new Date()), 'MMM d, yyyy') : 'Never',
+                lastShift: volunteer.last_shift_date ? volunteer.last_shift_date : null,
+                lastShiftTime: volunteer.last_shift_start_time ? volunteer.last_shift_start_time : null,
+                // lastShift: volunteer.last_rostered_at ? format(parse(volunteer.last_rostered_at, 'yyyy-MM-dd', new Date()), 'MMM d, yyyy') : 'Never',
             }
         })
     })
@@ -102,6 +102,16 @@
         if (column === 'action') return '!text-right';
         return '';
     };
+
+    const formatShiftDate = (shiftDate, shiftTime) => {
+        if (!shiftDate) {
+            return 'Never'
+        }
+        if (!shiftTime) {
+            return format(parse(shiftDate, 'yyyy-MM-dd', new Date()), 'MMM d, yyyy')
+        }
+        return format(parse(`${shiftDate} ${shiftTime}`, 'yyyy-MM-dd HH:mm:ss', new Date()), 'MMM d, yyyy, h:mma')
+    }
 
 </script>
 
@@ -129,12 +139,9 @@
                     :show-hover="false"
                     :body-row-class-name="bodyRowClassNameFunction"
                     :body-item-class-name="bodyItemClassNameFunction">
-                    <!--                <template #header-id="{text}">-->
-                    <!--                    {{ text }}-->
-                    <!--                </template>-->
-                    <!--                <template #name="{ text }">-->
-                    <!--                    {{ text }}-->
-                    <!--                </template>-->
+                    <template #item-lastShift="{lastShift, lastShiftTime}">
+                        {{ formatShiftDate(lastShift, lastShiftTime) }}
+                    </template>
                     <template #item-action="{ id, name }">
                         <JetButton style-type="info" @click="assignVolunteer(id, name)">
                             <UserAdd color="#fff"/>
