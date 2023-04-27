@@ -111,12 +111,12 @@
     const showUserAddModal = ref(false)
 
     const rowClass = gender => {
-        if (!gender) {
-            return ''
+        if (gender === 'male') {
+            return 'bg-blue-100 hover:bg-blue-200 dark:bg-blue-900/40 dark:hover:bg-blue-900/60'
+        } else if (gender === 'female') {
+            return 'bg-pink-100 hover:bg-pink-200 dark:bg-fuchsia-900/40 dark:hover:bg-fuchsia-900/60'
         }
-        return gender === 'male'
-            ? 'bg-blue-100 hover:bg-blue-200 dark:bg-blue-900/40 dark:hover:bg-blue-900/60 transition duration-150 hover:ease-in'
-            : 'bg-pink-100 hover:bg-pink-200 dark:bg-fuchsia-900/40 dark:hover:bg-fuchsia-900/60 transition duration-150 hover:ease-in'
+        return 'bg-slate-200 dark:bg-slate-700 dark:text-gray-50'
     };
 
 
@@ -175,55 +175,46 @@
                             </div>
                             <div></div>
                             <div
-                                class="col-span-full bg-slate-200 dark:bg-slate-700 dark:text-gray-50 rounded px-3 py-2">
-                                <ul>
-                                    <li v-for="(volunteer, index) in shift.filterVolunteers"
-                                        :key="index"
-                                        class="border-b border-gray-400 last:border-b-0 py-2 flex justify-between flex-wrap sm:flex-nowrap"
-                                        :class="rowClass(volunteer?.gender)">
-                                        <template v-if="volunteer">
-                                            <div class="flex items-center flex-wrap sm:flex-nowrap">
-                                                <div class="w-full md:w-auto md:mr-3">
-                                                    {{ volunteer.gender === 'male' ? 'Bro' : 'Sis' }}
-                                                    {{ volunteer.name }}
-                                                </div>
-                                                <div class="w-full md:w-auto">
-                                                    <MoveUserSelectField :date="date"
-                                                                         :shift="shift"
-                                                                         :location-id="location.id"
-                                                                         :empty-shifts-for-time="emptyShiftsForTime"
-                                                                         @update:modelValue="promptMoveVolunteer($event, volunteer, shift)"/>
+                                class="col-span-full dark:text-gray-50">
+                                <div v-for="(volunteer, index) in shift.filterVolunteers"
+                                     :key="index"
+                                     class="border-b border-gray-400 last:border-b-0 first:rounded-t-md last:rounded-b-md p-2 transition duration-150 hover:ease-in"
+                                     :class="rowClass(volunteer?.gender)">
+                                    <div v-if="volunteer" class="grid grid-cols-2 gap-1.5">
+                                        <div class="md:mr-3">
+                                            {{ volunteer.gender === 'male' ? 'Bro' : 'Sis' }}
+                                            {{ volunteer.name }}
+                                        </div>
+                                        <div class="text-right">Ph: <a :href="`tel:${volunteer.mobile_phone}`"
+                                                                       class="underline underline-offset-4 decoration-dotted decoration-1 decoration-blue-800 visited:decoration-blue-800">{{
+                                                volunteer.mobile_phone
+                                            }}</a>
+                                        </div>
+                                        <div class="col-span-2 grid grid-cols-2 gap-1.5 lg:flex lg:gap-3">
+                                        <MoveUserSelectField class="inline-block"
+                                                             :volunteer="volunteer"
+                                                             :date="date"
+                                                             :shift="shift"
+                                                             :location-id="location.id"
+                                                             :empty-shifts-for-time="emptyShiftsForTime"
+                                                             @update:modelValue="promptMoveVolunteer($event, volunteer, shift)"/>
+                                        <div class="text-right">
+                                            <JetButton style-type="danger"
+                                                       @click="setRemoveUser(volunteer, shift, location, date)">
+                                                <UserRemove :color="isDarkMode ? '#fff' : '#000'"/>
+                                            </JetButton>
+                                        </div>
+                                        </div>
+                                    </div>
 
-                                                    <JetButton outline
-                                                               style-type="danger"
-                                                               @click="setRemoveUser(volunteer, shift, location, date)">
-                                                        <UserRemove :color="isDarkMode ? '#fff' : '#000'"/>
-                                                    </JetButton>
-                                                </div>
-                                            </div>
-                                            <div>Ph: <a :href="`tel:${volunteer.mobile_phone}`"
-                                                        class="underline underline-offset-4 decoration-dotted decoration-1 decoration-blue-800 visited:decoration-blue-800">{{
-                                                    volunteer.mobile_phone
-                                                }}</a></div>
-                                        </template>
-                                        <template v-else>
-                                            <div class="flex items-center flex-wrap sm:flex-nowrap">
-                                                <div
-                                                    class="w-full md:w-auto md:mr-3 italic text-gray-700 dark:text-gray-400">
-                                                    Free shift
-                                                </div>
-                                                <div class="w-full md:w-auto">
-                                                    <div class="pl-5">
-                                                        <JetButton style-type="info"
-                                                                   @click="doShowAssignVolunteerModal(shift, location)">
-                                                            <UserAdd :color="isDarkMode ? '#fff' : '#000'"/>
-                                                        </JetButton>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </template>
-                                    </li>
-                                </ul>
+                                    <div v-else>
+                                        <JetButton style-type="info"
+                                                   @click="doShowAssignVolunteerModal(shift, location)">
+                                            <UserAdd color="#fff"/>
+                                            <span class="ml-3">Add Volunteer</span>
+                                        </JetButton>
+                                    </div>
+                                </div>
                             </div>
                         </template>
                     </div>

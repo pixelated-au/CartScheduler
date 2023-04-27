@@ -66,11 +66,6 @@
             width: '10%',
         },
         {
-            text: '',
-            value: 'gender',
-            sortable: false,
-        },
-        {
             text: 'Name',
             value: 'name',
             sortable: true,
@@ -104,7 +99,7 @@
             ? 'bg-blue-100 hover:bg-blue-200 dark:bg-blue-900/40 dark:hover:bg-blue-900/60 transition duration-150 hover:ease-in'
             : 'bg-pink-100 hover:bg-pink-200 dark:bg-fuchsia-900/40 dark:hover:bg-fuchsia-900/60 transition duration-150 hover:ease-in';
     const bodyItemClassNameFunction = column => {
-        if (column === 'action') return 'text-right';
+        if (column === 'action') return '!text-right';
         return '';
     };
 
@@ -140,13 +135,9 @@
                     <!--                <template #name="{ text }">-->
                     <!--                    {{ text }}-->
                     <!--                </template>-->
-                    <template #item-gender="{ gender }">
-                        <Male v-if="gender === 'male'" v-tooltip="'Brother'"/>
-                        <Female v-else-if="gender === 'female'" v-tooltip="'Sister'"/>
-                    </template>
                     <template #item-action="{ id, name }">
                         <JetButton style-type="info" @click="assignVolunteer(id, name)">
-                            <UserAdd :color="isDarkMode ? '#fff' : '#000'"/>
+                            <UserAdd color="#fff"/>
                         </JetButton>
                     </template>
                 </data-table>
