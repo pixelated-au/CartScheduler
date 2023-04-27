@@ -27,7 +27,7 @@ class ToggleUserOntoShiftReservationController extends Controller
         }
         $user = User::findOrFail($userId);
 
-        $rules = $this->toggleShiftReservationControllerRules->execute($user, $request->all());
+        $rules = $this->toggleShiftReservationControllerRules->execute($user, $request->all(), true);
 
         $data = $this->validate($request, $rules);
         $status = $this->toggleUserOntoShift->execute($user, $data);

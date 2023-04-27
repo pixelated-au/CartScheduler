@@ -24,7 +24,7 @@ class ToggleShiftReservationControllerRules
     {
     }
 
-    public function execute(User $user, array $data)
+    public function execute(User $user, array $data, bool $isAdmin = false)
     {
         return [
             'location'   => ['required', 'integer', 'exists:locations,id'],
@@ -49,9 +49,9 @@ class ToggleShiftReservationControllerRules
                 'date',
                 'after_or_equal:today',
                 //'before_or_equal:last day of next month zulu',
-                function ($attribute, $value, $fail) use ($data) {
+                function ($attribute, $value, $fail) use ($data, $isAdmin) {
                     // only validate if adding a shift
-                    if (!$data['do_reserve']) {
+                    if ($isAdmin || !$data['do_reserve']) {
                         return;
                     }
                     $date = Carbon::createFromFormat('Y-m-d', $value);
