@@ -82,5 +82,6 @@ will be available in this interface.
 ## TODO:
 
 - [ ] Implement Testing
-- [ ] Implement feature for admin to remove a user from a shift in addition to moving them to another shift
+- [x] Implement feature for admin to remove a user from a shift in addition to moving them to another shift
+  - [ ] Create relationships between users so admin can assign user and their relationship to a shift
 - [ ] Allow users to book another user onto a shift
