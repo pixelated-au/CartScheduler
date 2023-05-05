@@ -21,6 +21,11 @@ class Report extends Model
         'shift_date',
     ];
 
+    protected $casts = [
+        'shift_date' => 'date',
+        'metadata'   => 'array',
+    ];
+
     public function shift(): BelongsTo
     {
         return $this->belongsTo(Shift::class);
