@@ -40,9 +40,10 @@ class UserFactory extends Factory
     {
         return $this->state(function (array $attributes) {
             return [
-                'name'  => 'Admin',
-                'email' => 'admin@example.com',
-                'role'  => 'admin',
+                'name'   => 'Admin',
+                'email'  => 'admin@example.com',
+                'role'   => 'admin',
+                'gender' => 'male',
             ];
         });
     }
