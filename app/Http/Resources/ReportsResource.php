@@ -35,6 +35,8 @@ class ReportsResource extends JsonResource
             'metadata'            => $this->when($this->metadata && count($this->metadata), [
                 'shift_id'           => $this->metadata['shift_id'] ?? null,
                 'shift_time'         => $this->metadata['shift_time'] ?? null,
+                'location_id'        => $this->metadata['location_id'] ?? null,
+                'location_name'      => $this->metadata['location_name'] ?? null,
                 'submitted_by_name'  => $this->metadata['submitted_by_name'] ?? null,
                 'submitted_by_email' => $this->metadata['submitted_by_email'] ?? null,
                 'submitted_by_phone' => $this->metadata['submitted_by_phone'] ?? null,
