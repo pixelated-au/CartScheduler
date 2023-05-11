@@ -65,10 +65,10 @@
                             :search-value="userSearch"
                             @click-row="handleSelection">
                     <template #item-email="{ email }">
-                        <a :href="`mailto:${email}`" class="underline decoration-1">{{ email }}</a>
+                        <a :href="`mailto:${email}`">{{ email }}</a>
                     </template>
                     <template #item-phone="{ mobile_phone }">
-                        <a :href="`tel:${mobile_phone}`" class="underline decoration-1">{{ mobile_phone }}</a>
+                        <a :href="`tel:${mobile_phone}`">{{ mobile_phone }}</a>
                     </template>
                     <template #item-is_enabled="{ is_enabled }">
                         {{ is_enabled ? 'Yes' : 'No' }}

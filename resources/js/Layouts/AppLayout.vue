@@ -301,6 +301,9 @@ $dp__cell_size: auto;
         @apply text-blue-600;
         @apply dark:text-blue-500;
         @apply hover:underline;
+        @apply hover:text-blue-900;
+        @apply hover:dark:text-blue-400;
+        @apply decoration-dotted;
     }
 }
 </style>

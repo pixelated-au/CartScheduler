@@ -125,8 +125,7 @@
                                             class="border-b border-gray-400 last:border-b-0 py-2 flex justify-between">
                                             <template v-if="volunteer">
                                                 <div>{{ volunteer.name }}</div>
-                                                <div>Ph: <a :href="`tel:${volunteer.mobile_phone}`"
-                                                            class="underline underline-offset-4 decoration-dotted decoration-1 decoration-blue-800 visited:decoration-blue-800">{{ volunteer.mobile_phone
+                                                <div>Ph: <a :href="`tel:${volunteer.mobile_phone}`">{{ volunteer.mobile_phone
                                                     }}</a></div>
                                             </template>
                                             <template v-else>
