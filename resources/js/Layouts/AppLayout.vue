@@ -58,7 +58,7 @@
 
                             <!-- Navigation Links -->
                             <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
-                                <JetNavLink :href="route('dashboard')" :active="route().current('dashboard')">
+                                <JetNavLink :href="route('dashboard')" :active="route().current('dashboard')" class="text-gray-500 dark:text-gray-100 hover:text-gray-700 hover:dark:text-gray-300 hover:no-underline">
                                     Dashboard
                                 </JetNavLink>
 
@@ -85,7 +85,7 @@
                         <div class="-mr-2 flex items-center sm:hidden">
                             <DarkMode @is-dark-mode="isDarkMode = $event"/>
 
-                            <button class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 focus:text-gray-500 transition"
+                            <button class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 focus:text-gray-500 transition"
                                     @click="showingNavigationDropdown = ! showingNavigationDropdown">
                                 <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
                                     <path :class="{'hidden': showingNavigationDropdown, 'inline-flex': ! showingNavigationDropdown }"

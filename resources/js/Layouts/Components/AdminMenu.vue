@@ -40,21 +40,21 @@
                         Site Administration
                     </div>
 
-                    <JetDropdownLink :href="route('admin.dashboard')">
+                    <JetDropdownLink :href="route('admin.dashboard')" is-menu>
                         Dashboard
                     </JetDropdownLink>
 
                     <div class="border-t border-gray-100"/>
 
-                    <JetDropdownLink :href="route('admin.users.index')">
+                    <JetDropdownLink :href="route('admin.users.index')" is-menu>
                         Users
                     </JetDropdownLink>
 
-                    <JetDropdownLink :href="route('admin.locations.index')">
+                    <JetDropdownLink :href="route('admin.locations.index')" is-menu>
                         Locations
                     </JetDropdownLink>
 
-                    <JetDropdownLink :href="route('admin.reports.index')">
+                    <JetDropdownLink :href="route('admin.reports.index')" is-menu>
                         Reports
                     </JetDropdownLink>
 
