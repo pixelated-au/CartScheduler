@@ -17,8 +17,8 @@
 
     const reportData = computed(() => props.reports.data.map(report => ({
             id: report.id,
-            location: report.shift.location?.name || '',
-            locationId: report.shift.location?.id || '',
+            location: report.metadata.location_name,
+            locationId: report.metadata.locationId,
             userExists: !!report.submitted_by?.id,
             submittedByName: report.metadata.submitted_by_name,
             submittedByPhone: report.metadata.submitted_by_phone,
