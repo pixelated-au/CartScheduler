@@ -292,3 +292,15 @@ $dp__cell_size: auto;
     }
 }
 </style>
+
+<style lang="css">
+@tailwind base;
+@layer base {
+    a {
+        @apply font-medium;
+        @apply text-blue-600;
+        @apply dark:text-blue-500;
+        @apply hover:underline;
+    }
+}
+</style>
