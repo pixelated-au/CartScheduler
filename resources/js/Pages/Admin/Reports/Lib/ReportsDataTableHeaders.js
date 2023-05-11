@@ -22,7 +22,7 @@ export default [
     },
     {
         text: 'Report By',
-        value: 'username',
+        value: 'submittedByName',
         sortable: true,
     },
     {

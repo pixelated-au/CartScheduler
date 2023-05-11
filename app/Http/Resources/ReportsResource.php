@@ -3,7 +3,6 @@
 namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Support\Arr;
 
 /**
  * @property integer $id
@@ -36,15 +35,10 @@ class ReportsResource extends JsonResource
             'metadata'            => $this->when($this->metadata && count($this->metadata), [
                 'shift_id'           => $this->metadata['shift_id'] ?? null,
                 'shift_time'         => $this->metadata['shift_time'] ?? null,
-                'submitted_by_name'  => $this->metadata['submitted_user_name'] ?? null,
-                'submitted_by_email' => $this->metadata['submitted_user_email'] ?? null,
-                'submitted_by_phone' => $this->metadata['submitted_user_phone'] ?? null,
-                'associates'         => Arr::map(
-                    $this->metadata['associates'] ?? [],
-                    static fn($associate) => [
-                        'id'   => $associate['id'],
-                        'name' => $associate['name'],
-                    ])
+                'submitted_by_name'  => $this->metadata['submitted_by_name'] ?? null,
+                'submitted_by_email' => $this->metadata['submitted_by_email'] ?? null,
+                'submitted_by_phone' => $this->metadata['submitted_by_phone'] ?? null,
+                'associates'         => $this->metadata['associates'] ?? null,
             ]),
         ];
     }
