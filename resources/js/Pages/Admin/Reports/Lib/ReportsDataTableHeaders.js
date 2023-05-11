@@ -21,7 +21,7 @@ export default [
         sortable: true,
     },
     {
-        text: 'User',
+        text: 'Report By',
         value: 'username',
         sortable: true,
     },
