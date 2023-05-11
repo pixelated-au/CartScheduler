@@ -22,7 +22,7 @@ class Report extends Model
     ];
 
     protected $casts = [
-        'shift_date' => 'date',
+        'shift_date' => 'custom_datetime:Y-m-d',
         'metadata'   => 'array',
     ];
 
