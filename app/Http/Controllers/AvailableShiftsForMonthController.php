@@ -7,6 +7,7 @@ use App\Actions\GetMaxShiftReservationDateAllowed;
 use App\Http\Resources\LocationResource;
 use App\Models\Location;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -14,7 +15,7 @@ use Illuminate\Support\Facades\Auth;
 class AvailableShiftsForMonthController extends Controller
 {
     public function __construct(
-        private readonly GetFreeShiftsData $getFreeShiftsData,
+        private readonly GetFreeShiftsData                 $getFreeShiftsData,
         private readonly GetMaxShiftReservationDateAllowed $getMaxShiftReservationDateAllowed)
     {
     }
@@ -32,14 +33,14 @@ class AvailableShiftsForMonthController extends Controller
 
         // Locations are the list of locations in the 'accordion' menu
         $locations = Location::with([
-            'shifts' => function (HasMany $query) {
-                $query->where('shifts.is_enabled', true);
-                $query->orderBy('shifts.start_time');
-            },
-            'shifts.users',
+            'shifts' => fn(HasMany $query) => $query
+                ->where('shifts.is_enabled', true)
+                ->orderBy('shifts.start_time'),
+            'shifts.users' => fn(BelongsToMany $query) => $query
+                ->where('shift_user.shift_date', '>=', $startDate)
         ])
-                             ->where('is_enabled', true)
-                             ->get();
+            ->where('is_enabled', true)
+            ->get();
 
         $endDate = $this->getMaxShiftReservationDateAllowed->execute()->format('Y-m-d');
         $shifts  = $this->getFreeShiftsData->execute($startDate, $endDate);
