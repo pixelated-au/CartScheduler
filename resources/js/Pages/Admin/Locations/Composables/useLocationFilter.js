@@ -63,6 +63,9 @@ export default function useLocationFilter (canAdmin = false) {
                 location: location.name,
                 locationId: location.id,
                 currentVolunteers: volunteers,
+                days: shift.js_days,
+                available_from: shift.available_from,
+                available_to: shift.available_to,
             })
         }
     }

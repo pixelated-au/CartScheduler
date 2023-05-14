@@ -1,6 +1,6 @@
 <script setup>
     import SelectField from '@/Components/SelectField.vue'
-    import {addMinutes, areIntervalsOverlapping, format, parse, subMinutes} from 'date-fns'
+    import {addMinutes, areIntervalsOverlapping, format, getDay, parse, subMinutes} from 'date-fns'
     import {computed, inject} from 'vue'
     import UserMove from "@/Components/Icons/UserMove.vue";
     // noinspection ES6UnusedImports
@@ -17,11 +17,20 @@
 
     const shiftStart = computed(() => parse(props.shift.start_time, 'HH:mm:ss', props.date))
 
+    const dayOfWeek = computed(() => getDay(props.date))
+
     const hasMatch = (shiftData) => {
         return areIntervalsOverlapping(
-            {start: subMinutes(shiftStart.value, 45), end: addMinutes(shiftStart.value, 45)},
-            {start: shiftData.startTime, end: addMinutes(shiftData.startTime, 30)},
-        ) && shiftData.locationId !== props.locationId
+                {start: subMinutes(shiftStart.value, 45), end: addMinutes(shiftStart.value, 45)},
+                {start: shiftData.startTime, end: addMinutes(shiftData.startTime, 30)},
+            )
+            && shiftData.locationId !== props.locationId
+            && shiftData.days[dayOfWeek.value] === true
+            && (
+                (!shiftData.available_from || shiftData.available_from >= props.date)
+                &&
+                (!shiftData.available_to || shiftData.available_to <= props.date)
+            )
     }
 
     const shiftsForTime = computed(() => {
