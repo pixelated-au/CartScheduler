@@ -2,32 +2,44 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+    h1 {
+        @apply font-bold text-3xl;
+    }
+
+    h2 {
+        @apply font-semibold text-3xl;
+    }
+
+    h3 {
+        @apply font-semibold text-2xl;
+    }
+
+    h4 {
+        @apply font-semibold text-xl;
+    }
+
+    h5 {
+        @apply font-semibold text-lg;
+    }
+
+    h6 {
+        @apply font-semibold text-sm;
+    }
+
+    a {
+        @apply font-medium;
+        @apply text-blue-600;
+        @apply dark:text-blue-500;
+        @apply hover:underline;
+        @apply hover:text-blue-900;
+        @apply hover:dark:text-blue-400;
+        @apply decoration-dotted;
+    }
+}
+
 .v-popper__popper .v-popper__inner div {
     @apply text-sm;
-}
-
-h1 {
-    @apply font-bold text-3xl;
-}
-
-h2 {
-    @apply font-semibold text-3xl;
-}
-
-h3 {
-    @apply font-semibold text-2xl;
-}
-
-h4 {
-    @apply font-semibold text-xl;
-}
-
-h5 {
-    @apply font-semibold text-lg;
-}
-
-h6 {
-    @apply font-semibold text-sm;
 }
 
 .page-content ul, .page-content ol {
@@ -40,20 +52,4 @@ h6 {
 
 .page-content ol li {
     @apply list-decimal;
-}
-
-.page-content a {
-    @apply cursor-pointer underline decoration-2 decoration-indigo-500;
-}
-
-.page-content a:active {
-    @apply decoration-indigo-900;
-}
-
-.page-content a:visited {
-    @apply decoration-indigo-300;
-}
-
-.page-content a:hover {
-    @apply decoration-indigo-700 transition;
 }
