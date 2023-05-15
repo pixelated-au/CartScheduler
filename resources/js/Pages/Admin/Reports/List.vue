@@ -17,12 +17,12 @@
 
     const reportData = computed(() => props.reports.data.map(report => ({
             id: report.id,
-            location: report.metadata.location_name,
-            locationId: report.metadata.locationId,
+            location: report.metadata?.location_name || report.shift.location?.name || '',
+            locationId: report.metadata?.locationId || report.shift.location?.id || '',
             userExists: !!report.submitted_by?.id,
-            submittedByName: report.metadata.submitted_by_name,
-            submittedByPhone: report.metadata.submitted_by_phone,
-            submittedByEmail: report.metadata.submitted_by_email,
+            submittedByName: report.metadata.submitted_by_name || report.submitted_by?.name || '',
+            submittedByPhone: report.metadata.submitted_by_phone || report.submitted_by?.mobile_phone || '',
+            submittedByEmail: report.metadata.submitted_by_email || report.submitted_by?.email || '',
             date: report.shift_date,
             time: report.shift.start_time,
             placements: report.placements_count,
@@ -31,7 +31,7 @@
             comments: report.comments,
             tags: report.tags.map(tag => tag.name.en),
             cancelled: report.shift_was_cancelled,
-            associates: report.metadata.associates,
+            associates: report.metadata?.associates || [],
     })))
 
     const showLocationFilter = ref(false)
