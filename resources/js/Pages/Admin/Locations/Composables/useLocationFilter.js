@@ -105,7 +105,7 @@ export default function useLocationFilter (canAdmin = false) {
 
     const locations = computed(() => {
         if (!serverLocations?.value) {
-            return
+            return []
         }
         const mappedLocations = []
         const myLocations = cloneDeep(serverLocations.value)

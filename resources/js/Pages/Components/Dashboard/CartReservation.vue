@@ -8,10 +8,10 @@
     import useToast from '@/Composables/useToast'
     import useLocationFilter from '@/Pages/Admin/Locations/Composables/useLocationFilter'
     import DatePicker from '@/Pages/Components/Dashboard/DatePicker.vue'
-    import { format, isSameDay, parse } from 'date-fns'
+    import {format, isSameDay, parse} from 'date-fns'
     // noinspection ES6UnusedImports
-    import { VTooltip } from 'floating-vue'
-    import { computed, ref } from 'vue'
+    import {VTooltip} from 'floating-vue'
+    import {computed, ref} from 'vue'
 
     defineProps({
         user: Object,
@@ -19,7 +19,7 @@
 
     const toast = useToast()
 
-    const { date, locations, maxReservationDate, serverDates, getShifts } = useLocationFilter()
+    const {date, locations, maxReservationDate, serverDates, getShifts} = useLocationFilter()
 
     const gridCols = {
         // See tailwind.config.js
@@ -45,7 +45,7 @@
             await getShifts()
 
         } catch (e) {
-            toast.error(e.response.data.message, { timeout: 4000 })
+            toast.error(e.response.data.message, {timeout: 4000})
             if (e.response.data.error_code === 100) {
                 await getShifts()
             }
@@ -67,7 +67,7 @@
 <template>
     <div class="p-3 grid gap-3 grid-cols-1 sm:grid-cols-[min-content_auto]">
         <div class="pb-3">
-            <ComponentSpinner :show="!locations?.length">
+            <ComponentSpinner :show="!locations">
                 <DatePicker v-model:date="date"
                             :max-date="maxReservationDate"
                             :locations="locations"
@@ -78,7 +78,8 @@
             <div class="text-sm text-gray-500 text-center">Blue squares indicate free shifts</div>
         </div>
         <div class="text-sm">
-            <Accordion :items="locations" label="name" uid="id">
+            <Accordion :items="locations" label="name" uid="id"
+                       empty-collection-text="No available locations for this day">
                 <template #label="{label, location}">
                     <span v-if="isMyShift(location)"
                           class="text-green-800 dark:text-green-300 border-b-2 border-green-500"
@@ -108,9 +109,10 @@
                                         <Male v-else-if="volunteer.gender === 'male'" v-tooltip="volunteer.name"/>
                                         <Female v-else-if="volunteer.gender === 'female'" v-tooltip="volunteer.name"/>
                                     </template>
-                                    <EmptySlot v-else-if="index === shift.filterVolunteers.length - 1 && shift.maxedFemales && user.gender === 'female'"
-                                               color="#79B9ED"
-                                               v-tooltip="'This slot can only be reserved by a brother'"/>
+                                    <EmptySlot
+                                        v-else-if="index === shift.filterVolunteers.length - 1 && shift.maxedFemales && user.gender === 'female'"
+                                        color="#79B9ED"
+                                        v-tooltip="'This slot can only be reserved by a brother'"/>
                                     <button v-else
                                             type="button"
                                             class="block"
@@ -118,14 +120,16 @@
                                         <EmptySlot v-tooltip="'Tap to reserve this shift'"/>
                                     </button>
                                 </div>
-                                <div class="col-span-full bg-slate-200 dark:bg-slate-700 dark:text-gray-50 rounded px-3 sm:py-2">
+                                <div
+                                    class="col-span-full bg-slate-200 dark:bg-slate-700 dark:text-gray-50 rounded px-3 sm:py-2">
                                     <ul>
                                         <li v-for="(volunteer, index) in shift.filterVolunteers"
                                             :key="index"
                                             class="border-b border-gray-400 last:border-b-0 py-2 flex justify-between">
                                             <template v-if="volunteer">
                                                 <div>{{ volunteer.name }}</div>
-                                                <div>Ph: <a :href="`tel:${volunteer.mobile_phone}`">{{ volunteer.mobile_phone
+                                                <div>Ph: <a :href="`tel:${volunteer.mobile_phone}`">{{
+                                                        volunteer.mobile_phone
                                                     }}</a></div>
                                             </template>
                                             <template v-else>
