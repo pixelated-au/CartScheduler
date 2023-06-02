@@ -56,62 +56,64 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     Route::post('/save-report', SaveShiftReportController::class)->name('save.report');
     Route::get('/get-report-tags', GetReportTagsController::class);
 
-    Route::prefix('admin')->group(static function () {
-        Route::get('/', AdminDashboardController::class)->name('admin.dashboard');
+    Route::prefix('admin')
+        ->middleware('is-admin')
+        ->group(static function () {
+            Route::get('/', AdminDashboardController::class)->name('admin.dashboard');
 
-        Route::get('/users/import', [UsersImportController::class, 'show'])->name('admin.users.import.show');
-        Route::post('/users/import', [UsersImportController::class, 'import'])->name('admin.users.import.import');
+            Route::get('/users/import', [UsersImportController::class, 'show'])->name('admin.users.import.show');
+            Route::post('/users/import', [UsersImportController::class, 'import'])->name('admin.users.import.import');
 
-        Route::resource('/users', UsersController::class)->names([
-            'index'   => 'admin.users.index',
-            'create'  => 'admin.users.create',
-            'store'   => 'admin.users.store',
-            'show'    => 'admin.users.show',
-            'edit'    => 'admin.users.edit',
-            'update'  => 'admin.users.update',
-            'destroy' => 'admin.users.destroy',
-        ]);
+            Route::resource('/users', UsersController::class)->names([
+                'index'   => 'admin.users.index',
+                'create'  => 'admin.users.create',
+                'store'   => 'admin.users.store',
+                'show'    => 'admin.users.show',
+                'edit'    => 'admin.users.edit',
+                'update'  => 'admin.users.update',
+                'destroy' => 'admin.users.destroy',
+            ]);
 
-        Route::resource('/locations', LocationsController::class)->names([
-            'index'   => 'admin.locations.index',
-            'create'  => 'admin.locations.create',
-            'store'   => 'admin.locations.store',
-            'show'    => 'admin.locations.show',
-            'edit'    => 'admin.locations.edit',
-            'update'  => 'admin.locations.update',
-            'destroy' => 'admin.locations.destroy',
-        ]);
+            Route::resource('/locations', LocationsController::class)->names([
+                'index'   => 'admin.locations.index',
+                'create'  => 'admin.locations.create',
+                'store'   => 'admin.locations.store',
+                'show'    => 'admin.locations.show',
+                'edit'    => 'admin.locations.edit',
+                'update'  => 'admin.locations.update',
+                'destroy' => 'admin.locations.destroy',
+            ]);
 
-        Route::resource('/reports', ReportsController::class)->names([
-            'index' => 'admin.reports.index',
-            'show'  => 'admin.reports.show',
-        ])->only(['index', 'show']);
+            Route::resource('/reports', ReportsController::class)->names([
+                'index' => 'admin.reports.index',
+                'show'  => 'admin.reports.show',
+            ])->only(['index', 'show']);
 
-        Route::resource('/report-tags', ReportTagsController::class)->parameter('report-tags', 'tag')->names([
-            'index'   => 'admin.report-tags.index',
-            'store'   => 'admin.report-tags.store',
-            'update'  => 'admin.report-tags.update',
-            'destroy' => 'admin.report-tags.destroy',
-        ]);
-        Route::put('/report-tag-sort-order', ReportTagsSortOrderController::class);
-        Route::post('/resend-welcome-email', ResendWelcomeEmailController::class)->name('admin.resend-welcome-email');
+            Route::resource('/report-tags', ReportTagsController::class)->parameter('report-tags', 'tag')->names([
+                'index'   => 'admin.report-tags.index',
+                'store'   => 'admin.report-tags.store',
+                'update'  => 'admin.report-tags.update',
+                'destroy' => 'admin.report-tags.destroy',
+            ]);
+            Route::put('/report-tag-sort-order', ReportTagsSortOrderController::class);
+            Route::post('/resend-welcome-email', ResendWelcomeEmailController::class)->name('admin.resend-welcome-email');
 
-        Route::resource('shifts', ShiftsController::class)->only(['destroy'])->names([
-            'destroy' => 'admin.shifts.destroy',
-        ]);
+            Route::resource('shifts', ShiftsController::class)->only(['destroy'])->names([
+                'destroy' => 'admin.shifts.destroy',
+            ]);
 
-        Route::put('/move-volunteer-to-shift', MoveUserToNewShiftController::class);
+            Route::put('/move-volunteer-to-shift', MoveUserToNewShiftController::class);
 
-        Route::get('/available-users-for-shift/{shift}', GetAvailableUsersForShiftController::class);
-        Route::match(['put', 'delete'], '/toggle-shift-for-user', ToggleUserOntoShiftReservationController::class);
+            Route::get('/available-users-for-shift/{shift}', GetAvailableUsersForShiftController::class);
+            Route::match(['put', 'delete'], '/toggle-shift-for-user', ToggleUserOntoShiftReservationController::class);
 
-        //Route::get('/', static fn() => Inertia::render('Admin/Dashboard'))->name('admin.dashboard');
+            //Route::get('/', static fn() => Inertia::render('Admin/Dashboard'))->name('admin.dashboard');
 
-        //Route::resource('locations', 'Admin\LocationsController');
-        //Route::resource('users', 'Admin\UsersController');
-        //Route::resource('roles', 'Admin\RolesController');
-        //Route::resource('permissions', 'Admin\PermissionsController');
-        //Route::resource('reports', 'Admin\ReportsController');
-        //Route::resource('reservations', 'Admin\ReservationsController');
-    });
+            //Route::resource('locations', 'Admin\LocationsController');
+            //Route::resource('users', 'Admin\UsersController');
+            //Route::resource('roles', 'Admin\RolesController');
+            //Route::resource('permissions', 'Admin\PermissionsController');
+            //Route::resource('reports', 'Admin\ReportsController');
+            //Route::resource('reservations', 'Admin\ReservationsController');
+        });
 });
