@@ -45,6 +45,10 @@
                 Profile
             </JetDropdownLink>
 
+            <JetDropdownLink :href="route('user.availability')">
+                Availability
+            </JetDropdownLink>
+
             <JetDropdownLink v-if="$page.props.jetstream.hasApiFeatures" :href="route('api-tokens.index')">
                 API Tokens
             </JetDropdownLink>

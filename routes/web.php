@@ -14,8 +14,11 @@ use App\Http\Controllers\ResendWelcomeEmailController;
 use App\Http\Controllers\SaveShiftReportController;
 use App\Http\Controllers\SetUserPasswordController;
 use App\Http\Controllers\ShiftsController;
+use App\Http\Controllers\ShowUserAvailabilityController;
 use App\Http\Controllers\ToggleShiftReservationController;
 use App\Http\Controllers\ToggleUserOntoShiftReservationController;
+use App\Http\Controllers\UpdateUserRegularAvailabilityController;
+use App\Http\Controllers\UpdateUserVacationsController;
 use App\Http\Controllers\UsersController;
 use App\Http\Controllers\UsersImportController;
 use Illuminate\Support\Facades\Route;
@@ -55,6 +58,10 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     Route::post('/reserve-shift', ToggleShiftReservationController::class);
     Route::post('/save-report', SaveShiftReportController::class)->name('save.report');
     Route::get('/get-report-tags', GetReportTagsController::class);
+
+    Route::get('/user/availability', ShowUserAvailabilityController::class)->name('user.availability');
+    Route::put('/user/availability', UpdateUserRegularAvailabilityController::class)->name('update.user.availability');
+    Route::put('/user/vacations', UpdateUserVacationsController::class)->name('update.user.vacations');
 
     Route::prefix('admin')
         ->middleware('is-admin')
