@@ -24,7 +24,8 @@ class GetShiftFilledData
 
                     SELECT dates.date,
                            COUNT(shift_user.id)                AS shifts_filled,
-                           (SELECT SUM(locations.max_volunteers)
+                           IFNULL(
+                               (SELECT SUM(locations.max_volunteers)
                             FROM shifts
                                      JOIN locations on locations.id = shifts.location_id
                             WHERE locations.is_enabled = 1
@@ -37,7 +38,8 @@ class GetShiftFilledData
                                       WHEN DAYOFWEEK(dates.date) = 5 THEN shifts.day_thursday
                                       WHEN DAYOFWEEK(dates.date) = 6 THEN shifts.day_friday
                                       WHEN DAYOFWEEK(dates.date) = 7 THEN shifts.day_saturday
-                                      END = 1) as shifts_available
+                                      END = 1),
+                               0) as shifts_available
                     FROM dates
                              LEFT JOIN shift_user ON dates.date = shift_user.shift_date
                              LEFT JOIN shifts ON shifts.id = shift_user.shift_id
