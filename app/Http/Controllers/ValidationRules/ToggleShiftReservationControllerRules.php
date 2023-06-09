@@ -100,18 +100,20 @@ class ToggleShiftReservationControllerRules
             return;
         }
 
-        $shifts = ShiftUser::with(['user' => fn(BelongsTo $query) => $query->select(['id', 'gender'])])
+        $shiftUsers = ShiftUser::with(['user' => fn(BelongsTo $query) => $query->select(['id', 'gender'])])
             ->where('shift_id', $shiftId)
             ->where('shift_date', $shiftDate->toDateString())
             ->get();
 
-        if ($shifts->count() < $location->max_volunteers - 1) {
+        if ($shiftUsers->count() < $location->max_volunteers - 1) {
             // not enough volunteers to require a brother
             return;
         }
 
+        $currentVolunteers = $shiftUsers->map(fn(ShiftUser $shiftUser) => $shiftUser->user);
+
         try {
-            $this->validateVolunteerIsAllowedToBeRosteredAction->execute($location, $user);
+            $this->validateVolunteerIsAllowedToBeRosteredAction->execute($location, $user, $currentVolunteers);
         } catch (VolunteerIsAllowedException $e) {
             $fail($e->getMessage());
         }

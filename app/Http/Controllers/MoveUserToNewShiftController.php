@@ -72,7 +72,7 @@ class MoveUserToNewShiftController extends Controller
 
         $user = User::find($request->get('user_id'));
         try {
-            $this->validateVolunteerIsAllowedToBeRosteredAction->execute($location, $user);
+            $this->validateVolunteerIsAllowedToBeRosteredAction->execute($location, $user, $shift->users);
         } catch (VolunteerIsAllowedException $e) {
             return ErrorApiResource::create($e->getMessage(), $e->getExceptionType(), 422);
         }
