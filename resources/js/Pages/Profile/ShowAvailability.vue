@@ -10,8 +10,10 @@ import UpdatePasswordForm from '@/Pages/Profile/Partials/UpdatePasswordForm.vue'
 import UpdateProfileInformationForm from '@/Pages/Profile/Partials/UpdateProfileInformationForm.vue';
 
 defineProps({
-    confirmsTwoFactorAuthentication: Boolean,
-    sessions: Array,
+    availability: {
+        type: Object,
+        required: false,
+    },
 });
 </script>
 
