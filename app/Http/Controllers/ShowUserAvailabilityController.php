@@ -15,10 +15,16 @@ class ShowUserAvailabilityController extends Controller
 {
     public function __invoke(Request $request)
     {
-        $this->authorize('view', $request->user());
+        /** @var \App\Models\User $user */
+        $user = $request->user();
+        $this->authorize('view', $user);
+
+        $user->load('availability');
+        //ray($user->availability()->first());
+        // Note, availability can be null
 
         return Inertia::render('Profile/ShowAvailability', [
-//            'exampleFile' => asset('storage/example-user-import.xlsx'),
+//            'availability' => $user->availability,
         ]);
     }
 }
