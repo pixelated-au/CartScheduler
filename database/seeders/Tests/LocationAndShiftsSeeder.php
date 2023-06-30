@@ -12,6 +12,8 @@ class LocationAndShiftsSeeder extends Seeder
     {
         $location = Location::factory()->create([
             'requires_brother' => true,
+            'min_volunteers' => 3,
+            'max_volunteers' => 3,
         ]);
         Shift::factory()->everyDay()->create([
             'location_id' => $location->id,

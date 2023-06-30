@@ -220,6 +220,8 @@ class UserReservationsTest extends TestCase
 
         $location = Location::factory()->create([
             'requires_brother' => true,
+            'min_volunteers' => 3,
+            'max_volunteers' => 3,
         ]);
 
         /** @var Shift $shift */
