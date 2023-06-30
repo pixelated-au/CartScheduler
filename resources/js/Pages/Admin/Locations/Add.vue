@@ -1,23 +1,29 @@
 <script setup>
-    import JetButton from '@/Jetstream/Button.vue'
-    import AppLayout from '@/Layouts/AppLayout.vue'
-    import LocationForm from '@/Pages/Admin/Locations/Partials/LocationForm.vue'
-    import { Inertia } from '@inertiajs/inertia'
+import JetButton from '@/Jetstream/Button.vue'
+import AppLayout from '@/Layouts/AppLayout.vue'
+import LocationForm from '@/Pages/Admin/Locations/Partials/LocationForm.vue'
+import {Inertia} from '@inertiajs/inertia'
 
-    const listRouteAction = () => {
-        Inertia.visit(route('admin.locations.index'))
-    }
-    const newLocation = {
-        data: {
-            name: '',
-            description: '',
-            min_volunteers: 2,
-            max_volunteers: 3,
-            requires_brother: true,
-            is_enabled: true,
-            shifts: [],
-        },
-    }
+defineProps({
+    maxVolunteers: {
+        type: Number,
+    },
+})
+
+const listRouteAction = () => {
+    Inertia.visit(route('admin.locations.index'))
+}
+const newLocation = {
+    data: {
+        name: '',
+        description: '',
+        min_volunteers: 2,
+        max_volunteers: 3,
+        requires_brother: true,
+        is_enabled: true,
+        shifts: [],
+    },
+}
 </script>
 
 <template>
@@ -33,7 +39,7 @@
 
         <div>
             <div class="max-w-7xl mx-auto py-10 sm:px-6 lg:px-8">
-                <LocationForm :location="newLocation" action="add"/>
+                <LocationForm :location="newLocation" action="add" :max-volunteers="maxVolunteers"/>
             </div>
         </div>
     </AppLayout>

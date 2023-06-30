@@ -12,6 +12,10 @@
 
     const props = defineProps({
         location: Object,
+        maxVolunteers: {
+            type: Number,
+            required: true,
+        },
         action: {
             type: String,
             default: 'edit',
@@ -60,7 +64,7 @@
     })
 
     watch(() => form.max_volunteers, (value, oldValue) => {
-        if (value > 4) {
+        if (value > props.maxVolunteers) {
             nextTick(() => {
                 form.max_volunteers = oldValue
             })
@@ -141,7 +145,7 @@
         </template>
 
         <template #form>
-            <LocationData v-model="form"/>
+            <LocationData v-model="form" :max-volunteers="maxVolunteers"/>
 
             <JetSectionBorder class="col-span-full"/>
 
