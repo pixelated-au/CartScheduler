@@ -30,7 +30,9 @@ class LocationsController extends Controller
 
     public function create(): Response
     {
-        return Inertia::render('Admin/Locations/Add');
+        return Inertia::render('Admin/Locations/Add', [
+            'maxVolunteers' => config('cart-scheduler.max_volunteers_per_location'),
+        ]);
     }
 
     public function store(CreateLocationRequest $request): RedirectResponse
@@ -57,7 +59,8 @@ class LocationsController extends Controller
     public function edit(Location $location): Response
     {
         return Inertia::render('Admin/Locations/Edit', [
-            'location' => LocationAdminResource::make($location->load([
+            'maxVolunteers' => config('cart-scheduler.max_volunteers_per_location'),
+            'location'       => LocationAdminResource::make($location->load([
                 'shifts' => function ($query) {
                     $query->orderBy('start_time', 'asc');
                 },
