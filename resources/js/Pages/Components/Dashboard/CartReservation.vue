@@ -27,6 +27,7 @@
         2: 'grid-cols-sm-reservation-2 sm:grid-cols-reservation-2',
         3: 'grid-cols-sm-reservation-3 sm:grid-cols-reservation-3',
         4: 'grid-cols-sm-reservation-4 sm:grid-cols-reservation-4',
+        5: 'grid-cols-sm-reservation-5 sm:grid-cols-reservation-5',
     }
 
     const toggleReservation = async (locationId, shiftId, toggleOn) => {
