@@ -26,7 +26,10 @@ class UserResource extends JsonResource
             'gender'       => $this->gender,
             'mobile_phone' => $this->mobile_phone,
             'email'        => $this->email,
-            'shift_date'   => $this->whenPivotLoaded('shift_user', fn() => $this->pivot['shift_date']),
+            $this->mergeWhen($this->pivot, [
+                'shift_date'   => $this->pivot['shift_date'],
+                'shift_id'     => $this->pivot['id'],
+            ]),
             'last_shift_date' => $this->whenNotNull($this->last_shift_date),
             'last_shift_start_time' => $this->whenNotNull($this->last_shift_start_time),
         ];
