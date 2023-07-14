@@ -43,7 +43,7 @@ onMounted(async () => {
         </template>
 
         <template #form>
-            <div class="col-span-2 bg-white rounded-lg shadow max-w-md dark:bg-gray-700">
+            <div class="order-last sm:order-first col-span-6 sm:col-span-3 lg:col-span-2 bg-white rounded-lg shadow max-w-md dark:bg-gray-700">
                 <ul class="overflow-y-auto text-sm text-gray-700 dark:text-gray-200"
                     aria-labelledby="admin-users">
                     <li v-for="user in adminUsers" :key="user.id">
@@ -58,7 +58,7 @@ onMounted(async () => {
                     </li>
                 </ul>
             </div>
-            <div class="col-span-4 mt-1 ml-1 max-w-xl text-sm text-gray-600 dark:text-gray-300">
+            <div class="col-span-6 sm:col-span-3 lg:col-span-4 mt-1 ml-1 max-w-xl text-sm text-gray-600 dark:text-gray-300">
                 <p class="mb-3">
                     Note: Not all admin users should necessarily have access to this page. Please only specify those who
                     know what impact changing these settings could have.
