@@ -8,6 +8,7 @@ import DarkMode from '@/Layouts/Components/DarkMode.vue'
 import ProfileSettingsMenu from '@/Layouts/Components/ProfileSettingsMenu.vue'
 import TeamsMenu from '@/Layouts/Components/TeamsMenu.vue'
 import Bugsnag from '@bugsnag/js'
+import {Inertia} from "@inertiajs/inertia";
 import {Head, Link, usePage} from '@inertiajs/inertia-vue3'
 import {computed, onMounted, provide, ref} from 'vue'
 
@@ -32,8 +33,9 @@ const permissions = computed(() => {
     return usePage().props.value.pagePermissions
 })
 
-const isDarkMode = ref(false)
+const logout = () => Inertia.post(route('logout'))
 
+const isDarkMode = ref(false)
 provide('darkMode', isDarkMode)
 </script>
 
