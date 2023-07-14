@@ -1,40 +1,40 @@
 <script setup>
-    import JetApplicationMark from '@/Jetstream/ApplicationMark.vue'
-    import JetBanner from '@/Jetstream/Banner.vue'
-    import JetNavLink from '@/Jetstream/NavLink.vue'
-    import JetResponsiveNavLink from '@/Jetstream/ResponsiveNavLink.vue'
-    import AdminMenu from '@/Layouts/Components/AdminMenu.vue'
-    import DarkMode from '@/Layouts/Components/DarkMode.vue'
-    import ProfileSettingsMenu from '@/Layouts/Components/ProfileSettingsMenu.vue'
-    import TeamsMenu from '@/Layouts/Components/TeamsMenu.vue'
-    import Bugsnag from '@bugsnag/js'
-    import { Head, Link, usePage } from '@inertiajs/inertia-vue3'
-    import { computed, onMounted, provide, ref } from 'vue'
+import JetApplicationMark from '@/Jetstream/ApplicationMark.vue'
+import JetBanner from '@/Jetstream/Banner.vue'
+import JetNavLink from '@/Jetstream/NavLink.vue'
+import JetResponsiveNavLink from '@/Jetstream/ResponsiveNavLink.vue'
+import AdminMenu from '@/Layouts/Components/AdminMenu.vue'
+import DarkMode from '@/Layouts/Components/DarkMode.vue'
+import ProfileSettingsMenu from '@/Layouts/Components/ProfileSettingsMenu.vue'
+import TeamsMenu from '@/Layouts/Components/TeamsMenu.vue'
+import Bugsnag from '@bugsnag/js'
+import {Head, Link, usePage} from '@inertiajs/inertia-vue3'
+import {computed, onMounted, provide, ref} from 'vue'
 
-    defineProps({
-        title: String,
-        user: Object,
-    })
+defineProps({
+    title: String,
+    user: Object,
+})
 
-    const bugsnagKey = import.meta.env.VITE_BUGSNAG_FRONT_END_API_KEY
-    onMounted(() => {
-        if (bugsnagKey) {
-            const user = usePage().props.value.user
-            if (user && user.id) {
-                Bugsnag.setUser(user.id, user.email, user.name)
-            }
+const bugsnagKey = import.meta.env.VITE_BUGSNAG_FRONT_END_API_KEY
+onMounted(() => {
+    if (bugsnagKey) {
+        const user = usePage().props.value.user
+        if (user && user.id) {
+            Bugsnag.setUser(user.id, user.email, user.name)
         }
-    })
+    }
+})
 
-    const showingNavigationDropdown = ref(false)
+const showingNavigationDropdown = ref(false)
 
-    const permissions = computed(() => {
-        return usePage().props.value.pagePermissions
-    })
+const permissions = computed(() => {
+    return usePage().props.value.pagePermissions
+})
 
-    const isDarkMode = ref(false)
+const isDarkMode = ref(false)
 
-    provide('darkMode', isDarkMode)
+provide('darkMode', isDarkMode)
 </script>
 
 <template>
@@ -58,7 +58,8 @@
 
                             <!-- Navigation Links -->
                             <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
-                                <JetNavLink :href="route('dashboard')" :active="route().current('dashboard')" class="text-gray-500 dark:text-gray-100 hover:text-gray-700 hover:dark:text-gray-300 hover:no-underline">
+                                <JetNavLink :href="route('dashboard')" :active="route().current('dashboard')"
+                                            class="text-gray-500 dark:text-gray-100 hover:text-gray-700 hover:dark:text-gray-300 hover:no-underline">
                                     Dashboard
                                 </JetNavLink>
 
@@ -85,19 +86,22 @@
                         <div class="-mr-2 flex items-center sm:hidden">
                             <DarkMode @is-dark-mode="isDarkMode = $event"/>
 
-                            <button class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 focus:text-gray-500 transition"
-                                    @click="showingNavigationDropdown = ! showingNavigationDropdown">
+                            <button
+                                class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 focus:text-gray-500 transition"
+                                @click="showingNavigationDropdown = ! showingNavigationDropdown">
                                 <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
-                                    <path :class="{'hidden': showingNavigationDropdown, 'inline-flex': ! showingNavigationDropdown }"
-                                          stroke-linecap="round"
-                                          stroke-linejoin="round"
-                                          stroke-width="2"
-                                          d="M4 6h16M4 12h16M4 18h16"/>
-                                    <path :class="{'hidden': ! showingNavigationDropdown, 'inline-flex': showingNavigationDropdown }"
-                                          stroke-linecap="round"
-                                          stroke-linejoin="round"
-                                          stroke-width="2"
-                                          d="M6 18L18 6M6 6l12 12"/>
+                                    <path
+                                        :class="{'hidden': showingNavigationDropdown, 'inline-flex': ! showingNavigationDropdown }"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="2"
+                                        d="M4 6h16M4 12h16M4 18h16"/>
+                                    <path
+                                        :class="{'hidden': ! showingNavigationDropdown, 'inline-flex': showingNavigationDropdown }"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="2"
+                                        d="M6 18L18 6M6 6l12 12"/>
                                 </svg>
                             </button>
                         </div>
@@ -135,6 +139,12 @@
                                 <JetResponsiveNavLink :href="route('admin.reports.index')"
                                                       :active="route().current('admin.reports.index')">
                                     Reports
+                                </JetResponsiveNavLink>
+
+                                <JetResponsiveNavLink v-if="permissions.canEditSettings"
+                                                      :href="route('admin.settings')"
+                                                      :active="route().current('admin.settings')">
+                                    Settings
                                 </JetResponsiveNavLink>
                             </div>
                         </div>

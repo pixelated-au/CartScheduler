@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Settings\GeneralSettings;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Inertia\Middleware;
@@ -15,6 +16,11 @@ class HandleInertiaRequests extends Middleware
      * @var string
      */
     protected $rootView = 'app';
+
+    public function __construct(private readonly GeneralSettings $settings)
+    {
+    }
+
 
     /**
      * Determines the current asset version.
@@ -42,7 +48,7 @@ class HandleInertiaRequests extends Middleware
     public function share(Request $request): array
     {
         return array_merge(parent::share($request), [
-            'pagePermissions'   => $this->getPageAccessPermissions(),
+            'pagePermissions'   => $this->getPageAccessPermissions($request),
             'shiftAvailability' => [
                 'timezone'       => config('app.timezone'),
                 'duration'       => (int)config('cart-scheduler.shift_reservation_duration'),
@@ -53,11 +59,15 @@ class HandleInertiaRequests extends Middleware
         ]);
     }
 
-    protected function getPageAccessPermissions(): array
+    protected function getPageAccessPermissions(Request $request): array
     {
         $permissions = [];
         if (Gate::check('admin')) {
             $permissions['canAdmin'] = true;
+            $user = $request->user();
+            if (in_array($user->id, $this->settings->allowedSettingsUsers)) {
+                $permissions['canEditSettings'] = true;
+            }
         }
 
         return $permissions;
