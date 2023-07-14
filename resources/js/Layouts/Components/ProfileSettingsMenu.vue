@@ -3,9 +3,7 @@
     import JetDropdownLink from '@/Jetstream/DropdownLink.vue'
     import { Inertia } from '@inertiajs/inertia'
 
-    const logout = () => {
-        Inertia.post(route('logout'))
-    }
+    const logout = () => Inertia.post(route('logout'))
 </script>
 
 <template>
