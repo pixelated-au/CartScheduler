@@ -58,6 +58,10 @@
                         Reports
                     </JetDropdownLink>
 
+                    <JetDropdownLink :href="route('admin.settings')" is-menu>
+                        Settings
+                    </JetDropdownLink>
+
                     <div class="border-t border-gray-100"/>
                 </template>
             </JetDropdown>
