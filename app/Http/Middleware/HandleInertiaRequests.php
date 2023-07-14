@@ -2,7 +2,6 @@
 
 namespace App\Http\Middleware;
 
-use App\Actions\GetMaxShiftReservationDateAllowed;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Inertia\Middleware;
@@ -16,10 +15,6 @@ class HandleInertiaRequests extends Middleware
      * @var string
      */
     protected $rootView = 'app';
-
-    public function __construct(private readonly GetMaxShiftReservationDateAllowed $getMaxShiftReservationDateAllowed)
-    {
-    }
 
     /**
      * Determines the current asset version.
