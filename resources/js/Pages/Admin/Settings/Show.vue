@@ -23,7 +23,7 @@ defineProps({
                     </li>
                 </ul>
             </div>
-            <UpdateGeneralSettingsForm :settings="settings" class="mb-3"/>
+            <UpdateGeneralSettingsForm :settings="settings" class="mb-10 md:mb-3"/>
             <UpdateAllowedSettingsUsersForm :settings="settings"/>
         </div>
     </AppLayout>
