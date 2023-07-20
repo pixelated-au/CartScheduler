@@ -7,7 +7,7 @@ use Illuminate\Console\Command;
 
 class UpdateCommand extends Command
 {
-    protected $signature = 'update {--force : Force update}';
+    protected $signature = 'cart-scheduler:do-update {--force : Force update}';
 
     protected              $description = 'CLI update';
     private UpdaterManager $updater;
