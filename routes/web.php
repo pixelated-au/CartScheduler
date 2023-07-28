@@ -1,6 +1,8 @@
 <?php
 
+use App\Http\Controllers\AdminCheckForUpdateController;
 use App\Http\Controllers\AdminDashboardController;
+use App\Http\Controllers\AdminRunSoftwareUpdateController;
 use App\Http\Controllers\AvailableShiftsForMonthController;
 use App\Http\Controllers\GetAdminUsersController;
 use App\Http\Controllers\GetAvailableUsersForShiftController;
@@ -118,6 +120,8 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
             Route::put('/general-settings', UpdateGeneralSettingsController::class)->name('admin.general-settings.update');
             Route::put('/allowed-settings-users', UpdateAllowedSettingsUsersController::class)->name('admin.allowed-settings-users.update');
             Route::get('/admin-users', GetAdminUsersController::class)->name('admin.admin-users.get');
+            Route::get('/check-update', AdminCheckForUpdateController::class)->name('admin.check-update');
+            Route::post('/do-update', AdminRunSoftwareUpdateController::class)->name('admin.do-update');
 
             //Route::get('/', static fn() => Inertia::render('Admin/Dashboard'))->name('admin.dashboard');
 
