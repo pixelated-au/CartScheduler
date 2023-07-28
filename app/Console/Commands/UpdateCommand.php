@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Settings\GeneralSettings;
 use Codedge\Updater\UpdaterManager;
 use Illuminate\Console\Command;
 
@@ -10,13 +11,13 @@ class UpdateCommand extends Command
     protected $signature = 'cart-scheduler:do-update {--force : Force update}';
 
     protected              $description = 'CLI update';
-    private UpdaterManager $updater;
 
-    public function __construct(UpdaterManager $updater)
+    public function __construct(
+        private readonly UpdaterManager $updater,
+        private readonly GeneralSettings $settings,
+    )
     {
         parent::__construct();
-
-        $this->updater = $updater;
     }
 
     public function handle(): void
@@ -57,8 +58,10 @@ class UpdateCommand extends Command
             return;
         }
 
-        if (config('app.env') !== 'production') {
-            $this->warn('Not in production, aborting update');
+        if (config('app.env') === 'local') {
+            $this->warn('Not in production, pretending to update...');
+            $this->settings->currentVersion = $new;
+            $this->settings->save();
 
             return;
         }
@@ -80,6 +83,8 @@ class UpdateCommand extends Command
         $this->info('DB Migration done');
         $this->call('optimize:clear'); // Clear cache
 
+        $this->settings->currentVersion = $new;
+        $this->settings->save();
         $this->info("Finished! Updated from $current to $new");
     }
 
