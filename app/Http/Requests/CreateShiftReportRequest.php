@@ -34,6 +34,9 @@ class CreateShiftReportRequest extends FormRequest
             'placements_count.integer'    => 'Placements count must be a whole number',
             'videos_count.integer'        => 'Videos count must be a whole number',
             'requests_count.integer'      => 'Requests count must be a whole number',
+            'placements_count.min'        => 'Placements count cannot be negative',
+            'videos_count.min'            => 'Videos count cannot be negative',
+            'requests_count.min'          => 'Requests count cannot be negative',
             'comments.string'             => 'Comments must be a string',
             'comments.max'                => 'Comments must be less than 500 characters',
         ];
