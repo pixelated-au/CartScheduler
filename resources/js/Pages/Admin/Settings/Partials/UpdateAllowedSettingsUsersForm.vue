@@ -68,11 +68,6 @@ onMounted(async () => {
                 </p>
             </div>
             <JetInputError :message="form.errors.allowedSettingsUsers" class="mt-2"/>
-
-            <!--            <div class="col-span-6 sm:col-span-4">-->
-            <!--                <JetLabel for="allowed_user_ids" value="IDs of users" />-->
-            <!--                <JetInput id="allowed_user_ids" v-model="form.allowedSettingsUsers" type="text" class="mt-1 block w-full"/>-->
-            <!--            </div>-->
         </template>
 
         <template #actions>
