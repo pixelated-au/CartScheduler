@@ -72,9 +72,13 @@ class HandleInertiaRequests extends Middleware
         return array_merge(parent::share($request), $custom);
     }
 
-    protected function getPageAccessPermissions(User $user): array
+    protected function getPageAccessPermissions(?User $user): array
     {
         $permissions = [];
+        if (!$user) {
+            return $permissions;
+        }
+
         if (Gate::check('admin')) {
             $permissions['canAdmin'] = true;
             if (in_array($user->id, $this->settings->allowedSettingsUsers)) {
@@ -85,8 +89,11 @@ class HandleInertiaRequests extends Middleware
         return $permissions;
     }
 
-    protected function getHasSoftwareUpdate(User $user): ?bool
+    protected function getHasSoftwareUpdate(?User $user): ?bool
     {
+        if ($user === null) {
+            return null;
+        }
         if (!Gate::check('admin')) {
             return null;
         }
