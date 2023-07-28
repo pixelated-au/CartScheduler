@@ -35,9 +35,8 @@ const doSoftwareUpdate = async () => {
     processing.value = true
     try {
         const response = await axios.post(route('admin.do-update'))
-        console.log('doSoftwareUpdate', response)
         toast.success(`Update successful! You are now running version: ${props.settings.currentVersion}`)
-        updateLog.value = response.data
+        updateLog.value = response.data || 'Update succeeded.'
     } finally {
         processing.value = false
     }
