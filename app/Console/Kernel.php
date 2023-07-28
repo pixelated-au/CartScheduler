@@ -19,7 +19,9 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule): void
     {
         // $schedule->command('inspire')->hourly();
+        /** @noinspection SpellCheckingInspection */
         $schedule->command('activitylog:clean --force')->daily();
+        $schedule->command('cart-scheduler:has-update')->daily();
     }
 
     protected function commands(): void
