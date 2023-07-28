@@ -1,4 +1,5 @@
 <script setup>
+import Bell from "@/Components/Icons/Bell.vue";
 import useToast from "@/Composables/useToast";
 import JetButton from '@/Jetstream/Button.vue';
 import JetFormSection from '@/Jetstream/FormSection.vue';
@@ -62,13 +63,18 @@ onMounted(async () => {
         </template>
 
         <template #description>
-            <template v-if="hasUpdate"><span class="font-bold">Update Available!</span></template>
-            <template v-else>You are running the latest version of the scheduling software.</template>
+            <div v-if="hasUpdate" class="flex items-center content-center">
+                <div class="inline-block px-0.5 py-0.5 bg-red-500 rounded-full text-xs mr-1">
+                    <bell color="#fff" box="12"/>
+                </div>
+                <div class="font-bold">Update Available!</div>
+            </div>
+            <div v-else>You are running the latest version of the scheduling software.</div>
         </template>
 
         <template #form>
             <template v-if="hasUpdate">
-                <p class="col-span-12 text-gray-600 dark:text-gray-300">
+                <p class="col-span-12 text-gray-600 dark:text-gray-300 bg-yellow-200 dark:bg-yellow-800 px-3">
                     The latest version is: <span class="font-mono font-bold">{{ settings.availableVersion }}</span>
                     You are running version: <span class="font-mono">{{ settings.currentVersion }}</span>.
                 </p>
@@ -77,13 +83,14 @@ onMounted(async () => {
                        target="_blank">Latest version release notes</a>.
                 </p>
                 <p class="col-span-12 text-gray-600 dark:text-gray-300 font-bold">
-                    Note: Updates should be safe. However, things can always go wrong. It's generally wise to perform
-                    the update out of peak usage hours so potential issues can be addressed with minimum impact.
+                    Note: Updates should be safe to perform. However, sometimes they don't work as expected. It's
+                    generally wise to perform the update out of peak usage hours so potential issues can be addressed
+                    with minimum impact.
                 </p>
             </template>
             <div v-else-if="updateLog" class="col-span-12 text-gray-600 dark:text-gray-300">
                 <div class="font-bold">Update Log:</div>
-                <pre class="font-mono">{{updateLog}}</pre>
+                <pre class="font-mono">{{ updateLog }}</pre>
             </div>
             <template v-else>
                 <p class="col-span-12 text-gray-600 dark:text-gray-300">You are running the latest version of the
