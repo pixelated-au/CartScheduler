@@ -14,13 +14,13 @@ return new class extends Migration {
 
             $availabilities = AvailabilityPeriods::getHourPartValues();
 
-            $table->set('day_monday', $availabilities);
-            $table->set('day_tuesday', $availabilities);
-            $table->set('day_wednesday', $availabilities);
-            $table->set('day_thursday', $availabilities);
-            $table->set('day_friday', $availabilities);
-            $table->set('day_saturday', $availabilities);
-            $table->set('day_sunday', $availabilities);
+            $table->set('day_monday', $availabilities)->nullable();
+            $table->set('day_tuesday', $availabilities)->nullable();
+            $table->set('day_wednesday', $availabilities)->nullable();
+            $table->set('day_thursday', $availabilities)->nullable();
+            $table->set('day_friday', $availabilities)->nullable();
+            $table->set('day_saturday', $availabilities)->nullable();
+            $table->set('day_sunday', $availabilities)->nullable();
 
             $table->tinyInteger('num_mondays')->unsigned()->default(0);
             $table->tinyInteger('num_tuesdays')->unsigned()->default(0);

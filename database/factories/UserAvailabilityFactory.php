@@ -40,7 +40,7 @@ class UserAvailabilityFactory extends Factory
         ];
     }
 
-    private function availability(): array
+    private function availability(): ?array
     {
         // 10% chance of full-day
         if ($this->faker->boolean(20)) {
@@ -64,6 +64,6 @@ class UserAvailabilityFactory extends Factory
                 ->filter(fn(AvailabilityPeriods $availability) => (int)$availability->value >= 12 && (int)$availability->value <= 18)
                 ->toArray();
         }
-        return [];
+        return null;
     }
 }
