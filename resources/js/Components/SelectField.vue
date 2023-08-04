@@ -1,72 +1,101 @@
 <script setup>
-    import {computed, inject, ref, useSlots} from 'vue'
+import {Dropdown} from 'flowbite'
+import {computed, inject, onMounted, ref, useSlots} from 'vue'
 
-    const props = defineProps({
-        modelValue: Object,
-        options: {
-            type: Array,
-            required: true,
-        },
-        emptyNote: String,
-        selectLabel: String,
-    })
+const props = defineProps({
+  modelValue: [Object, Number, String],
+  options: {
+    type: Array,
+    required: true,
+  },
+  emptyNote: String,
+  selectLabel: String,
+  returnObjectValue: {
+    type: Boolean,
+    default: false,
+  },
+})
 
-    const emit = defineEmits(['update:modelValue'])
+const emit = defineEmits(['update:modelValue'])
 
-    const fieldUnique = computed(() => Math.random().toString(36).substring(2, 9))
+const fieldUnique = computed(() => Math.random().toString(36).substring(2, 9))
 
-    const isOpen = ref(false)
-
-    const model = computed({
-        get: () => props.modelValue,
-        set: value => {
-            isOpen.value = false
-            emit('update:modelValue', value)
-        },
-    })
-
-    const menuStyle = computed(() => {
-        return isOpen.value ? 'display: block' : 'display: none'
-    })
-
-    const slots = useSlots()
-    const useLabelSlot = computed(() => !!slots.label)
+const model = computed({
+  get: () => props.modelValue,
+  set: value => {
+    emit('update:modelValue', value)
+  },
+})
 
 
-    const label = computed(() => model.value
-        ? props.options.find(option => option.value === model.value)?.label
-        : props.selectLabel || 'Select one'
-    )
+const slots = useSlots()
+const useLabelSlot = computed(() => !!slots.label)
 
-    const noOptions = computed(() => props.options.length === 0)
 
-    const isDarkMode = inject('darkMode', false)
+const label = computed(() => model.value
+  ? props.options.find(option => option.value === model.value)?.label
+  : props.selectLabel || 'Select one'
+)
 
-    const arrowFill = computed(() => {
-        if (isDarkMode.value) {
-            return '#fff'
-        }
-        return noOptions.value ? '#000' : '#fff'
-    })
+const noOptions = computed(() => props.options.length === 0)
 
-    const buttonClasses = computed(() => {
-        let classes = []
-        if (noOptions.value) {
-            classes.push('!bg-gray-300 dark:!bg-gray-700 !cursor-not-allowed')
-        }
-        return classes.join(' ')
-    })
+const isDarkMode = inject('darkMode', false)
 
+const arrowFill = computed(() => {
+  if (isDarkMode.value) {
+    return '#fff'
+  }
+  return noOptions.value ? '#000' : '#fff'
+})
+
+const buttonClasses = computed(() => {
+  let classes = []
+  if (noOptions.value) {
+    classes.push('!bg-gray-300 dark:!bg-gray-700 !cursor-not-allowed')
+  }
+  return classes.join(' ')
+})
+
+const doShow = ref(false)
+const onSelect = (selection) => {
+  dropdown.value.hide()
+  if (noOptions.value) {
+    return
+  }
+
+  if (props.returnObjectValue) {
+    // We're not returning the whole object, just the value
+    model.value = selection.value
+    return
+  }
+
+  model.value = selection
+}
+
+const selectedClass = (option) => {
+  const val = props.returnObjectValue ? option.value : option
+  return model.value === val ? 'bg-purple-200 dark:bg-purple-800' : ''
+}
+
+const trigger = ref()
+const target = ref()
+const dropdown = ref()
+
+onMounted(() => {
+  dropdown.value = new Dropdown(target.value, trigger.value, {
+    triggerType: 'click',
+  })
+})
 </script>
 
 <template>
     <div class="relative">
-        <button id="dropdownDefault"
+        <button :ref="el => trigger = el"
+                :id="`dropdown-select-${fieldUnique}`"
                 :data-dropdown-toggle="`dropdown-${fieldUnique}`"
                 :class="buttonClasses"
                 class="text-white bg-purple-700 hover:bg-purple-800 focus:ring-4 focus:outline-none focus:ring-purple-300 font-medium rounded-lg text-sm px-4 py-2.5 text-center inline-flex items-center dark:bg-purple-600 dark:hover:bg-purple-700 dark:focus:ring-purple-800"
-                type="button"
-                @click="isOpen = !isOpen">
+                type="button" data-on-show="foo">
             <slot name="label" v-if="useLabelSlot"/>
             <template v-else>
                 {{ label }}
@@ -81,20 +110,21 @@
             </svg>
         </button>
         <!-- Dropdown menu -->
-        <div :id="`dropdown-${fieldUnique}`"
-             class="absolute z-10 w-64 bg-white rounded divide-y divide-gray-100 drop-shadow-xl dark:bg-gray-700 cursor-pointer"
-             :style="menuStyle">
-            <ul class="py-1 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownDefault">
+        <div :ref="el => target = el"
+             :id="`dropdown-${fieldUnique}`"
+             class="absolute z-10 w-64 bg-white rounded divide-y divide-gray-100 drop-shadow-xl dark:bg-gray-700 cursor-pointer hidden">
+            <ul class="py-1 text-sm text-gray-700 dark:text-gray-200"
+                :aria-labelledby="`dropdown-select-${fieldUnique}`">
                 <template v-if="noOptions">
                     <li class="block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white font-bold">
                         {{ emptyNote || 'No options available' }}
                     </li>
                 </template>
                 <template v-else>
-                    <li v-for="option in options" :key="option.id">
+                    <li v-for="option in options" :key="option.id" :class="selectedClass(option)">
                         <div
-                            class="block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white font-bold"
-                            @click="model = option">
+                                class="block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white font-bold"
+                                @click="onSelect(option)">
                             {{ option.label }}
                             <slot name="extra" :option="option"></slot>
                         </div>
