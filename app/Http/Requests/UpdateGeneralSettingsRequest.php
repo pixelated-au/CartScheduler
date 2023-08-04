@@ -15,6 +15,8 @@ class UpdateGeneralSettingsRequest extends FormRequest
     {
         return [
             'siteName' => ['required', 'string', 'max:255'],
+            'systemShiftStartHour' => ['required', 'integer', 'min:0', 'max:23'],
+            'systemShiftEndHour' => ['required', 'integer', 'min:0', 'max:23'],
         ];
     }
 

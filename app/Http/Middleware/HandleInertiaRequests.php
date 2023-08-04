@@ -61,6 +61,8 @@ class HandleInertiaRequests extends Middleware
                 'period'         => config('cart-scheduler.shift_reservation_duration_period'),
                 'releasedDaily'  => config('cart-scheduler.do_release_shifts_daily'),
                 'weekDayRelease' => (int)config('cart-scheduler.release_weekly_shifts_on_day'),
+                'systemShiftStartHour' => $this->settings->systemShiftStartHour,
+                'systemShiftEndHour' => $this->settings->systemShiftEndHour,
             ],
         ];
 
