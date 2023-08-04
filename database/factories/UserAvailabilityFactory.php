@@ -2,7 +2,7 @@
 
 namespace Database\Factories;
 
-use App\Enums\AvailabilityPeriods;
+use App\Enums\AvailabilityHours;
 use App\Models\UserAvailability;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Carbon;
@@ -16,7 +16,7 @@ class UserAvailabilityFactory extends Factory
 
     public function definition(): array
     {
-        $this->dayParts = collect(AvailabilityPeriods::getHourParts());
+        $this->dayParts = collect(AvailabilityHours::cases());
 
         return [
             'user_id'        => $this->faker->randomNumber(),
@@ -45,8 +45,8 @@ class UserAvailabilityFactory extends Factory
         // 10% chance of full-day
         if ($this->faker->boolean(20)) {
             return $this->dayParts
-                ->filter(function (AvailabilityPeriods $availability) {
-                    return (int)$availability->value >= 7 && (int)$availability->value <= 18;
+                ->filter(function (AvailabilityHours $availability) {
+                    return $availability->value >= 7 && $availability->value <= 18;
                 })
                 ->toArray();
         }
@@ -54,14 +54,14 @@ class UserAvailabilityFactory extends Factory
         // 10% chance of morning
         if ($this->faker->boolean(20)) {
             return $this->dayParts
-                ->filter(fn(AvailabilityPeriods $availability) => (int)$availability->value >= 7 && (int)$availability->value <= 12)
+                ->filter(fn(AvailabilityHours $availability) => $availability->value >= 7 && $availability->value <= 12)
                 ->toArray();
         }
 
         // 10% chance of afternoon
         if ($this->faker->boolean(20)) {
             return $this->dayParts
-                ->filter(fn(AvailabilityPeriods $availability) => (int)$availability->value >= 12 && (int)$availability->value <= 18)
+                ->filter(fn(AvailabilityHours $availability) => $availability->value >= 12 && $availability->value <= 18)
                 ->toArray();
         }
         return null;
