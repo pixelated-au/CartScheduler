@@ -18,22 +18,30 @@ class UserAvailabilityFactory extends Factory
     {
         $this->dayParts = collect(AvailabilityHours::cases());
 
+        $monday    = $this->availability();
+        $tuesday   = $this->availability();
+        $wednesday = $this->availability();
+        $thursday  = $this->availability();
+        $friday    = $this->availability();
+        $saturday  = $this->availability();
+        $sunday    = $this->availability();
+
         return [
             'user_id'        => $this->faker->randomNumber(),
-            'day_monday'     => $this->availability(),
-            'day_tuesday'    => $this->availability(),
-            'day_wednesday'  => $this->availability(),
-            'day_thursday'   => $this->availability(),
-            'day_friday'     => $this->availability(),
-            'day_saturday'   => $this->availability(),
-            'day_sunday'     => $this->availability(),
-            'num_mondays'    => $this->faker->numberBetween(0, 4),
-            'num_tuesdays'   => $this->faker->numberBetween(0, 4),
-            'num_wednesdays' => $this->faker->numberBetween(0, 4),
-            'num_thursdays'  => $this->faker->numberBetween(0, 4),
-            'num_fridays'    => $this->faker->numberBetween(0, 4),
-            'num_saturdays'  => $this->faker->numberBetween(0, 4),
-            'num_sundays'    => $this->faker->numberBetween(0, 4),
+            'day_monday'     => $monday,
+            'day_tuesday'    => $tuesday,
+            'day_wednesday'  => $wednesday,
+            'day_thursday'   => $thursday,
+            'day_friday'     => $friday,
+            'day_saturday'   => $saturday,
+            'day_sunday'     => $sunday,
+            'num_mondays'    => $monday ? $this->faker->numberBetween(0, 4) : 0,
+            'num_tuesdays'   => $tuesday ? $this->faker->numberBetween(0, 4) : 0,
+            'num_wednesdays' => $wednesday ? $this->faker->numberBetween(0, 4) : 0,
+            'num_thursdays'  => $thursday ? $this->faker->numberBetween(0, 4) : 0,
+            'num_fridays'    => $friday ? $this->faker->numberBetween(0, 4) : 0,
+            'num_saturdays'  => $saturday ? $this->faker->numberBetween(0, 4) : 0,
+            'num_sundays'    => $sunday ? $this->faker->numberBetween(0, 4) : 0,
             'comments'       => $this->faker->sentence(),
             'created_at'     => Carbon::now(),
             'updated_at'     => Carbon::now(),
