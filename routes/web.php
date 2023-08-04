@@ -1,7 +1,10 @@
 <?php
 
+use App\Http\Controllers\AdminCheckForUpdateController;
 use App\Http\Controllers\AdminDashboardController;
+use App\Http\Controllers\AdminRunSoftwareUpdateController;
 use App\Http\Controllers\AvailableShiftsForMonthController;
+use App\Http\Controllers\GetAdminUsersController;
 use App\Http\Controllers\GetAvailableUsersForShiftController;
 use App\Http\Controllers\GetReportTagsController;
 use App\Http\Controllers\LocationsController;
@@ -19,8 +22,11 @@ use App\Http\Controllers\ToggleShiftReservationController;
 use App\Http\Controllers\ToggleUserOntoShiftReservationController;
 use App\Http\Controllers\UpdateUserRegularAvailabilityController;
 use App\Http\Controllers\UpdateUserVacationsController;
+use App\Http\Controllers\UpdateAllowedSettingsUsersController;
+use App\Http\Controllers\UpdateGeneralSettingsController;
 use App\Http\Controllers\UsersController;
 use App\Http\Controllers\UsersImportController;
+use App\Settings\GeneralSettings;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -113,6 +119,16 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
 
             Route::get('/available-users-for-shift/{shift}', GetAvailableUsersForShiftController::class);
             Route::match(['put', 'delete'], '/toggle-shift-for-user', ToggleUserOntoShiftReservationController::class);
+
+            Route::get('/settings', static fn(GeneralSettings $settings) => Inertia::render('Admin/Settings/Show', [
+                'settings' => $settings->toArray(),
+            ]))->name('admin.settings');
+
+            Route::put('/general-settings', UpdateGeneralSettingsController::class)->name('admin.general-settings.update');
+            Route::put('/allowed-settings-users', UpdateAllowedSettingsUsersController::class)->name('admin.allowed-settings-users.update');
+            Route::get('/admin-users', GetAdminUsersController::class)->name('admin.admin-users.get');
+            Route::get('/check-update', AdminCheckForUpdateController::class)->name('admin.check-update');
+            Route::post('/do-update', AdminRunSoftwareUpdateController::class)->name('admin.do-update');
 
             //Route::get('/', static fn() => Inertia::render('Admin/Dashboard'))->name('admin.dashboard');
 

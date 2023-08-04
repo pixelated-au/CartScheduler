@@ -27,12 +27,8 @@ export default function useLocationFilter (canAdmin = false) {
     })
 
     const selectedDate = computed({
-        get () {
-            return date.value ? formatISO(date.value, { representation: 'date' }) : ''
-        },
-        set (value) {
-            date.value = value
-        },
+        get: () => date.value ? formatISO(date.value, { representation: 'date' }) : '',
+        set: (value) => date.value = value,
     })
 
     const emptyShiftsForTime = ref([])
@@ -45,10 +41,10 @@ export default function useLocationFilter (canAdmin = false) {
             if (a.gender < b.gender) {
                 return 1
             }
-            if (a.name < b.name) {
+            if (a.shift_id < b.shift_id) {
                 return -1
             }
-            if (a.name > b.name) {
+            if (a.shift_id > b.shift_id) {
                 return 1
             }
             return 0

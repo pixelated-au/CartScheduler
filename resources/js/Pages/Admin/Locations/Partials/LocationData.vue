@@ -1,27 +1,31 @@
 <script setup>
-    import HorizontalRadioButtons from '@/Components/HorizontalRadioButtons.vue'
-    import TextEditor from '@/Components/TextEditor.vue'
-    import JetInput from '@/Jetstream/Input.vue'
-    import JetInputError from '@/Jetstream/InputError.vue'
-    import JetLabel from '@/Jetstream/Label.vue'
-    import { computed, defineProps } from 'vue'
+import HorizontalRadioButtons from '@/Components/HorizontalRadioButtons.vue'
+import TextEditor from '@/Components/TextEditor.vue'
+import JetInput from '@/Jetstream/Input.vue'
+import JetInputError from '@/Jetstream/InputError.vue'
+import JetLabel from '@/Jetstream/Label.vue'
+import {computed, defineProps} from 'vue'
 
-    const props = defineProps({
-        modelValue: Object,
-    })
+const props = defineProps({
+    modelValue: Object,
+    maxVolunteers: {
+        type: Number,
+        required: true,
+    },
+})
 
-    const emit = defineEmits([
-        'update:modelValue',
-    ])
+const emit = defineEmits([
+    'update:modelValue',
+])
 
-    const form = computed({
-        get () {
-            return props.modelValue
-        },
-        set (value) {
-            emit('update:modelValue', value)
-        },
-    })
+const form = computed({
+    get() {
+        return props.modelValue
+    },
+    set(value) {
+        emit('update:modelValue', value)
+    },
+})
 </script>
 
 <template>
@@ -52,7 +56,7 @@
     <!-- Maximum Volunteers -->
     <div class="col-span-6 sm:col-span-4 md:col-span-3">
         <JetLabel for="max-volunteers">
-            Maximum Volunteers at Location <span class="text-sm">(Max 4)</span>
+            Maximum Volunteers at Location <span class="text-sm">(Max {{maxVolunteers}})</span>
         </JetLabel>
         <JetInput id="max-volunteers"
                   v-model="form.max_volunteers"

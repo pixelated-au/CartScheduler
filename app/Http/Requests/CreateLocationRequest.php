@@ -18,11 +18,12 @@ class CreateLocationRequest extends FormRequest
      */
     public function rules(): array
     {
+        $maxVolunteers = config('cart-scheduler.max_volunteers_per_location');
         return [
             'name'                    => ['required', 'string', 'max:255'],
             'description'             => ['required', 'string', 'max:4000000000'],
             'min_volunteers'          => ['required', 'integer', 'min:0'],
-            'max_volunteers'          => ['required', 'integer', 'max:4'],
+            'max_volunteers'          => ['required', 'integer', "max:$maxVolunteers"],
             'requires_brother'        => ['boolean'],
             'latitude'                => ['numeric', 'min:-90', 'max:90.999999999999'],
             'longitude'               => ['numeric', 'min:-180', 'max:180.999999999999'],

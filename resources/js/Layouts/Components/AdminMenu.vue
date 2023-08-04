@@ -1,16 +1,27 @@
 <script setup>
-    import JetDropdown from '@/Jetstream/Dropdown.vue'
-    import JetDropdownLink from '@/Jetstream/DropdownLink.vue'
-    import { computed } from 'vue'
+import Bell from "@/Components/Icons/Bell.vue";
+import JetDropdown from '@/Jetstream/Dropdown.vue'
+import JetDropdownLink from '@/Jetstream/DropdownLink.vue'
+import {usePage} from "@inertiajs/inertia-vue3";
+import {computed} from 'vue'
 
-    const classes = computed(() => {
-        // return route().current('admin.dashboard')
-        // || route().current('admin.users.index')
-        // || route().current('admin.locations.index')
-        return route().current().startsWith('admin.')
-            ? 'inline-flex items-center px-1 pt-1 border-b-2 border-indigo-400 text-sm font-medium leading-5 text-gray-900 focus:outline-none focus:border-indigo-700 transition'
-            : 'inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium leading-5 text-gray-500 hover:text-gray-700 hover:border-gray-300 focus:outline-none focus:text-gray-700 focus:border-gray-300 transition'
-    })
+const classes = computed(() => {
+    // return route().current('admin.dashboard')
+    // || route().current('admin.users.index')
+    // || route().current('admin.locations.index')
+    return route().current().startsWith('admin.')
+        ? 'inline-flex items-center px-1 pt-1 border-b-2 border-indigo-400 text-sm font-medium leading-5 text-gray-900 focus:outline-none focus:border-indigo-700 transition'
+        : 'inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium leading-5 text-gray-500 hover:text-gray-700 hover:border-gray-300 focus:outline-none focus:text-gray-700 focus:border-gray-300 transition'
+})
+
+const permissions = computed(() => {
+    return usePage().props.value.pagePermissions
+})
+
+const hasUpdate = computed(() => {
+    return !!usePage().props.value.hasUpdate
+})
+
 </script>
 
 <template>
@@ -21,6 +32,11 @@
             <span class="inline-flex rounded-md">
                 <button type="button"
                         class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 dark:text-gray-100 dark:bg-slate-900 dark:hover:text-gray-300 focus:outline-none transition">
+                        <template v-if="hasUpdate">
+                            <div class="inline-block px-0.5 py-0.5 bg-red-500 rounded-full text-xs mr-1">
+                                <bell color="#fff" box="12"/>
+                            </div>
+                        </template>
                     Admin
                     <svg class="ml-2 -mr-0.5 h-4 w-4"
                          xmlns="http://www.w3.org/2000/svg"
@@ -58,7 +74,15 @@
                         Reports
                     </JetDropdownLink>
 
-                    <div class="border-t border-gray-100"/>
+                    <JetDropdownLink v-if="permissions.canEditSettings" :href="route('admin.settings')" is-menu
+                                     inner-classes="flex content-center items-center">
+                        <template v-if="hasUpdate">
+                            <div class="inline-block px-0.5 py-0.5 bg-red-500 rounded-full text-xs mr-1">
+                                <bell color="#fff" box="12"/>
+                            </div>
+                        </template>
+                        Settings
+                    </JetDropdownLink>
                 </template>
             </JetDropdown>
         </div>

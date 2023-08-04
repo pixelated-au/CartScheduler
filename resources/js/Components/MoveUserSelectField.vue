@@ -19,6 +19,8 @@
 
     const dayOfWeek = computed(() => getDay(props.date))
 
+    const formattedDate = computed(() => format(props.date, 'yyyy-MM-dd'))
+
     const hasMatch = (shiftData) => {
         return areIntervalsOverlapping(
                 {start: subMinutes(shiftStart.value, 45), end: addMinutes(shiftStart.value, 45)},
@@ -27,9 +29,9 @@
             && shiftData.locationId !== props.locationId
             && shiftData.days[dayOfWeek.value] === true
             && (
-                (!shiftData.available_from || shiftData.available_from >= props.date)
+                (!shiftData.available_from || shiftData.available_from >= formattedDate.value)
                 &&
-                (!shiftData.available_to || shiftData.available_to <= props.date)
+                (!shiftData.available_to || shiftData.available_to <= formattedDate.value)
             )
     }
 

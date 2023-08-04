@@ -2,7 +2,9 @@
 
 namespace App\Http\Middleware;
 
-use App\Actions\GetMaxShiftReservationDateAllowed;
+use App\Actions\HasNewVersionAvailable;
+use App\Models\User;
+use App\Settings\GeneralSettings;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Inertia\Middleware;
@@ -17,9 +19,13 @@ class HandleInertiaRequests extends Middleware
      */
     protected $rootView = 'app';
 
-    public function __construct(private readonly GetMaxShiftReservationDateAllowed $getMaxShiftReservationDateAllowed)
+    public function __construct(
+        private readonly GeneralSettings        $settings,
+        private readonly HasNewVersionAvailable $hasNewVersionAvailable,
+    )
     {
     }
+
 
     /**
      * Determines the current asset version.
@@ -46,8 +52,9 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
-        return array_merge(parent::share($request), [
-            'pagePermissions'   => $this->getPageAccessPermissions(),
+        $user   = $request->user();
+        $custom = [
+            'pagePermissions'   => $this->getPageAccessPermissions($user),
             'shiftAvailability' => [
                 'timezone'       => config('app.timezone'),
                 'duration'       => (int)config('cart-scheduler.shift_reservation_duration'),
@@ -55,16 +62,44 @@ class HandleInertiaRequests extends Middleware
                 'releasedDaily'  => config('cart-scheduler.do_release_shifts_daily'),
                 'weekDayRelease' => (int)config('cart-scheduler.release_weekly_shifts_on_day'),
             ],
-        ]);
+        ];
+
+        $hasUpdate = $this->getHasSoftwareUpdate($user);
+        if ($hasUpdate !== null) {
+            $custom['hasUpdate'] = $hasUpdate;
+        }
+
+        return array_merge(parent::share($request), $custom);
     }
 
-    protected function getPageAccessPermissions(): array
+    protected function getPageAccessPermissions(?User $user): array
     {
         $permissions = [];
+        if (!$user) {
+            return $permissions;
+        }
+
         if (Gate::check('admin')) {
             $permissions['canAdmin'] = true;
+            if (in_array($user->id, $this->settings->allowedSettingsUsers)) {
+                $permissions['canEditSettings'] = true;
+            }
         }
 
         return $permissions;
+    }
+
+    protected function getHasSoftwareUpdate(?User $user): ?bool
+    {
+        if ($user === null) {
+            return null;
+        }
+        if (!Gate::check('admin')) {
+            return null;
+        }
+        if (!in_array($user->id, $this->settings->allowedSettingsUsers)) {
+            return null;
+        }
+        return $this->hasNewVersionAvailable->execute();
     }
 }

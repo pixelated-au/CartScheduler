@@ -32,6 +32,7 @@
         2: 'grid-cols-reservation-2',
         3: 'grid-cols-reservation-3',
         4: 'grid-cols-reservation-4',
+        5: 'grid-cols-reservation-5',
     }
 
     const locationsOnDays = ref([])

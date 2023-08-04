@@ -21,13 +21,14 @@ class UserResource extends JsonResource
     public function toArray($request): array
     {
         return [
-            'id'           => $this->id,
-            'name'         => $this->name,
-            'gender'       => $this->gender,
-            'mobile_phone' => $this->mobile_phone,
-            'email'        => $this->email,
-            'shift_date'   => $this->whenPivotLoaded('shift_user', fn() => $this->pivot['shift_date']),
-            'last_shift_date' => $this->whenNotNull($this->last_shift_date),
+            'id'                    => $this->id,
+            'name'                  => $this->name,
+            'gender'                => $this->gender,
+            'mobile_phone'          => $this->mobile_phone,
+            'email'                 => $this->email,
+            'shift_id'              => $this->whenPivotLoaded('shift_user', fn() => $this->pivot['shift_id']),
+            'shift_date'            => $this->whenPivotLoaded('shift_user', fn() => $this->pivot['shift_date']),
+            'last_shift_date'       => $this->whenNotNull($this->last_shift_date),
             'last_shift_start_time' => $this->whenNotNull($this->last_shift_start_time),
         ];
     }

@@ -78,7 +78,7 @@ class Shift extends Model
 
     public function users(): BelongsToMany
     {
-        return $this->belongsToMany(User::class)->withPivot('shift_date');
+        return $this->belongsToMany(User::class)->withPivot(['id', 'shift_date']);
     }
 
     public function getActivitylogOptions(): LogOptions
