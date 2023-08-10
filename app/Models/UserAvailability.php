@@ -12,6 +12,8 @@ class UserAvailability extends Model
 {
     use HasFactory;
 
+    protected $primaryKey = 'user_id';
+
     protected $casts = [
         'day_monday'    => SetAsEnumCollectionCast::class . ':' . AvailabilityHours::class,
         'day_tuesday'   => SetAsEnumCollectionCast::class . ':' . AvailabilityHours::class,
