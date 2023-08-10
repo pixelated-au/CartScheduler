@@ -3,11 +3,14 @@ import useAvailabilityActions from "@/Composables/useAvailabilityActions";
 import JetActionMessage from '@/Jetstream/ActionMessage.vue';
 import JetButton from '@/Jetstream/Button.vue';
 import JetFormSection from '@/Jetstream/FormSection.vue';
+import JetInput from "@/Jetstream/Input.vue";
+import JetInputError from "@/Jetstream/InputError.vue";
+import JetLabel from "@/Jetstream/Label.vue";
 import JetToggle from '@/Jetstream/Toggle.vue';
 import DayOfWeekConfiguration from "@/Pages/Profile/Partials/DayOfWeekConfiguration.vue";
 import {useForm, usePage} from '@inertiajs/inertia-vue3';
 import '@vueform/slider/themes/tailwind.scss';
-import {computed, reactive} from 'vue';
+import {computed, nextTick, reactive, ref, watch} from 'vue';
 
 const props = defineProps({
   availability: {
@@ -36,6 +39,7 @@ const form = useForm({
   num_fridays: props.availability.num_fridays || 0,
   num_saturdays: props.availability.num_saturdays || 0,
   num_sundays: props.availability.num_sundays || 0,
+  comments: props.availability.comments || '',
 })
 
 const {computedRange, numberOfWeeks, toggleRosterDay, tooltipFormat} = useAvailabilityActions(form, ranges)
@@ -62,15 +66,27 @@ const update = () => {
   form.put(route('update.user.availability'), {
     errorBag: 'updatePassword',
     preserveScroll: true,
-    preserveState: false,
-    onSuccess: () => form.reset(),
-    onError: () => {
-    },
   })
 }
 
 const showConfigurations = computed(() => {
   return form.num_mondays > 0 || form.num_tuesdays > 0 || form.num_wednesdays > 0 || form.num_thursdays > 0 || form.num_fridays > 0 || form.num_saturdays > 0 || form.num_sundays > 0
+})
+
+const maxCommentChars = 500
+const commentsRemainingCharacters = computed(() => {
+  if (form.comments) {
+    return maxCommentChars - form.comments.length
+  }
+  return maxCommentChars
+})
+
+watch(() => form.comments, (value, oldValue) => {
+  if (value.length > maxCommentChars) {
+    nextTick(() => {
+      form.comments = oldValue
+    })
+  }
 })
 </script>
 
@@ -155,6 +171,18 @@ const showConfigurations = computed(() => {
                                             :tooltip-format="tooltipFormat"/>
                 </div>
             </Transition>
+
+            <div class="col-span-6 text-gray-700 dark:text-gray-100 items-stretch bg-slate-200 dark:bg-slate-800 border border-gray-200 dark:border-gray-900 rounded p-3">
+                <JetLabel for="comments" value="Comments (optional)"/>
+                <textarea id="comments"
+                          class="border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 rounded-md shadow-sm w-full h-40 dark:bg-slate-800 dark:border-slate-700 dark:text-white"
+                          v-model="form.comments"/>
+                <div class="text-sm">{{ commentsRemainingCharacters }} characters remaining</div>
+                <JetInputError :message="form.errors.comments" class="mt-2"/>
+                <div class="italic, text-gray-500 text-sm">
+                    If relevant, use this to provide any additional information about your availability that could assist in scheduling.
+                </div>
+            </div>
         </template>
 
         <template #actions>
