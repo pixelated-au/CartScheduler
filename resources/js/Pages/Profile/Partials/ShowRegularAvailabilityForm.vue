@@ -2,9 +2,8 @@
 import useAvailabilityActions from "@/Composables/useAvailabilityActions";
 import JetActionMessage from '@/Jetstream/ActionMessage.vue';
 import JetButton from '@/Jetstream/Button.vue';
-import JetCheckbox from '@/Jetstream/Checkbox.vue';
-import JetToggle from '@/Jetstream/Toggle.vue';
 import JetFormSection from '@/Jetstream/FormSection.vue';
+import JetToggle from '@/Jetstream/Toggle.vue';
 import DayOfWeekConfiguration from "@/Pages/Profile/Partials/DayOfWeekConfiguration.vue";
 import {useForm, usePage} from '@inertiajs/inertia-vue3';
 import '@vueform/slider/themes/tailwind.scss';
@@ -70,6 +69,10 @@ const update = () => {
     },
   })
 }
+
+const showConfigurations = computed(() => {
+  return form.num_mondays > 0 || form.num_tuesdays > 0 || form.num_wednesdays > 0 || form.num_thursdays > 0 || form.num_fridays > 0 || form.num_saturdays > 0 || form.num_sundays > 0
+})
 </script>
 
 <template>
@@ -107,49 +110,52 @@ const update = () => {
                     <JetToggle id="check-sunday" v-model="rosterSunday" label="Sunday"/>
                 </div>
             </div>
-            <div class="col-span-6 text-gray-700 dark:text-gray-100 grid grid-cols-2 sm:grid-cols-12 items-stretch gap-y-px bg-slate-200 dark:bg-slate-800 border border-gray-200 dark:border-gray-900 rounded p-3">
-                <DayOfWeekConfiguration v-model:hours-each-day="hoursEachDay.monday"
-                                        v-model:number-of-days-per-month="form.num_mondays"
-                                        :start="ranges.start" :end="ranges.end"
-                                        :number-of-weeks="numberOfWeeks" label="Monday"
-                                        :tooltip-format="tooltipFormat"/>
+            <Transition>
+                <div v-show="showConfigurations"
+                     class="col-span-6 text-gray-700 dark:text-gray-100 grid grid-cols-2 sm:grid-cols-12 items-stretch gap-y-px bg-slate-200 dark:bg-slate-800 border border-gray-200 dark:border-gray-900 rounded p-3">
+                    <DayOfWeekConfiguration v-model:hours-each-day="hoursEachDay.monday"
+                                            v-model:number-of-days-per-month="form.num_mondays"
+                                            :start="ranges.start" :end="ranges.end"
+                                            :number-of-weeks="numberOfWeeks" label="Monday"
+                                            :tooltip-format="tooltipFormat"/>
 
-                <DayOfWeekConfiguration v-model:hours-each-day="hoursEachDay.tuesday"
-                                        v-model:number-of-days-per-month="form.num_tuesdays"
-                                        :start="ranges.start" :end="ranges.end"
-                                        :number-of-weeks="numberOfWeeks" label="Tuesday"
-                                        :tooltip-format="tooltipFormat"/>
+                    <DayOfWeekConfiguration v-model:hours-each-day="hoursEachDay.tuesday"
+                                            v-model:number-of-days-per-month="form.num_tuesdays"
+                                            :start="ranges.start" :end="ranges.end"
+                                            :number-of-weeks="numberOfWeeks" label="Tuesday"
+                                            :tooltip-format="tooltipFormat"/>
 
-                <DayOfWeekConfiguration v-model:hours-each-day="hoursEachDay.wednesday"
-                                        v-model:number-of-days-per-month="form.num_wednesdays"
-                                        :start="ranges.start" :end="ranges.end"
-                                        :number-of-weeks="numberOfWeeks" label="Wednesday"
-                                        :tooltip-format="tooltipFormat"/>
+                    <DayOfWeekConfiguration v-model:hours-each-day="hoursEachDay.wednesday"
+                                            v-model:number-of-days-per-month="form.num_wednesdays"
+                                            :start="ranges.start" :end="ranges.end"
+                                            :number-of-weeks="numberOfWeeks" label="Wednesday"
+                                            :tooltip-format="tooltipFormat"/>
 
-                <DayOfWeekConfiguration v-model:hours-each-day="hoursEachDay.thursday"
-                                        v-model:number-of-days-per-month="form.num_thursdays"
-                                        :start="ranges.start" :end="ranges.end"
-                                        :number-of-weeks="numberOfWeeks" label="Thursday"
-                                        :tooltip-format="tooltipFormat"/>
+                    <DayOfWeekConfiguration v-model:hours-each-day="hoursEachDay.thursday"
+                                            v-model:number-of-days-per-month="form.num_thursdays"
+                                            :start="ranges.start" :end="ranges.end"
+                                            :number-of-weeks="numberOfWeeks" label="Thursday"
+                                            :tooltip-format="tooltipFormat"/>
 
-                <DayOfWeekConfiguration v-model:hours-each-day="hoursEachDay.friday"
-                                        v-model:number-of-days-per-month="form.num_fridays"
-                                        :start="ranges.start" :end="ranges.end"
-                                        :number-of-weeks="numberOfWeeks" label="Friday"
-                                        :tooltip-format="tooltipFormat"/>
+                    <DayOfWeekConfiguration v-model:hours-each-day="hoursEachDay.friday"
+                                            v-model:number-of-days-per-month="form.num_fridays"
+                                            :start="ranges.start" :end="ranges.end"
+                                            :number-of-weeks="numberOfWeeks" label="Friday"
+                                            :tooltip-format="tooltipFormat"/>
 
-                <DayOfWeekConfiguration v-model:hours-each-day="hoursEachDay.saturday"
-                                        v-model:number-of-days-per-month="form.num_saturdays"
-                                        :start="ranges.start" :end="ranges.end"
-                                        :number-of-weeks="numberOfWeeks" label="Saturday"
-                                        :tooltip-format="tooltipFormat"/>
+                    <DayOfWeekConfiguration v-model:hours-each-day="hoursEachDay.saturday"
+                                            v-model:number-of-days-per-month="form.num_saturdays"
+                                            :start="ranges.start" :end="ranges.end"
+                                            :number-of-weeks="numberOfWeeks" label="Saturday"
+                                            :tooltip-format="tooltipFormat"/>
 
-                <DayOfWeekConfiguration v-model:hours-each-day="hoursEachDay.sunday"
-                                        v-model:number-of-days-per-month="form.num_sundays"
-                                        :start="ranges.start" :end="ranges.end"
-                                        :number-of-weeks="numberOfWeeks" label="Sunday"
-                                        :tooltip-format="tooltipFormat"/>
-            </div>
+                    <DayOfWeekConfiguration v-model:hours-each-day="hoursEachDay.sunday"
+                                            v-model:number-of-days-per-month="form.num_sundays"
+                                            :start="ranges.start" :end="ranges.end"
+                                            :number-of-weeks="numberOfWeeks" label="Sunday"
+                                            :tooltip-format="tooltipFormat"/>
+                </div>
+            </Transition>
         </template>
 
         <template #actions>
@@ -163,3 +169,15 @@ const update = () => {
         </template>
     </JetFormSection>
 </template>
+
+<style lang="scss" scoped>
+.v-enter-active,
+.v-leave-active {
+  transition: opacity 0.5s ease;
+}
+
+.v-enter-from,
+.v-leave-to {
+  opacity: 0;
+}
+</style>
