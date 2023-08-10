@@ -3,6 +3,7 @@ import useAvailabilityActions from "@/Composables/useAvailabilityActions";
 import JetActionMessage from '@/Jetstream/ActionMessage.vue';
 import JetButton from '@/Jetstream/Button.vue';
 import JetCheckbox from '@/Jetstream/Checkbox.vue';
+import JetToggle from '@/Jetstream/Toggle.vue';
 import JetFormSection from '@/Jetstream/FormSection.vue';
 import DayOfWeekConfiguration from "@/Pages/Profile/Partials/DayOfWeekConfiguration.vue";
 import {useForm, usePage} from '@inertiajs/inertia-vue3';
@@ -82,31 +83,31 @@ const update = () => {
         </template>
 
         <template #form>
-            <div class="col-span-6 grid grid-cols-7 text-gray-700 dark:text-gray-100 items-stretch gap-y-px bg-slate-200 dark:bg-slate-900 border border-gray-200 dark:border-gray-900 rounded p-3">
+            <div class="col-span-6 grid grid-cols-7 text-gray-700 dark:text-gray-100 items-stretch gap-y-px bg-slate-200 dark:bg-slate-800 border border-gray-200 dark:border-gray-900 rounded p-3">
                 <div class="col-span-7 font-bold">I am available to be rostered:</div>
-                <div class="col text-center"><label for="check-monday">Monday</label><br>
-                    <JetCheckbox id="check-monday" v-model="rosterMonday"/>
+                <div class="col text-center">
+                    <JetToggle id="check-monday" v-model="rosterMonday" label="Monday"/>
                 </div>
-                <div class="col text-center"><label for="check-tuesday">Tuesday</label><br>
-                    <JetCheckbox id="check-tuesday" v-model="rosterTuesday"/>
+                <div class="col text-center">
+                    <JetToggle id="check-tuesday" v-model="rosterTuesday" label="Tuesday"/>
                 </div>
-                <div class="col text-center"><label for="check-wednesday">Wednesday</label><br>
-                    <JetCheckbox id="check-wednesday" v-model="rosterWednesday"/>
+                <div class="col text-center">
+                    <JetToggle id="check-wednesday" v-model="rosterWednesday" label="Wednesday"/>
                 </div>
-                <div class="col text-center"><label for="check-thursday">Thursday</label><br>
-                    <JetCheckbox id="check-thursday" v-model="rosterThursday"/>
+                <div class="col text-center">
+                    <JetToggle id="check-thursday" v-model="rosterThursday" label="Thursday"/>
                 </div>
-                <div class="col text-center"><label for="check-friday">Friday</label><br>
-                    <JetCheckbox id="check-friday" v-model="rosterFriday"/>
+                <div class="col text-center">
+                    <JetToggle id="check-friday" v-model="rosterFriday" label="Friday"/>
                 </div>
-                <div class="col text-center"><label for="check-saturday">Saturday</label><br>
-                    <JetCheckbox id="check-saturday" v-model="rosterSaturday"/>
+                <div class="col text-center">
+                    <JetToggle id="check-saturday" v-model="rosterSaturday" label="Saturday"/>
                 </div>
-                <div class="col text-center"><label for="check-sunday">Sunday</label><br>
-                    <JetCheckbox id="check-sunday" v-model="rosterSunday"/>
+                <div class="col text-center">
+                    <JetToggle id="check-sunday" v-model="rosterSunday" label="Sunday"/>
                 </div>
             </div>
-            <div class="col-span-6 text-gray-700 dark:text-gray-100 grid grid-cols-2 sm:grid-cols-12 items-stretch gap-y-px bg-slate-200 dark:bg-slate-900 border border-gray-200 dark:border-gray-900 rounded p-3">
+            <div class="col-span-6 text-gray-700 dark:text-gray-100 grid grid-cols-2 sm:grid-cols-12 items-stretch gap-y-px bg-slate-200 dark:bg-slate-800 border border-gray-200 dark:border-gray-900 rounded p-3">
                 <DayOfWeekConfiguration v-model:hours-each-day="hoursEachDay.monday"
                                         v-model:number-of-days-per-month="form.num_mondays"
                                         :start="ranges.start" :end="ranges.end"

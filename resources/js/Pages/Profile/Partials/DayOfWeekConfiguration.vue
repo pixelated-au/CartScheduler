@@ -31,18 +31,18 @@ const numberOfDaysPerMonthModel = computed({
 </script>
 
 <template>
-    <Transition>
+    <Transition mode="out-in">
         <div v-show="numberOfDaysPerMonthModel > 0"
              class="col-span-2 bg-slate-200 dark:bg-slate-800 p-2 grid self-center">
             {{ label }}
         </div>
     </Transition>
-    <Transition>
+    <Transition mode="out-in">
         <SelectField v-show="numberOfDaysPerMonthModel > 0" return-object-value full-width-button
                      v-model="numberOfDaysPerMonthModel" :options="numberOfWeeks"
                      class="col-span-3 bg-slate-200 dark:bg-slate-800 p-2 mr-2"/>
     </Transition>
-    <Transition>
+    <Transition mode="out-in">
         <div v-show="numberOfDaysPerMonthModel > 0"
              class="col-span-7 bg-slate-200 dark:bg-slate-800 p-2 grid items-center">
             <Slider v-model="hoursEachDayModel" :min="start" :max="end" :format="tooltipFormat"/>
