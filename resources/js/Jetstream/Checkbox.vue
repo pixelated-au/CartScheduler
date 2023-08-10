@@ -1,28 +1,30 @@
 <script setup>
-    import { computed } from 'vue'
+import {computed} from 'vue'
 
-    const emit = defineEmits(['update:checked'])
+const emit = defineEmits(['update:modelValue', 'update:checked'])
 
-    const props = defineProps({
-        checked: {
-            type: [Array, Boolean],
-            default: false,
-        },
-        value: {
-            type: String,
-            default: null,
-        },
-    })
+const props = defineProps({
+  modelValue: {
+    type: [Array, Boolean],
+    default: false,
+  },
+  checked: {
+    type: [Array, Boolean],
+    default: false,
+  },
+  value: {
+    type: String,
+    default: null,
+  },
+})
 
-    const proxyChecked = computed({
-        get () {
-            return props.checked
-        },
-
-        set (val) {
-            emit('update:checked', val)
-        },
-    })
+const proxyChecked = computed({
+  get: () => props.checked || props.modelValue,
+  set: val => {
+    emit('update:checked', val);
+    emit('update:modelValue', val);
+  },
+})
 </script>
 
 
