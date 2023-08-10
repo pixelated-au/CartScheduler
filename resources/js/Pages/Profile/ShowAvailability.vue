@@ -28,9 +28,9 @@ defineProps({
         <div>
             <div class="max-w-7xl mx-auto py-10 sm:px-6 lg:px-8">
                 <div>
-                    <ShowRegularAvailabilityForm :availability="availability.data"  class="mt-10 sm:mt-0" />
-                    <JetSectionBorder />
                     <ShowVacationsAvailabilityForm :user="$page.props.user"  class="mt-10 sm:mt-0" />
+                    <JetSectionBorder />
+                    <ShowRegularAvailabilityForm :availability="availability.data"  class="mt-10 sm:mt-0" />
                 </div>
             </div>
         </div>
