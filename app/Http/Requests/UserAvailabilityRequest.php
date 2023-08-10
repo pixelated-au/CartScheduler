@@ -32,7 +32,7 @@ class UserAvailabilityRequest extends FormRequest
             'num_saturdays' => ['required', 'integer', 'min:0', 'max:4'],
             'num_sundays' => ['required', 'integer', 'min:0', 'max:4'],
 
-            'comments' => ['nullable', 'string'],
+            'comments' => ['nullable', 'string', 'max:500'],
         ];
     }
 
