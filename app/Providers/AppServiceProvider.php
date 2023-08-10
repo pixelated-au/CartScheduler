@@ -36,7 +36,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        JsonResource::withoutWrapping();
         Model::preventLazyLoading(!app()->isProduction());
         Model::preventSilentlyDiscardingAttributes(!app()->isProduction());
         Schema::defaultStringLength(191);

@@ -2,14 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Imports\UsersImport;
-use App\Models\User;
-use Illuminate\Http\RedirectResponse;
+use App\Http\Resources\AvailabilityResource;
+use App\Models\UserAvailability;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Redirect;
 use Inertia\Inertia;
-use Inertia\Response;
-use Maatwebsite\Excel\Facades\Excel;
 
 class ShowUserAvailabilityController extends Controller
 {
@@ -19,12 +15,10 @@ class ShowUserAvailabilityController extends Controller
         $user = $request->user();
         $this->authorize('view', $user);
 
-        $user->load('availability');
-        //ray($user->availability()->first());
-        // Note, availability can be null
+        $availability = UserAvailability::firstOr(fn() => UserAvailability::create(['user_id' => $user->id]));
 
         return Inertia::render('Profile/ShowAvailability', [
-//            'availability' => $user->availability,
+            'availability' => AvailabilityResource::make($availability),
         ]);
     }
 }

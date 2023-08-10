@@ -14,6 +14,10 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  fullWidthButton: {
+    type: Boolean,
+    default: false,
+  },
 })
 
 const emit = defineEmits(['update:modelValue'])
@@ -32,7 +36,7 @@ const slots = useSlots()
 const useLabelSlot = computed(() => !!slots.label)
 
 
-const label = computed(() => model.value
+const label = computed(() => isNaN(model.value) && model.value || model.value !== null
   ? props.options.find(option => option.value === model.value)?.label
   : props.selectLabel || 'Select one'
 )
@@ -50,6 +54,9 @@ const arrowFill = computed(() => {
 
 const buttonClasses = computed(() => {
   let classes = []
+  if (props.fullWidthButton) {
+    classes.push('w-full')
+  }
   if (noOptions.value) {
     classes.push('!bg-gray-300 dark:!bg-gray-700 !cursor-not-allowed')
   }
