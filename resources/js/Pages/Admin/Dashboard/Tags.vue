@@ -58,7 +58,7 @@
     }
 
     watch(allTags, async (val, oldVal) => {
-        if (!oldVal || !val.length) {
+        if (!oldVal || !val?.length) {
             return
         }
         await axios.put('/admin/report-tag-sort-order', { ids: allTags.value.map(tag => tag.id) })
@@ -69,13 +69,13 @@
     <div class="col-span-full bg-gray-100 dark:bg-slate-700 p-6 rounded-lg shadow-lg grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
         <div>
             <h3 class="text-lg font-semibold text-gray-900">
-                <span class="text-gray-600 dark:text-gray-200">{{ allTags.length }}</span>
+                <span class="text-gray-600 dark:text-gray-200">{{ allTags?.length }}</span>
                 <span class="text-gray-500 dark:text-gray-300 ml-1">Tags</span>
             </h3>
             <p class="text-gray-700 dark:text-gray-300">Total number of tags in the system.</p>
             <p class="text-gray-700 dark:text-gray-300"><em>Used for quickly filling out reports.</em></p>
         </div>
-        <div class="px-3">
+        <div v-if="allTags?.length" class="px-3">
             <SlickList axis="xy" v-model:list="allTags">
                 <SlickItem v-for="(tag, i) in allTags"
                            :key="tag.id"
