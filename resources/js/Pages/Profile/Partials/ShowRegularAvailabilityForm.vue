@@ -48,8 +48,6 @@ const rosterFriday = toggleRosterDay('friday')
 const rosterSaturday = toggleRosterDay('saturday')
 const rosterSunday = toggleRosterDay('sunday')
 
-const mondayHours = computedRange('monday')
-
 const hoursEachDay = reactive({
   monday: computedRange('monday'),
   tuesday: computedRange('tuesday'),
