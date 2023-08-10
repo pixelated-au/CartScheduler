@@ -62,6 +62,7 @@ const update = () => {
   form.put(route('update.user.availability'), {
     errorBag: 'updatePassword',
     preserveScroll: true,
+    preserveState: false,
     onSuccess: () => form.reset(),
     onError: () => {
     },
