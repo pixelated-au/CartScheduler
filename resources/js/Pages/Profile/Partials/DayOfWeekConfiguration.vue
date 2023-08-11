@@ -44,7 +44,7 @@ const numberOfDaysPerMonthModel = computed({
     </Transition>
     <Transition mode="out-in">
         <div v-show="numberOfDaysPerMonthModel > 0"
-             class="col-span-7 bg-slate-200 dark:bg-slate-800 p-2 grid items-center">
+             class="col-span-7 bg-slate-200 dark:bg-slate-800 p-2 grid items-center pb-6 sm:pb-0 border-b border-gray-500">
             <Slider v-model="hoursEachDayModel" :min="start" :max="end" :format="tooltipFormat"/>
         </div>
     </Transition>

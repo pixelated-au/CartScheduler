@@ -3,14 +3,13 @@ import useAvailabilityActions from "@/Composables/useAvailabilityActions";
 import JetActionMessage from '@/Jetstream/ActionMessage.vue';
 import JetButton from '@/Jetstream/Button.vue';
 import JetFormSection from '@/Jetstream/FormSection.vue';
-import JetInput from "@/Jetstream/Input.vue";
 import JetInputError from "@/Jetstream/InputError.vue";
 import JetLabel from "@/Jetstream/Label.vue";
 import JetToggle from '@/Jetstream/Toggle.vue';
 import DayOfWeekConfiguration from "@/Pages/Profile/Partials/DayOfWeekConfiguration.vue";
 import {useForm, usePage} from '@inertiajs/inertia-vue3';
 import '@vueform/slider/themes/tailwind.scss';
-import {computed, nextTick, reactive, ref, watch} from 'vue';
+import {computed, nextTick, reactive, watch} from 'vue';
 
 const props = defineProps({
   availability: {
@@ -101,8 +100,8 @@ watch(() => form.comments, (value, oldValue) => {
         </template>
 
         <template #form>
-            <div class="col-span-6 grid grid-cols-7 text-gray-700 dark:text-gray-100 items-stretch gap-y-px bg-slate-200 dark:bg-slate-800 border border-gray-200 dark:border-gray-900 rounded p-3">
-                <div class="col-span-7 font-bold">I am available to be rostered:</div>
+            <div class="col-span-6 grid grid-cols-4 md:grid-cols-7 text-gray-700 dark:text-gray-100 items-stretch gap-y-px bg-slate-200 dark:bg-slate-800 border border-gray-200 dark:border-gray-900 rounded p-3">
+                <div class="col-span-4 md:col-span-7 font-bold">I am available to be rostered:</div>
                 <div class="col text-center">
                     <JetToggle id="check-monday" v-model="rosterMonday" label="Monday"/>
                 </div>
@@ -127,7 +126,7 @@ watch(() => form.comments, (value, oldValue) => {
             </div>
             <Transition>
                 <div v-show="showConfigurations"
-                     class="col-span-6 text-gray-700 dark:text-gray-100 grid grid-cols-2 sm:grid-cols-12 items-stretch gap-y-px bg-slate-200 dark:bg-slate-800 border border-gray-200 dark:border-gray-900 rounded p-3">
+                     class="col-span-6 text-gray-700 dark:text-gray-100 grid grid-cols-2 md:grid-cols-12 items-stretch gap-y-5 md:gap-y-px bg-slate-200 dark:bg-slate-800 border border-gray-200 dark:border-gray-900 rounded p-3">
                     <DayOfWeekConfiguration v-model:hours-each-day="hoursEachDay.monday"
                                             v-model:number-of-days-per-month="form.num_mondays"
                                             :start="ranges.start" :end="ranges.end"
@@ -180,7 +179,8 @@ watch(() => form.comments, (value, oldValue) => {
                 <div class="text-sm">{{ commentsRemainingCharacters }} characters remaining</div>
                 <JetInputError :message="form.errors.comments" class="mt-2"/>
                 <div class="italic, text-gray-500 text-sm">
-                    If relevant, use this to provide any additional information about your availability that could assist in scheduling.
+                    If relevant, use this to provide any additional information about your availability that could
+                    assist in scheduling.
                 </div>
             </div>
         </template>
