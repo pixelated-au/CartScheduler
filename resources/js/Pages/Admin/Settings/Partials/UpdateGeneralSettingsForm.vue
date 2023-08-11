@@ -2,6 +2,7 @@
 import SelectField from "@/Components/SelectField.vue";
 import JetActionMessage from '@/Jetstream/ActionMessage.vue';
 import JetButton from '@/Jetstream/Button.vue';
+import JetCheckbox from '@/Jetstream/Checkbox.vue';
 import JetFormSection from '@/Jetstream/FormSection.vue';
 import JetInput from '@/Jetstream/Input.vue';
 import JetInputError from '@/Jetstream/InputError.vue';
@@ -18,6 +19,7 @@ const form = useForm({
   siteName: props.settings.siteName,
   systemShiftStartHour: props.settings.systemShiftStartHour,
   systemShiftEndHour: props.settings.systemShiftEndHour,
+  enableUserAvailability: props.settings.enableUserAvailability,
 });
 
 const updateGeneralSettings = () => {
@@ -69,13 +71,31 @@ const hours = computed(() => {
                 </div>
                 <div>
                     <JetLabel for="system_shift_end_hour" value="Shift End Hour"/>
-                    <SelectField return-object-value id="system_shift_end_hour" v-model="form.systemShiftEndHour" :options="hours"
+                    <SelectField return-object-value id="system_shift_end_hour" v-model="form.systemShiftEndHour"
+                                 :options="hours"
                                  class="mt-1"/>
                     <JetInputError :message="form.errors.systemShiftEndHour" class="mt-2"/>
                 </div>
                 <div class="col-span-2 ml-1 text-sm text-gray-600 dark:text-gray-300">
-                    The Start and End hours are used primarily to define the earliest and latest 'hour' a volunteer can make
-                    themselves available for a shift (on their 'availability' page).
+                    The Start and End hours are used primarily to define the earliest and latest 'hour' a volunteer can
+                    make themselves available for a shift (on their 'availability' page).
+                </div>
+            </div>
+
+            <div class="col-span-6 flex items-center flex-wrap">
+                <JetCheckbox id="enable_user_availability"
+                             v-model:checked="form.enableUserAvailability"
+                             value="true"
+                             class="mr-3"/>
+                <JetLabel for="enable_user_availability" value="Enable User Availability"/>
+                <JetInputError :message="form.errors.enableUserAvailability" class="mt-2"/>
+                <div class="col-span-2 ml-1 text-sm text-gray-600 dark:text-gray-300 w-full">
+                    Used for admin based scheduling. Enabling this will prompt users update the times they are available
+                    to be rostered on.
+                    <span class="italic">
+                        Note: as soon as this is enabled, users will start to be prompted so it's usually best to warn
+                        them first.
+                    </span>
                 </div>
             </div>
         </template>

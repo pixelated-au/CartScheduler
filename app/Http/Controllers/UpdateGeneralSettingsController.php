@@ -17,6 +17,7 @@ class UpdateGeneralSettingsController extends Controller
         $this->settings->siteName = $request->input('siteName');
         $this->settings->systemShiftStartHour = $request->input('systemShiftStartHour');
         $this->settings->systemShiftEndHour = $request->input('systemShiftEndHour');
+        $this->settings->enableUserAvailability = $request->input('enableUserAvailability');
         $this->settings->save();
 
         return to_route('admin.settings');

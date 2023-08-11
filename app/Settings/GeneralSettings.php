@@ -13,6 +13,7 @@ class GeneralSettings extends Settings
     public array $allowedSettingsUsers;
     public int $systemShiftStartHour;
     public int $systemShiftEndHour;
+    public bool $enableUserAvailability;
 
     public static function group(): string
     {
