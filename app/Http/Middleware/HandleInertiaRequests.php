@@ -71,6 +71,10 @@ class HandleInertiaRequests extends Middleware
             $custom['hasUpdate'] = $hasUpdate;
         }
 
+        if ($this->settings->enableUserAvailability) {
+            $custom['enableUserAvailability'] = true;
+        }
+
         return array_merge(parent::share($request), $custom);
     }
 
