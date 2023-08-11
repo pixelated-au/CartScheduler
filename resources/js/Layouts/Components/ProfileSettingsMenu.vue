@@ -43,7 +43,7 @@
                 Profile
             </JetDropdownLink>
 
-            <JetDropdownLink :href="route('user.availability')">
+            <JetDropdownLink v-if="$page.props.enableUserAvailability" :href="route('user.availability')">
                 Availability
             </JetDropdownLink>
 

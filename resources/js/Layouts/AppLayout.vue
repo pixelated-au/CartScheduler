@@ -1,6 +1,7 @@
 <script setup>
 import JetApplicationMark from '@/Jetstream/ApplicationMark.vue'
 import JetBanner from '@/Jetstream/Banner.vue'
+import JetDropdownLink from "@/Jetstream/DropdownLink.vue";
 import JetNavLink from '@/Jetstream/NavLink.vue'
 import JetResponsiveNavLink from '@/Jetstream/ResponsiveNavLink.vue'
 import AdminMenu from '@/Layouts/Components/AdminMenu.vue'
@@ -175,6 +176,10 @@ provide('darkMode', isDarkMode)
                             <JetResponsiveNavLink :href="route('profile.show')"
                                                   :active="route().current('profile.show')">
                                 Profile
+                            </JetResponsiveNavLink>
+
+                            <JetResponsiveNavLink v-if="$page.props.enableUserAvailability" :href="route('user.availability')" :active="route().current('user.availability')">
+                                Availability
                             </JetResponsiveNavLink>
 
                             <JetResponsiveNavLink v-if="$page.props.jetstream.hasApiFeatures"
