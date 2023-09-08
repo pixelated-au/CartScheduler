@@ -148,6 +148,11 @@ class User extends Authenticatable
         return $this->hasOne(UserAvailability::class);
     }
 
+    public function vacations(): HasMany
+    {
+        return $this->hasMany(UserVacation::class);
+    }
+
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
