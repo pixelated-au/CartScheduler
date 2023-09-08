@@ -31,12 +31,17 @@ const updateGeneralSettings = () => {
 }
 
 const hours = computed(() => {
-  const hours = [];
-  for (let i = 1; i < 24; i++) {
-    hours.push({label: i + (i < 12 ? 'am' : 'pm'), value: i});
-  }
-  hours.push({label: '12am', value: 0})
-  return hours;
+  return Array(24).fill('').map((_, i) => {
+    if (i === 0) {
+      return {label: '12am', value: 0}
+    }
+
+    if (i === 12) {
+      return {label: '12pm', value: 0}
+    }
+
+    return {label: i < 12 ? i + 'am' : i - 12 + 'pm', value: i}
+  });
 });
 
 </script>
