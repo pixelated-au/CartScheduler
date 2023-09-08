@@ -37,23 +37,24 @@
                 <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight w-full md:w-auto">
                     Users</h2>
                 <div class="w-full md:w-auto">
-                    <JetButton class="md:mx-3 w-full md:w-auto my-3 md:my-0"
+                    <JetButton class="hidden sm:inline-flex md:mx-3 w-full md:w-auto my-3 md:my-0"
                                style-type="secondary"
                                outline
                                @click="onImportUsers">
                         Import Users
                     </JetButton>
-                    <JetButton class="md:mx-3 w-full md:w-auto" style-type="primary" @click="onNewUser">
+                    <JetButton class="py-4 sm:py-2 md:mx-3 w-full md:w-auto" style-type="primary" @click="onNewUser">
                         New User
                     </JetButton>
                 </div>
             </div>
         </template>
 
-        <div class="max-w-7xl mx-auto pt-10 pb-5 sm:px-6 lg:px-8">
-            <div class="bg-white dark:bg-slate-900 shadow-xl sm:rounded-lg sm:p-6">
-                <JetLabel for="search" value="Search for a user"/>
-                <JetInput id="search" v-model="userSearch" type="text" class="mt-1 block w-full"/>
+        <div class="max-w-7xl mx-auto sm:pt-10 sm:pb-5 sm:px-6 lg:px-8">
+            <div class="bg-white dark:bg-slate-900 shadow-xl sm:rounded-lg py-3 px-4 sm:p-6">
+                <JetLabel for="search" value="Search for a user:"/>
+                <!-- Overriding background colours for usability -->
+                <JetInput id="search" v-model="userSearch" type="text" class="mt-1 block w-full dark:bg-slate-700 sm:dark:bg-slate-800 "/>
                 <JetHelpText>Search on name, email, phone, role or any field</JetHelpText>
             </div>
         </div>
