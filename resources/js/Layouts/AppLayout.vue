@@ -1,7 +1,6 @@
 <script setup>
 import JetApplicationMark from '@/Jetstream/ApplicationMark.vue'
 import JetBanner from '@/Jetstream/Banner.vue'
-import JetDropdownLink from "@/Jetstream/DropdownLink.vue";
 import JetNavLink from '@/Jetstream/NavLink.vue'
 import JetResponsiveNavLink from '@/Jetstream/ResponsiveNavLink.vue'
 import AdminMenu from '@/Layouts/Components/AdminMenu.vue'
@@ -11,6 +10,7 @@ import TeamsMenu from '@/Layouts/Components/TeamsMenu.vue'
 import Bugsnag from '@bugsnag/js'
 import {Inertia} from "@inertiajs/inertia";
 import {Head, Link, usePage} from '@inertiajs/inertia-vue3'
+import '@vuepic/vue-datepicker/dist/main.css'
 import {computed, onMounted, provide, ref} from 'vue'
 
 defineProps({
@@ -178,7 +178,9 @@ provide('darkMode', isDarkMode)
                                 Profile
                             </JetResponsiveNavLink>
 
-                            <JetResponsiveNavLink v-if="$page.props.enableUserAvailability" :href="route('user.availability')" :active="route().current('user.availability')">
+                            <JetResponsiveNavLink v-if="$page.props.enableUserAvailability"
+                                                  :href="route('user.availability')"
+                                                  :active="route().current('user.availability')">
                                 Availability
                             </JetResponsiveNavLink>
 
@@ -216,7 +218,7 @@ provide('darkMode', isDarkMode)
 
 <style lang="scss">
 $dp__cell_size: auto;
-@import '@vuepic/vue-datepicker/src/VueDatePicker/style/main.scss';
+//@import '@vuepic/vue-datepicker/src/VueDatePicker/style/main.scss';
 
 .dp__theme_dark {
     --dp-background-color: #1E293B;
