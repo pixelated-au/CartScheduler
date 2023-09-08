@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\AvailabilityResource;
+use App\Http\Resources\UserVacationResource;
 use App\Models\UserAvailability;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -18,6 +19,7 @@ class ShowUserAvailabilityController extends Controller
         $availability = UserAvailability::firstOr(fn() => UserAvailability::create(['user_id' => $user->id]));
 
         return Inertia::render('Profile/ShowAvailability', [
+            'vacations' => UserVacationResource::collection($user->vacations->all()),
             'availability' => AvailabilityResource::make($availability),
         ]);
     }
