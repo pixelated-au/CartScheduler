@@ -4,24 +4,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 
-/**
- * @property mixed $user_id
- * @property mixed $day_monday
- * @property mixed $day_tuesday
- * @property mixed $day_wednesday
- * @property mixed $day_thursday
- * @property mixed $day_friday
- * @property mixed $day_saturday
- * @property mixed $day_sunday
- * @property mixed $num_mondays
- * @property mixed $num_tuesdays
- * @property mixed $num_wednesdays
- * @property mixed $num_thursdays
- * @property mixed $num_fridays
- * @property mixed $num_saturdays
- * @property mixed $num_sundays
- * @property mixed $comments
- */
+/** @mixin \App\Models\UserAvailability */
 class AvailabilityResource extends JsonResource
 {
     public function toArray($request): array
