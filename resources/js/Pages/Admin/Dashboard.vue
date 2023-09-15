@@ -54,7 +54,7 @@
                             </h3>
                             <p class="text-gray-700 dark:text-gray-300">Total number of locations in the system.</p>
                         </div>
-                        <div class="col-span-full sm:p-6 rounded-lg shadow-lg grid grid-cols-1 bg-white dark:bg-slate-900">
+                        <div class="dashboard col-span-full sm:p-6 rounded-lg shadow-lg grid grid-cols-1 bg-white dark:bg-slate-900">
                             <CartReservationManagement/>
                         </div>
                         <div class="col-span-full bg-gray-100 dark:bg-slate-700 p-6 rounded-lg shadow-lg grid grid-cols-1">
