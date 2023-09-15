@@ -1,4 +1,5 @@
 <script setup>
+import useToast from "@/Composables/useToast";
 import JetApplicationMark from '@/Jetstream/ApplicationMark.vue'
 import JetBanner from '@/Jetstream/Banner.vue'
 import JetNavLink from '@/Jetstream/NavLink.vue'
@@ -11,7 +12,7 @@ import Bugsnag from '@bugsnag/js'
 import {Inertia} from "@inertiajs/inertia";
 import {Head, Link, usePage} from '@inertiajs/inertia-vue3'
 import '@vuepic/vue-datepicker/dist/main.css'
-import {computed, onMounted, provide, ref} from 'vue'
+import {computed, nextTick, onMounted, onUpdated, provide, ref, watch} from 'vue'
 import 'floating-vue/dist/style.css'
 
 
@@ -40,6 +41,23 @@ const logout = () => Inertia.post(route('logout'))
 
 const isDarkMode = ref(false)
 provide('darkMode', isDarkMode)
+
+// const style = computed(() => usePage().props.value.jetstream.flash?.bannerStyle || 'success')
+// const message = computed(() => usePage().props.value.jetstream.flash?.banner || '')
+
+const toast = useToast()
+onUpdated(() => {
+    const flash = usePage().props.value.jetstream.flash
+    const type = flash?.bannerStyle || 'success'
+    const message = flash?.banner || ''
+    if (!message) {
+        return
+    }
+    // toast.success(message);
+    toast.message(type, message);
+})
+
+
 </script>
 
 <template>
