@@ -9,11 +9,12 @@ class UserVacationRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'user_id'                 => ['nullable', 'integer', 'exists:users,id'],
             'vacations.*.id'          => ['nullable', 'integer', 'exists:user_vacations,id'],
-            'vacations.*.user_id'     => ['nullable', 'integer', 'exists:users,id'],
             'vacations.*.start_date'  => ['required', 'date'],
-            'vacations.*.end_date'    => ['required', 'bool'],
-            'vacations.*.description' => ['nullable', 'string', 'max:2'],
+            'vacations.*.end_date'    => ['required', 'date'],
+            'vacations.*.description' => ['nullable', 'string', 'max:255'],
+            'deletedVacations.*.id'   => ['integer', 'exists:user_vacations,id'],
         ];
     }
 
