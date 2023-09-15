@@ -12,6 +12,8 @@ import {Inertia} from "@inertiajs/inertia";
 import {Head, Link, usePage} from '@inertiajs/inertia-vue3'
 import '@vuepic/vue-datepicker/dist/main.css'
 import {computed, onMounted, provide, ref} from 'vue'
+import 'floating-vue/dist/style.css'
+
 
 defineProps({
     title: String,
@@ -217,47 +219,60 @@ provide('darkMode', isDarkMode)
 </template>
 
 <style lang="scss">
+
+.v-popper__popper .v-popper__wrapper {
+    .v-popper__inner {
+        @apply bg-white dark:bg-slate-300 border border-white dark:border-slate-300 shadow-lg text-slate-900 dark:text-slate-800 p-3;
+    }
+}
+
+.v-popper__popper .v-popper__wrapper .v-popper__arrow-container {
+    .v-popper__arrow-inner, .v-popper__arrow-outer {
+        @apply border-white dark:border-slate-300;
+    }
+}
+
 $dp__cell_size: auto;
-//@import '@vuepic/vue-datepicker/src/VueDatePicker/style/main.scss';
-
-.dp__theme_dark {
-    --dp-background-color: #1E293B;
-}
-
-.dp__main.dp__flex_display {
-    width: 100%;
-    @media (min-width: 460px) and (max-width: 639px) {
-        width: 80%;
-        margin: 0 auto;
-    }
-    @media only screen and (max-width: 639px) {
-        flex-direction: column !important;
+.dashboard {
+    .dp__theme_dark {
+        --dp-background-color: #1E293B;
     }
 
-}
+    .dp__main.dp__flex_display {
+        width: 100%;
+        @media (min-width: 460px) and (max-width: 639px) {
+            width: 80%;
+            margin: 0 auto;
+        }
+        @media only screen and (max-width: 639px) {
+            flex-direction: column !important;
+        }
 
-.dp__calendar_header {
-    width: 100%;
-
-    .dp__calendar_header_item {
-        flex: 1 1 0;
-        margin: 0 2px;
     }
-}
 
-.dp__calendar {
-    width: 100%;
+    .dp__calendar_header {
+        width: 100%;
 
-    .dp__calendar_item {
-        flex: 1 1 0;
-        margin: 0 2px;
+        .dp__calendar_header_item {
+            flex: 1 1 0;
+            margin: 0 2px;
+        }
+    }
 
-        .dp__cell_inner {
-            @media (max-width: 500px) {
-                min-height: calc(100vw / 9);
-            }
-            @media (min-width: 500px) and (max-width: 639px) {
-                min-height: calc(100vw / 10);
+    .dp__calendar {
+        width: 100%;
+
+        .dp__calendar_item {
+            flex: 1 1 0;
+            margin: 0 2px;
+
+            .dp__cell_inner {
+                @media (max-width: 500px) {
+                    min-height: calc(100vw / 9);
+                }
+                @media (min-width: 500px) and (max-width: 639px) {
+                    min-height: calc(100vw / 10);
+                }
             }
         }
     }
