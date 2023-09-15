@@ -7,6 +7,7 @@ export default function () {
         'danger': 'amber',
         'help': 'purple',
         'warning': 'red',
+        'transparent': 'transparent',
     }
 
     /**
