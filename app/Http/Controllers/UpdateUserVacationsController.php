@@ -5,9 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\UserVacationRequest;
 use App\Models\User;
 use App\Models\UserVacation;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
-use Inertia\Inertia;
 
 class UpdateUserVacationsController extends Controller
 {
@@ -16,27 +14,39 @@ class UpdateUserVacationsController extends Controller
         $this->authorize('update', $request->user());
 
         /** @var User $user */
-        $user = $request->user();
-        $vacations = $request->validated('vacations');
+        $user      = $request->user();
+        $vacations = $request->validated('vacations', []);
 
         foreach ($vacations as $vacation) {
             if (isset($vacation['id'])) {
                 /** @var \App\Models\UserVacation $userVacation */
                 $userVacation = $user->vacations()->find($vacation['id']);
-                $userVacation->start_date = $vacation['start_date'];
-                $userVacation->end_date = $vacation['end_date'];
+                if (!$userVacation) {
+                    continue;
+                }
+                $userVacation->start_date  = $vacation['start_date'];
+                $userVacation->end_date    = $vacation['end_date'];
                 $userVacation->description = $vacation['description'];
                 $userVacation->save();
             } else {
-                $userVacation = new UserVacation();
-                $userVacation->start_date = $vacation['start_date'];
-                $userVacation->end_date = $vacation['end_date'];
+                $userVacation              = new UserVacation();
+                $userVacation->start_date  = $vacation['start_date'];
+                $userVacation->end_date    = $vacation['end_date'];
                 $userVacation->description = $vacation['description'];
-                $userVacation->user_id = $user->id;
+                $userVacation->user_id     = $user->id;
                 $userVacation->save();
             }
         }
 
+        $deleted = $request->validated('deletedVacations');
+        foreach ($deleted as $vacation) {
+            /** @var \App\Models\UserVacation $userVacation */
+            $userVacation = $user->vacations()->find($vacation['id']);
+            if (!$userVacation) {
+                continue;
+            }
+            $userVacation->delete();
+        }
 
         session()->flash('flash.banner', 'Your availability has been updated.');
         session()->flash('flash.bannerStyle', 'success');
