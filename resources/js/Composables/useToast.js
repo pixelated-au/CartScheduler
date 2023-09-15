@@ -1,9 +1,9 @@
 import 'floating-vue/dist/style.css'
-import { useToast as ut } from 'vue-toastification'
+import { POSITION, TYPE, useToast as ut } from 'vue-toastification'
 //https://vue-toastification.maronato.dev/
 
 const options = {
-    position: 'top-center',
+    position: POSITION.TOP_CENTER,
     timeout: 2000,
     closeOnClick: true,
     pauseOnFocusLoss: true,
@@ -32,9 +32,19 @@ export default function useToast () {
         toast.warning(message, { ...options, ...itemOptions })
     }
 
+    /**
+     * @param {TYPE} type
+     * @param {string} message
+     * @param {object} itemOptions
+     */
+    const message = (type, message, itemOptions = null) => {
+        toast(message, { ...options, ...itemOptions, ...{type:type}} )
+    }
+
     return {
         error,
         success,
         warning,
+        message,
     }
 }
