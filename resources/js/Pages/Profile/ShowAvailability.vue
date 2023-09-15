@@ -10,6 +10,10 @@ import UpdatePasswordForm from '@/Pages/Profile/Partials/UpdatePasswordForm.vue'
 import UpdateProfileInformationForm from '@/Pages/Profile/Partials/UpdateProfileInformationForm.vue';
 
 defineProps({
+    vacations: {
+        type: Object,
+        required: false,
+    },
     availability: {
         type: Object,
         required: false,
@@ -28,7 +32,7 @@ defineProps({
         <div>
             <div class="max-w-7xl mx-auto py-10 sm:px-6 lg:px-8">
                 <div>
-                    <ShowVacationsAvailabilityForm :user="$page.props.user"  class="mt-10 sm:mt-0" />
+                    <ShowVacationsAvailabilityForm :vacations="vacations.data"  class="mt-10 sm:mt-0" />
                     <JetSectionBorder />
                     <ShowRegularAvailabilityForm :availability="availability.data"  class="mt-10 sm:mt-0" />
                 </div>
