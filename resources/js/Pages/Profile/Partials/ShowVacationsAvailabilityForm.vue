@@ -1,40 +1,50 @@
 <script setup>
-import { ref } from 'vue';
-import { useForm } from '@inertiajs/inertia-vue3';
+import CloseCircle from "@/Components/Icons/CloseCircle.vue";
+import QuestionCircle from "@/Components/Icons/QuestionCircle.vue";
+import InputTextEIPField from "@/Components/InputTextEIPField.vue";
 import JetActionMessage from '@/Jetstream/ActionMessage.vue';
 import JetButton from '@/Jetstream/Button.vue';
 import JetFormSection from '@/Jetstream/FormSection.vue';
-import JetInput from '@/Jetstream/Input.vue';
 import JetInputError from '@/Jetstream/InputError.vue';
-import JetLabel from '@/Jetstream/Label.vue';
+import VacationDateRange from "@/Pages/Profile/Partials/VacationDateRange.vue";
+import {useForm} from '@inertiajs/inertia-vue3';
+import {intlFormat, parseISO} from "date-fns";
+// noinspection ES6UnusedImports
+import {Dropdown as VDropdown, VTooltip} from 'floating-vue'
+import {computed, ref} from 'vue';
 
-const passwordInput = ref(null);
-const currentPasswordInput = ref(null);
-
+const props = defineProps({
+    vacations: {
+        type: Array,
+        required: true,
+    },
+})
 const form = useForm({
-    current_password: '',
-    password: '',
-    password_confirmation: '',
-});
+    vacations: props.vacations || [],
+    deletedVacations: [],
+})
 
 const update = () => {
+    console.log('update')
     form.put(route('update.user.vacations'), {
-        errorBag: 'updatePassword',
         preserveScroll: true,
-        onSuccess: () => form.reset(),
-        onError: () => {
-            if (form.errors.password) {
-                form.reset('password', 'password_confirmation');
-                passwordInput.value.focus();
-            }
-
-            if (form.errors.current_password) {
-                form.reset('current_password');
-                currentPasswordInput.value.focus();
-            }
+        onSuccess: (r) => {
+        },
+        onError: (r) => {
+            console.log('error', r)
         },
     });
 };
+
+const resetForm = () => {
+    form.reset();
+    form.clearErrors();
+}
+
+const formatDate = (date) => intlFormat(parseISO(date));
+
+const deleteVacation = (idx) => form.deletedVacations = [...form.deletedVacations, form.vacations.splice(idx, 1)[0]];
+
 </script>
 
 <template>
@@ -48,51 +58,57 @@ const update = () => {
         </template>
 
         <template #form>
-            Vacation Stuff here 👋
-<!--            <div class="col-span-6 sm:col-span-4">-->
-<!--                <JetLabel for="current_password" value="Current Password" />-->
-<!--                <JetInput-->
-<!--                    id="current_password"-->
-<!--                    ref="currentPasswordInput"-->
-<!--                    v-model="form.current_password"-->
-<!--                    type="password"-->
-<!--                    class="mt-1 block w-full"-->
-<!--                    autocomplete="current-password"-->
-<!--                />-->
-<!--                <JetInputError :message="form.errors.current_password" class="mt-2" />-->
-<!--            </div>-->
+            <div class="col-span-6 text-gray-700 dark:text-gray-100">
+                <div v-if="form.vacations?.length"
+                     class="border border-gray-200 dark:border-gray-900">
+                    <div v-for="(vacation, idx) in form.vacations" :key="vacation.id" class="bg-slate-200 dark:bg-slate-800 grid grid-cols-[auto_minmax(0,_1fr)] sm:grid-cols-[auto_minmax(0,_2fr)_3fr] gap-y-px gap-x-3 rounded p-3 items-center">
+                        <JetButton style-type="transparent" type="button" class="row-span-2 sm:row-span-1 px-1 py-1 mr-2" @click="deleteVacation(idx)"><CloseCircle/></JetButton>
+                        <div>
+                            <div class="font-bold">From - To</div>
+                            <vacation-date-range v-model:start-date="vacation.start_date"
+                                                 v-model:end-date="vacation.end_date"/>
+                            <JetInputError :message="form.errors['vacations.' + idx + '.start_date']"/>
+                            <JetInputError :message="form.errors['vacations.' + idx + '.end_date']"/>
+                        </div>
+                        <div class="mt-2 sm:mt-0">
+                            <div class="font-bold flex items-center">Comment
+                                <v-dropdown class="ml-2 inline-block">
+                                    <span><QuestionCircle/></span>
+                                    <template #popper>
+                                        <div class="">
+                                            <p class="text-sm">Tap on the comment to edit it.</p>
+                                        </div>
+                                    </template>
+                                </v-dropdown>
+                            </div>
+                            <InputTextEIPField class="" input-class="w-full dark:bg-slate-700" v-model="vacation.description"/>
+                            <JetInputError :message="form.errors['vacations.' + idx + '.description']"/>
+                        </div>
+                    </div>
+                </div>
+                <div v-else
+                     class="items-stretch gap-y-px bg-slate-200 dark:bg-slate-800 border border-gray-200 dark:border-gray-900 rounded p-3">
+                    <div class="text-center">No vacations set</div>
+                </div>
 
-<!--            <div class="col-span-6 sm:col-span-4">-->
-<!--                <JetLabel for="password" value="New Password" />-->
-<!--                <JetInput-->
-<!--                    id="password"-->
-<!--                    ref="passwordInput"-->
-<!--                    v-model="form.password"-->
-<!--                    type="password"-->
-<!--                    class="mt-1 block w-full"-->
-<!--                    autocomplete="new-password"-->
-<!--                />-->
-<!--                <JetInputError :message="form.errors.password" class="mt-2" />-->
-<!--            </div>-->
-
-<!--            <div class="col-span-6 sm:col-span-4">-->
-<!--                <JetLabel for="password_confirmation" value="Confirm Password" />-->
-<!--                <JetInput-->
-<!--                    id="password_confirmation"-->
-<!--                    v-model="form.password_confirmation"-->
-<!--                    type="password"-->
-<!--                    class="mt-1 block w-full"-->
-<!--                    autocomplete="new-password"-->
-<!--                />-->
-<!--                <JetInputError :message="form.errors.password_confirmation" class="mt-2" />-->
-<!--            </div>-->
+                <div
+                    class="items-stretch gap-y-px bg-slate-200 dark:bg-slate-900 border border-gray-200 dark:border-gray-900 rounded p-3 text-xs mt-3">
+                    Current <pre>{{ form.vacations }}</pre>
+                    <div>Deleted<pre>{{ form.deletedVacations }}</pre></div>
+                </div>
+            </div>
         </template>
 
         <template #actions>
             <JetActionMessage :on="form.recentlySuccessful" class="mr-3">
                 Saved.
             </JetActionMessage>
-
+            <div v-if="form.hasErrors" class="text-red-500 font-bold mr-3">
+                An error occurred with the data. See above.
+            </div>
+            <JetButton style-type="secondary" type="button" class="mr-3" @click="resetForm">
+                Cancel
+            </JetButton>
             <JetButton :class="{ 'opacity-25': form.processing }" :disabled="form.processing">
                 Save
             </JetButton>
