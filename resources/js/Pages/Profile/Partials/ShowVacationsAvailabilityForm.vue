@@ -108,16 +108,6 @@ const deleteVacation = (idx) => form.deletedVacations = [...form.deletedVacation
                     Add a New Vacation
                 </JetButton>
                 </div>
-
-                <div
-                    class="items-stretch gap-y-px bg-slate-200 dark:bg-slate-900 border border-gray-200 dark:border-gray-900 rounded p-3 text-xs mt-3">
-                    Current
-                    <pre>{{ form.vacations }}</pre>
-                    <div>Deleted
-                        <pre>{{ form.deletedVacations }}</pre>
-                    </div>
-                </div>
-
             </div>
         </template>
 
