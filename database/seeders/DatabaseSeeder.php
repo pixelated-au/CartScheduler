@@ -19,6 +19,7 @@ class DatabaseSeeder extends Seeder
             ShiftSeeder::class,
             ShiftUserSeeder::class,
             UserAvailabilitySeeder::class,
+            UserVacationSeeder::class,
         ]);
     }
 }
