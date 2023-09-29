@@ -108,7 +108,6 @@
     const today = new Date()
     const formatTime = time => format(parse(time, 'HH:mm:ss', today), 'h:mm a')
 
-    const isDarkMode = inject('darkMode', false)
     const showUserAddModal = ref(false)
 
     const rowClass = gender => {
