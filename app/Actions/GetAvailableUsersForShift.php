@@ -5,13 +5,19 @@ namespace App\Actions;
 use App\Models\Shift;
 use App\Models\ShiftUser;
 use App\Models\User;
+use App\Settings\GeneralSettings;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
 class GetAvailableUsersForShift
 {
-    public function execute(Shift $shift, string $date): Collection
+    public function __construct(private readonly GeneralSettings $settings)
+    {
+    }
+
+    public function execute(Shift $shift, Carbon $date): Collection
     {
         $overlappingShifts = $this->getOverlappingShifts($shift, $date);
 
@@ -39,14 +45,45 @@ class GetAvailableUsersForShift
                 ->where('shifts.is_enabled', true)
                 ->where('locations.is_enabled', true)
                 ->whereIn('shift_id', $overlappingShifts)
+                ->when($canOnlyBrothersRegister, fn(Builder $query) => $query
+                    ->where('users.gender', 'male')
+                )
             )
-            ->when($canOnlyBrothersRegister, fn(Builder $query) => $query
-                ->where('users.gender', 'male')
+            ->when($this->settings->enableUserAvailability, fn(Builder $query) => $query
+                ->join(table: 'user_availabilities', first: 'users.id', operator: '=', second: 'user_availabilities.user_id')
+                ->whereRaw("CASE
+                                    WHEN DAYOFWEEK('$date') = 1 THEN user_availabilities.num_sundays
+                                    WHEN DAYOFWEEK('$date') = 2 THEN user_availabilities.num_mondays
+                                    WHEN DAYOFWEEK('$date') = 3 THEN user_availabilities.num_tuesdays
+                                    WHEN DAYOFWEEK('$date') = 4 THEN user_availabilities.num_wednesdays
+                                    WHEN DAYOFWEEK('$date') = 5 THEN user_availabilities.num_thursdays
+                                    WHEN DAYOFWEEK('$date') = 6 THEN user_availabilities.num_fridays
+                                    WHEN DAYOFWEEK('$date') = 7 THEN user_availabilities.num_saturdays
+                                    END > 0")
+                        ->whereRaw("FIND_IN_SET($shift->start_hour, CASE
+                                    WHEN DAYOFWEEK('$date') = 1 THEN user_availabilities.day_sunday
+                                    WHEN DAYOFWEEK('$date') = 2 THEN user_availabilities.day_monday
+                                    WHEN DAYOFWEEK('$date') = 3 THEN user_availabilities.day_tuesday
+                                    WHEN DAYOFWEEK('$date') = 4 THEN user_availabilities.day_wednesday
+                                    WHEN DAYOFWEEK('$date') = 5 THEN user_availabilities.day_thursday
+                                    WHEN DAYOFWEEK('$date') = 6 THEN user_availabilities.day_friday
+                                    WHEN DAYOFWEEK('$date') = 7 THEN user_availabilities.day_saturday
+                                    END)")
+                        ->whereRaw("FIND_IN_SET($shift->end_hour, CASE
+                                    WHEN DAYOFWEEK('$date') = 1 THEN user_availabilities.day_sunday
+                                    WHEN DAYOFWEEK('$date') = 2 THEN user_availabilities.day_monday
+                                    WHEN DAYOFWEEK('$date') = 3 THEN user_availabilities.day_tuesday
+                                    WHEN DAYOFWEEK('$date') = 4 THEN user_availabilities.day_wednesday
+                                    WHEN DAYOFWEEK('$date') = 5 THEN user_availabilities.day_thursday
+                                    WHEN DAYOFWEEK('$date') = 6 THEN user_availabilities.day_friday
+                                    WHEN DAYOFWEEK('$date') = 7 THEN user_availabilities.day_saturday
+                                    END)")
             )
+//            ->tap(fn ($query) => ray($query->toSql()))
             ->get();
     }
 
-    private function getOverlappingShifts(Shift $shift, string $date): \Illuminate\Support\Collection
+    private function getOverlappingShifts(Shift $shift, Carbon $date): \Illuminate\Support\Collection
     {
         return Shift::query()
             ->select(['id'])
@@ -57,7 +94,7 @@ class GetAvailableUsersForShift
             ->map(fn(Shift $shift) => $shift->getKey());
     }
 
-    private function canOnlyBrothersBook(Shift $shift, string $date): bool
+    private function canOnlyBrothersBook(Shift $shift, Carbon $date): bool
     {
         $location = $shift->load('location')->location;
         $location = $shift->load('location')->location;
@@ -83,8 +120,8 @@ class GetAvailableUsersForShift
     /**
      * format of lowercase 'L' ('l') returns the lowercase full day name of the week in English
      */
-    private function getDayOfWeekForDate(string $date): string
+    private function getDayOfWeekForDate(Carbon $date): string
     {
-        return 'day_' . strtolower(date('l', strtotime($date)));
+        return 'day_' . strtolower($date->format('l'));
     }
 }

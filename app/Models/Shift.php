@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Str;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
@@ -71,6 +72,20 @@ class Shift extends Model
         );
     }
 
+    protected function startHour(): Attribute
+    {
+        return Attribute::make(
+            get: static fn(?string $value, array $attributes) => Str::of($attributes['start_time'])->before(':')->toInteger(),
+        );
+    }
+
+    protected function endHour(): Attribute
+    {
+        return Attribute::make(
+            get: static fn(?string $value, array $attributes) => Str::of($attributes['end_time'])->before(':')->toInteger(),
+        );
+    }
+
     public function location(): BelongsTo
     {
         return $this->belongsTo(Location::class);
@@ -84,7 +99,7 @@ class Shift extends Model
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
-                         ->logAll()
-                         ->logOnlyDirty();
+            ->logAll()
+            ->logOnlyDirty();
     }
 }

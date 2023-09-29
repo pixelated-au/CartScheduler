@@ -19,7 +19,7 @@ class GetAvailableUsersForShiftController extends Controller
         $request->validate(['date' => ['required', 'date']]);
 
         return UserResource::collection(
-            $this->getUsersForShift->execute($shift, $request->input('date')),
+            $this->getUsersForShift->execute($shift, $request->date('date')),
         );
     }
 }
