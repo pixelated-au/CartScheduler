@@ -54,7 +54,7 @@
             <div class="bg-white dark:bg-slate-900 shadow-xl sm:rounded-lg py-3 px-4 sm:p-6">
                 <JetLabel for="search" value="Search for a user:"/>
                 <!-- Overriding background colours for usability -->
-                <JetInput id="search" v-model="userSearch" type="text" class="mt-1 block w-full dark:bg-slate-700 sm:dark:bg-slate-800 "/>
+                <JetInput id="search" v-model="userSearch" type="text" class="mt-1 block w-full dark:bg-slate-700 sm:dark:bg-slate-800"/>
                 <JetHelpText>Search on name, email, phone, role or any field</JetHelpText>
             </div>
         </div>
