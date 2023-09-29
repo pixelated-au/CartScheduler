@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\UserAvailabilityRequest;
+use App\Models\User;
 use Illuminate\Support\Facades\Redirect;
 
 class UpdateUserRegularAvailabilityController extends Controller
@@ -11,6 +12,13 @@ class UpdateUserRegularAvailabilityController extends Controller
     {
         $user = $request->user();
         $this->authorize('update', $user);
+
+        $isOther = false;
+        if ($request->validated('user_id')) {
+            // this means admin is updating another user's availability
+            $isOther = true;
+            $user = User::findOrFail($request->validated('user_id'));
+        }
 
         $user->availability->day_monday    = $request->validated('day_monday');
         $user->availability->day_tuesday   = $request->validated('day_tuesday');
@@ -32,9 +40,12 @@ class UpdateUserRegularAvailabilityController extends Controller
 
         $user->availability->save();
 
-        session()->flash('flash.banner', 'Your availability has been updated.');
+        session()->flash('flash.banner', $isOther ? 'Volunteer availability has been updated.' : 'Your availability has been updated.');
         session()->flash('flash.bannerStyle', 'success');
 
+        if ($isOther) {
+            return Redirect::route('admin.users.edit', $user);
+        }
         return Redirect::route('user.availability');
     }
 }

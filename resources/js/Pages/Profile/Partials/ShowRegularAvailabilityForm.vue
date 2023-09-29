@@ -12,33 +12,37 @@ import '@vueform/slider/themes/tailwind.scss';
 import {computed, nextTick, reactive, watch} from 'vue';
 
 const props = defineProps({
-  availability: {
-    type: Object,
-    required: true,
-  },
+    availability: {
+        type: Object,
+        required: true,
+    },
+    userId: {
+        type: Number,
+        default: null,
+    },
 })
 
 const ranges = computed(() => ({
-  start: usePage().props.value.shiftAvailability.systemShiftStartHour,
-  end: usePage().props.value.shiftAvailability.systemShiftEndHour,
+    start: usePage().props.value.shiftAvailability.systemShiftStartHour,
+    end: usePage().props.value.shiftAvailability.systemShiftEndHour,
 }))
 
 const form = useForm({
-  day_monday: props.availability.day_monday || [ranges.value.start, ranges.value.end],
-  day_tuesday: props.availability.day_tuesday || [ranges.value.start, ranges.value.end],
-  day_wednesday: props.availability.day_wednesday || [ranges.value.start, ranges.value.end],
-  day_thursday: props.availability.day_thursday || [ranges.value.start, ranges.value.end],
-  day_friday: props.availability.day_friday || [ranges.value.start, ranges.value.end],
-  day_saturday: props.availability.day_saturday || [ranges.value.start, ranges.value.end],
-  day_sunday: props.availability.day_sunday || [ranges.value.start, ranges.value.end],
-  num_mondays: props.availability.num_mondays || 0,
-  num_tuesdays: props.availability.num_tuesdays || 0,
-  num_wednesdays: props.availability.num_wednesdays || 0,
-  num_thursdays: props.availability.num_thursdays || 0,
-  num_fridays: props.availability.num_fridays || 0,
-  num_saturdays: props.availability.num_saturdays || 0,
-  num_sundays: props.availability.num_sundays || 0,
-  comments: props.availability.comments || '',
+    day_monday: props.availability.day_monday || [ranges.value.start, ranges.value.end],
+    day_tuesday: props.availability.day_tuesday || [ranges.value.start, ranges.value.end],
+    day_wednesday: props.availability.day_wednesday || [ranges.value.start, ranges.value.end],
+    day_thursday: props.availability.day_thursday || [ranges.value.start, ranges.value.end],
+    day_friday: props.availability.day_friday || [ranges.value.start, ranges.value.end],
+    day_saturday: props.availability.day_saturday || [ranges.value.start, ranges.value.end],
+    day_sunday: props.availability.day_sunday || [ranges.value.start, ranges.value.end],
+    num_mondays: props.availability.num_mondays || 0,
+    num_tuesdays: props.availability.num_tuesdays || 0,
+    num_wednesdays: props.availability.num_wednesdays || 0,
+    num_thursdays: props.availability.num_thursdays || 0,
+    num_fridays: props.availability.num_fridays || 0,
+    num_saturdays: props.availability.num_saturdays || 0,
+    num_sundays: props.availability.num_sundays || 0,
+    comments: props.availability.comments || '',
 })
 
 const {computedRange, numberOfWeeks, toggleRosterDay, tooltipFormat} = useAvailabilityActions(form, ranges)
@@ -52,40 +56,48 @@ const rosterSaturday = toggleRosterDay('saturday')
 const rosterSunday = toggleRosterDay('sunday')
 
 const hoursEachDay = reactive({
-  monday: computedRange('monday'),
-  tuesday: computedRange('tuesday'),
-  wednesday: computedRange('wednesday'),
-  thursday: computedRange('thursday'),
-  friday: computedRange('friday'),
-  saturday: computedRange('saturday'),
-  sunday: computedRange('sunday'),
+    monday: computedRange('monday'),
+    tuesday: computedRange('tuesday'),
+    wednesday: computedRange('wednesday'),
+    thursday: computedRange('thursday'),
+    friday: computedRange('friday'),
+    saturday: computedRange('saturday'),
+    sunday: computedRange('sunday'),
 })
 
 const update = () => {
-  form.put(route('update.user.availability'), {
-    errorBag: 'updatePassword',
-    preserveScroll: true,
-  })
+    form.transform((data) => {
+            if (props.userId) {
+                return {
+                    ...data,
+                    user_id: props.userId,
+                }
+            }
+            return data
+        })
+        .put(route('update.user.availability'), {
+            preserveScroll: true,
+        })
 }
 
 const showConfigurations = computed(() => {
-  return form.num_mondays > 0 || form.num_tuesdays > 0 || form.num_wednesdays > 0 || form.num_thursdays > 0 || form.num_fridays > 0 || form.num_saturdays > 0 || form.num_sundays > 0
+    return form.num_mondays > 0 || form.num_tuesdays > 0 || form.num_wednesdays > 0 || form.num_thursdays > 0 || form.num_fridays > 0 || form.num_saturdays > 0 || form.num_sundays > 0
 })
 
 const maxCommentChars = 500
 const commentsRemainingCharacters = computed(() => {
-  if (form.comments) {
-    return maxCommentChars - form.comments.length
-  }
-  return maxCommentChars
+    if (form.comments) {
+        return maxCommentChars - form.comments.length
+    }
+    return maxCommentChars
 })
 
 watch(() => form.comments, (value, oldValue) => {
-  if (value.length > maxCommentChars) {
-    nextTick(() => {
-      form.comments = oldValue
-    })
-  }
+    if (value.length > maxCommentChars) {
+        nextTick(() => {
+            form.comments = oldValue
+        })
+    }
 })
 </script>
 
@@ -96,12 +108,13 @@ watch(() => form.comments, (value, oldValue) => {
         </template>
 
         <template #description>
-            Please indicate your availability
+            Please indicate {{ props.userId ? 'this volunteers' : 'your' }} availability
         </template>
 
         <template #form>
-            <div class="col-span-6 grid grid-cols-4 md:grid-cols-7 text-gray-700 dark:text-gray-100 items-stretch gap-y-px bg-slate-200 dark:bg-slate-800 border border-gray-200 dark:border-gray-900 rounded p-3">
-                <div class="col-span-4 md:col-span-7 font-bold">I am available to be rostered:</div>
+            <div
+                class="col-span-6 grid grid-cols-4 md:grid-cols-7 text-gray-700 dark:text-gray-100 items-stretch gap-y-px bg-slate-200 dark:bg-slate-800 border border-gray-200 dark:border-gray-900 rounded p-3">
+                <div class="col-span-4 md:col-span-7 font-bold">{{ props.userId ? 'Volunteer is' : 'I am' }} available to be rostered:</div>
                 <div class="col text-center">
                     <JetToggle id="check-monday" v-model="rosterMonday" label="Monday"/>
                 </div>
@@ -171,7 +184,8 @@ watch(() => form.comments, (value, oldValue) => {
                 </div>
             </Transition>
 
-            <div class="col-span-6 text-gray-700 dark:text-gray-100 items-stretch bg-slate-200 dark:bg-slate-800 border border-gray-200 dark:border-gray-900 rounded p-3">
+            <div
+                class="col-span-6 text-gray-700 dark:text-gray-100 items-stretch bg-slate-200 dark:bg-slate-800 border border-gray-200 dark:border-gray-900 rounded p-3">
                 <JetLabel for="comments" value="Comments (optional)"/>
                 <textarea id="comments"
                           class="border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 rounded-md shadow-sm w-full h-40 dark:bg-slate-800 dark:border-slate-700 dark:text-white"
@@ -200,11 +214,11 @@ watch(() => form.comments, (value, oldValue) => {
 <style lang="scss" scoped>
 .v-enter-active,
 .v-leave-active {
-  transition: opacity 0.5s ease;
+    transition: opacity 0.5s ease;
 }
 
 .v-enter-from,
 .v-leave-to {
-  opacity: 0;
+    opacity: 0;
 }
 </style>

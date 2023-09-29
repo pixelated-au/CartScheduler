@@ -11,10 +11,17 @@ class UpdateUserVacationsController extends Controller
 {
     public function __invoke(UserVacationRequest $request)
     {
-        $this->authorize('update', $request->user());
-
         /** @var User $user */
         $user      = $request->user();
+        $this->authorize('update', $user);
+
+        $isOther = false;
+        if ($request->validated('user_id')) {
+            // this means admin is updating another user's availability
+            $isOther = true;
+            $user = User::findOrFail($request->validated('user_id'));
+        }
+
         $vacations = $request->validated('vacations', []);
 
         foreach ($vacations as $vacation) {
@@ -51,9 +58,12 @@ class UpdateUserVacationsController extends Controller
             $userVacation->delete();
         }
 
-        session()->flash('flash.banner', 'Your availability has been updated.');
+        session()->flash('flash.banner', $isOther ? 'Volunteer holidays have been updated.' : 'Your holidays have been updated.');
         session()->flash('flash.bannerStyle', 'success');
 
+        if ($isOther) {
+            return Redirect::route('admin.users.edit', $user);
+        }
         return Redirect::route('user.availability');
     }
 }

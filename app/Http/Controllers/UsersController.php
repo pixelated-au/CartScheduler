@@ -49,7 +49,8 @@ class UsersController extends Controller
     public function edit(User $user): Response
     {
         return Inertia::render('Admin/Users/Edit', [
-            'editUser' => $user,
+//            'editUser' => $user,
+            'editUser' => $user->load(['vacations', 'availability']),
         ]);
     }
 
