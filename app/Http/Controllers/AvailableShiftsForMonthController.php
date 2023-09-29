@@ -27,7 +27,7 @@ class AvailableShiftsForMonthController extends Controller
         }
 
         $startDate = ($canViewHistorical
-            ? Carbon::today()->subMonths(6)->startOfMonth()
+            ? Carbon::today()->subMonths(1)->startOfMonth()
             : Carbon::today())
             ->format('Y-m-d');
 
