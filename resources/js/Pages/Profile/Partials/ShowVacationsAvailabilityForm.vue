@@ -5,13 +5,13 @@ import InputTextEIPField from "@/Components/InputTextEIPField.vue";
 import JetActionMessage from '@/Jetstream/ActionMessage.vue';
 import JetButton from '@/Jetstream/Button.vue';
 import JetFormSection from '@/Jetstream/FormSection.vue';
+import JetInput from '@/Jetstream/Input.vue';
 import JetInputError from '@/Jetstream/InputError.vue';
 import VacationDateRange from "@/Pages/Profile/Partials/VacationDateRange.vue";
 import {useForm} from '@inertiajs/inertia-vue3';
 import {intlFormat, parseISO} from "date-fns";
 // noinspection ES6UnusedImports
 import {Dropdown as VDropdown, VTooltip} from 'floating-vue'
-import {computed, ref} from 'vue';
 
 const props = defineProps({
     vacations: {
@@ -28,7 +28,12 @@ const update = () => {
     console.log('update')
     form.put(route('update.user.vacations'), {
         preserveScroll: true,
-        onSuccess: (r) => {
+        onSuccess: () => {
+            form.defaults({
+                vacations: props.vacations || [],
+                deletedVacations: [],
+            })
+            form.reset()
         },
         onError: (r) => {
             console.log('error', r)
@@ -41,7 +46,7 @@ const resetForm = () => {
     form.clearErrors();
 }
 
-const formatDate = (date) => intlFormat(parseISO(date));
+const addVacation = () => form.vacations = [...form.vacations, {start_date: '', end_date: '', description: ''}];
 
 const deleteVacation = (idx) => form.deletedVacations = [...form.deletedVacations, form.vacations.splice(idx, 1)[0]];
 
@@ -61,8 +66,12 @@ const deleteVacation = (idx) => form.deletedVacations = [...form.deletedVacation
             <div class="col-span-6 text-gray-700 dark:text-gray-100">
                 <div v-if="form.vacations?.length"
                      class="border border-gray-200 dark:border-gray-900">
-                    <div v-for="(vacation, idx) in form.vacations" :key="vacation.id" class="bg-slate-200 dark:bg-slate-800 grid grid-cols-[auto_minmax(0,_1fr)] sm:grid-cols-[auto_minmax(0,_2fr)_3fr] gap-y-px gap-x-3 rounded p-3 items-center">
-                        <JetButton style-type="transparent" type="button" class="row-span-2 sm:row-span-1 px-1 py-1 mr-2" @click="deleteVacation(idx)"><CloseCircle/></JetButton>
+                    <div v-for="(vacation, idx) in form.vacations" :key="vacation.id"
+                         class="bg-slate-200 dark:bg-slate-800 grid grid-cols-[auto_minmax(0,_1fr)] sm:grid-cols-[auto_minmax(0,_2fr)_3fr] gap-y-px gap-x-3 rounded p-3 items-center">
+                        <JetButton style-type="transparent" type="button"
+                                   class="row-span-2 sm:row-span-1 px-1 py-1 mr-2" @click="deleteVacation(idx)">
+                            <CloseCircle/>
+                        </JetButton>
                         <div>
                             <div class="font-bold">From - To</div>
                             <vacation-date-range v-model:start-date="vacation.start_date"
@@ -72,7 +81,7 @@ const deleteVacation = (idx) => form.deletedVacations = [...form.deletedVacation
                         </div>
                         <div class="mt-2 sm:mt-0">
                             <div class="font-bold flex items-center">Comment
-                                <v-dropdown class="ml-2 inline-block">
+                                <v-dropdown v-if="vacation.id" class="ml-2 inline-block">
                                     <span><QuestionCircle/></span>
                                     <template #popper>
                                         <div class="">
@@ -81,21 +90,34 @@ const deleteVacation = (idx) => form.deletedVacations = [...form.deletedVacation
                                     </template>
                                 </v-dropdown>
                             </div>
-                            <InputTextEIPField class="" input-class="w-full dark:bg-slate-700" v-model="vacation.description"/>
+                            <JetInput v-if="!vacation.id" type="text" class="w-full dark:bg-slate-700" v-model="vacation.description"/>
+                            <InputTextEIPField v-else input-class="w-full dark:bg-slate-700"
+                                               v-model="vacation.description"
+                            empty-value="No comment set"/>
                             <JetInputError :message="form.errors['vacations.' + idx + '.description']"/>
                         </div>
                     </div>
                 </div>
                 <div v-else
-                     class="items-stretch gap-y-px bg-slate-200 dark:bg-slate-800 border border-gray-200 dark:border-gray-900 rounded p-3">
-                    <div class="text-center">No vacations set</div>
+                     class="items-stretch gap-y-px bg-slate-200 dark:bg-slate-800 border border-gray-200 dark:border-gray-900 rounded p-3 flex flex-wrap justify-center">
+                    <div class="w-full text-center">No vacations set</div>
+                </div>
+                <div class="flex justify-center">
+                <JetButton style-type="primary" type="button" class="mt-3"
+                           @click="addVacation">
+                    Add a New Vacation
+                </JetButton>
                 </div>
 
                 <div
                     class="items-stretch gap-y-px bg-slate-200 dark:bg-slate-900 border border-gray-200 dark:border-gray-900 rounded p-3 text-xs mt-3">
-                    Current <pre>{{ form.vacations }}</pre>
-                    <div>Deleted<pre>{{ form.deletedVacations }}</pre></div>
+                    Current
+                    <pre>{{ form.vacations }}</pre>
+                    <div>Deleted
+                        <pre>{{ form.deletedVacations }}</pre>
+                    </div>
                 </div>
+
             </div>
         </template>
 
