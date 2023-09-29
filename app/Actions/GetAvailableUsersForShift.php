@@ -51,6 +51,7 @@ class GetAvailableUsersForShift
             )
             ->when($this->settings->enableUserAvailability, fn(Builder $query) => $query
                 ->join(table: 'user_availabilities', first: 'users.id', operator: '=', second: 'user_availabilities.user_id')
+                ->leftJoin(table: 'user_vacations', first: 'users.id', operator: '=', second: 'user_vacations.user_id')
                 ->whereRaw("CASE
                                     WHEN DAYOFWEEK('$date') = 1 THEN user_availabilities.num_sundays
                                     WHEN DAYOFWEEK('$date') = 2 THEN user_availabilities.num_mondays
@@ -60,7 +61,7 @@ class GetAvailableUsersForShift
                                     WHEN DAYOFWEEK('$date') = 6 THEN user_availabilities.num_fridays
                                     WHEN DAYOFWEEK('$date') = 7 THEN user_availabilities.num_saturdays
                                     END > 0")
-                        ->whereRaw("FIND_IN_SET($shift->start_hour, CASE
+                ->whereRaw("FIND_IN_SET($shift->start_hour, CASE
                                     WHEN DAYOFWEEK('$date') = 1 THEN user_availabilities.day_sunday
                                     WHEN DAYOFWEEK('$date') = 2 THEN user_availabilities.day_monday
                                     WHEN DAYOFWEEK('$date') = 3 THEN user_availabilities.day_tuesday
@@ -69,7 +70,7 @@ class GetAvailableUsersForShift
                                     WHEN DAYOFWEEK('$date') = 6 THEN user_availabilities.day_friday
                                     WHEN DAYOFWEEK('$date') = 7 THEN user_availabilities.day_saturday
                                     END)")
-                        ->whereRaw("FIND_IN_SET($shift->end_hour, CASE
+                ->whereRaw("FIND_IN_SET($shift->end_hour, CASE
                                     WHEN DAYOFWEEK('$date') = 1 THEN user_availabilities.day_sunday
                                     WHEN DAYOFWEEK('$date') = 2 THEN user_availabilities.day_monday
                                     WHEN DAYOFWEEK('$date') = 3 THEN user_availabilities.day_tuesday
@@ -78,6 +79,11 @@ class GetAvailableUsersForShift
                                     WHEN DAYOFWEEK('$date') = 6 THEN user_availabilities.day_friday
                                     WHEN DAYOFWEEK('$date') = 7 THEN user_availabilities.day_saturday
                                     END)")
+                ->withCount(['vacations as vacations_count' => fn(Builder $query) => $query
+                    ->where('start_date', '<=', $date)
+                    ->where('end_date', '>=', $date)
+                ])
+                ->having('vacations_count', '=', 0)
             )
 //            ->tap(fn ($query) => ray($query->toSql()))
             ->get();
