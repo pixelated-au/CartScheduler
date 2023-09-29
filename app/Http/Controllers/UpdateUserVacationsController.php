@@ -38,8 +38,11 @@ class UpdateUserVacationsController extends Controller
             }
         }
 
-        $deleted = $request->validated('deletedVacations');
+        $deleted = $request->validated('deletedVacations', []);
         foreach ($deleted as $vacation) {
+            if (!isset($vacation['id'])) {
+                continue;
+            }
             /** @var \App\Models\UserVacation $userVacation */
             $userVacation = $user->vacations()->find($vacation['id']);
             if (!$userVacation) {
