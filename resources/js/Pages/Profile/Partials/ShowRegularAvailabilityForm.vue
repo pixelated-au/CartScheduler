@@ -47,6 +47,26 @@ const form = useForm({
 
 const {computedRange, numberOfWeeks, toggleRosterDay, tooltipFormat} = useAvailabilityActions(form, ranges)
 
+const hasDayError = computed(() => {
+    return form.errors['day_monday']?.length > 0
+    || form.errors['day_tuesday']?.length > 0
+    || form.errors['day_wednesday']?.length > 0
+    || form.errors['day_thursday']?.length > 0
+    || form.errors['day_friday']?.length > 0
+    || form.errors['day_saturday']?.length > 0
+    || form.errors['day_sunday']?.length > 0
+})
+
+const hasNumError = computed(() => {
+    return form.errors['num_mondays']?.length > 0
+    || form.errors['num_tuesdays']?.length > 0
+    || form.errors['num_wednesdays']?.length > 0
+    || form.errors['num_thursdays']?.length > 0
+    || form.errors['num_fridays']?.length > 0
+    || form.errors['num_saturdays']?.length > 0
+    || form.errors['num_sundays']?.length > 0
+})
+
 const rosterMonday = toggleRosterDay('monday')
 const rosterTuesday = toggleRosterDay('tuesday')
 const rosterWednesday = toggleRosterDay('wednesday')
@@ -77,6 +97,12 @@ const update = () => {
         })
         .put(route('update.user.availability'), {
             preserveScroll: true,
+            onError: () => {
+                console.log('error')
+            },
+            onSuccess: (a, b, c) => {
+                console.log('success', a, b, c)
+            },
         })
 }
 
@@ -136,6 +162,18 @@ watch(() => form.comments, (value, oldValue) => {
                 <div class="col text-center">
                     <JetToggle id="check-sunday" v-model="rosterSunday" label="Sunday"/>
                 </div>
+                <div v-if="hasDayError" class="col-span-4 md:col-span-7 font-bold">
+                    <p class="text-sm text-red-600">
+                        {{ form.errors.day_monday }}
+                        {{ form.errors.day_tuesday }}
+                        {{ form.errors.day_wednesday }}
+                        {{ form.errors.day_thursday }}
+                        {{ form.errors.day_friday }}
+                        {{ form.errors.day_saturday }}
+                        {{ form.errors.day_sunday }}
+                    </p>
+
+                </div>
             </div>
             <Transition>
                 <div v-show="showConfigurations"
@@ -183,6 +221,17 @@ watch(() => form.comments, (value, oldValue) => {
                                             :tooltip-format="tooltipFormat"/>
                 </div>
             </Transition>
+            <div v-if="hasNumError" class="col-span-6 text-gray-700 dark:text-gray-100 items-stretch gap-y-5 md:gap-y-px bg-slate-200 dark:bg-slate-800 border border-gray-200 dark:border-gray-900 rounded p-3">
+                <p class="text-sm text-red-600">
+                    {{ form.errors.num_mondays }}
+                    {{ form.errors.num_tuesdays }}
+                    {{ form.errors.num_wednesdays }}
+                    {{ form.errors.num_thursdays }}
+                    {{ form.errors.num_fridays }}
+                    {{ form.errors.num_saturdays }}
+                    {{ form.errors.num_sundays }}
+                </p>
+            </div>
 
             <div
                 class="col-span-6 text-gray-700 dark:text-gray-100 items-stretch bg-slate-200 dark:bg-slate-800 border border-gray-200 dark:border-gray-900 rounded p-3">
