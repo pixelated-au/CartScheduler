@@ -133,7 +133,7 @@ const toggleLabel = computed(() => doShowFilteredVolunteers.value
                     <JetInput id="search" v-model="volunteerSearch" type="text" class="mt-1 block w-full"/>
                     <JetHelpText>Search on name</JetHelpText>
                 </div>
-                <div class="mt-3 flex justify-end">
+                <div v-if="$page.props.enableUserAvailability" class="mt-3 flex justify-end">
                     <div class="flex justify-center w-[150px]">
                         <JetToggle v-model="doShowFilteredVolunteers" :label="toggleLabel"/>
                     </div>
