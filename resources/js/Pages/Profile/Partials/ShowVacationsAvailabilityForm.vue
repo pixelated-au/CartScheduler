@@ -66,7 +66,7 @@ const deleteVacation = (idx) => form.deletedVacations = [...form.deletedVacation
 <template>
     <JetFormSection @submitted="update">
         <template #title>
-            Temporary Unavailability
+            Vacations
         </template>
 
         <template #description>
