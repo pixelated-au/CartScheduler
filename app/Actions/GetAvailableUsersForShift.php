@@ -17,6 +17,7 @@ class GetAvailableUsersForShift
     {
     }
 
+    /** @noinspection UnknownColumnInspection */
     public function execute(Shift $shift, Carbon $date, bool $showAll): Collection
     {
         $overlappingShifts = $this->getOverlappingShifts($shift, $date);
@@ -52,33 +53,9 @@ class GetAvailableUsersForShift
             ->when($this->settings->enableUserAvailability && !$showAll, fn(Builder $query) => $query
                 ->join(table: 'user_availabilities', first: 'users.id', operator: '=', second: 'user_availabilities.user_id')
                 ->leftJoin(table: 'user_vacations', first: 'users.id', operator: '=', second: 'user_vacations.user_id')
-                ->whereRaw("CASE
-                                    WHEN DAYOFWEEK('$date') = 1 THEN user_availabilities.num_sundays
-                                    WHEN DAYOFWEEK('$date') = 2 THEN user_availabilities.num_mondays
-                                    WHEN DAYOFWEEK('$date') = 3 THEN user_availabilities.num_tuesdays
-                                    WHEN DAYOFWEEK('$date') = 4 THEN user_availabilities.num_wednesdays
-                                    WHEN DAYOFWEEK('$date') = 5 THEN user_availabilities.num_thursdays
-                                    WHEN DAYOFWEEK('$date') = 6 THEN user_availabilities.num_fridays
-                                    WHEN DAYOFWEEK('$date') = 7 THEN user_availabilities.num_saturdays
-                                    END > 0")
-                ->whereRaw("FIND_IN_SET($shift->start_hour, CASE
-                                    WHEN DAYOFWEEK('$date') = 1 THEN user_availabilities.day_sunday
-                                    WHEN DAYOFWEEK('$date') = 2 THEN user_availabilities.day_monday
-                                    WHEN DAYOFWEEK('$date') = 3 THEN user_availabilities.day_tuesday
-                                    WHEN DAYOFWEEK('$date') = 4 THEN user_availabilities.day_wednesday
-                                    WHEN DAYOFWEEK('$date') = 5 THEN user_availabilities.day_thursday
-                                    WHEN DAYOFWEEK('$date') = 6 THEN user_availabilities.day_friday
-                                    WHEN DAYOFWEEK('$date') = 7 THEN user_availabilities.day_saturday
-                                    END)")
-                ->whereRaw("FIND_IN_SET($shift->end_hour, CASE
-                                    WHEN DAYOFWEEK('$date') = 1 THEN user_availabilities.day_sunday
-                                    WHEN DAYOFWEEK('$date') = 2 THEN user_availabilities.day_monday
-                                    WHEN DAYOFWEEK('$date') = 3 THEN user_availabilities.day_tuesday
-                                    WHEN DAYOFWEEK('$date') = 4 THEN user_availabilities.day_wednesday
-                                    WHEN DAYOFWEEK('$date') = 5 THEN user_availabilities.day_thursday
-                                    WHEN DAYOFWEEK('$date') = 6 THEN user_availabilities.day_friday
-                                    WHEN DAYOFWEEK('$date') = 7 THEN user_availabilities.day_saturday
-                                    END)")
+                ->tap(fn(Builder $query) => $this->queryIsAvailableOnDayOfWeek($query, $date))
+                ->tap(fn(Builder $query) => $this->queryIsAvailableAtHour($query, $date, $shift->start_hour))
+                ->tap(fn (Builder $query) => $this->queryIsAvailableAtHour($query, $date, $shift->end_hour))
                 ->withCount(['vacations as vacations_count' => fn(Builder $query) => $query
                     ->where('start_date', '<=', $date)
                     ->where('end_date', '>=', $date)
@@ -87,6 +64,34 @@ class GetAvailableUsersForShift
             )
 //            ->tap(fn ($query) => ray($query->toSql()))
             ->get();
+    }
+
+    private function queryIsAvailableOnDayOfWeek(Builder $query, string $date): void
+    {
+        /** @noinspection SpellCheckingInspection */
+        $query->whereRaw("CASE
+                                    WHEN DAYOFWEEK('$date') = 1 THEN user_availabilities.num_sundays
+                                    WHEN DAYOFWEEK('$date') = 2 THEN user_availabilities.num_mondays
+                                    WHEN DAYOFWEEK('$date') = 3 THEN user_availabilities.num_tuesdays
+                                    WHEN DAYOFWEEK('$date') = 4 THEN user_availabilities.num_wednesdays
+                                    WHEN DAYOFWEEK('$date') = 5 THEN user_availabilities.num_thursdays
+                                    WHEN DAYOFWEEK('$date') = 6 THEN user_availabilities.num_fridays
+                                    WHEN DAYOFWEEK('$date') = 7 THEN user_availabilities.num_saturdays
+                                    END > 0");
+    }
+
+    private function queryIsAvailableAtHour(Builder $query, string $date, int $hour): void
+    {
+        /** @noinspection SpellCheckingInspection */
+        $query->whereRaw("FIND_IN_SET($hour, CASE
+                                    WHEN DAYOFWEEK('$date') = 1 THEN user_availabilities.day_sunday
+                                    WHEN DAYOFWEEK('$date') = 2 THEN user_availabilities.day_monday
+                                    WHEN DAYOFWEEK('$date') = 3 THEN user_availabilities.day_tuesday
+                                    WHEN DAYOFWEEK('$date') = 4 THEN user_availabilities.day_wednesday
+                                    WHEN DAYOFWEEK('$date') = 5 THEN user_availabilities.day_thursday
+                                    WHEN DAYOFWEEK('$date') = 6 THEN user_availabilities.day_friday
+                                    WHEN DAYOFWEEK('$date') = 7 THEN user_availabilities.day_saturday
+                                    END)");
     }
 
     private function getOverlappingShifts(Shift $shift, Carbon $date): \Illuminate\Support\Collection
@@ -102,7 +107,6 @@ class GetAvailableUsersForShift
 
     private function canOnlyBrothersBook(Shift $shift, Carbon $date): bool
     {
-        $location = $shift->load('location')->location;
         $location = $shift->load('location')->location;
         if (!$location->requires_brother) {
             return false;
