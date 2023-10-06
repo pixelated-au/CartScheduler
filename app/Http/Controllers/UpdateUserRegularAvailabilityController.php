@@ -20,14 +20,6 @@ class UpdateUserRegularAvailabilityController extends Controller
             $user = User::findOrFail($request->validated('user_id'));
         }
 
-        $user->availability->day_monday    = $request->validated('day_monday');
-        $user->availability->day_tuesday   = $request->validated('day_tuesday');
-        $user->availability->day_wednesday = $request->validated('day_wednesday');
-        $user->availability->day_thursday  = $request->validated('day_thursday');
-        $user->availability->day_friday    = $request->validated('day_friday');
-        $user->availability->day_saturday  = $request->validated('day_saturday');
-        $user->availability->day_sunday    = $request->validated('day_sunday');
-
         $user->availability->num_mondays    = $request->validated('num_mondays');
         $user->availability->num_tuesdays   = $request->validated('num_tuesdays');
         $user->availability->num_wednesdays = $request->validated('num_wednesdays');
@@ -35,6 +27,14 @@ class UpdateUserRegularAvailabilityController extends Controller
         $user->availability->num_fridays    = $request->validated('num_fridays');
         $user->availability->num_saturdays  = $request->validated('num_saturdays');
         $user->availability->num_sundays    = $request->validated('num_sundays');
+
+        $user->availability->day_monday    = $request->validated('day_monday');
+        $user->availability->day_tuesday   = $request->validated('day_tuesday');
+        $user->availability->day_wednesday = $request->validated('day_wednesday');
+        $user->availability->day_thursday  = $request->validated('day_thursday');
+        $user->availability->day_friday    = $request->validated('day_friday');
+        $user->availability->day_saturday  = $request->validated('day_saturday');
+        $user->availability->day_sunday    = $request->validated('day_sunday');
 
         $user->availability->comments = $request->validated('comments');
 
