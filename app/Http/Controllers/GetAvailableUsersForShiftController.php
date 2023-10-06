@@ -16,10 +16,13 @@ class GetAvailableUsersForShiftController extends Controller
 
     public function __invoke(Request $request, Shift $shift)
     {
-        $request->validate(['date' => ['required', 'date']]);
+        $request->validate([
+            'date' => ['required', 'date'],
+            'showAll' => ['nullable', 'boolean'],
+        ]);
 
         return UserResource::collection(
-            $this->getUsersForShift->execute($shift, $request->date('date')),
+            $this->getUsersForShift->execute($shift, $request->date('date'), $request->boolean('showAll', false)),
         );
     }
 }

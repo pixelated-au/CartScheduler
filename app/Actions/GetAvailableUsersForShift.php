@@ -17,7 +17,7 @@ class GetAvailableUsersForShift
     {
     }
 
-    public function execute(Shift $shift, Carbon $date): Collection
+    public function execute(Shift $shift, Carbon $date, bool $showAll): Collection
     {
         $overlappingShifts = $this->getOverlappingShifts($shift, $date);
 
@@ -49,7 +49,7 @@ class GetAvailableUsersForShift
                     ->where('users.gender', 'male')
                 )
             )
-            ->when($this->settings->enableUserAvailability, fn(Builder $query) => $query
+            ->when($this->settings->enableUserAvailability && !$showAll, fn(Builder $query) => $query
                 ->join(table: 'user_availabilities', first: 'users.id', operator: '=', second: 'user_availabilities.user_id')
                 ->leftJoin(table: 'user_vacations', first: 'users.id', operator: '=', second: 'user_vacations.user_id')
                 ->whereRaw("CASE
