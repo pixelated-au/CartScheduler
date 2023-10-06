@@ -18,7 +18,6 @@ class DeleteAccountTest extends TestCase
         }
 
         $this->actingAs($user = User::factory()->create());
-        ray($user->getConnection());
 
         $response = $this->delete('/user', [
             'password' => 'password',

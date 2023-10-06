@@ -20,8 +20,6 @@ class ShiftsForMonthResource extends JsonResource
 
     public function toArray($request): array
     {
-        ray($this);
-
         return [
             'locations' => LocationResource::collection($this->locations),
             'dates'     => ShiftDateResourceCollection::collection($this->dates),
