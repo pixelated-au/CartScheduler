@@ -26,6 +26,27 @@ class GetAvailableUsersForShift
         return User::query()
             ->distinct()
             ->select(['users.*', 'last_shift_date', 'last_shift_start_time'])
+//            TODO need to get the number of shifts for the month for day and total across all days
+//            TODO need to get the number of shifts for the month for day and total across all days
+//            TODO need to get the number of shifts for the month for day and total across all days
+//            TODO need to get the number of shifts for the month for day and total across all days
+//            TODO need to get the number of shifts for the month for day and total across all days
+//            TODO need to get the number of shifts for the month for day and total across all days
+//            TODO need to get the number of shifts for the month for day and total across all days
+//            TODO need to get the number of shifts for the month for day and total across all days
+//            TODO need to get the number of shifts for the month for day and total across all days
+
+//            ->select(fn(Builder $query) => $query
+//                ->selectRaw('COUNT(*) as num_shifts_for_day')
+//                ->from('shift_user')
+//                ->join(table: 'shifts', first: 'shift_user.shift_id', operator: '=', second: 'shifts.id')
+//                ->join(table: 'locations', first: 'shifts.location_id', operator: '=', second: 'locations.id')
+//                ->where('shift_date', '>=', $date->clone()->startOfMonth())
+//                ->where('shift_date', '<=', $date->clone()->endOfMonth())
+//                ->where('shifts.is_enabled', true)
+//                ->where('shifts.location_id', $shift->location_id)
+//                ->where('shift_user.user_id', DB::raw('users.id'))
+//                ->where('locations.is_enabled', true))
             ->leftJoinSub(
                 query: DB::query()
                     ->select(['user_id'])
