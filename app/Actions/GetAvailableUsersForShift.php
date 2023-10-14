@@ -28,8 +28,10 @@ class GetAvailableUsersForShift
             ->distinct()
             ->select(['users.*', 'last_shift_date', 'last_shift_start_time'])
             ->when($this->settings->enableUserAvailability, fn(Builder $query) => $query
-                ->addSelect(['num_sunday', 'num_monday', 'num_tuesday', 'num_wednesday', 'num_thursday', 'num_friday', 'num_saturday'])
+                ->addSelect(['filled_sundays', 'filled_mondays', 'filled_tuesdays', 'filled_wednesdays', 'filled_thursdays', 'filled_fridays', 'filled_saturdays'])
                 ->tap(fn(Builder $query) => $this->getDayCounts($query, $date)))
+            ->addSelect(['num_sundays', 'num_mondays', 'num_tuesdays', 'num_wednesdays', 'num_thursdays', 'num_fridays', 'num_saturdays'])
+            ->leftJoin(table: 'user_availabilities', first: 'users.id', operator: '=', second: 'user_availabilities.user_id')
             ->leftJoinSub(
                 query: DB::query()
                     ->select(['user_id'])
@@ -55,7 +57,7 @@ class GetAvailableUsersForShift
                 )
             )
             ->when($this->settings->enableUserAvailability && !$showAll, fn(Builder $query) => $query
-                ->join(table: 'user_availabilities', first: 'users.id', operator: '=', second: 'user_availabilities.user_id')
+//                ->join(table: 'user_availabilities', first: 'users.id', operator: '=', second: 'user_availabilities.user_id')
                 ->leftJoin(table: 'user_vacations', first: 'users.id', operator: '=', second: 'user_vacations.user_id')
                 ->tap(fn(Builder $query) => $this->queryIsAvailableOnDayOfWeek($query, $date))
                 ->tap(fn(Builder $query) => $this->queryIsAvailableAtHour($query, $date, $shift->start_hour))
@@ -130,15 +132,18 @@ class GetAvailableUsersForShift
     private function getDayCountQuery(Carbon $date, string $dayName, int $dayNumber): \Illuminate\Database\Query\Builder
     {
         return DB::query()
-            ->select(['user_id'])
-            ->selectRaw("COUNT(*) as num_$dayName")
-            ->from('shift_user')
-            ->join(table: 'shifts', first: 'shift_user.shift_id', operator: '=', second: 'shifts.id')
-            ->join(table: 'locations', first: 'shifts.location_id', operator: '=', second: 'locations.id')
-            ->whereBetween('shift_date', [$date->clone()->startOfMonth(), $date->clone()->endOfMonth()])
-            ->whereRaw('DAYOFWEEK(shift_date) = ?', $dayNumber)
-            ->where('shifts.is_enabled', true)
-            ->where('locations.is_enabled', true)
+            ->selectRaw("user_id, COUNT(*) as filled_{$dayName}s")
+            ->fromSub(fn(\Illuminate\Database\Query\Builder $query) => $query
+                ->selectRaw("user_id, 1")
+                ->from('shift_user')
+                ->join(table: 'shifts', first: 'shift_user.shift_id', operator: '=', second: 'shifts.id')
+                ->join(table: 'locations', first: 'shifts.location_id', operator: '=', second: 'locations.id')
+                ->whereBetween('shift_date', [$date->clone()->startOfMonth(), $date->clone()->endOfMonth()])
+                ->whereRaw('DAYOFWEEK(shift_date) = ?', $dayNumber)
+                ->where('shifts.is_enabled', true)
+                ->where('locations.is_enabled', true)
+                ->groupBy('user_id', 'shift_date')
+                , as: "filled_{$dayName}")
             ->groupBy('user_id');
     }
 
