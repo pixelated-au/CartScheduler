@@ -28,7 +28,7 @@ class GetAvailableUsersForShift
             ->distinct()
             ->select(['users.*', 'last_shift_date', 'last_shift_start_time'])
             ->when($this->settings->enableUserAvailability, fn(Builder $query) => $query
-                ->addSelect(['num_sundays', 'num_mondays', 'num_tuesdays', 'num_wednesdays', 'num_thursdays', 'num_fridays', 'num_saturdays'])
+                ->addSelect(['num_sunday', 'num_monday', 'num_tuesday', 'num_wednesday', 'num_thursday', 'num_friday', 'num_saturday'])
                 ->tap(fn(Builder $query) => $this->getDayCounts($query, $date)))
             ->leftJoinSub(
                 query: DB::query()
