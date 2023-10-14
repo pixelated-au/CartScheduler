@@ -1,6 +1,7 @@
 <script setup>
 import DataTable from "@/Components/DataTable.vue";
 import UserAdd from "@/Components/Icons/UserAdd.vue";
+import useToast from "@/Composables/useToast";
 import JetButton from '@/Jetstream/Button.vue'
 import JetDialogModal from '@/Jetstream/DialogModal.vue'
 import JetHelpText from "@/Jetstream/HelpText.vue";
@@ -37,17 +38,22 @@ const closeModal = () => {
 }
 
 const volunteers = ref([])
+const toast = useToast()
 watchEffect(async () => {
     if (!showModal.value) {
         return
     }
-    const response = await axios.get(`/admin/available-users-for-shift/${props.shift.id}`, {
-        params: {
-            date: format(props.date, 'yyyy-MM-dd'),
-            showAll: doShowFilteredVolunteers.value ? 0 : 1,
-        }
-    })
-    volunteers.value = response.data.data
+    try {
+        const response = await axios.get(`/admin/available-users-for-shift/${props.shift.id}`, {
+            params: {
+                date: format(props.date, 'yyyy-MM-dd'),
+                showAll: doShowFilteredVolunteers.value ? 0 : 1,
+            }
+        })
+        volunteers.value = response.data.data
+    } catch (e) {
+        toast.error('Unable to load volunteers, a critical error has occurred.')
+    }
 })
 
 const volunteerSearch = ref('')
@@ -74,6 +80,11 @@ const tableHeaders = [
         sortable: true,
     },
     {
+        text: 'Shifts',
+        value: 'filledShifts',
+        sortable: false,
+    },
+    {
         text: '',
         value: 'action',
         sortable: false,
@@ -89,7 +100,24 @@ const tableRows = computed(() => {
             gender: volunteer.gender,
             lastShift: volunteer.last_shift_date ? volunteer.last_shift_date : null,
             lastShiftTime: volunteer.last_shift_start_time ? volunteer.last_shift_start_time : null,
-            // lastShift: volunteer.last_rostered_at ? format(parse(volunteer.last_rostered_at, 'yyyy-MM-dd', new Date()), 'MMM d, yyyy') : 'Never',
+            daysAlreadyRostered: {
+                sunday: volunteer.filled_sundays,
+                monday: volunteer.filled_mondays,
+                tuesday: volunteer.filled_tuesdays,
+                wednesday: volunteer.filled_wednesdays,
+                thursday: volunteer.filled_thursdays,
+                friday: volunteer.filled_fridays,
+                saturday: volunteer.filled_saturdays,
+            },
+            daysAvailable: {
+                sunday: volunteer.num_sundays,
+                monday: volunteer.num_mondays,
+                tuesday: volunteer.num_tuesdays,
+                wednesday: volunteer.num_wednesdays,
+                thursday: volunteer.num_thursdays,
+                friday: volunteer.num_fridays,
+                saturday: volunteer.num_saturdays,
+            }
         }
     })
 })
@@ -151,6 +179,16 @@ const toggleLabel = computed(() => doShowFilteredVolunteers.value
                     :body-item-class-name="bodyItemClassNameFunction">
                     <template #item-lastShift="{lastShift, lastShiftTime}">
                         {{ formatShiftDate(lastShift, lastShiftTime) }}
+                    </template>
+                    <template #item-filledShifts="{daysAlreadyRostered, daysAvailable}">
+                        <div class="flex gap-x-1">
+                            <template v-for="(value, key) in daysAvailable" :key="key">
+                                <small v-if="value">
+                                    <span>{{key.substring(0, 2)}}</span><br>
+                                    <span>{{daysAlreadyRostered[key]}}/{{value}}</span>
+                                </small>
+                            </template>
+                        </div>
                     </template>
                     <template #item-action="{ id, name }">
                         <JetButton style-type="info" @click="assignVolunteer(id, name)">
