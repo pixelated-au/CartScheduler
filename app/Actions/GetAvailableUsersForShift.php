@@ -129,6 +129,11 @@ class GetAvailableUsersForShift
         return $query;
     }
 
+    /**
+     * This query is used to get the number of days per week a user has a shift
+     * Note, it's not counting the number of shifts per day because it's possible for a user to have multiple shifts on
+     * the same day, but it counts the number of shifts per day of the week
+     */
     private function getDayCountQuery(Carbon $date, string $dayName, int $dayNumber): \Illuminate\Database\Query\Builder
     {
         return DB::query()
