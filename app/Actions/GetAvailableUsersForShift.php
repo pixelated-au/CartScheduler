@@ -23,30 +23,13 @@ class GetAvailableUsersForShift
         $overlappingShifts = $this->getOverlappingShifts($shift, $date);
 
         $canOnlyBrothersRegister = $this->canOnlyBrothersBook($shift, $date);
+
         return User::query()
             ->distinct()
             ->select(['users.*', 'last_shift_date', 'last_shift_start_time'])
-//            TODO need to get the number of shifts for the month for day and total across all days
-//            TODO need to get the number of shifts for the month for day and total across all days
-//            TODO need to get the number of shifts for the month for day and total across all days
-//            TODO need to get the number of shifts for the month for day and total across all days
-//            TODO need to get the number of shifts for the month for day and total across all days
-//            TODO need to get the number of shifts for the month for day and total across all days
-//            TODO need to get the number of shifts for the month for day and total across all days
-//            TODO need to get the number of shifts for the month for day and total across all days
-//            TODO need to get the number of shifts for the month for day and total across all days
-
-//            ->select(fn(Builder $query) => $query
-//                ->selectRaw('COUNT(*) as num_shifts_for_day')
-//                ->from('shift_user')
-//                ->join(table: 'shifts', first: 'shift_user.shift_id', operator: '=', second: 'shifts.id')
-//                ->join(table: 'locations', first: 'shifts.location_id', operator: '=', second: 'locations.id')
-//                ->where('shift_date', '>=', $date->clone()->startOfMonth())
-//                ->where('shift_date', '<=', $date->clone()->endOfMonth())
-//                ->where('shifts.is_enabled', true)
-//                ->where('shifts.location_id', $shift->location_id)
-//                ->where('shift_user.user_id', DB::raw('users.id'))
-//                ->where('locations.is_enabled', true))
+            ->when($this->settings->enableUserAvailability, fn(Builder $query) => $query
+                ->addSelect(['num_sundays', 'num_mondays', 'num_tuesdays', 'num_wednesdays', 'num_thursdays', 'num_fridays', 'num_saturdays'])
+                ->tap(fn(Builder $query) => $this->getDayCounts($query, $date)))
             ->leftJoinSub(
                 query: DB::query()
                     ->select(['user_id'])
@@ -76,14 +59,13 @@ class GetAvailableUsersForShift
                 ->leftJoin(table: 'user_vacations', first: 'users.id', operator: '=', second: 'user_vacations.user_id')
                 ->tap(fn(Builder $query) => $this->queryIsAvailableOnDayOfWeek($query, $date))
                 ->tap(fn(Builder $query) => $this->queryIsAvailableAtHour($query, $date, $shift->start_hour))
-                ->tap(fn (Builder $query) => $this->queryIsAvailableAtHour($query, $date, $shift->end_hour))
+                ->tap(fn(Builder $query) => $this->queryIsAvailableAtHour($query, $date, $shift->end_hour))
                 ->withCount(['vacations as vacations_count' => fn(Builder $query) => $query
                     ->where('start_date', '<=', $date)
                     ->where('end_date', '>=', $date)
                 ])
                 ->having('vacations_count', '=', 0)
             )
-//            ->tap(fn ($query) => ray($query->toSql()))
             ->get();
     }
 
@@ -124,6 +106,40 @@ class GetAvailableUsersForShift
             ->where('end_time', '>', $shift->start_time)
             ->get()
             ->map(fn(Shift $shift) => $shift->getKey());
+    }
+
+    private function getDayCounts(Builder $query, Carbon $date): Builder
+    {
+        collect([
+            'sunday'    => 1,
+            'monday'    => 2,
+            'tuesday'   => 3,
+            'wednesday' => 4,
+            'thursday'  => 5,
+            'friday'    => 6,
+            'saturday'  => 7,
+        ])->each(fn(int $dayNumber, string $dayName) => $query->leftJoinSub(
+            query: $this->getDayCountQuery($date, $dayName, $dayNumber),
+            as: "{$dayName}_shifts",
+            first: "{$dayName}_shifts.user_id",
+            operator: '=',
+            second: 'users.id'));
+        return $query;
+    }
+
+    private function getDayCountQuery(Carbon $date, string $dayName, int $dayNumber): \Illuminate\Database\Query\Builder
+    {
+        return DB::query()
+            ->select(['user_id'])
+            ->selectRaw("COUNT(*) as num_$dayName")
+            ->from('shift_user')
+            ->join(table: 'shifts', first: 'shift_user.shift_id', operator: '=', second: 'shifts.id')
+            ->join(table: 'locations', first: 'shifts.location_id', operator: '=', second: 'locations.id')
+            ->whereBetween('shift_date', [$date->clone()->startOfMonth(), $date->clone()->endOfMonth()])
+            ->whereRaw('DAYOFWEEK(shift_date) = ?', $dayNumber)
+            ->where('shifts.is_enabled', true)
+            ->where('locations.is_enabled', true)
+            ->groupBy('user_id');
     }
 
     private function canOnlyBrothersBook(Shift $shift, Carbon $date): bool

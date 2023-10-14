@@ -15,6 +15,13 @@ use Illuminate\Http\Resources\Json\JsonResource;
  * @property mixed $pivot
  * @property mixed $last_shift_date
  * @property mixed $last_shift_start_time
+ * @property mixed $num_sundays
+ * @property mixed $num_mondays
+ * @property mixed $num_tuesdays
+ * @property mixed $num_wednesdays
+ * @property mixed $num_thursdays
+ * @property mixed $num_fridays
+ * @property mixed $num_saturdays
  */
 class UserResource extends JsonResource
 {
@@ -30,6 +37,13 @@ class UserResource extends JsonResource
             'shift_date'            => $this->whenPivotLoaded('shift_user', fn() => $this->pivot['shift_date']),
             'last_shift_date'       => $this->whenNotNull($this->last_shift_date),
             'last_shift_start_time' => $this->whenNotNull($this->last_shift_start_time),
+            'num_sundays'           => $this->whenNotNull($this->num_sundays),
+            'num_mondays'           => $this->whenNotNull($this->num_mondays),
+            'num_tuesdays'          => $this->whenNotNull($this->num_tuesdays),
+            'num_wednesdays'        => $this->whenNotNull($this->num_wednesdays),
+            'num_thursdays'         => $this->whenNotNull($this->num_thursdays),
+            'num_fridays'           => $this->whenNotNull($this->num_fridays),
+            'num_saturdays'         => $this->whenNotNull($this->num_saturdays),
         ];
     }
 }
