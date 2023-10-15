@@ -110,46 +110,44 @@ class GetAvailableUsersForShift
             ->map(fn(Shift $shift) => $shift->getKey());
     }
 
-    private function getDayCounts(Builder $query, Carbon $date): Builder
-    {
-        collect([
-            'sunday'    => 1,
-            'monday'    => 2,
-            'tuesday'   => 3,
-            'wednesday' => 4,
-            'thursday'  => 5,
-            'friday'    => 6,
-            'saturday'  => 7,
-        ])->each(fn(int $dayNumber, string $dayName) => $query->leftJoinSub(
-            query: $this->getDayCountQuery($date, $dayName, $dayNumber),
-            as: "{$dayName}_shifts",
-            first: "{$dayName}_shifts.user_id",
-            operator: '=',
-            second: 'users.id'));
-        return $query;
-    }
-
     /**
      * This query is used to get the number of days per week a user has a shift
      * Note, it's not counting the number of shifts per day because it's possible for a user to have multiple shifts on
      * the same day, but it counts the number of shifts per day of the week
      */
-    private function getDayCountQuery(Carbon $date, string $dayName, int $dayNumber): \Illuminate\Database\Query\Builder
+    private function getDayCounts(Builder $query, Carbon $date): Builder
     {
-        return DB::query()
-            ->selectRaw("user_id, COUNT(*) as filled_{$dayName}s")
+        return $query->leftJoinSub(DB::query()
+            ->selectRaw("user_id")
+            ->selectRaw("SUM(num_sundays) AS filled_sundays")
+            ->selectRaw("SUM(num_mondays) AS filled_mondays")
+            ->selectRaw("SUM(num_tuesdays) AS filled_tuesdays")
+            ->selectRaw("SUM(num_wednesdays) AS filled_wednesdays")
+            ->selectRaw("SUM(num_thursdays) AS filled_thursdays")
+            ->selectRaw("SUM(num_fridays) AS filled_fridays")
+            ->selectRaw("SUM(num_saturdays) AS filled_saturdays")
             ->fromSub(fn(\Illuminate\Database\Query\Builder $query) => $query
-                ->selectRaw("user_id, 1")
+                ->selectRaw("user_id")
+                ->selectRaw("IF(DAYOFWEEK(shift_user.shift_date) = 1, 1, 0) AS num_sundays")
+                ->selectRaw("IF(DAYOFWEEK(shift_user.shift_date) = 2, 1, 0) AS num_mondays")
+                ->selectRaw("IF(DAYOFWEEK(shift_user.shift_date) = 3, 1, 0) AS num_tuesdays")
+                ->selectRaw("IF(DAYOFWEEK(shift_user.shift_date) = 4, 1, 0) AS num_wednesdays")
+                ->selectRaw("IF(DAYOFWEEK(shift_user.shift_date) = 5, 1, 0) AS num_thursdays")
+                ->selectRaw("IF(DAYOFWEEK(shift_user.shift_date) = 6, 1, 0) AS num_fridays")
+                ->selectRaw("IF(DAYOFWEEK(shift_user.shift_date) = 7, 1, 0) AS num_saturdays")
                 ->from('shift_user')
                 ->join(table: 'shifts', first: 'shift_user.shift_id', operator: '=', second: 'shifts.id')
                 ->join(table: 'locations', first: 'shifts.location_id', operator: '=', second: 'locations.id')
                 ->whereBetween('shift_date', [$date->clone()->startOfMonth(), $date->clone()->endOfMonth()])
-                ->whereRaw('DAYOFWEEK(shift_date) = ?', $dayNumber)
                 ->where('shifts.is_enabled', true)
                 ->where('locations.is_enabled', true)
                 ->groupBy('user_id', 'shift_date')
-                , as: "filled_{$dayName}")
-            ->groupBy('user_id');
+                , as: "shift_count")
+            ->groupBy('user_id'),
+            as: "filled_shifts",
+            first: "filled_shifts.user_id",
+            operator: '=',
+            second: 'users.id');
     }
 
     private function canOnlyBrothersBook(Shift $shift, Carbon $date): bool
