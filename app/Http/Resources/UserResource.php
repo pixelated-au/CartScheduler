@@ -51,13 +51,13 @@ class UserResource extends JsonResource
             'num_thursdays'         => $this->whenNotNull($this->num_thursdays),
             'num_fridays'           => $this->whenNotNull($this->num_fridays),
             'num_saturdays'         => $this->whenNotNull($this->num_saturdays),
-            'filled_sundays'        => $this->whenNotNull($this->filled_sundays),
-            'filled_mondays'        => $this->whenNotNull($this->filled_mondays),
-            'filled_tuesdays'       => $this->whenNotNull($this->filled_tuesdays),
-            'filled_wednesdays'     => $this->whenNotNull($this->filled_wednesdays),
-            'filled_thursdays'      => $this->whenNotNull($this->filled_thursdays),
-            'filled_fridays'        => $this->whenNotNull($this->filled_fridays),
-            'filled_saturdays'      => $this->whenNotNull($this->filled_saturdays),
+            'filled_sundays'        => $this->whenNotNull((int)$this->filled_sundays),
+            'filled_mondays'        => $this->whenNotNull((int)$this->filled_mondays),
+            'filled_tuesdays'       => $this->whenNotNull((int)$this->filled_tuesdays),
+            'filled_wednesdays'     => $this->whenNotNull((int)$this->filled_wednesdays),
+            'filled_thursdays'      => $this->whenNotNull((int)$this->filled_thursdays),
+            'filled_fridays'        => $this->whenNotNull((int)$this->filled_fridays),
+            'filled_saturdays'      => $this->whenNotNull((int)$this->filled_saturdays),
         ];
     }
 }
