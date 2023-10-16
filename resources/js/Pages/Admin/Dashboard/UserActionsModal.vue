@@ -9,6 +9,7 @@ import JetInput from "@/Jetstream/Input.vue";
 import JetLabel from "@/Jetstream/Label.vue";
 import JetSecondaryButton from '@/Jetstream/SecondaryButton.vue'
 import JetToggle from '@/Jetstream/Toggle.vue'
+import FilledShiftsIndicator from "@/Pages/Admin/Dashboard/FilledShiftsIndicator.vue";
 import {format, parse} from "date-fns";
 // noinspection ES6UnusedImports
 import {VTooltip} from 'floating-vue'
@@ -82,7 +83,7 @@ const tableHeaders = [
     {
         text: 'Shifts',
         value: 'filledShifts',
-        sortable: false,
+        sortable: true,
     },
     {
         text: '',
@@ -91,33 +92,57 @@ const tableHeaders = [
     },
 ]
 
+const calcShiftPercentage = (daysRostered, daysAvailable) => {
+    if (!daysAvailable) {
+        return 0
+    }
+    let sumOfDaysRostered = 0
+    let sumOfDaysAvailable = 0
+    for (const day in daysAvailable) {
+        if (!daysAvailable.hasOwnProperty(day) || !daysAvailable[day]) {
+            continue
+        }
+        // Not using Array.reduce because we're only calculating based on the days a volunteer is available
+        sumOfDaysRostered += daysRostered[day]
+        sumOfDaysAvailable += daysAvailable[day]
+        if (sumOfDaysRostered > sumOfDaysAvailable) {
+            sumOfDaysRostered = sumOfDaysAvailable
+        }
+    }
+    return Math.round((sumOfDaysRostered / sumOfDaysAvailable) * 100)
+}
+
 const tableRows = computed(() => {
     return volunteers.value.map(volunteer => {
         const prefix = volunteer.gender === 'male' ? 'Bro' : 'Sis'
+        const daysAvailable = {
+            sunday: volunteer.num_sundays,
+            monday: volunteer.num_mondays,
+            tuesday: volunteer.num_tuesdays,
+            wednesday: volunteer.num_wednesdays,
+            thursday: volunteer.num_thursdays,
+            friday: volunteer.num_fridays,
+            saturday: volunteer.num_saturdays,
+        }
+        const daysAlreadyRostered = {
+            sunday: (volunteer.filled_sundays < daysAvailable.sunday ? volunteer.filled_sundays : daysAvailable.sunday) || 0,
+            monday: (volunteer.filled_mondays < daysAvailable.monday ? volunteer.filled_mondays : daysAvailable.monday) || 0,
+            tuesday: (volunteer.filled_tuesdays < daysAvailable.tuesday ? volunteer.filled_tuesdays : daysAvailable.tuesday) || 0,
+            wednesday: (volunteer.filled_wednesdays < daysAvailable.wednesday ? volunteer.filled_wednesdays : daysAvailable.wednesday) || 0,
+            thursday: (volunteer.filled_thursdays < daysAvailable.thursday ? volunteer.filled_thursdays : daysAvailable.thursday) || 0,
+            friday: (volunteer.filled_fridays < daysAvailable.friday ? volunteer.filled_fridays : daysAvailable.friday) || 0,
+            saturday: (volunteer.filled_saturdays < daysAvailable.saturday ? volunteer.filled_saturdays : daysAvailable.saturday) || 0,
+        }
+
         return {
             id: volunteer.id,
             name: `${prefix} ${volunteer.name}`,
             gender: volunteer.gender,
             lastShift: volunteer.last_shift_date ? volunteer.last_shift_date : null,
             lastShiftTime: volunteer.last_shift_start_time ? volunteer.last_shift_start_time : null,
-            daysAlreadyRostered: {
-                sunday: volunteer.filled_sundays,
-                monday: volunteer.filled_mondays,
-                tuesday: volunteer.filled_tuesdays,
-                wednesday: volunteer.filled_wednesdays,
-                thursday: volunteer.filled_thursdays,
-                friday: volunteer.filled_fridays,
-                saturday: volunteer.filled_saturdays,
-            },
-            daysAvailable: {
-                sunday: volunteer.num_sundays,
-                monday: volunteer.num_mondays,
-                tuesday: volunteer.num_tuesdays,
-                wednesday: volunteer.num_wednesdays,
-                thursday: volunteer.num_thursdays,
-                friday: volunteer.num_fridays,
-                saturday: volunteer.num_saturdays,
-            }
+            filledShifts: calcShiftPercentage(daysAlreadyRostered, daysAvailable),
+            daysAlreadyRostered,
+            daysAvailable,
         }
     })
 })
@@ -180,12 +205,13 @@ const toggleLabel = computed(() => doShowFilteredVolunteers.value
                     <template #item-lastShift="{lastShift, lastShiftTime}">
                         {{ formatShiftDate(lastShift, lastShiftTime) }}
                     </template>
-                    <template #item-filledShifts="{daysAlreadyRostered, daysAvailable}">
+                    <template #item-filledShifts="{daysAlreadyRostered, daysAvailable, filledShifts}">
                         <div class="flex gap-x-1">
-                            <template v-for="(value, key) in daysAvailable" :key="key">
-                                <small v-if="value">
-                                    <span>{{key.substring(0, 2)}}</span><br>
-                                    <span>{{daysAlreadyRostered[key]}}/{{value}}</span>
+                            <small class="self-center text-xs border-slate-500 border-r pr-1 mr-1">{{filledShifts}}%</small>
+                            <template v-for="(days, key) in daysAvailable" :key="key">
+                                <small v-if="days">
+                                    <span>{{ key.substring(0, 2) }}</span><br>
+                                    <FilledShiftsIndicator :available="days" :filled="daysAlreadyRostered[key]"/>
                                 </small>
                             </template>
                         </div>
@@ -204,13 +230,6 @@ const toggleLabel = computed(() => doShowFilteredVolunteers.value
             <JetSecondaryButton @click="closeModal">
                 Close
             </JetSecondaryButton>
-
-            <!--            <JetDangerButton class="ml-3"-->
-            <!--                             :class="{ 'opacity-25': form.processing }"-->
-            <!--                             :disabled="form.processing"-->
-            <!--                             @click="deleteUser">-->
-            <!--                Delete Account-->
-            <!--            </JetDangerButton>-->
         </template>
     </JetDialogModal>
 </template>
