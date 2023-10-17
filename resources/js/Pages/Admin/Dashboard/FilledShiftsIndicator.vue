@@ -24,7 +24,7 @@ const indicators = computed(() => {
 </script>
 
 <template>
-    <div class="grid grid-cols-2">
+    <div class="grid grid-cols-2 gap-[1px] min-w-[16px]">
         <div v-for="(item, idx) in indicators" :key="idx" class="img" :class="item"></div>
     </div>
 </template>
