@@ -240,13 +240,13 @@ onUpdated(() => {
 
 .v-popper__popper .v-popper__wrapper {
     .v-popper__inner {
-        @apply bg-white dark:bg-slate-300 border border-white dark:border-slate-300 shadow-lg text-slate-900 dark:text-slate-800 p-3;
+        @apply bg-white dark:bg-indigo-800 border border-white dark:border-indigo-800 shadow-lg text-slate-900 dark:text-slate-200 p-3 shadow-lg;
     }
 }
 
 .v-popper__popper .v-popper__wrapper .v-popper__arrow-container {
     .v-popper__arrow-inner, .v-popper__arrow-outer {
-        @apply border-white dark:border-slate-300;
+        @apply border-white dark:border-indigo-800;
     }
 }
 
