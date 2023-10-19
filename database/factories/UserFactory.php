@@ -22,14 +22,17 @@ class UserFactory extends Factory
      */
     public function definition(): array
     {
+        $gender = $this->faker->randomElement(['male', 'female']);
         return [
             'uuid'           => $this->faker->uuid(),
             'name'           => $this->faker->name(),
             'email'          => $this->faker->unique()->safeEmail(),
             'role'           => $this->faker->randomElement(['admin', 'user']),
             //'email_verified_at'  => now(),
-            'gender'         => $this->faker->randomElement(['male', 'female']),
+            'gender'         => $gender,
             'mobile_phone'   => $this->faker->phoneNumber(),
+            'appointment'    => $this->getAppointment($gender),
+            'serving_as'     => $this->faker->randomElement(['field missionary', 'special pioneer', 'bethel family member', 'regular pioneer', 'publisher']),
             'is_enabled'     => true,
             'password'       => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', // password
             'remember_token' => Str::random(10),
@@ -40,10 +43,11 @@ class UserFactory extends Factory
     {
         return $this->state(function (array $attributes) {
             return [
-                'name'   => 'Admin',
-                'email'  => 'admin@example.com',
-                'role'   => 'admin',
-                'gender' => 'male',
+                'name'        => 'Admin',
+                'email'       => 'admin@example.com',
+                'role'        => 'admin',
+                'gender'      => 'male',
+                'appointment' => 'elder'
             ];
         });
     }
@@ -52,8 +56,9 @@ class UserFactory extends Factory
     {
         return $this->state(function (array $attributes) {
             return [
-                'role'   => 'admin',
-                'gender' => 'male',
+                'role'        => 'admin',
+                'gender'      => 'male',
+                'appointment' => 'elder'
             ];
         });
     }
@@ -100,9 +105,15 @@ class UserFactory extends Factory
         });
     }
 
-    /**
-     * Indicate that the user should have a personal team.
-     *
-     * @return $this
-     */
+    protected function getAppointment($gender = 'male'): ?string
+    {
+        if ($gender !== 'male') {
+            return null;
+        }
+        $appointment = $this->faker->randomElement(['elder', 'ministerial servant', '']);
+        if ($appointment === '') {
+            return null;
+        }
+        return $appointment;
+    }
 }

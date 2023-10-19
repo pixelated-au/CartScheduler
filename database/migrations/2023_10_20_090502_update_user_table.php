@@ -8,7 +8,8 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->set('serving_as', ['field missionary', 'special pioneer', 'bethel family member', 'regular pioneer', 'publisher', 'elder', 'ministerial servant'])->after('mobile_phone');
+            $table->enum('appointment', ['elder', 'ministerial servant'])->nullable()->after('mobile_phone');
+            $table->enum('serving_as', ['field missionary', 'special pioneer', 'bethel family member', 'regular pioneer', 'publisher'])->default('publisher')->after('appointment');
         });
     }
 };
