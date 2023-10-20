@@ -36,8 +36,9 @@ class UpdateUserRequest extends FormRequest
         ];
     }
 
-    public function prepareForValidation(array $data, int $index)
+    public function prepareForValidation()
     {
+        $data = $this->all();
         $data['mobile_phone'] = Str::of($data['mobile_phone'])
             ->tap(fn(string $value) => Str::startsWith($value, '+') ? "0$value" : "$value")
             ->replaceMatches('/[^A-Za-z0-9]++/', '')
@@ -79,7 +80,7 @@ class UpdateUserRequest extends FormRequest
             $data['responsible_brother'] = false;
         }
 
-        return $data;
+        $this->merge($data);
     }
 
     public function messages(): array
