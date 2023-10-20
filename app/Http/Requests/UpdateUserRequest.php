@@ -19,6 +19,7 @@ class UpdateUserRequest extends FormRequest
      */
     public function rules(): array
     {
+        // NOTE, if updating these, also update the rules in the UsersImport class which also has validations
         return [
             'name'            => ['required', 'string', 'max:255'],
             'email'           => ['required', 'email', 'max:255', Rule::unique('users')->ignore($this->get('id'))],
