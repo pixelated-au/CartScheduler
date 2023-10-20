@@ -9,6 +9,10 @@
         },
         emptyNote: String,
         selectLabel: String,
+        emitFullObject: {
+            type: Boolean,
+            default: false,
+        }
     })
 
     const emit = defineEmits(['update:modelValue'])
@@ -21,7 +25,7 @@
         get: () => props.modelValue,
         set: value => {
             isOpen.value = false
-            emit('update:modelValue', value)
+            emit('update:modelValue', props.emitFullObject ? value : value.value)
         },
     })
 
@@ -94,6 +98,7 @@
                     <li v-for="option in options" :key="option.id">
                         <div
                             class="block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white font-bold"
+                            :class="model === option.value ? 'bg-purple-100 dark:bg-purple-600 dark:text-white' : ''"
                             @click="model = option">
                             {{ option.label }}
                             <slot name="extra" :option="option"></slot>
