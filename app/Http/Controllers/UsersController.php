@@ -22,7 +22,7 @@ class UsersController extends Controller
     public function index(): Response
     {
         return Inertia::render('Admin/Users/List', [
-            'users' => UserAdminResource::collection(User::all()),
+            'users' => UserAdminResource::collection(User::with('spouse')->get()),
         ]);
     }
 
