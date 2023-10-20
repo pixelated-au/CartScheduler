@@ -20,12 +20,16 @@ class UpdateUserRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name'         => ['required', 'string', 'max:255'],
-            'email'        => ['required', 'email', 'max:255', Rule::unique('users')->ignore($this->get('id'))],
-            'role'         => ['required', 'string', 'in:admin,user'],
-            'gender'       => ['required', 'string', 'in:male,female'],
-            'mobile_phone' => ['required', 'string', 'regex:/^([0-9\+\-\s]+)$/', 'min:10', 'max:15'],
-            'is_enabled'   => ['boolean']
+            'name'            => ['required', 'string', 'max:255'],
+            'email'           => ['required', 'email', 'max:255', Rule::unique('users')->ignore($this->get('id'))],
+            'role'            => ['required', 'string', 'in:admin,user'],
+            'gender'          => ['required', 'string', 'in:male,female'],
+            'mobile_phone'    => ['required', 'string', 'regex:/^([0-9\+\-\s]+)$/', 'min:10', 'max:15'],
+            'year_of_baptism' => ['nullable', 'integer', 'min:' . date('Y') - 100, 'max:' . date('Y')],
+            'appointment'     => ['nullable', 'string', 'in:elder,ministerial servant'],
+            'serving_as'      => ['nullable', 'string', 'in:field missionary,special pioneer,bethel family member,regular pioneer,publisher'],
+            'marital_status'  => ['nullable', 'string', 'in:single,married,separated,divorced,widowed'],
+            'is_enabled'      => ['boolean']
         ];
     }
 
