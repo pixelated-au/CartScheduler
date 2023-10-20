@@ -49,7 +49,7 @@ class CreateUserRequest extends FormRequest
             $data['gender'] = 'female';
         }
 
-        if ($data['spouse_email']) {
+        if (isset($data['spouse_email'])) {
             $spouse = User::where('email', $data['spouse_email'])->first();
             if ($spouse) {
                 $data['spouse_id'] = $spouse->id;
