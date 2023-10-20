@@ -69,6 +69,12 @@ class User extends Authenticatable
         'gender',
         'is_enabled',
         'mobile_phone',
+        'year_of_baptism',
+        'marital_status',
+        'spouse_id',
+        'appointment',
+        'serving_as',
+        'responsible_brother',
         'password',
         'role',
     ];
