@@ -12,14 +12,16 @@ class UserSeeder extends Seeder
         User::unsetEventDispatcher();// stops the UserAccountCreated mail from being sent
         User::factory()->devUser()->create();
         User::factory()->adminRoleUser()->count(3)->create();
-        $husband = User::factory()->create([
-            'name' => 'Husband',
-            'gender' => 'male'
+        $husband            = User::factory()->create([
+            'name'           => 'Husband',
+            'gender'         => 'male',
+            'marital_status' => 'married',
         ]);
-        $wife = User::factory()->create([
-            'name' => 'Wife',
-            'gender' => 'female',
-            'spouse_id' => $husband->id,
+        $wife               = User::factory()->create([
+            'name'           => 'Wife',
+            'gender'         => 'female',
+            'marital_status' => 'married',
+            'spouse_id'      => $husband->id,
         ]);
         $husband->spouse_id = $wife->id;
         $husband->save();
