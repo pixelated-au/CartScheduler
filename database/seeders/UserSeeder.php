@@ -14,9 +14,11 @@ class UserSeeder extends Seeder
         User::factory()->adminRoleUser()->count(3)->create();
         $husband = User::factory()->create([
             'name' => 'Husband',
+            'gender' => 'male'
         ]);
         $wife = User::factory()->create([
             'name' => 'Wife',
+            'gender' => 'female',
             'spouse_id' => $husband->id,
         ]);
         $husband->spouse_id = $wife->id;
