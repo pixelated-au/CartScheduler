@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests;
 
+use App\Models\User;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
 class CreateUserRequest extends FormRequest
@@ -27,6 +29,52 @@ class CreateUserRequest extends FormRequest
             'mobile_phone' => ['required', 'string', 'regex:/^([0-9\+\-\s]+)$/', 'min:10', 'max:15'],
             'is_enabled'   => ['boolean']
         ];
+    }
+
+    public function prepareForValidation(array $data, int $index)
+    {
+        $data['mobile_phone'] = Str::of($data['mobile_phone'])
+            ->tap(fn(string $value) => Str::startsWith($value, '+') ? "0$value" : "$value")
+            ->replaceMatches('/[^A-Za-z0-9]++/', '')
+            ->trim()
+            ->toString();
+
+        $data['email'] = Str::of($data['email'])->lower()->trim()->toString();
+
+        if ($data['gender'] === 'm') {
+            $data['gender'] = 'male';
+        }
+        if ($data['gender'] === 'f') {
+            $data['gender'] = 'female';
+        }
+
+        if ($data['spouse_email']) {
+            $spouse = User::where('email', $data['spouse_email'])->first();
+            if ($spouse) {
+                $data['spouse_id'] = $spouse->id;
+            }
+        }
+
+        if (!isset($data['year_of_baptism'])) {
+            $data['year_of_baptism'] = null;
+        }
+        if (!isset($data['appointment'])) {
+            $data['appointment'] = null;
+        }
+        if (!isset($data['serving_as'])) {
+            $data['serving_as'] = null;
+        }
+        if (!isset($data['marital_status'])) {
+            $data['marital_status'] = null;
+        }
+        if (!isset($data['spouse_id'])) {
+            $data['spouse_id'] = null;
+        }
+        if (!isset($data['responsible_brother'])) {
+            $data['responsible_brother'] = false;
+        }
+
+        return $data;
     }
 
     public function messages(): array
