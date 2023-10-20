@@ -2,7 +2,7 @@
     import {computed, inject, ref, useSlots} from 'vue'
 
     const props = defineProps({
-        modelValue: Object,
+        modelValue: Object|String|Number,
         options: {
             type: Array,
             required: true,
