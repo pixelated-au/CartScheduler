@@ -34,7 +34,7 @@ class UserAdminResource extends JsonResource
             'appointment'     => $this->appointment,
             'serving_as'      => $this->serving_as,
             'marital_status'  => $this->marital_status,
-            'spouse_name'     => $this->whenHas('spouse_id', fn() => $this->spouse->name),
+            'spouse_name'     => $this->whenLoaded('spouse', fn() => $this->spouse->name),
             'spouse_id'       => $this->whenHas('spouse_id', fn() => $this->spouse_id),
             'is_enabled'      => $this->is_enabled,
         ];
