@@ -34,8 +34,25 @@ class User extends Authenticatable
 
     protected static function booted(): void
     {
-        static::created(static function ($user) {
+        static::created(static function (self $user) {
             Mail::to($user->email)->send(new UserAccountCreated($user));
+        });
+        static::saved(static function (self $user) {
+            // called on updated and created events
+            if ($user->spouse_id) {
+                $spouse            = User::find($user->spouse_id);
+                $spouse->spouse_id = $user->id;
+                $spouse->saveQuietly();
+            }
+        });
+        static::updating(static function (self $user) {
+            $dirty    = $user->getDirty();
+            $original = $user->getOriginal();
+            if (array_key_exists('spouse_id', $dirty) && $dirty['spouse_id'] === null && $original['spouse_id'] !== null) {
+                $spouse            = User::find($original['spouse_id']);
+                $spouse->spouse_id = null;
+                $spouse->saveQuietly();
+            }
         });
     }
 
@@ -144,8 +161,8 @@ class User extends Authenticatable
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
-                         ->logAll()
-                         ->logExcept(['password', 'remember_token', 'two_factor_recovery_codes', 'two_factor_secret'])
-                         ->logOnlyDirty();
+            ->logAll()
+            ->logExcept(['password', 'remember_token', 'two_factor_recovery_codes', 'two_factor_secret'])
+            ->logOnlyDirty();
     }
 }
