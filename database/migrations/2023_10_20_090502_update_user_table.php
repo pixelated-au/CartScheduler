@@ -12,7 +12,7 @@ return new class extends Migration {
             $table->enum('marital_status', ['married', 'single', 'divorced', 'separated', 'widowed'])->default('single')->after('year_of_baptism');
             $table->unsignedBigInteger('spouse_id')->nullable()->after('marital_status');
             $table->enum('appointment', ['elder', 'ministerial servant'])->nullable()->after('spouse_id');
-            $table->enum('serving_as', ['field missionary', 'special pioneer', 'bethel family member', 'regular pioneer', 'publisher'])->default('publisher')->after('appointment');
+            $table->enum('serving_as', ['field missionary', 'special pioneer', 'bethel family member', 'circuit overseer', 'regular pioneer', 'publisher'])->default('publisher')->after('appointment');
             $table->boolean('responsible_brother')->default(false)->after('serving_as')->comment('Indicates if the volunteer has been trained to oversee a shift');
 
             $table->foreign('spouse_id')->references('id')->on('users')->nullOnDelete();
