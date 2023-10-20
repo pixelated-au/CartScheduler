@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Mail;
@@ -158,6 +159,11 @@ class User extends Authenticatable
     public function shifts(): BelongsToMany
     {
         return $this->belongsToMany(Shift::class)->withPivot('shift_user');
+    }
+
+    public function spouse(): HasOne
+    {
+        return $this->hasOne(User::class, 'id', 'spouse_id');
     }
 
     public function bookings(): HasMany
