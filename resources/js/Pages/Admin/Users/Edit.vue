@@ -16,11 +16,11 @@
 </script>
 
 <template>
-    <AppLayout :title="`User: ${editUser.name}`">
+    <AppLayout :title="`User: ${editUser.data.name}`">
         <template #header>
             <div class="flex justify-between">
                 <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-                    User {{ editUser.name }} </h2>
+                    User {{ editUser.data.name }} </h2>
                 <JetButton class="mx-3" type="button" style-type="secondary" outline @click.prevent="listRouteAction">
                     Back
                 </JetButton>
@@ -29,7 +29,7 @@
 
         <div>
             <div class="max-w-7xl mx-auto py-10 sm:px-6 lg:px-8">
-                <UserProfileForm :user="editUser"/>
+                <UserProfileForm :user="editUser.data"/>
             </div>
         </div>
     </AppLayout>
