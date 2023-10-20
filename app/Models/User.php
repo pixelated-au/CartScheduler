@@ -42,6 +42,7 @@ class User extends Authenticatable
             if ($user->spouse_id) {
                 $spouse            = User::find($user->spouse_id);
                 $spouse->spouse_id = $user->id;
+                $spouse->marital_status = 'married';
                 $spouse->saveQuietly();
             }
         });
