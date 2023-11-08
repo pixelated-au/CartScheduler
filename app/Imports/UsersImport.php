@@ -44,7 +44,7 @@ class UsersImport implements ToCollection, WithHeadingRow, WithValidation, WithB
             'gender'              => ['required', 'in:male,female,m,f'],
             'year_of_baptism'     => ['nullable', 'integer', 'min:' . date('Y') - 100, 'max:' . date('Y')],
             'appointment'         => ['nullable', 'string', 'in:elder,ministerial servant'],
-            'serving_as'          => ['nullable', 'string', 'in:field missionary,special pioneer,bethel family member,regular pioneer,publisher'],
+            'serving_as'          => ['nullable', 'string', 'in:field missionary,special pioneer,bethel family member,circuit overseer,regular pioneer,publisher'],
             'marital_status'      => ['nullable', 'string', 'in:single,married,separated,divorced,widowed'],
             'spouse_email'        => ['nullable', 'email'],
             'spouse_id'           => ['nullable', 'exists:users,id'],
