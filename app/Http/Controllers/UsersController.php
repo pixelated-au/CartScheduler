@@ -2,8 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\CreateUserRequest;
-use App\Http\Requests\UpdateUserRequest;
+use App\Http\Requests\ModifyUserRequest;
 use App\Http\Resources\UserAdminResource;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
@@ -31,7 +30,7 @@ class UsersController extends Controller
         return Inertia::render('Admin/Users/Add');
     }
 
-    public function store(CreateUserRequest $request): RedirectResponse
+    public function store(ModifyUserRequest $request): RedirectResponse
     {
         $data             = $request->validated();
         $data['password'] = null; // Set it to null. Once set, the user will be unable to log in
@@ -53,7 +52,7 @@ class UsersController extends Controller
         ]);
     }
 
-    public function update(UpdateUserRequest $request, User $user): RedirectResponse
+    public function update(ModifyUserRequest $request, User $user): RedirectResponse
     {
         $user->update($request->validated());
 

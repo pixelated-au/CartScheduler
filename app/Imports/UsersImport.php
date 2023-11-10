@@ -54,18 +54,22 @@ class UsersImport implements ToCollection, WithHeadingRow, WithValidation, WithB
 
     public function prepareForValidation(array $data, int $index)
     {
-        $data['mobile_phone'] = Str::of($data['mobile_phone'])
-            ->tap(fn(string $value) => Str::startsWith($value, '+') ? "0$value" : "$value")
-            ->replaceMatches('/[^A-Za-z0-9]++/', '')
-            ->trim()
-            ->toString();
+        $data['mobile_phone'] = isset($data['mobile_phone'])
+            ? Str::of($data['mobile_phone'])
+                ->tap(fn(string $value) => Str::startsWith($value, '+') ? "0$value" : "$value")
+                ->replaceMatches('/[^A-Za-z0-9]++/', '')
+                ->trim()
+                ->toString()
+            : null;
 
-        $data['email'] = Str::of($data['email'])->lower()->trim()->toString();
+        $data['email'] = isset($data['email'])
+            ? Str::of($data['email'])->lower()->trim()->toString()
+            : null;
 
-        if ($data['gender'] === 'm') {
+        if (isset($data['gender']) && $data['gender'] === 'm') {
             $data['gender'] = 'male';
         }
-        if ($data['gender'] === 'f') {
+        if (isset($data['gender']) && $data['gender'] === 'f') {
             $data['gender'] = 'female';
         }
 
