@@ -2,9 +2,13 @@
 
 namespace App\Imports;
 
+use App\Enums\Appontment;
+use App\Enums\MaritalStatus;
+use App\Enums\ServingAs;
 use App\Models\User;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rules\Enum;
 use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\WithBatchInserts;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
@@ -23,7 +27,7 @@ class UsersImport implements ToCollection, WithHeadingRow, WithValidation, WithB
                 'email'               => $row['email'],
                 'mobile_phone'        => $row['mobile_phone'],
                 'gender'              => $row['gender'],
-                'year_of_baptism'     => $row['year_of_baptism'],
+                'year_of_birth'       => $row['year_of_birth'],
                 'appointment'         => $row['appointment'],
                 'serving_as'          => $row['serving_as'],
                 'marital_status'      => $row['marital_status'],
@@ -40,12 +44,12 @@ class UsersImport implements ToCollection, WithHeadingRow, WithValidation, WithB
         return [
             'name'                => ['required', 'string', 'max:255'],
             'email'               => ['required', 'email', 'unique:users,email'],
-            'mobile_phone'        => ['required', 'max:255'],
+            'mobile_phone'        => ['required', 'string', 'regex:/^([0-9\+\-\s]+)$/', 'min:10', 'max:15'],
             'gender'              => ['required', 'in:male,female,m,f'],
-            'year_of_baptism'     => ['nullable', 'integer', 'min:' . date('Y') - 100, 'max:' . date('Y')],
-            'appointment'         => ['nullable', 'string', 'in:elder,ministerial servant'],
-            'serving_as'          => ['nullable', 'string', 'in:field missionary,special pioneer,bethel family member,circuit overseer,regular pioneer,publisher'],
-            'marital_status'      => ['nullable', 'string', 'in:single,married,separated,divorced,widowed'],
+            'year_of_birth'       => ['nullable', 'integer', 'min:' . date('Y') - 100, 'max:' . date('Y')],
+            'appointment'         => ['nullable', 'string', new Enum(Appontment::class)],
+            'serving_as'          => ['nullable', 'string', new Enum(ServingAs::class)],
+            'marital_status'      => ['nullable', 'string', new Enum(MaritalStatus::class)],
             'spouse_email'        => ['nullable', 'email'],
             'spouse_id'           => ['nullable', 'exists:users,id'],
             'responsible_brother' => ['nullable', 'boolean'],
@@ -80,8 +84,8 @@ class UsersImport implements ToCollection, WithHeadingRow, WithValidation, WithB
             }
         }
 
-        if (!isset($data['year_of_baptism'])) {
-            $data['year_of_baptism'] = null;
+        if (!isset($data['year_of_birth'])) {
+            $data['year_of_birth'] = null;
         }
         if (!isset($data['appointment'])) {
             $data['appointment'] = null;

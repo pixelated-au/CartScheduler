@@ -32,8 +32,8 @@ const form = useForm({
     email: props.user.email,
     gender: props.user.gender,
     mobile_phone: props.user.mobile_phone,
-    baptism_year: props.user.baptism_year,
-    year_of_baptism: props.user.year_of_baptism,
+    birth_year: props.user.birth_year,
+    year_of_birth: props.user.year_of_birth,
     marital_status: props.user.marital_status,
     appointment: props.user.appointment,
     serving_as: props.user.serving_as,
@@ -148,10 +148,10 @@ const cancelButtonText = computed(() => form.isDirty ? 'Cancel' : 'Back')
 
             <!-- Baptism Year -->
             <div class="col-span-6 sm:col-span-2">
-                <JetLabel for="baptism-year" value="Baptism Year"/>
-                <JetInput id="baptism-year" v-model="form.year_of_baptism" type="number" inputmode="numeric"
+                <JetLabel for="birth-year" value="Birth Year"/>
+                <JetInput id="birth-year" v-model="form.year_of_birth" type="number" inputmode="numeric"
                           class="mt-1 block w-full"/>
-                <JetInputError :message="form.errors.year_of_baptism" class="mt-2"/>
+                <JetInputError :message="form.errors.year_of_birth" class="mt-2"/>
             </div>
 
             <div class="my-3 col-span-6 grid grid-cols-1 sm:grid-cols-3 gap-3">

@@ -70,7 +70,7 @@ class User extends Authenticatable
         'gender',
         'is_enabled',
         'mobile_phone',
-        'year_of_baptism',
+        'year_of_birth',
         'marital_status',
         'spouse_id',
         'appointment',
