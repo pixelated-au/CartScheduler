@@ -4,6 +4,7 @@ import VerticalRadioButtons from '@/Components/VerticalRadioButtons.vue'
 import useToast from '@/Composables/useToast.js'
 import JetActionMessage from '@/Jetstream/ActionMessage.vue'
 import JetButton from '@/Jetstream/Button.vue'
+import JetCheckbox from '@/Jetstream/Checkbox.vue'
 import JetConfirmationModal from '@/Jetstream/ConfirmationModal.vue'
 import JetFormSection from '@/Jetstream/FormSection.vue'
 import JetInput from '@/Jetstream/Input.vue'
@@ -37,6 +38,7 @@ const form = useForm({
     marital_status: props.user.marital_status,
     appointment: props.user.appointment,
     serving_as: props.user.serving_as,
+    responsible_brother: props.user.responsible_brother,
     is_enabled: props.user.is_enabled,
 })
 
@@ -212,6 +214,18 @@ const cancelButtonText = computed(() => form.isDirty ? 'Cancel' : 'Back')
                     <div class="font-medium text-gray-700 dark:text-gray-100">
                         Spouse: {{ user.spouse_name }}
                     </div>
+                </div>
+                <div class="sm:col-span-2">
+                    <!-- Responsible Brother -->
+                    <label class="font-medium text-gray-700 dark:text-gray-100">
+                        <div>Trained Responsible Brother</div>
+                        <JetCheckbox v-model:checked="form.responsible_brother" value="responsible_brother"
+                                     name="responsible_brother"/>
+                        <small class="ml-3 text-gray-700 dark:text-gray-300">Typically used to schedule one
+                            <em>trained</em>
+                            brother onto a shift</small>
+                    </label>
+                    <JetInputError :message="form.errors.responsible_brother" class="mt-2"/>
                 </div>
             </div>
 
