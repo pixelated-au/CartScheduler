@@ -5,15 +5,16 @@ namespace App\Console\Commands;
 use App\Settings\GeneralSettings;
 use Codedge\Updater\UpdaterManager;
 use Illuminate\Console\Command;
+use Illuminate\Support\Str;
 
 class UpdateCommand extends Command
 {
     protected $signature = 'cart-scheduler:do-update {--force : Force update}';
 
-    protected              $description = 'CLI update';
+    protected $description = 'CLI update';
 
     public function __construct(
-        private readonly UpdaterManager $updater,
+        private readonly UpdaterManager  $updater,
         private readonly GeneralSettings $settings,
     )
     {
@@ -23,6 +24,7 @@ class UpdateCommand extends Command
     public function handle(): void
     {
         $doForce = $this->option('force');
+        $beta    = $this->option('beta');
 
         $this->info('Checking for updates...');
         // Check if new version is available
@@ -46,6 +48,15 @@ class UpdateCommand extends Command
         $new = $this->updater->source()->getVersionAvailable();
         $this->info('New version: ' . $new);
 
+        if (Str::endsWith($new, 'b')) {
+            if (!$beta) {
+                $this->error("New version is a beta release. Use --beta to force update to beta version $new.");
+                return;
+            }
+            $this->warn("New version is a beta release. Forcing update to beta version $new...");
+        }
+
+
         if (version_compare($new, $current, '>')) {
             $this->info('Versions are not the same. Updating...');
 
@@ -53,8 +64,8 @@ class UpdateCommand extends Command
             $this->info('Versions are the same. Forcing update...');
 
         } else {
-            $this->warn('Versions are the same. Aborting.');
-
+            // Shouldn't happen but theoretically possible...
+            $this->error('Versions are the same. Aborting.');
             return;
         }
 

@@ -2,7 +2,9 @@
 import Bell from "@/Components/Icons/Bell.vue";
 import useToast from "@/Composables/useToast";
 import JetButton from '@/Jetstream/Button.vue';
+import JetCheckbox from '@/Jetstream/Checkbox.vue';
 import JetFormSection from '@/Jetstream/FormSection.vue';
+import Label from "@/Jetstream/Label.vue";
 import {Inertia} from '@inertiajs/inertia';
 import {usePage} from '@inertiajs/inertia-vue3';
 import axios from "axios";
@@ -13,11 +15,12 @@ const props = defineProps({
 })
 
 const processing = ref(false)
+const betaCheck = ref(false)
 const toast = useToast()
 const updateCheck = async () => {
     processing.value = true
     try {
-        const response = await axios.get(route('admin.check-update'))
+        const response = await axios.get(route('admin.check-update'), {params: {beta: !!betaCheck.value}})
         if (!response.data) {
             toast.warning('No update available')
             return
@@ -96,7 +99,9 @@ onMounted(async () => {
                     scheduling software (version {{ settings.currentVersion }}).</p>
                 <p class="col-span-12 text-gray-600 dark:text-gray-300">You can reinstall the current update. Note that
                     this usually isn't required. Use only if directed to by your IT support.</p>
-
+                <p class="col-span-12 text-gray-600 dark:text-gray-300 font-bold">Do not use the Beta update option
+                    unless
+                    instructed by your IT support.</p>
             </template>
         </template>
 
@@ -105,6 +110,10 @@ onMounted(async () => {
                 Update Now
             </JetButton>
             <template v-else-if="!updateLog">
+                <label class="block mr-3 flex items-center text-gray-400 dark:text-gray-600">
+                    <JetCheckbox v-model:checked="betaCheck" value="true"/>
+                    <span class="ml-1.5">Check for Beta updates</span>
+                </label>
                 <JetButton outline style-type="danger" :class="{ 'opacity-25': processing }" class="mr-3"
                            :disabled="processing" @click.prevent.stop="updateCheck">
                     Check for update
