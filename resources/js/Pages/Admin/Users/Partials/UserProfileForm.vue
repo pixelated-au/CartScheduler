@@ -215,7 +215,7 @@ const cancelButtonText = computed(() => form.isDirty ? 'Cancel' : 'Back')
                         Spouse: {{ user.spouse_name }}
                     </div>
                 </div>
-                <div class="sm:col-span-2">
+                <div class="sm:col-span-3">
                     <!-- Responsible Brother -->
                     <label class="font-medium text-gray-700 dark:text-gray-100">
                         <div>Trained Responsible Brother</div>
