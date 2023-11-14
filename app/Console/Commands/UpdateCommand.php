@@ -9,7 +9,7 @@ use Illuminate\Support\Str;
 
 class UpdateCommand extends Command
 {
-    protected $signature = 'cart-scheduler:do-update {--force : Force update}';
+    protected $signature = 'cart-scheduler:do-update {--force : Force update} {--beta : Update to beta version}';
 
     protected $description = 'CLI update';
 
