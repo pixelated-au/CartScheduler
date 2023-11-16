@@ -3,25 +3,25 @@ import {Dropdown} from 'flowbite'
 import {computed, inject, onMounted, ref, useSlots} from 'vue'
 
 const props = defineProps({
-  modelValue: [Object, Number, String],
-  options: {
-    type: Array,
-    required: true,
-  },
-  emptyNote: String,
-  selectLabel: String,
-  returnObjectValue: {
-    type: Boolean,
-    default: false,
-  },
-  fullWidthButton: {
-    type: Boolean,
-    default: false,
-  },
-        emitFullObject: {
-            type: Boolean,
-            default: false,
-        }
+    modelValue: [Object, Number, String],
+    options: {
+        type: Array,
+        required: true,
+    },
+    emptyNote: String,
+    selectLabel: String,
+    returnObjectValue: {
+        type: Boolean,
+        default: false,
+    },
+    fullWidthButton: {
+        type: Boolean,
+        default: false,
+    },
+    emitFullObject: {
+        type: Boolean,
+        default: false,
+    }
 })
 
 const emit = defineEmits(['update:modelValue'])
@@ -29,12 +29,11 @@ const emit = defineEmits(['update:modelValue'])
 const fieldUnique = computed(() => Math.random().toString(36).substring(2, 9))
 
 const model = computed({
-  get: () => props.modelValue,
-  set: value => {
-    emit('update:modelValue', value)
-            isOpen.value = false
-            emit('update:modelValue', props.emitFullObject ? value : value.value)
-  },
+    get: () => props.modelValue,
+    set: value => {
+        emit('update:modelValue', value)
+        emit('update:modelValue', props.emitFullObject ? value : value.value)
+    },
 })
 
 
@@ -43,8 +42,8 @@ const useLabelSlot = computed(() => !!slots.label)
 
 
 const label = computed(() => isNaN(model.value) && model.value || model.value !== null
-  ? props.options.find(option => option.value === model.value)?.label
-  : props.selectLabel || 'Select one'
+    ? props.options.find(option => option.value === model.value)?.label
+    : props.selectLabel || 'Select one'
 )
 
 const noOptions = computed(() => props.options.length === 0)
@@ -52,42 +51,42 @@ const noOptions = computed(() => props.options.length === 0)
 const isDarkMode = inject('darkMode', false)
 
 const arrowFill = computed(() => {
-  if (isDarkMode.value) {
-    return '#fff'
-  }
-  return noOptions.value ? '#000' : '#fff'
+    if (isDarkMode.value) {
+        return '#fff'
+    }
+    return noOptions.value ? '#000' : '#fff'
 })
 
 const buttonClasses = computed(() => {
-  let classes = []
-  if (props.fullWidthButton) {
-    classes.push('w-full')
-  }
-  if (noOptions.value) {
-    classes.push('!bg-gray-300 dark:!bg-gray-700 !cursor-not-allowed')
-  }
-  return classes.join(' ')
+    let classes = []
+    if (props.fullWidthButton) {
+        classes.push('w-full')
+    }
+    if (noOptions.value) {
+        classes.push('!bg-gray-300 dark:!bg-gray-700 !cursor-not-allowed')
+    }
+    return classes.join(' ')
 })
 
 const doShow = ref(false)
 const onSelect = (selection) => {
-  dropdown.value.hide()
-  if (noOptions.value) {
-    return
-  }
+    dropdown.value.hide()
+    if (noOptions.value) {
+        return
+    }
 
-  if (props.returnObjectValue) {
-    // We're not returning the whole object, just the value
-    model.value = selection.value
-    return
-  }
+    if (props.returnObjectValue) {
+        // We're not returning the whole object, just the value
+        model.value = selection.value
+        return
+    }
 
-  model.value = selection
+    model.value = selection
 }
 
 const selectedClass = (option) => {
-  const val = props.returnObjectValue ? option.value : option
-  return model.value === val ? 'bg-purple-200 dark:bg-purple-800' : ''
+    const val = props.returnObjectValue ? option.value : option
+    return model.value === val ? 'bg-purple-200 dark:bg-purple-800' : ''
 }
 
 const trigger = ref()
@@ -95,9 +94,9 @@ const target = ref()
 const dropdown = ref()
 
 onMounted(() => {
-  dropdown.value = new Dropdown(target.value, trigger.value, {
-    triggerType: 'click',
-  })
+    dropdown.value = new Dropdown(target.value, trigger.value, {
+        triggerType: 'click',
+    })
 })
 </script>
 
@@ -136,9 +135,9 @@ onMounted(() => {
                 <template v-else>
                     <li v-for="option in options" :key="option.id" :class="selectedClass(option)">
                         <div
-                                class="block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white font-bold"
+                            class="block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white font-bold"
                             :class="model === option.value ? 'bg-purple-100 dark:bg-purple-600 dark:text-white' : ''"
-                                @click="onSelect(option)">
+                            @click="onSelect(option)">
                             {{ option.label }}
                             <slot name="extra" :option="option"></slot>
                         </div>
