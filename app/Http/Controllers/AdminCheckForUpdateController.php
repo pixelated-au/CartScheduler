@@ -2,12 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\UpdateAllowedSettingsUsersRequest;
-use App\Models\Location;
-use App\Models\User;
 use App\Settings\GeneralSettings;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
-use Inertia\Inertia;
 
 class AdminCheckForUpdateController extends Controller
 {
@@ -15,10 +12,15 @@ class AdminCheckForUpdateController extends Controller
     {
     }
 
-    public function __invoke()
+    public function __invoke(Request $request)
     {
         $old = $this->settings->availableVersion;
-        Artisan::call('cart-scheduler:has-update');
+        $params = [];
+        $beta = $request->boolean('beta');
+        if ($beta) {
+            $params['--beta'] = true;
+        }
+        Artisan::call('cart-scheduler:has-update', $params);
         $new = $this->settings->availableVersion;
         return version_compare($old, $new, '!=');
     }

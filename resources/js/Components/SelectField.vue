@@ -18,6 +18,10 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+        emitFullObject: {
+            type: Boolean,
+            default: false,
+        }
 })
 
 const emit = defineEmits(['update:modelValue'])
@@ -28,6 +32,8 @@ const model = computed({
   get: () => props.modelValue,
   set: value => {
     emit('update:modelValue', value)
+            isOpen.value = false
+            emit('update:modelValue', props.emitFullObject ? value : value.value)
   },
 })
 
@@ -131,6 +137,7 @@ onMounted(() => {
                     <li v-for="option in options" :key="option.id" :class="selectedClass(option)">
                         <div
                                 class="block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white font-bold"
+                            :class="model === option.value ? 'bg-purple-100 dark:bg-purple-600 dark:text-white' : ''"
                                 @click="onSelect(option)">
                             {{ option.label }}
                             <slot name="extra" :option="option"></slot>

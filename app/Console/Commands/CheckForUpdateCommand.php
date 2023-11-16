@@ -5,10 +5,11 @@ namespace App\Console\Commands;
 use App\Settings\GeneralSettings;
 use Codedge\Updater\UpdaterManager;
 use Illuminate\Console\Command;
+use Illuminate\Support\Str;
 
 class CheckForUpdateCommand extends Command
 {
-    protected $signature = 'cart-scheduler:has-update';
+    protected $signature = 'cart-scheduler:has-update {--beta : Check for beta version}';
 
     protected $description = 'Checks to see if there is an update available. If so, it will store the version number in the system settings.';
 
@@ -19,6 +20,8 @@ class CheckForUpdateCommand extends Command
 
     public function handle(): void
     {
+        $beta    = $this->option('beta');
+
         $this->info('Checking for updates...');
         // Check if new version is available
         $current = $this->updater->source()->getVersionInstalled();
@@ -27,11 +30,20 @@ class CheckForUpdateCommand extends Command
             return;
         }
 
+        $new = $this->updater->source()->getVersionAvailable();
+        if (Str::endsWith($new, 'b')) {
+            if (!$beta) {
+                $this->warn("New version is a beta release. Ignoring. Current version is $current");
+
+                return;
+            }
+            $this->warn("New version is a beta release, but --beta flag passed so continuing. Current version is $current");
+        }
+
         // Get the current installed version
         $this->info("Current version: $current");
 
         // Get the new version available
-        $new = $this->updater->source()->getVersionAvailable();
         $this->info('New version: ' . $new);
 
         $this->settings->availableVersion = $new;

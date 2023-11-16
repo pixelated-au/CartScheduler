@@ -1,7 +1,7 @@
 <script setup>
-import JetButton from '@/Jetstream/Button.vue'
-import AppLayout from '@/Layouts/AppLayout.vue'
-import UserProfileForm from '@/Pages/Admin/Users/Partials/UserProfileForm.vue'
+    import JetButton from '@/Jetstream/Button.vue'
+    import AppLayout from '@/Layouts/AppLayout.vue'
+    import UserProfileForm from '@/Pages/Admin/Users/Partials/UserProfileForm.vue'
 import ShowRegularAvailabilityForm from "@/Pages/Profile/Partials/ShowRegularAvailabilityForm.vue";
 import ShowVacationsAvailabilityForm from "@/Pages/Profile/Partials/ShowVacationsAvailabilityForm.vue";
 import {Inertia} from '@inertiajs/inertia'
@@ -18,11 +18,11 @@ const listRouteAction = () => {
 </script>
 
 <template>
-    <AppLayout :title="`User: ${editUser.name}`">
+    <AppLayout :title="`User: ${editUser.data.name}`">
         <template #header>
             <div class="flex justify-between">
                 <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-                    User {{ editUser.name }} </h2>
+                    User {{ editUser.data.name }} </h2>
                 <JetButton class="mx-3" type="button" style-type="secondary" outline @click.prevent="listRouteAction">
                     Back
                 </JetButton>
