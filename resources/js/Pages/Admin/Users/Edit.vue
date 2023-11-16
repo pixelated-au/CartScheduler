@@ -1,7 +1,7 @@
 <script setup>
-    import JetButton from '@/Jetstream/Button.vue'
-    import AppLayout from '@/Layouts/AppLayout.vue'
-    import UserProfileForm from '@/Pages/Admin/Users/Partials/UserProfileForm.vue'
+import JetButton from '@/Jetstream/Button.vue'
+import AppLayout from '@/Layouts/AppLayout.vue'
+import UserProfileForm from '@/Pages/Admin/Users/Partials/UserProfileForm.vue'
 import ShowRegularAvailabilityForm from "@/Pages/Profile/Partials/ShowRegularAvailabilityForm.vue";
 import ShowVacationsAvailabilityForm from "@/Pages/Profile/Partials/ShowVacationsAvailabilityForm.vue";
 import {Inertia} from '@inertiajs/inertia'
@@ -31,15 +31,15 @@ const listRouteAction = () => {
 
         <div>
             <div class="max-w-7xl mx-auto pt-10 sm:px-6 lg:px-8">
-                <UserProfileForm :user="editUser"/>
+                <UserProfileForm :user="editUser.data"/>
             </div>
             <template v-if="$page.props.enableUserAvailability">
                 <div class="max-w-7xl mx-auto pt-10 sm:px-6 lg:px-8">
-                    <ShowVacationsAvailabilityForm :userId="editUser.id" :vacations="editUser.vacations"
+                    <ShowVacationsAvailabilityForm :userId="editUser.id" :vacations="editUser.data.vacations"
                                                    class="mt-10 sm:mt-0"/>
                 </div>
                 <div class="max-w-7xl mx-auto pt-10 sm:px-6 lg:px-8">
-                    <ShowRegularAvailabilityForm :userId="editUser.id" :availability="editUser.availability"
+                    <ShowRegularAvailabilityForm :userId="editUser.id" :availability="editUser.data.availability"
                                                  class="mt-10 sm:mt-0"/>
                 </div>
             </template>

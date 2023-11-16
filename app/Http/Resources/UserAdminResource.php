@@ -39,6 +39,8 @@ class UserAdminResource extends JsonResource
             'spouse_id'           => $this->whenNotNull('spouse_id', fn() => $this->spouse_id),
             'is_enabled'          => $this->is_enabled,
             'responsible_brother' => $this->responsible_brother,
+            'vacations'           => UserVacationResource::collection($this->whenLoaded('vacations')),
+            'availability'        => AvailabilityResource::make($this->whenLoaded('availability')),
         ];
     }
 }
