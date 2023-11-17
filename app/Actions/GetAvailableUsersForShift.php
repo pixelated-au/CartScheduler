@@ -30,7 +30,7 @@ class GetAvailableUsersForShift
             ->when($this->settings->enableUserAvailability, fn(Builder $query) => $query
                 ->addSelect(['filled_sundays', 'filled_mondays', 'filled_tuesdays', 'filled_wednesdays', 'filled_thursdays', 'filled_fridays', 'filled_saturdays'])
                 ->tap(fn(Builder $query) => $this->getDayCounts($query, $date)))
-            ->addSelect(['num_sundays', 'num_mondays', 'num_tuesdays', 'num_wednesdays', 'num_thursdays', 'num_fridays', 'num_saturdays'])
+            ->addSelect(['num_sundays', 'num_mondays', 'num_tuesdays', 'num_wednesdays', 'num_thursdays', 'num_fridays', 'num_saturdays', 'comments'])
             ->leftJoin(table: 'user_availabilities', first: 'users.id', operator: '=', second: 'user_availabilities.user_id')
             ->leftJoinSub(
                 query: DB::query()

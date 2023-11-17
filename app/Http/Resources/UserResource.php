@@ -29,6 +29,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
  * @property mixed $filled_thursdays
  * @property mixed $filled_fridays
  * @property mixed $filled_saturdays
+ * @property mixed $comments
  */
 class UserResource extends JsonResource
 {
@@ -58,6 +59,7 @@ class UserResource extends JsonResource
             'filled_thursdays'      => $this->whenNotNull((int)$this->filled_thursdays),
             'filled_fridays'        => $this->whenNotNull((int)$this->filled_fridays),
             'filled_saturdays'      => $this->whenNotNull((int)$this->filled_saturdays),
+            'availability_comments' => $this->whenNotNull($this->comments),
         ];
     }
 }

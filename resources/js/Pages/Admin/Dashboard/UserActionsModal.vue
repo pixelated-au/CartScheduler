@@ -1,5 +1,6 @@
 <script setup>
 import DataTable from "@/Components/DataTable.vue";
+import Comment from "@/Components/Icons/Comment.vue";
 import QuestionCircle from "@/Components/Icons/QuestionCircle.vue";
 import UserAdd from "@/Components/Icons/UserAdd.vue";
 import useToast from "@/Composables/useToast";
@@ -139,6 +140,7 @@ const tableRows = computed(() => {
             id: volunteer.id,
             name: `${prefix} ${volunteer.name}`,
             gender: volunteer.gender,
+            comment: volunteer.availability_comments,
             lastShift: volunteer.last_shift_date ? volunteer.last_shift_date : null,
             lastShiftTime: volunteer.last_shift_start_time ? volunteer.last_shift_start_time : null,
             filledShifts: calcShiftPercentage(daysAlreadyRostered, daysAvailable),
@@ -236,6 +238,20 @@ const toggleLabel = computed(() => doShowFilteredVolunteers.value
                             </template>
                         </v-menu>
                         {{ header.text }}
+                    </template>
+                    <template #item-name="{name, comment}">
+                        {{ name }}
+                        <template v-if="comment">
+                            <v-menu class="mr-2 inline-block">
+                                <span><Comment/></span>
+                                <template #popper>
+                                    <div>
+                                        <h6>{{ name }} comments:</h6>
+                                        <div>{{ comment }}</div>
+                                    </div>
+                                </template>
+                            </v-menu>
+                        </template>
                     </template>
                     <template #item-lastShift="{lastShift, lastShiftTime}">
                         {{ formatShiftDate(lastShift, lastShiftTime) }}
