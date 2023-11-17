@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use App\Actions\HasNewVersionAvailable;
+use App\Actions\UserNeedsToUpdateAvailability;
 use App\Models\User;
 use App\Settings\GeneralSettings;
 use Illuminate\Http\Request;
@@ -22,6 +23,7 @@ class HandleInertiaRequests extends Middleware
     public function __construct(
         private readonly GeneralSettings        $settings,
         private readonly HasNewVersionAvailable $hasNewVersionAvailable,
+        private readonly UserNeedsToUpdateAvailability $getNeedsToUpdateAvailability,
     )
     {
     }
@@ -73,6 +75,7 @@ class HandleInertiaRequests extends Middleware
 
         if ($this->settings->enableUserAvailability) {
             $custom['enableUserAvailability'] = true;
+            $custom['needsToUpdateAvailability'] = $this->getNeedsToUpdateAvailability->execute($user);
         }
 
         return array_merge(parent::share($request), $custom);

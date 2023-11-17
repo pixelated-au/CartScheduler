@@ -15,18 +15,20 @@ use App\Http\Controllers\ReportTagsController;
 use App\Http\Controllers\ReportTagsSortOrderController;
 use App\Http\Controllers\ResendWelcomeEmailController;
 use App\Http\Controllers\SaveShiftReportController;
+use App\Http\Controllers\SetUserAvailabilityController;
 use App\Http\Controllers\SetUserPasswordController;
 use App\Http\Controllers\ShiftsController;
 use App\Http\Controllers\ShowUserAvailabilityController;
 use App\Http\Controllers\ToggleShiftReservationController;
 use App\Http\Controllers\ToggleUserOntoShiftReservationController;
-use App\Http\Controllers\UpdateUserRegularAvailabilityController;
-use App\Http\Controllers\UpdateUserVacationsController;
 use App\Http\Controllers\UpdateAllowedSettingsUsersController;
 use App\Http\Controllers\UpdateGeneralSettingsController;
+use App\Http\Controllers\UpdateUserRegularAvailabilityController;
+use App\Http\Controllers\UpdateUserVacationsController;
 use App\Http\Controllers\UsersController;
 use App\Http\Controllers\UsersImportController;
 use App\Settings\GeneralSettings;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -64,6 +66,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     Route::post('/reserve-shift', ToggleShiftReservationController::class);
     Route::post('/save-report', SaveShiftReportController::class)->name('save.report');
     Route::get('/get-report-tags', GetReportTagsController::class);
+    Route::post('/set-viewed-availability', fn (Request $request) => $request->user()->availability->touch())->name('set.viewed-availability');
 
     Route::get('/user/availability', ShowUserAvailabilityController::class)->name('user.availability');
     Route::put('/user/availability', UpdateUserRegularAvailabilityController::class)->name('update.user.availability');

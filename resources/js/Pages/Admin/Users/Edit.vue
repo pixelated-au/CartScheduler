@@ -35,11 +35,11 @@ const listRouteAction = () => {
             </div>
             <template v-if="$page.props.enableUserAvailability">
                 <div class="max-w-7xl mx-auto pt-10 sm:px-6 lg:px-8">
-                    <ShowVacationsAvailabilityForm :userId="editUser.id" :vacations="editUser.data.vacations"
+                    <ShowVacationsAvailabilityForm :userId="editUser.data.id" :vacations="editUser.data.vacations"
                                                    class="mt-10 sm:mt-0"/>
                 </div>
                 <div class="max-w-7xl mx-auto pt-10 sm:px-6 lg:px-8">
-                    <ShowRegularAvailabilityForm :userId="editUser.id" :availability="editUser.data.availability"
+                    <ShowRegularAvailabilityForm :userId="editUser.data.id" :availability="editUser.data.availability"
                                                  class="mt-10 sm:mt-0"/>
                 </div>
             </template>

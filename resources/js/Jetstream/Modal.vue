@@ -1,4 +1,5 @@
 <script setup>
+    import Login from "@/Pages/Auth/Login.vue";
     import { computed, onMounted, onUnmounted, watch } from 'vue'
 
     const props = defineProps({
@@ -14,6 +15,10 @@
             type: Boolean,
             default: true,
         },
+        fillScreen: {
+            type: Boolean,
+            default: false,
+        }
     })
 
     const emit = defineEmits(['close'])
@@ -46,21 +51,28 @@
     })
 
     const maxWidthClass = computed(() => {
-        return {
+        const options = {
             'sm': 'sm:max-w-sm',
             'md': 'sm:max-w-md',
             'lg': 'sm:max-w-lg',
             'xl': 'sm:max-w-xl',
             '2xl': 'sm:max-w-2xl',
-        }[props.maxWidth]
+        }
+        return options[props.maxWidth]
+    })
+
+    const extraClasses = computed(() => {
+        let classes = maxWidthClass.value
+        if (props.fillScreen) {
+            classes += 'inset-0 overflow-y-auto z-50 flex items-center justify-center px-4 py-6 sm:px-0 w-full sm:w-auto h-full sm:h-auto'
+        }
+        return classes
     })
 </script>
 
 <template>
     <teleport to="body">
         <transition leave-active-class="duration-200">
-            <!--            class="fixed inset-0 overflow-y-auto z-50 flex items-center justify-center px-4 py-6 sm:px-0"-->
-
             <div v-show="show" class="fixed inset-0 overflow-y-auto z-50 px-4 py-6 sm:px-0" scroll-region>
                 <transition enter-active-class="ease-out duration-300"
                             enter-from-class="opacity-0"
@@ -81,7 +93,7 @@
                             leave-to-class="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95">
                     <div v-show="show"
                          class="bg-white dark:bg-gray-900 rounded-lg shadow-xl transform transition-all sm:w-full sm:mx-auto"
-                         :class="maxWidthClass">
+                         :class="extraClasses">
                         <slot v-if="show"/>
                     </div>
                 </transition>

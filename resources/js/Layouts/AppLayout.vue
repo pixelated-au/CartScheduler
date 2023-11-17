@@ -1,19 +1,23 @@
 <script setup>
+import ObtrusiveNotification from "@/Components/ObtrusiveNotification.vue";
 import useToast from "@/Composables/useToast";
 import JetApplicationMark from '@/Jetstream/ApplicationMark.vue'
 import JetBanner from '@/Jetstream/Banner.vue'
+import JetButton from '@/Jetstream/Button.vue'
 import JetNavLink from '@/Jetstream/NavLink.vue'
 import JetResponsiveNavLink from '@/Jetstream/ResponsiveNavLink.vue'
 import AdminMenu from '@/Layouts/Components/AdminMenu.vue'
 import DarkMode from '@/Layouts/Components/DarkMode.vue'
 import ProfileSettingsMenu from '@/Layouts/Components/ProfileSettingsMenu.vue'
 import TeamsMenu from '@/Layouts/Components/TeamsMenu.vue'
+import {useGlobalState} from "@/store";
 import Bugsnag from '@bugsnag/js'
 import {Inertia} from "@inertiajs/inertia";
 import {Head, Link, usePage} from '@inertiajs/inertia-vue3'
 import '@vuepic/vue-datepicker/dist/main.css'
-import {computed, nextTick, onMounted, onUpdated, provide, ref, watch} from 'vue'
+import {differenceInDays} from "date-fns";
 import 'floating-vue/dist/style.css'
+import {computed, onMounted, onUpdated, provide, ref} from 'vue'
 
 
 defineProps({
@@ -57,7 +61,36 @@ onUpdated(() => {
     toast.message(type, message);
 })
 
+const state = useGlobalState()
+const showUpdateAvailabilityReminder = ref(false)
+onMounted(() => {
+    const pageProps = usePage().props.value
+    if (pageProps.user && pageProps.needsToUpdateAvailability && didHideAvailabilityReminderOverOneDayAgo.value) {
+        showUpdateAvailabilityReminder.value = true
+    }
+})
 
+const didHideAvailabilityReminderOverOneDayAgo = computed(() => {
+    const dismissedOn = state.value.dismissedAvailabilityOn
+    if (!dismissedOn) {
+        return true
+    }
+    if (differenceInDays(new Date(), new Date(dismissedOn)) > 1) {
+        return true
+    }
+
+    return false
+})
+
+const checkAvailability = () => {
+    checkLater()
+    Inertia.get(route('user.availability'))
+}
+
+const checkLater = () => {
+    state.value.dismissedAvailabilityOn = new Date()
+    showUpdateAvailabilityReminder.value = false
+}
 </script>
 
 <template>
@@ -234,6 +267,22 @@ onUpdated(() => {
             </main>
         </div>
     </div>
+
+    <ObtrusiveNotification closeable :show="showUpdateAvailabilityReminder"
+                           @close="showUpdateAvailabilityReminder = false">
+        <div class="p-6 dark:text-gray-100 text-center">
+            <p>It seems like you haven't updated your availability in a while. Please make sure your availability is up
+                to date.</p>
+            <p class="my-3">Checking will hide this message for 1 month</p>
+            <div class="w-full flex flex-col justify-between">
+                <JetButton class="mb-3 text-center justify-center" @click="checkAvailability">Check now</JetButton>
+                <JetButton style-type="secondary" outline class="text-center justify-center" @click="checkLater">I'll
+                    check later
+                </JetButton>
+                <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">You can always check your availability by going to the account menu item.</p>
+            </div>
+        </div>
+    </ObtrusiveNotification>
 </template>
 
 <style lang="scss">
