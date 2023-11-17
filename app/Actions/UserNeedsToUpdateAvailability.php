@@ -12,8 +12,12 @@ class UserNeedsToUpdateAvailability
     {
     }
 
-    public function execute(User $user): bool
+    public function execute(?User $user): bool
     {
+        if (!$user) {
+            return false;
+        }
+
         if (!$this->settings->enableUserAvailability) {
             return false;
         }
