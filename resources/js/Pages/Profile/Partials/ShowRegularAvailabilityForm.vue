@@ -136,7 +136,7 @@ watch(() => form.comments, (value, oldValue) => {
 
         <template #form>
             <div
-                class="col-span-6 grid grid-cols-4 md:grid-cols-7 text-gray-700 dark:text-gray-100 items-stretch gap-y-px bg-slate-200 dark:bg-slate-800 border border-gray-200 dark:border-gray-900 rounded p-3">
+                class="col-span-6 grid grid-cols-4 md:grid-cols-7 text-gray-700 dark:text-gray-100 items-stretch gap-y-px bg-slate-100 dark:bg-slate-800 border border-gray-200 dark:border-gray-900 rounded p-3">
                 <div class="col-span-4 md:col-span-7 font-bold">{{ props.userId ? 'Volunteer is' : 'I am' }} available to be rostered:</div>
                 <div class="col text-center">
                     <JetToggle id="check-monday" v-model="rosterMonday" label="Monday"/>
