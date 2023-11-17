@@ -189,9 +189,19 @@ const toggleLabel = computed(() => doShowFilteredVolunteers.value
                     <JetInput id="search" v-model="volunteerSearch" type="text" class="mt-1 block w-full"/>
                     <JetHelpText>Search on name</JetHelpText>
                 </div>
-                <div v-if="$page.props.enableUserAvailability" class="mt-3 flex justify-end">
-                    <div class="flex justify-center w-[150px]">
-                        <JetToggle v-model="doShowFilteredVolunteers" :label="toggleLabel"/>
+                <div v-if="$page.props.enableUserAvailability" class="mt-3 flex justify-end items-center">
+                    <div class="flex flex-wrap justify-center w-[150px]">
+                        <JetToggle v-model="doShowFilteredVolunteers">
+                            {{ toggleLabel }}
+                            <v-menu class="ml-1 inline-block">
+                                <span><QuestionCircle/></span>
+                                <template #popper>
+                                    <div class="max-w-[300px]">
+                                        Note: if an expected volunteer is missing, they're likely already rostered.
+                                    </div>
+                                </template>
+                            </v-menu>
+                        </JetToggle>
                     </div>
                 </div>
             </div>
