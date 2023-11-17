@@ -16,7 +16,7 @@ class ShowUserAvailabilityController extends Controller
         $user = $request->user();
         $this->authorize('view', $user);
 
-        $availability = UserAvailability::firstOr(fn() => UserAvailability::create(['user_id' => $user->id]));
+        $availability = UserAvailability::firstOrCreate(['user_id' => $user->id]);
 
         return Inertia::render('Profile/ShowAvailability', [
             'vacations' => UserVacationResource::collection($user->vacations->all()),
