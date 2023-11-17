@@ -14,6 +14,17 @@ class UserAvailability extends Model
 
     protected $primaryKey = 'user_id';
 
+    protected $fillable = [
+        'user_id',
+        'day_monday',
+        'day_tuesday',
+        'day_wednesday',
+        'day_thursday',
+        'day_friday',
+        'day_saturday',
+        'day_sunday',
+    ];
+
     protected $casts = [
         'day_monday'    => SetAsEnumCollectionCast::class . ':' . AvailabilityHours::class,
         'day_tuesday'   => SetAsEnumCollectionCast::class . ':' . AvailabilityHours::class,
