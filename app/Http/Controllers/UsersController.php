@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\ModifyUserRequest;
 use App\Http\Resources\UserAdminResource;
 use App\Models\User;
+use App\Models\UserAvailability;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Str;
@@ -47,6 +48,8 @@ class UsersController extends Controller
 
     public function edit(User $user): Response
     {
+        UserAvailability::where('user_id', $user->id)
+            ->firstOr(fn() => UserAvailability::create(['user_id' => $user->id]));
         return Inertia::render('Admin/Users/Edit', [
             'editUser' => UserAdminResource::make($user->load(['spouse', 'vacations', 'availability'])),
         ]);
