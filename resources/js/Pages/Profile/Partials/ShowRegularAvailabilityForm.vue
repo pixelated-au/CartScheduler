@@ -100,9 +100,6 @@ const update = () => {
             onError: () => {
                 console.log('error')
             },
-            onSuccess: (a, b, c) => {
-                console.log('success', a, b, c)
-            },
         })
 }
 
