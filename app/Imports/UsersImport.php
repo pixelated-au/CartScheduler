@@ -7,6 +7,7 @@ use App\Enums\Appontment;
 use App\Enums\MaritalStatus;
 use App\Enums\ServingAs;
 use App\Models\User;
+use App\Models\UserAvailability;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Enum;
@@ -22,7 +23,7 @@ class UsersImport implements ToCollection, WithHeadingRow, WithValidation, WithB
     public function collection(Collection $collection): void
     {
         foreach ($collection as $row) {
-            User::create([
+            $user = User::create([
                 'uuid'                => Str::uuid(),
                 'name'                => $row['name'],
                 'email'               => $row['email'],
@@ -36,6 +37,8 @@ class UsersImport implements ToCollection, WithHeadingRow, WithValidation, WithB
                 'responsible_brother' => $row['responsible_brother'],
                 'password'            => null,
             ]);
+
+            UserAvailability::create(['user_id' => $user->id]);
             ++$this->rowCount;
         }
     }
