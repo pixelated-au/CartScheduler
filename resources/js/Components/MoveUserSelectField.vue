@@ -61,8 +61,7 @@ const moveTooltip = computed(() => shiftsForTime.value?.length === 0
 
 </script>
 <template>
-    <SelectField emit-full-object
-                 :options="shiftsForTime"
+    <SelectField :options="shiftsForTime"
                  v-tooltip="moveTooltip"
                  emptyNote="No other locations available"
                  @update:modelValue="$emit('update:modelValue', $event)">

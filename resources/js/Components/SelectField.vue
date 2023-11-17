@@ -18,10 +18,6 @@ const props = defineProps({
         type: Boolean,
         default: false,
     },
-    emitFullObject: {
-        type: Boolean,
-        default: false,
-    }
 })
 
 const emit = defineEmits(['update:modelValue'])
@@ -30,12 +26,8 @@ const fieldUnique = computed(() => Math.random().toString(36).substring(2, 9))
 
 const model = computed({
     get: () => props.modelValue,
-    set: value => {
-        emit('update:modelValue', value)
-        emit('update:modelValue', props.emitFullObject ? value : value.value)
-    },
+    set: value => emit('update:modelValue', value),
 })
-
 
 const slots = useSlots()
 const useLabelSlot = computed(() => !!slots.label)
@@ -68,7 +60,6 @@ const buttonClasses = computed(() => {
     return classes.join(' ')
 })
 
-const doShow = ref(false)
 const onSelect = (selection) => {
     dropdown.value.hide()
     if (noOptions.value) {
@@ -77,6 +68,7 @@ const onSelect = (selection) => {
 
     if (props.returnObjectValue) {
         // We're not returning the whole object, just the value
+        console.log('selection value', selection.value)
         model.value = selection.value
         return
     }
