@@ -15,96 +15,96 @@ import {useForm} from '@inertiajs/inertia-vue3'
 import {computed, ref} from 'vue'
 
 const props = defineProps({
-    user: Object,
-    action: {
-        type: String,
-        default: 'edit',
-    },
+  user: Object,
+  action: {
+    type: String,
+    default: 'edit',
+  },
 })
 
 const emit = defineEmits([
-    'cancel',
+  'cancel',
 ])
 
 const form = useForm({
-    id: props.user.id,
-    name: props.user.name,
-    role: props.user.role,
-    email: props.user.email,
-    gender: props.user.gender,
-    mobile_phone: props.user.mobile_phone,
-    birth_year: props.user.birth_year,
-    year_of_birth: props.user.year_of_birth,
-    marital_status: props.user.marital_status,
-    appointment: props.user.appointment,
-    serving_as: props.user.serving_as,
-    responsible_brother: props.user.responsible_brother,
-    is_enabled: props.user.is_enabled,
+  id: props.user.id,
+  name: props.user.name,
+  role: props.user.role,
+  email: props.user.email,
+  gender: props.user.gender,
+  mobile_phone: props.user.mobile_phone,
+  birth_year: props.user.birth_year,
+  year_of_birth: props.user.year_of_birth,
+  marital_status: props.user.marital_status,
+  appointment: props.user.appointment,
+  serving_as: props.user.serving_as,
+  responsible_brother: props.user.responsible_brother,
+  is_enabled: props.user.is_enabled,
 })
 
 const updateUserData = () => {
-    form.put(route('admin.users.update', props.user.id), {
-        errorBag: 'updateUserData',
-        preserveScroll: true,
-    })
+  form.put(route('admin.users.update', props.user.id), {
+    errorBag: 'updateUserData',
+    preserveScroll: true,
+  })
 }
 
 const createUserData = () => {
-    form.post(route('admin.users.store'), {
-        errorBag: 'updateUserData',
-        preserveScroll: true,
-    })
+  form.post(route('admin.users.store'), {
+    errorBag: 'updateUserData',
+    preserveScroll: true,
+  })
 }
 
 const saveAction = () => {
-    if (props.action === 'edit') {
-        updateUserData()
-    } else {
-        createUserData()
-    }
+  if (props.action === 'edit') {
+    updateUserData()
+  } else {
+    createUserData()
+  }
 }
 
 const listRouteAction = () => {
-    Inertia.visit(route('admin.users.index'))
+  Inertia.visit(route('admin.users.index'))
 }
 
 const showConfirmationModal = ref(false)
 const modalDeleteAction = ref(false)
 const confirmCancel = () => {
-    modalDeleteAction.value = false
-    if (form.isDirty) {
-        showConfirmationModal.value = true
-    } else {
-        listRouteAction()
-    }
+  modalDeleteAction.value = false
+  if (form.isDirty) {
+    showConfirmationModal.value = true
+  } else {
+    listRouteAction()
+  }
 }
 
 const onDelete = () => {
-    modalDeleteAction.value = true
-    showConfirmationModal.value = true
+  modalDeleteAction.value = true
+  showConfirmationModal.value = true
 }
 
 const doDeleteAction = () => {
-    Inertia.delete(route('admin.users.destroy', props.user.id))
+  Inertia.delete(route('admin.users.destroy', props.user.id))
 }
 
 const performConfirmationAction = () => {
-    if (modalDeleteAction.value) {
-        doDeleteAction()
-    } else {
-        listRouteAction()
-    }
+  if (modalDeleteAction.value) {
+    doDeleteAction()
+  } else {
+    listRouteAction()
+  }
 }
 
 const toast = useToast()
 
 const performResendWelcomeAction = async () => {
-    try {
-        const response = await axios.post(route('admin.resend-welcome-email', {user_id: props.user.id}))
-        toast.success(response.data.message)
-    } catch (e) {
-        toast.error(e.response.data.message, {timeout: 3000})
-    }
+  try {
+    const response = await axios.post(route('admin.resend-welcome-email', {user_id: props.user.id}))
+    toast.success(response.data.message)
+  } catch (e) {
+    toast.error(e.response.data.message, {timeout: 3000})
+  }
 
 }
 
@@ -221,9 +221,8 @@ const cancelButtonText = computed(() => form.isDirty ? 'Cancel' : 'Back')
                         <div>Trained Responsible Brother</div>
                         <JetCheckbox v-model:checked="form.responsible_brother" value="responsible_brother"
                                      name="responsible_brother"/>
-                        <small class="ml-3 text-gray-700 dark:text-gray-300">Typically used to schedule one
-                            <em>trained</em>
-                            brother onto a shift</small>
+                        <small class="ml-3 text-gray-700 dark:text-gray-300">Typically used to flag brothers who can be
+                            trusted to oversee a shift.</small>
                     </label>
                     <JetInputError :message="form.errors.responsible_brother" class="mt-2"/>
                 </div>
