@@ -162,7 +162,7 @@ const cancelButtonText = computed(() => form.isDirty ? 'Cancel' : 'Back')
                     <div class="font-medium text-gray-700 dark:text-gray-100">
                         Gender
                     </div>
-                    <SelectField name="gender" v-model="form.gender" :options="[
+                    <SelectField return-object-value name="gender" v-model="form.gender" :options="[
                     { label: 'Male', value: 'male' },
                     { label: 'Female', value: 'female' },
                 ]"/>
@@ -173,7 +173,7 @@ const cancelButtonText = computed(() => form.isDirty ? 'Cancel' : 'Back')
                     <div class="font-medium text-gray-700 dark:text-gray-100">
                         Appointment
                     </div>
-                    <SelectField name="appointment" v-model="form.appointment" :options="[
+                    <SelectField return-object-value name="appointment" v-model="form.appointment" :options="[
                     { label: 'None', value: null },
                     { label: 'Ministerial Servant', value: 'ministerial servant' },
                     { label: 'Elder', value: 'elder' },
@@ -186,7 +186,7 @@ const cancelButtonText = computed(() => form.isDirty ? 'Cancel' : 'Back')
                         Serving As
                     </div>
                     <!--suppress SpellCheckingInspection -->
-                    <SelectField name="serving_as" v-model="form.serving_as" :options=" [
+                    <SelectField return-object-value name="serving_as" v-model="form.serving_as" :options=" [
                     { label: 'Field Missionary', value: 'field missionary' },
                     { label: 'Special Pioneer', value: 'special pioneer' },
                     { label: 'Regular Pioneer', value: 'regular pioneer' },
@@ -201,7 +201,7 @@ const cancelButtonText = computed(() => form.isDirty ? 'Cancel' : 'Back')
                     <div class="font-medium text-gray-700 dark:text-gray-100">
                         Marital Status
                     </div>
-                    <SelectField name="marital_status" v-model="form.marital_status" :options="[
+                    <SelectField return-object-value name="marital_status" v-model="form.marital_status" :options="[
                     { label: 'Single', value: 'single' },
                     { label: 'Married', value: 'married' },
                     { label: 'Separated', value: 'separated' },
