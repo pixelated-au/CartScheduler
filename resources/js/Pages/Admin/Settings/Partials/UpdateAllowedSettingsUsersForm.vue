@@ -43,7 +43,7 @@ onMounted(async () => {
         </template>
 
         <template #form>
-            <div class="order-last sm:order-first col-span-6 sm:col-span-3 lg:col-span-2 bg-white rounded-lg shadow max-w-md dark:bg-gray-700">
+            <div class="order-last sm:order-first col-span-6 sm:col-span-3 lg:col-span-2 bg-white rounded-lg shadow max-w-md dark:bg-gray-700 max-h-50 overflow-scroll">
                 <ul class="overflow-y-auto text-sm text-gray-700 dark:text-gray-200"
                     aria-labelledby="admin-users">
                     <li v-for="user in adminUsers" :key="user.id">
