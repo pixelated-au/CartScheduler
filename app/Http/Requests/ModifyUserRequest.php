@@ -31,7 +31,7 @@ class ModifyUserRequest extends FormRequest
             'email'               => ['required', 'email', 'max:255', Rule::unique('users')->ignore($this->get('id'))],
             'role'                => ['required', 'string', new Enum(Role::class)],
             'gender'              => ['required', 'string', 'in:male,female'],
-            'mobile_phone'        => ['required', 'string', 'regex:/^([0-9\+\-\s]+)$/', 'min:10', 'max:15'],
+            'mobile_phone'        => ['required', 'string', 'regex:/^([0-9\+\-\s]+)$/', 'min:8', 'max:15'],
             'year_of_birth'       => ['nullable', 'integer', 'min:' . date('Y') - 100, 'max:' . date('Y')],
             'appointment'         => ['nullable', 'string', new Enum(Appontment::class)],
             'serving_as'          => ['nullable', 'string', new Enum(ServingAs::class)],

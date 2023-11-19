@@ -48,7 +48,7 @@ class UsersImport implements ToCollection, WithHeadingRow, WithValidation, WithB
         return [
             'name'                => ['required', 'string', 'max:255'],
             'email'               => ['required', 'email', 'unique:users,email'],
-            'mobile_phone'        => ['required', 'string', 'regex:/^([0-9\+\-\s]+)$/', 'min:10', 'max:15'],
+            'mobile_phone'        => ['required', 'string', 'regex:/^([0-9\+\-\s]+)$/', 'min:8', 'max:15'],
             'gender'              => ['required', 'in:male,female,m,f'],
             'year_of_birth'       => ['nullable', 'integer', 'min:' . date('Y') - 100, 'max:' . date('Y')],
             'appointment'         => ['nullable', 'string', new Enum(Appontment::class)],
