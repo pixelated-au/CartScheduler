@@ -41,8 +41,13 @@
 
     const toast = useToast()
 
+    const isSaving = ref(false)
     const saveReport = async () => {
+        if (isSaving.value) {
+            return
+        }
         try {
+            isSaving.value = true
             errors.value = {}
             const response = await axios.post(route('save.report'), formData)
             toast.success(response.data.message)
@@ -50,6 +55,8 @@
         } catch (e) {
             errors.value = e.response.data.errors
             toast.error(e.response.data.message)
+        } finally {
+            isSaving.value = false
         }
     }
 
