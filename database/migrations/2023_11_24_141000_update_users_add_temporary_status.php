@@ -8,7 +8,7 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->boolean('is_temporary')->default(false)->after('remember_token');
+            $table->boolean('is_unrestricted')->default(false)->after('remember_token');
         });
     }
 };

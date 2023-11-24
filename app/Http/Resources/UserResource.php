@@ -12,7 +12,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
  * @property mixed $gender
  * @property mixed $mobile_phone
  * @property mixed $is_enabled
- * @property mixed $is_temporary
+ * @property mixed $is_unrestricted
  * @property mixed $pivot
  * @property mixed $last_shift_date
  * @property mixed $last_shift_start_time
@@ -42,7 +42,7 @@ class UserResource extends JsonResource
             'gender'                => $this->gender,
             'mobile_phone'          => $this->mobile_phone,
             'email'                 => $this->email,
-            'is_temporary'          => $this->is_temporary,
+            'is_unrestricted'       => $this->is_unrestricted,
             'shift_id'              => $this->whenPivotLoaded('shift_user', fn() => $this->pivot['shift_id']),
             'shift_date'            => $this->whenPivotLoaded('shift_user', fn() => $this->pivot['shift_date']),
             'last_shift_date'       => $this->whenNotNull($this->last_shift_date),
