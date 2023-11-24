@@ -12,7 +12,7 @@ import JetInputError from '@/Jetstream/InputError.vue'
 import JetLabel from '@/Jetstream/Label.vue'
 import {Inertia} from '@inertiajs/inertia'
 import {useForm} from '@inertiajs/inertia-vue3'
-import {computed, ref} from 'vue'
+import {computed, ref, watch} from 'vue'
 
 const props = defineProps({
     user: Object,
@@ -106,8 +106,14 @@ const performResendWelcomeAction = async () => {
     } catch (e) {
         toast.error(e.response.data.message, {timeout: 3000})
     }
-
 }
+
+watch(() => form.is_unrestricted, (value) => {
+    if (!value && form.role === 'admin') {
+        form.role = 'user'
+        toast.warning('Restricted users cannot be administrators. The role has been changed to a standard user.')
+    }
+})
 
 const cancelButtonText = computed(() => form.isDirty ? 'Cancel' : 'Back')
 </script>
