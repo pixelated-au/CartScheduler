@@ -246,7 +246,7 @@ const cancelButtonText = computed(() => form.isDirty ? 'Cancel' : 'Back')
                 <div class="font-medium text-gray-700 dark:text-gray-100">
                     System Access
                 </div>
-                <VerticalRadioButtons name="is-is_unrestricted" v-model="form.is_unrestricted" :options="[
+                <VerticalRadioButtons name="is-unrestricted" v-model="form.is_unrestricted" :options="[
                     { label: 'Restricted', value: false },
                     { label: 'Unrestricted', value: true },
                 ]"/>
