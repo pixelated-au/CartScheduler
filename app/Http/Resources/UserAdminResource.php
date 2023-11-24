@@ -6,6 +6,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
  * @property mixed $id
+ * @property mixed $is_temporary
  * @property mixed $name
  * @property mixed $email
  * @property mixed $role
@@ -26,6 +27,7 @@ class UserAdminResource extends JsonResource
     {
         return [
             'id'                  => $this->id,
+            'is_temporary'        => $this->is_temporary,
             'name'                => $this->name,
             'email'               => $this->email,
             'role'                => $this->role,

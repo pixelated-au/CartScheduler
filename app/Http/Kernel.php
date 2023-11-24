@@ -7,6 +7,7 @@ use App\Http\Middleware\EncryptCookies;
 use App\Http\Middleware\ForceHttps;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Middleware\IsAdminMiddleware;
+use App\Http\Middleware\IsUserEnabledMiddleware;
 use App\Http\Middleware\PreventRequestsDuringMaintenance;
 use App\Http\Middleware\RedirectIfAuthenticated;
 use App\Http\Middleware\TrimStrings;
@@ -69,6 +70,7 @@ class Kernel extends HttpKernel
         'api' => [
             // \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
             'throttle:api',
+            IsUserEnabledMiddleware::class,
             SubstituteBindings::class,
         ],
     ];
@@ -92,6 +94,7 @@ class Kernel extends HttpKernel
         'throttle'         => ThrottleRequests::class,
         'verified'         => EnsureEmailIsVerified::class,
         'is-admin'         => IsAdminMiddleware::class,
+        'user-enabled'     => IsUserEnabledMiddleware::class,
     ];
 
     protected function bootstrappers(): array

@@ -59,7 +59,7 @@ Route::post('/set-password', [SetUserPasswordController::class, 'update'])->name
 
 //Route::get('/mail', static fn() => new App\Mail\UserAccountCreated(App\Models\User::find(1)));
 
-Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified'])->group(function () {
+Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified', 'user-enabled'])->group(function () {
     Route::get('/', static fn() => Inertia::render('Dashboard'))->name('dashboard');
     Route::get('/shifts/{canViewHistorical?}', AvailableShiftsForMonthController::class);
     Route::get('/outstanding-reports', MissingReportsForUserController::class);
