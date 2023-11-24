@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Actions\UpdateUserPassword\UpdateUserPassword;
 use Codedge\Updater\UpdaterManager;
 use Composer\InstalledVersions;
 use Illuminate\Database\Eloquent\Model;
@@ -10,6 +11,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
+use Laravel\Fortify\Fortify;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -38,6 +40,7 @@ class AppServiceProvider extends ServiceProvider
     {
         Model::preventLazyLoading(!app()->isProduction());
         Model::preventSilentlyDiscardingAttributes(!app()->isProduction());
+
         Schema::defaultStringLength(191);
         if (config('app.is_https')) {
             URL::forceScheme('https');
