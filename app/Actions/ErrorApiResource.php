@@ -12,6 +12,7 @@ class ErrorApiResource extends JsonResponse
     public const CODE_BROTHER_REQUIRED = 110;
     public const CODE_SHIFT_NO_LONGER_AVAILABLE = 120;
     public const CODE_SHIFT_NOT_AVAILABLE_YET = 121;
+    public const CODE_NOT_ALLOWED = 200;
 
     public function __construct($data = null, $status = 200, $headers = [], $options = 0, $json = false)
     {
