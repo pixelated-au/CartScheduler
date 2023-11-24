@@ -99,9 +99,10 @@ class User extends Authenticatable
      * @var array
      */
     protected $casts = [
-        'is_enabled'        => 'boolean',
-        'is_unrestricted'   => 'boolean',
-        'email_verified_at' => 'datetime',
+        'is_enabled'          => 'boolean',
+        'is_unrestricted'     => 'boolean',
+        'responsible_brother' => 'boolean',
+        'email_verified_at'   => 'datetime',
 
     ];
 
