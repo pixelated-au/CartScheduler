@@ -79,9 +79,10 @@ class HandleInertiaRequests extends Middleware
             $custom['needsToUpdateAvailability'] = $this->getNeedsToUpdateAvailability->execute($user);
         }
 
-        if ($user->is_unrestricted) {
+        if ($user?->is_unrestricted) {
             $custom['isUnrestricted'] = true;
         }
+        $custom['user'] = fn() => $user?->only(['id', 'name', 'email']);
 
         return array_merge(parent::share($request), $custom);
     }
