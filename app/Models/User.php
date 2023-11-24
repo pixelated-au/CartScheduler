@@ -69,6 +69,7 @@ class User extends Authenticatable
         'email',
         'gender',
         'is_enabled',
+        'is_unrestricted',
         'mobile_phone',
         'year_of_birth',
         'marital_status',
