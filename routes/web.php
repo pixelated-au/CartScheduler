@@ -3,7 +3,7 @@
 use App\Http\Controllers\AdminCheckForUpdateController;
 use App\Http\Controllers\AdminDashboardController;
 use App\Http\Controllers\AdminRunSoftwareUpdateController;
-use App\Http\Controllers\AvailableShiftsForMonthController;
+use App\Http\Controllers\AvailableShiftsController;
 use App\Http\Controllers\GetAdminUsersController;
 use App\Http\Controllers\GetAvailableUsersForShiftController;
 use App\Http\Controllers\GetReportTagsController;
@@ -61,7 +61,7 @@ Route::post('/set-password', [SetUserPasswordController::class, 'update'])->name
 
 Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified', 'user-enabled'])->group(function () {
     Route::get('/', static fn() => Inertia::render('Dashboard'))->name('dashboard');
-    Route::get('/shifts/{canViewHistorical?}', AvailableShiftsForMonthController::class);
+    Route::get('/shifts/{canViewHistorical?}', AvailableShiftsController::class);
     Route::get('/outstanding-reports', MissingReportsForUserController::class);
     Route::post('/reserve-shift', ToggleShiftReservationController::class);
     Route::post('/save-report', SaveShiftReportController::class)->name('save.report');

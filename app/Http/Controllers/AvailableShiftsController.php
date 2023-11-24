@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
-class AvailableShiftsForMonthController extends Controller
+class AvailableShiftsController extends Controller
 {
     public function __construct(
         private readonly GetFreeShiftsData                 $getFreeShiftsData,
