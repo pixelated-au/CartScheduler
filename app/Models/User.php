@@ -41,8 +41,8 @@ class User extends Authenticatable
         static::saved(static function (self $user) {
             // called on updated and created events
             if ($user->spouse_id) {
-                $spouse            = User::find($user->spouse_id);
-                $spouse->spouse_id = $user->id;
+                $spouse                 = User::find($user->spouse_id);
+                $spouse->spouse_id      = $user->id;
                 $spouse->marital_status = 'married';
                 $spouse->saveQuietly();
             }
@@ -100,6 +100,7 @@ class User extends Authenticatable
      */
     protected $casts = [
         'is_enabled'        => 'boolean',
+        'is_unrestricted'   => 'boolean',
         'email_verified_at' => 'datetime',
 
     ];
