@@ -160,6 +160,15 @@ class User extends Authenticatable
         );
     }
 
+    protected function isRestricted(): Attribute
+    {
+        return Attribute::make(
+            get: static function ($value, $attributes) {
+                return !$attributes['is_unrestricted'];
+            },
+        );
+    }
+
     public function shifts(): BelongsToMany
     {
         return $this->belongsToMany(Shift::class)->withPivot('shift_user');
