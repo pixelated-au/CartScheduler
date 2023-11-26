@@ -1,6 +1,6 @@
 <script setup>
 import Datepicker from "@vuepic/vue-datepicker";
-import {intlFormat, parseISO} from "date-fns";
+import {intlFormat} from "date-fns";
 import formatISO from "date-fns/formatISO";
 import {computed, inject} from 'vue';
 
@@ -31,7 +31,7 @@ const formatDate = (date) => intlFormat(date, {day: 'numeric', month: 'numeric',
  * @param {Array<Date, Date>} dates
  * @returns {string}
  */
-const formatDateRange = (dates) => formatDate(dates[0]) + ' - ' +  formatDate(dates[1]);
+const formatDateRange = (dates) => formatDate(dates[0]) + ' - ' + formatDate(dates[1]);
 
 const dates = computed({
     get: () => {
@@ -45,5 +45,7 @@ const dates = computed({
 </script>
 
 <template>
-    <Datepicker range auto-apply v-model="dates" :enable-time-picker="false" :format="formatDateRange" :clearable="false" :dark="isDarkMode" class="vacation"/>
+    <Datepicker range auto-apply :multi-calendars="{solo: true}" v-model="dates" :enable-time-picker="false"
+                :format="formatDateRange" :clearable="false" :month-change-on-scroll="false" :dark="isDarkMode"
+                class="vacation"/>
 </template>
