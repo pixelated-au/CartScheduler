@@ -51,6 +51,7 @@ provide('darkMode', isDarkMode)
 
 const toast = useToast()
 onUpdated(() => {
+    // TODO this appears to be running twice. It may be fixed after updating to v1.x of Inertia (current is 0.11.0)
     const flash = usePage().props.value.jetstream.flash
     const type = flash?.bannerStyle || 'success'
     const message = flash?.banner || ''
