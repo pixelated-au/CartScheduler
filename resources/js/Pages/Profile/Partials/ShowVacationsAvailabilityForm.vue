@@ -80,7 +80,7 @@ const deleteVacation = (idx) => form.deletedVacations = [...form.deletedVacation
                     <div v-for="(vacation, idx) in form.vacations" :key="vacation.id"
                          class="bg-slate-200 dark:bg-slate-800 grid grid-cols-[auto_minmax(0,_1fr)] sm:grid-cols-[auto_minmax(0,_2fr)] gap-y-px gap-x-3 rounded p-3 items-center mb-3">
                         <JetButton style-type="" type="button"
-                                   class="bg-slate-300 self-stretch row-span-2 sm:row-span-2 px-1 py-1 mr-2" @click="deleteVacation(idx)">
+                                   class="bg-slate-300 dark:bg-transparent dark:border dark:border-slate-700 self-stretch row-span-2 sm:row-span-2 px-1 py-1 mr-2" @click="deleteVacation(idx)">
                             <CloseCircle/>
                         </JetButton>
                         <vacation-date-range v-model:start-date="vacation.start_date"
