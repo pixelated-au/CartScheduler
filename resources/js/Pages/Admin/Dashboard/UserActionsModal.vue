@@ -15,7 +15,7 @@ import FilledShiftsIndicator from "@/Pages/Admin/Dashboard/FilledShiftsIndicator
 import {format, parse} from "date-fns";
 // noinspection ES6UnusedImports
 import {Menu as VMenu, VTooltip} from 'floating-vue'
-import {computed, ref, watch, watchEffect} from "vue";
+import {computed, inject, ref, watch, watchEffect} from "vue";
 
 const props = defineProps({
     show: Boolean,
@@ -40,8 +40,10 @@ const closeModal = () => {
     showModal.value = false
 }
 
-const volunteers = ref([])
 const toast = useToast()
+const volunteers = ref([])
+const doShowFilteredVolunteers = ref(true)
+
 watchEffect(async () => {
     if (!showModal.value) {
         return
@@ -55,6 +57,7 @@ watchEffect(async () => {
         })
         volunteers.value = response.data.data
     } catch (e) {
+        console.log(e)
         toast.error('Unable to load volunteers, a critical error has occurred.')
     }
 })
@@ -65,34 +68,41 @@ watch(volunteerSearch, (value) => {
 
 })
 
-const tableHeaders = [
-    {
-        text: 'ID',
-        value: 'id',
-        sortable: true,
-        width: '10%',
-    },
-    {
-        text: 'Name',
-        value: 'name',
-        sortable: true,
-    },
-    {
-        text: 'Last Rostered',
-        value: 'lastShift',
-        sortable: true,
-    },
-    {
-        text: 'Shifts',
-        value: 'filledShifts',
-        sortable: true,
-    },
-    {
+const enableUserAvailability = inject('enableUserAvailability', false)
+
+const tableHeaders = computed(() => {
+    const headers = [
+        {
+            text: 'ID',
+            value: 'id',
+            sortable: true,
+            width: '10%',
+        },
+        {
+            text: 'Name',
+            value: 'name',
+            sortable: true,
+        },
+        {
+            text: 'Last Rostered',
+            value: 'lastShift',
+            sortable: true,
+        },
+    ]
+    if (enableUserAvailability) {
+        headers.push({
+            text: 'Availability',
+            value: 'filledShifts',
+            sortable: true,
+        })
+    }
+    headers.push({
         text: '',
         value: 'action',
         sortable: false,
-    },
-]
+    })
+    return headers
+})
 
 const calcShiftPercentage = (daysRostered, daysAvailable) => {
     if (!daysAvailable) {
@@ -169,8 +179,6 @@ const formatShiftDate = (shiftDate, shiftTime) => {
     return format(parse(`${shiftDate} ${shiftTime}`, 'yyyy-MM-dd HH:mm:ss', new Date()), 'MMM d, yyyy, h:mma')
 }
 
-const doShowFilteredVolunteers = ref(true)
-
 const toggleLabel = computed(() => doShowFilteredVolunteers.value
     ? 'Showing available'
     : 'Showing all')
@@ -189,7 +197,7 @@ const toggleLabel = computed(() => doShowFilteredVolunteers.value
                     <JetInput id="search" v-model="volunteerSearch" type="text" class="mt-1 block w-full"/>
                     <JetHelpText>Search on name</JetHelpText>
                 </div>
-                <div v-if="$page.props.enableUserAvailability" class="mt-3 flex justify-end items-center">
+                <div v-if="enableUserAvailability" class="mt-3 flex justify-end items-center">
                     <div class="flex flex-wrap justify-center w-[150px]">
                         <JetToggle v-model="doShowFilteredVolunteers">
                             {{ toggleLabel }}
@@ -266,7 +274,8 @@ const toggleLabel = computed(() => doShowFilteredVolunteers.value
                     <template #item-lastShift="{lastShift, lastShiftTime}">
                         {{ formatShiftDate(lastShift, lastShiftTime) }}
                     </template>
-                    <template #item-filledShifts="{daysAlreadyRostered, daysAvailable, filledShifts}">
+                    <template v-if="enableUserAvailability"
+                              #item-filledShifts="{daysAlreadyRostered, daysAvailable, filledShifts}">
                         <div class="flex gap-x-1">
                             <small class="self-center text-center text-xs border-slate-500 border-r pr-1 mr-2 w-8">
                                 %<br>{{ filledShifts }}

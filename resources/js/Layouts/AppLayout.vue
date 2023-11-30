@@ -46,6 +46,8 @@ const logout = () => Inertia.post(route('logout'))
 const isDarkMode = ref(false)
 provide('darkMode', isDarkMode)
 
+provide('enableUserAvailability', !!usePage().props.value.enableUserAvailability || false)
+
 // const style = computed(() => usePage().props.value.jetstream.flash?.bannerStyle || 'success')
 // const message = computed(() => usePage().props.value.jetstream.flash?.banner || '')
 
