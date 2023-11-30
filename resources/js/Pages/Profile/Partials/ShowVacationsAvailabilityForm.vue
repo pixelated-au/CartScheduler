@@ -76,23 +76,20 @@ const deleteVacation = (idx) => form.deletedVacations = [...form.deletedVacation
 
         <template #form>
             <div class="col-span-6 text-gray-700 dark:text-gray-100">
-                <div v-if="form.vacations?.length"
-                     class="border border-gray-200 dark:border-gray-900">
+                <div v-if="form.vacations?.length">
                     <div v-for="(vacation, idx) in form.vacations" :key="vacation.id"
-                         class="bg-slate-200 dark:bg-slate-800 grid grid-cols-[auto_minmax(0,_1fr)] sm:grid-cols-[auto_minmax(0,_2fr)_3fr] gap-y-px gap-x-3 rounded p-3 items-center">
-                        <JetButton style-type="transparent" type="button"
-                                   class="row-span-2 sm:row-span-1 px-1 py-1 mr-2" @click="deleteVacation(idx)">
+                         class="bg-slate-200 dark:bg-slate-800 grid grid-cols-[auto_minmax(0,_1fr)] sm:grid-cols-[auto_minmax(0,_2fr)] gap-y-px gap-x-3 rounded p-3 items-center mb-3">
+                        <JetButton style-type="" type="button"
+                                   class="bg-slate-300 self-stretch row-span-2 sm:row-span-2 px-1 py-1 mr-2" @click="deleteVacation(idx)">
                             <CloseCircle/>
                         </JetButton>
-                        <div>
-                            <div class="font-bold">From - To</div>
-                            <vacation-date-range v-model:start-date="vacation.start_date"
-                                                 v-model:end-date="vacation.end_date"/>
-                            <JetInputError :message="form.errors['vacations.' + idx + '.start_date']"/>
-                            <JetInputError :message="form.errors['vacations.' + idx + '.end_date']"/>
-                        </div>
+                        <vacation-date-range v-model:start-date="vacation.start_date"
+                                             v-model:end-date="vacation.end_date"
+                                             :start-error="form.errors['vacations.' + idx + '.start_date']"
+                                             :end-error="form.errors['vacations.' + idx + '.end_date']"/>
                         <div class="mt-2 sm:mt-0">
-                            <div class="font-bold flex items-center">Comment
+                            <div class="flex items-center">
+                                <span class="font-bold">Comment</span>
                                 <v-dropdown v-if="vacation.id" class="ml-2 inline-block">
                                     <span><QuestionCircle/></span>
                                     <template #popper>
