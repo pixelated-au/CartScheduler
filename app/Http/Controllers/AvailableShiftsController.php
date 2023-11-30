@@ -28,6 +28,8 @@ class AvailableShiftsController extends Controller
         }
 
         // TODO This appears to be working but we need to limit the locations if a user is restricted
+        // TODO BUT FIRST, SEE HOW EASY IT IS TO INJECT THE USER METADATA INTO THE ROSTERING TABLE
+        // TODO AND FILTER BY RESPONSBILE BROTHER, AND BROTHER
 
         $startDate = ($canViewHistorical
             ? Carbon::today()->subMonths(1)->startOfMonth()
