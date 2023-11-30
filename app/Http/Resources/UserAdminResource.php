@@ -19,6 +19,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
  * @property \App\Models\User $spouse
  * @property mixed $spouse_id
  * @property mixed $responsible_brother
+ * @property mixed $has_logged_in
  */
 class UserAdminResource extends JsonResource
 {
@@ -39,6 +40,7 @@ class UserAdminResource extends JsonResource
             'spouse_id'           => $this->whenNotNull('spouse_id', fn() => $this->spouse_id),
             'is_enabled'          => $this->is_enabled,
             'responsible_brother' => (boolean)$this->responsible_brother,
+            'has_logged_in'       => $this->has_logged_in,
             'vacations'           => UserVacationResource::collection($this->whenLoaded('vacations')),
             'availability'        => AvailabilityResource::make($this->whenLoaded('availability')),
         ];
