@@ -40,8 +40,10 @@ const closeModal = () => {
     showModal.value = false
 }
 
-const volunteers = ref([])
 const toast = useToast()
+const volunteers = ref([])
+const doShowFilteredVolunteers = ref(true)
+
 watchEffect(async () => {
     if (!showModal.value) {
         return
@@ -55,6 +57,7 @@ watchEffect(async () => {
         })
         volunteers.value = response.data.data
     } catch (e) {
+        console.log(e)
         toast.error('Unable to load volunteers, a critical error has occurred.')
     }
 })
@@ -175,8 +178,6 @@ const formatShiftDate = (shiftDate, shiftTime) => {
     }
     return format(parse(`${shiftDate} ${shiftTime}`, 'yyyy-MM-dd HH:mm:ss', new Date()), 'MMM d, yyyy, h:mma')
 }
-
-const doShowFilteredVolunteers = ref(true)
 
 const toggleLabel = computed(() => doShowFilteredVolunteers.value
     ? 'Showing available'
