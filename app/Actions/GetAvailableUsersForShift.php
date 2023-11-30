@@ -56,6 +56,9 @@ class GetAvailableUsersForShift
                     ->where('users.gender', 'male')
                 )
             )
+            ->when($canOnlyBrothersRegister, fn(Builder $query) => $query
+                ->where('users.gender', 'male')
+            )
             ->when($this->settings->enableUserAvailability && !$showAll, fn(Builder $query) => $query
 //                ->join(table: 'user_availabilities', first: 'users.id', operator: '=', second: 'user_availabilities.user_id')
                 ->leftJoin(table: 'user_vacations', first: 'users.id', operator: '=', second: 'user_vacations.user_id')

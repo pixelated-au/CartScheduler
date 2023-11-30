@@ -90,16 +90,19 @@ class UserReservationsTest extends TestCase
         $shiftId  = $shift->id;
 
         $date  = '2023-01-03'; // A Tuesday
+        // Attach a sister to the shift
         ShiftUser::factory()->create([
             'shift_id' => $shift->id,
             'user_id' => $sisters->get(0)->getKey(),
             'shift_date' => $date,
         ]);
+
         $response = $this->actingAs($admin)
             ->json('GET', "/admin/available-users-for-shift/$shiftId", ['date' => $date]);
-        // 4 users in the system. Should have all 7 users returned
+        // 7 users in the system, 1 female assigned. Should have 6 users returned
         $response->assertJsonCount(6, 'data');
 
+        // Attach another sister so now no more sisters should be returned on the next request
         ShiftUser::factory()->create([
             'shift_id' => $shift->id,
             'user_id' => $sisters->get(1)->getKey(),
@@ -108,7 +111,7 @@ class UserReservationsTest extends TestCase
 
         $response = $this->actingAs($admin)
             ->json('GET', "/admin/available-users-for-shift/$shiftId", ['date' => $date]);
-        // 4 users in the system. Should only have male users returned
+        // Should only have male users returned
         $response->assertJsonCount(4, 'data');
         $response->assertJsonPath('data.0.gender', 'male');
         $response->assertJsonPath('data.1.gender', 'male');

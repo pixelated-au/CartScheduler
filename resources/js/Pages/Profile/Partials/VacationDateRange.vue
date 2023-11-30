@@ -1,6 +1,7 @@
 <script setup>
+import JetInputError from "@/Jetstream/InputError.vue";
 import Datepicker from "@vuepic/vue-datepicker";
-import {intlFormat, parseISO} from "date-fns";
+import {intlFormat} from "date-fns";
 import formatISO from "date-fns/formatISO";
 import {computed, inject} from 'vue';
 
@@ -10,6 +11,14 @@ const props = defineProps({
     },
     endDate: {
         type: String,
+    },
+    startError: {
+        type: String,
+        required: false,
+    },
+    endError: {
+        type: String,
+        required: false,
     },
 })
 
@@ -25,25 +34,39 @@ const parseDate = (date) => formatISO(date, {representation: 'date'});
 /**
  * @param {Date} date
  */
-const formatDate = (date) => intlFormat(date, {day: 'numeric', month: 'numeric', year: 'numeric'});
+const formatDate = (date) => intlFormat(date, {day: 'numeric', month: 'short', year: 'numeric'});
 
 /**
  * @param {Array<Date, Date>} dates
  * @returns {string}
  */
-const formatDateRange = (dates) => formatDate(dates[0]) + ' - ' +  formatDate(dates[1]);
+const format = date => formatDate(date)
 
-const dates = computed({
-    get: () => {
-        return [props.startDate, props.endDate]
-    },
-    set: (value) => {
-        emit('update:startDate', parseDate(value[0]))
-        emit('update:endDate', parseDate(value[1]))
-    }
+const start = computed({
+    get: () => props.startDate,
+    set: (value) => emit('update:startDate', parseDate(value))
+})
+const end = computed({
+    get: () => props.endDate,
+    set: (value) => emit('update:endDate', parseDate(value))
 })
 </script>
 
 <template>
-    <Datepicker range auto-apply v-model="dates" :enable-time-picker="false" :format="formatDateRange" :clearable="false" :dark="isDarkMode" class="vacation"/>
+    <div class="grid grid-cols-[auto_minmax(0,_1fr)] gap-2 items-center sm:flex sm:space-x-4">
+        <label class="contents">
+            <div class="font-bold flex-grow-0">From:</div>
+            <Datepicker auto-apply v-model="start" :enable-time-picker="false"
+                        :format="format" :clearable="false" :month-change-on-scroll="false" :dark="isDarkMode"
+                        class="vacation flex-grow-0"/>
+            <JetInputError :message="startError"/>
+        </label>
+        <label class="contents">
+            <div class="font-bold flex-grow-0">To:</div>
+            <Datepicker auto-apply v-model="end" :enable-time-picker="false"
+                        :format="format" :clearable="false" :month-change-on-scroll="false" :dark="isDarkMode"
+                        class="vacation flex-grow-0"/>
+            <JetInputError :message="endError"/>
+        </label>
+    </div>
 </template>

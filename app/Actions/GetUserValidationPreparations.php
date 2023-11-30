@@ -50,8 +50,14 @@ class GetUserValidationPreparations
         if (!isset($data['spouse_id'])) {
             $data['spouse_id'] = null;
         }
-        if (!isset($data['responsible_brother'])) {
+        if (!isset($data['responsible_brother'])
+            || trim($data['responsible_brother']) === '0'
+            || trim(strtolower($data['responsible_brother'])) === 'false') {
             $data['responsible_brother'] = false;
+
+        } else if (trim($data['responsible_brother']) === '1'
+            || trim(strtolower($data['responsible_brother'])) === 'true') {
+            $data['responsible_brother'] = true;
         }
 
         return $data;

@@ -29,12 +29,12 @@ class UsersImport implements ToCollection, WithHeadingRow, WithValidation, WithB
                 'email'               => $row['email'],
                 'mobile_phone'        => $row['mobile_phone'],
                 'gender'              => $row['gender'],
-                'year_of_birth'       => $row['year_of_birth'],
-                'appointment'         => $row['appointment'],
-                'serving_as'          => $row['serving_as'],
-                'marital_status'      => $row['marital_status'],
-                'spouse_id'           => $row['spouse_id'],
-                'responsible_brother' => $row['responsible_brother'],
+                'year_of_birth'       => $this->tidyNullableData($row['year_of_birth']),
+                'appointment'         => $this->tidyNullableData($row['appointment']),
+                'serving_as'          => $this->tidyNullableData($row['serving_as']),
+                'marital_status'      => $this->tidyNullableData($row['marital_status']),
+                'spouse_id'           => $this->tidyNullableData($row['spouse_id']),
+                'responsible_brother' => $row['responsible_brother'] ?: false,
                 'password'            => null,
             ]);
 
@@ -58,6 +58,11 @@ class UsersImport implements ToCollection, WithHeadingRow, WithValidation, WithB
             'spouse_id'           => ['nullable', 'exists:users,id'],
             'responsible_brother' => ['nullable', 'boolean'],
         ];
+    }
+
+    private function tidyNullableData(?string $datum): ?string
+    {
+        return (!$datum || !trim($datum)) ? null : $datum;
     }
 
     /**

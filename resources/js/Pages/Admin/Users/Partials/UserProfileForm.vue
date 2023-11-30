@@ -126,7 +126,7 @@ const cancelButtonText = computed(() => form.isDirty ? 'Cancel' : 'Back')
 
         <template #description>
             <div>Update the user's personal information.</div>
-            <JetButton outline class="mt-5" style-type="info" @click="performResendWelcomeAction">
+            <JetButton v-if="action === 'edit'" outline class="mt-5" style-type="info" @click="performResendWelcomeAction">
                 <template v-if="user.has_logged_in">Send Password Reset Email</template>
                 <template v-else>Resend Welcome Email</template>
             </JetButton>
