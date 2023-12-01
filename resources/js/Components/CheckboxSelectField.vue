@@ -76,6 +76,13 @@ onMounted(() => {
         triggerType: 'click',
     })
 })
+
+const modelLength = computed(() => Object.keys(model.value).length)
+
+const liClasses = index => ({
+    "rounded-b": index === modelLength.value - 1,
+    "rounded-t": index === 0,
+})
 </script>
 
 <template>
@@ -102,13 +109,15 @@ onMounted(() => {
         <!-- Dropdown menu -->
         <div :ref="el => target = el"
              :id="`dropdown-${fieldUnique}`"
-             class="absolute z-10 w-64 bg-white rounded divide-y divide-gray-100 drop-shadow-xl dark:bg-gray-700 cursor-pointer hidden">
-            <ul class="py-1 text-sm text-gray-700 dark:text-gray-200"
+             class="border border-gray-200 dark:border-gray-800 absolute z-10 w-64 bg-white rounded divide-y divide-gray-100 drop-shadow-xl dark:bg-gray-700 cursor-pointer hidden">
+            <ul class="text-sm text-gray-700 dark:text-gray-200"
                 :aria-labelledby="`dropdown-select-${fieldUnique}`">
-                <li v-for="(value, key) in model" :key="key">
+                <li v-for="(value, key, index) in model" :key="key"
+                    class="border-b border-b-gray-200 dark:border-gray-800 last:border-b-0">
                     <label
-                        class="block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white font-bold">
-                        <JetCheckbox v-model:checked="value.value" value="true"/>
+                        class="flex items-center py-2 pl-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white font-normal"
+                        :class="liClasses(index)">
+                        <JetCheckbox v-model:checked="value.value" value="true" class="mr-2"/>
                         {{ value.label }}
                     </label>
                 </li>
