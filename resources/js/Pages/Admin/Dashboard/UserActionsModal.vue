@@ -10,7 +10,7 @@ import JetToggle from '@/Jetstream/Toggle.vue'
 import UserTable from "@/Pages/Admin/Dashboard/UserTable.vue";
 import {format} from "date-fns";
 import {Menu as VMenu} from 'floating-vue'
-import {computed, inject, reactive, ref} from "vue";
+import {computed, inject, onBeforeMount, reactive, ref, watch} from "vue";
 
 const props = defineProps({
     show: Boolean,
@@ -45,6 +45,30 @@ const columnFilters = reactive({
     maritalStatus: {label: 'Marital Status', value: false},
     birthYear: {label: 'Birth Year', value: false},
     responsibleBrother: {label: 'Is Responsible Bro?', value: false},
+})
+
+watch(columnFilters, val => {
+    const c = {}
+    for (const key in columnFilters) {
+        if (columnFilters.hasOwnProperty(key)) {
+            c[key] = val[key].value
+        }
+    }
+
+    localStorage.setItem('admin-user-rostering-columns', JSON.stringify(c))
+}, {deep: true})
+
+onBeforeMount(() => {
+    const c = localStorage.getItem('admin-user-rostering-columns')
+    if (!c) {
+        return
+    }
+    const columns = JSON.parse(c)
+    for (const key in columnFilters) {
+        if (columns.hasOwnProperty(key)) {
+            columnFilters[key].value = columns[key]
+        }
+    }
 })
 
 const volunteerSearch = ref('')
