@@ -67,7 +67,7 @@ const tableHeaders = computed(() => {
     if (props.columnFilters.responsibleBrother.value) {
         headers.push({
             text: 'Is Responsible Bro',
-            value: 'responsible_brother',
+            value: 'responsibleBrother',
             sortable: true,
         })
     }
@@ -88,21 +88,21 @@ const tableHeaders = computed(() => {
     if (props.columnFilters.servingAs.value) {
         headers.push({
             text: 'Serving As',
-            value: 'serving_as',
+            value: 'servingAs',
             sortable: true,
         })
     }
     if (props.columnFilters.maritalStatus.value) {
         headers.push({
             text: 'Marital Status',
-            value: 'marital_status',
+            value: 'maritalStatus',
             sortable: true,
         })
     }
     if (props.columnFilters.birthYear.value) {
         headers.push({
             text: 'Birth Year',
-            value: 'birth_year',
+            value: 'birthYear',
             sortable: true,
         })
     }
@@ -232,6 +232,7 @@ watchEffect(async () => {
 
 </script>
 <template>
+    <h1>STORE THE SETTINGS FOR THE COLUMNS IN THE USER BROWSER STORAGE</h1>
     <div class="volunteers">
         <data-table
             :headers="tableHeaders"
@@ -288,27 +289,26 @@ watchEffect(async () => {
                     </v-menu>
                 </template>
             </template>
-            <template v-if="props.columnFilters.responsibleBrother.value" #item-responsible_brother="{responsibleBrother}">
+            <template #item-responsibleBrother="{responsibleBrother}">
                 <span v-if="responsibleBrother" class="text-green-500">Yes</span>
                 <span v-else class="text-gray-500">No</span>
             </template>
-            <template v-if="props.columnFilters.appointment.value" #item-appointment="{appointment}">
+            <template #item-appointment="{appointment}">
                 {{ appointment }}
             </template>
-            <template v-if="props.columnFilters.servingAs.value" #item-serving_as="{servingAs}">
+            <template #item-servingAs="{servingAs}">
                 {{ servingAs }}
             </template>
-            <template v-if="props.columnFilters.maritalStatus.value" #item-marital_status="{maritalStatus}">
+            <template #item-maritalStatus="{maritalStatus}">
                 {{ maritalStatus }}
             </template>
-            <template v-if="props.columnFilters.birthYear.value" #item-birth_year="{birthYear}">
+            <template #item-birthYear="{birthYear}">
                 {{ birthYear }}
             </template>
             <template #item-lastShift="{lastShift, lastShiftTime}">
                 {{ formatShiftDate(lastShift, lastShiftTime) }}
             </template>
-            <template v-if="enableUserAvailability"
-                      #item-filledShifts="{daysAlreadyRostered, daysAvailable, filledShifts}">
+            <template #item-filledShifts="{daysAlreadyRostered, daysAvailable, filledShifts}">
                 <div class="flex gap-x-1">
                     <small class="self-center text-center text-xs border-slate-500 border-r pr-1 mr-2 w-8">
                         %<br>{{ filledShifts }}
@@ -334,13 +334,8 @@ watchEffect(async () => {
 .volunteers .data-table table {
     border-spacing: 0 2px;
 
-    td:first-child {
-        @apply rounded-l-lg;
+    thead th {
+        @apply select-none;
     }
-
-    td:last-child {
-        @apply rounded-r-lg;
-    }
-
 }
 </style>
