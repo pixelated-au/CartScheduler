@@ -19,10 +19,22 @@ class GetAvailableUsersForShiftController extends Controller
         $request->validate([
             'date'    => ['required', 'date'],
             'showAll' => ['nullable', 'boolean'],
+            'showOnlyResponsibleBros' => ['nullable', 'boolean'],
+            'hidePublishers' => ['nullable', 'boolean'],
+            'showOnlyElders' => ['nullable', 'boolean'],
+            'showOnlyMinisterialServants' => ['nullable', 'boolean'],
         ]);
 
         return ExtendedUserResource::collection(
-            $this->getUsersForShift->execute($shift, $request->date('date'), $request->boolean('showAll', false)),
+            $this->getUsersForShift->execute(
+                shift: $shift,
+                date: $request->date('date'),
+                showUnavailable: $request->boolean('showAll'),
+                showOnlyResponsibleBros: $request->boolean('showOnlyResponsibleBros'),
+                hidePublishers: $request->boolean('hidePublishers'),
+                showOnlyElders: $request->boolean('showOnlyElders'),
+                showOnlyMninsterialServants: $request->boolean('showOnlyMinisterialServants'),
+            ),
         );
     }
 }

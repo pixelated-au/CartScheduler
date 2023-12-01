@@ -17,6 +17,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
  * @property mixed $appointment
  * @property mixed $serving_as
  * @property mixed $responsible_brother
+ * @property mixed $year_of_birth
  * @property mixed $pivot
  * @property mixed $last_shift_date
  * @property mixed $last_shift_start_time
@@ -36,7 +37,6 @@ use Illuminate\Http\Resources\Json\JsonResource;
  * @property mixed $filled_saturdays
  * @property mixed $comments
  */
-
 class ExtendedUserResource extends JsonResource
 {
     public function toArray($request): array
@@ -51,6 +51,7 @@ class ExtendedUserResource extends JsonResource
             'appointment'           => $this->appointment,
             'serving_as'            => $this->serving_as,
             'responsible_brother'   => $this->responsible_brother,
+            'birth_year'            => $this->year_of_birth,
             'shift_id'              => $this->whenPivotLoaded('shift_user', fn() => $this->pivot['shift_id']),
             'shift_date'            => $this->whenPivotLoaded('shift_user', fn() => $this->pivot['shift_date']),
             'last_shift_date'       => $this->whenNotNull($this->last_shift_date),

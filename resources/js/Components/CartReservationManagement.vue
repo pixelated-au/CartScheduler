@@ -1,5 +1,5 @@
 <script setup>
-    import Accordion from '@/Components/Accordion.vue'
+    import Accordion from '@/Components/LocationAccordion.vue'
     import EmptySlot from '@/Components/Icons/EmptySlot.vue'
     import Female from '@/Components/Icons/Female.vue'
     import JetButton from '@/Jetstream/Button.vue'

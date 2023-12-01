@@ -1,15 +1,15 @@
 <script setup>
-import useToast from "@/Composables/useToast";
-import JetButton from "@/Jetstream/Button.vue";
 import DataTable from "@/Components/DataTable.vue";
 import Comment from "@/Components/Icons/Comment.vue";
 import QuestionCircle from "@/Components/Icons/QuestionCircle.vue";
 import UserAdd from "@/Components/Icons/UserAdd.vue";
+import useToast from "@/Composables/useToast";
+import JetButton from "@/Jetstream/Button.vue";
 import FilledShiftsIndicator from "@/Pages/Admin/Dashboard/FilledShiftsIndicator.vue";
 import {format, parse} from "date-fns";
-import {computed, inject, ref, watchEffect} from "vue";
 // noinspection ES6UnusedImports
 import {Menu as VMenu, VTooltip} from 'floating-vue'
+import {computed, inject, ref, watchEffect} from "vue";
 
 const props = defineProps({
     shiftId: {
@@ -64,6 +64,48 @@ const tableHeaders = computed(() => {
             sortable: true,
         },
     ]
+    if (props.columnFilters.responsibleBrother.value) {
+        headers.push({
+            text: 'Is Responsible Bro',
+            value: 'responsible_brother',
+            sortable: true,
+        })
+    }
+    if (props.columnFilters.gender.value) {
+        headers.push({
+            text: 'Gender',
+            value: 'gender',
+            sortable: true,
+        })
+    }
+    if (props.columnFilters.appointment.value) {
+        headers.push({
+            text: 'Appointment',
+            value: 'appointment',
+            sortable: true,
+        })
+    }
+    if (props.columnFilters.servingAs.value) {
+        headers.push({
+            text: 'Serving As',
+            value: 'serving_as',
+            sortable: true,
+        })
+    }
+    if (props.columnFilters.maritalStatus.value) {
+        headers.push({
+            text: 'Marital Status',
+            value: 'marital_status',
+            sortable: true,
+        })
+    }
+    if (props.columnFilters.birthYear.value) {
+        headers.push({
+            text: 'Birth Year',
+            value: 'birth_year',
+            sortable: true,
+        })
+    }
     if (enableUserAvailability) {
         headers.push({
             text: 'Availability',
@@ -109,6 +151,11 @@ const tableRows = computed(() => {
             lastShift: volunteer.last_shift_date ? volunteer.last_shift_date : null,
             lastShiftTime: volunteer.last_shift_start_time ? volunteer.last_shift_start_time : null,
             filledShifts: calcShiftPercentage(daysAlreadyRostered, daysAvailable),
+            responsibleBrother: volunteer.responsible_brother,
+            appointment: volunteer.appointment,
+            servingAs: volunteer.serving_as,
+            maritalStatus: volunteer.marital_status,
+            birthYear: volunteer.birth_year,
             daysAlreadyRostered,
             daysAvailable,
         }
@@ -169,6 +216,10 @@ watchEffect(async () => {
             params: {
                 date: format(props.date, 'yyyy-MM-dd'),
                 showAll: props.mainFilters.doShowFilteredVolunteers ? 0 : 1,
+                showOnlyResponsibleBros: props.mainFilters.doShowOnlyResponsibleBros ? 1 : 0,
+                hidePublishers: props.mainFilters.doHidePublishers ? 1 : 0,
+                showOnlyElders: props.mainFilters.doShowOnlyElders ? 1 : 0,
+                showOnlyMinisterialServants: props.mainFilters.doShowOnlyMinisterialServants ? 1 : 0,
             }
         })
         volunteers.value = response.data.data
@@ -183,13 +234,13 @@ watchEffect(async () => {
 <template>
     <div class="volunteers">
         <data-table
-                :headers="tableHeaders"
-                :items="tableRows"
-                :search-value="textFilter"
-                :filter-options="[]"
-                :show-hover="false"
-                :body-row-class-name="bodyRowClassNameFunction"
-                :body-item-class-name="bodyItemClassNameFunction">
+            :headers="tableHeaders"
+            :items="tableRows"
+            :search-value="textFilter"
+            :filter-options="[]"
+            :show-hover="false"
+            :body-row-class-name="bodyRowClassNameFunction"
+            :body-item-class-name="bodyItemClassNameFunction">
             <template #header-filledShifts="header">
                 <v-menu class="mr-2 inline-block">
                     <span><QuestionCircle/></span>
@@ -197,13 +248,12 @@ watchEffect(async () => {
                         <div class="max-w-[300px]">
                             <p class="text-sm font-bold">Diagram Explanation</p>
                             <div class="flex gap-x-1 mt-2 mb-3">
-                                <small
-                                        class="self-center text-center text-xs border-slate-500 border-r pr-1 mr-2 w-8">
+                                <small class="self-center text-center text-xs border-slate-500 border-r pr-1 mr-2 w-8">
                                     %<br>62
                                 </small>
                                 <template
-                                        v-for="(days, key) in {tu: {a: 3, f: 2}, fr: {a: 1, f: 0}, sa:{a: 4, f: 3}}"
-                                        :key="key">
+                                    v-for="(days, key) in {tu: {a: 3, f: 2}, fr: {a: 1, f: 0}, sa:{a: 4, f: 3}}"
+                                    :key="key">
                                     <small v-if="days" class="block text-center">
                                         <span>{{ key }}</span><br>
                                         <FilledShiftsIndicator :available="days.a" :filled="days.f"/>
@@ -238,6 +288,22 @@ watchEffect(async () => {
                     </v-menu>
                 </template>
             </template>
+            <template v-if="props.columnFilters.responsibleBrother.value" #item-responsible_brother="{responsibleBrother}">
+                <span v-if="responsibleBrother" class="text-green-500">Yes</span>
+                <span v-else class="text-gray-500">No</span>
+            </template>
+            <template v-if="props.columnFilters.appointment.value" #item-appointment="{appointment}">
+                {{ appointment }}
+            </template>
+            <template v-if="props.columnFilters.servingAs.value" #item-serving_as="{servingAs}">
+                {{ servingAs }}
+            </template>
+            <template v-if="props.columnFilters.maritalStatus.value" #item-marital_status="{maritalStatus}">
+                {{ maritalStatus }}
+            </template>
+            <template v-if="props.columnFilters.birthYear.value" #item-birth_year="{birthYear}">
+                {{ birthYear }}
+            </template>
             <template #item-lastShift="{lastShift, lastShiftTime}">
                 {{ formatShiftDate(lastShift, lastShiftTime) }}
             </template>
@@ -266,15 +332,15 @@ watchEffect(async () => {
 
 <style lang="scss">
 .volunteers .data-table table {
-  border-spacing: 0 2px;
+    border-spacing: 0 2px;
 
-  td:first-child {
-    @apply rounded-l-lg;
-  }
+    td:first-child {
+        @apply rounded-l-lg;
+    }
 
-  td:last-child {
-    @apply rounded-r-lg;
-  }
+    td:last-child {
+        @apply rounded-r-lg;
+    }
 
 }
 </style>
