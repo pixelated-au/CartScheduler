@@ -58,15 +58,10 @@ const tableHeaders = computed(() => {
             value: 'name',
             sortable: true,
         },
-        {
-            text: 'Last Rostered',
-            value: 'lastShift',
-            sortable: true,
-        },
     ]
     if (props.columnFilters.responsibleBrother.value) {
         headers.push({
-            text: 'Is Responsible Bro',
+            text: 'Resp?',
             value: 'responsibleBrother',
             sortable: true,
         })
@@ -106,6 +101,11 @@ const tableHeaders = computed(() => {
             sortable: true,
         })
     }
+    headers.push({
+        text: 'Last Shift',
+        value: 'lastShift',
+        sortable: true,
+    })
     if (enableUserAvailability) {
         headers.push({
             text: 'Availability',
@@ -242,8 +242,17 @@ watchEffect(async () => {
             :show-hover="false"
             :body-row-class-name="bodyRowClassNameFunction"
             :body-item-class-name="bodyItemClassNameFunction">
+            <template #header-responsibleBrother="header">
+                <v-menu class="mr-1 inline-block">
+                    <span><QuestionCircle/></span>
+                    <template #popper>
+                        <div class="max-w-[300px]">Is volunteer a 'trained responsible brother'?</div>
+                    </template>
+                </v-menu>
+                {{ header.text }}
+            </template>
             <template #header-filledShifts="header">
-                <v-menu class="mr-2 inline-block">
+                <v-menu class="mr-1 inline-block">
                     <span><QuestionCircle/></span>
                     <template #popper>
                         <div class="max-w-[300px]">
