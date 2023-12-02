@@ -12,8 +12,12 @@ import {Menu as VMenu, VTooltip} from 'floating-vue'
 import {computed, inject, ref, watchEffect} from "vue";
 
 const props = defineProps({
-    shiftId: {
-        type: Number,
+    shift: {
+        type: Object,
+        required: true,
+    },
+    location: {
+        type: Object,
         required: true,
     },
     date: {
@@ -40,7 +44,7 @@ const props = defineProps({
     },
 })
 
-defineEmits(['assignVolunteer'])
+const emit = defineEmits(['assignVolunteer'])
 
 const enableUserAvailability = inject('enableUserAvailability', false)
 const volunteers = ref([])
@@ -212,7 +216,7 @@ watchEffect(async () => {
         return
     }
     try {
-        const response = await axios.get(`/admin/available-users-for-shift/${props.shiftId}`, {
+        const response = await axios.get(`/admin/available-users-for-shift/${props.shift.id}`, {
             params: {
                 date: format(props.date, 'yyyy-MM-dd'),
                 showAll: props.mainFilters.doShowFilteredVolunteers ? 0 : 1,
@@ -232,7 +236,6 @@ watchEffect(async () => {
 
 </script>
 <template>
-    <h1>STORE THE SETTINGS FOR THE COLUMNS IN THE USER BROWSER STORAGE</h1>
     <div class="volunteers">
         <data-table
             :headers="tableHeaders"

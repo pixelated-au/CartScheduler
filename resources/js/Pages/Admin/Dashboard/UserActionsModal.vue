@@ -75,8 +75,8 @@ const volunteerSearch = ref('')
 
 const enableUserAvailability = inject('enableUserAvailability', false)
 
-const volunteerAssigned = function (volunteer) {
-    emit('assignVolunteer', volunteer)
+const volunteerAssigned = function (data) {
+    emit('assignVolunteer', data)
     closeModal()
 }
 </script>
@@ -163,7 +163,7 @@ const volunteerAssigned = function (volunteer) {
                 </div>
             </div>
 
-            <UserTable :shift-id="shift.id" :date="date" :is-visible="showModal" :text-filter="volunteerSearch"
+            <UserTable :shift="shift" :date="date" :location="location" :is-visible="showModal" :text-filter="volunteerSearch"
                        :main-filters="mainFilters"
                        :column-filters="columnFilters" @assignVolunteer="volunteerAssigned"/>
 
