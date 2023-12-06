@@ -1,7 +1,7 @@
 import { isAfter, isBefore, parse, parseISO } from 'date-fns'
 import formatISO from 'date-fns/formatISO'
 import { cloneDeep } from 'lodash'
-import { computed, onMounted, ref } from 'vue'
+import {computed, onMounted, ref, shallowRef} from 'vue'
 
 export default function useLocationFilter (canAdmin = false) {
     /**
@@ -10,8 +10,8 @@ export default function useLocationFilter (canAdmin = false) {
     const date = ref(parse('12:00:00', 'HH:mm:ss', new Date()))
 
     const maxReservationDate = ref(new Date())
-    const serverLocations = ref([])
-    const serverDates = ref({})
+    const serverLocations = shallowRef([])
+    const serverDates = shallowRef({})
 
     const getShifts = async () => {
         const extra = canAdmin ? '/1' : ''
