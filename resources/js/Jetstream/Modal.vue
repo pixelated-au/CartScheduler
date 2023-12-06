@@ -1,73 +1,78 @@
 <script setup>
-    import Login from "@/Pages/Auth/Login.vue";
-    import { computed, onMounted, onUnmounted, watch } from 'vue'
+import {computed, onMounted, onUnmounted, watch} from 'vue'
 
-    const props = defineProps({
-        show: {
-            type: Boolean,
-            default: false,
-        },
-        maxWidth: {
-            type: String,
-            default: '2xl',
-        },
-        closeable: {
-            type: Boolean,
-            default: true,
-        },
-        fillScreen: {
-            type: Boolean,
-            default: false,
-        }
-    })
-
-    const emit = defineEmits(['close'])
-
-    watch(() => props.show, () => {
-        if (props.show) {
-            document.body.style.overflow = 'hidden'
-        } else {
-            document.body.style.overflow = null
-        }
-    })
-
-    const close = () => {
-        if (props.closeable) {
-            emit('close')
-        }
+const props = defineProps({
+    show: {
+        type: Boolean,
+        default: false,
+    },
+    maxWidth: {
+        type: String,
+        default: '2xl',
+    },
+    closeable: {
+        type: Boolean,
+        default: true,
+    },
+    fillScreen: {
+        type: Boolean,
+        default: false,
     }
+})
 
-    const closeOnEscape = (e) => {
-        if (e.key === 'Escape' && props.show) {
-            close()
-        }
-    }
+const emit = defineEmits(['close'])
 
-    onMounted(() => document.addEventListener('keydown', closeOnEscape))
-
-    onUnmounted(() => {
-        document.removeEventListener('keydown', closeOnEscape)
+watch(() => props.show, () => {
+    if (props.show) {
+        document.body.style.overflow = 'hidden'
+    } else {
         document.body.style.overflow = null
-    })
+    }
+})
 
-    const maxWidthClass = computed(() => {
-        const options = {
-            'sm': 'sm:max-w-sm',
-            'md': 'sm:max-w-md',
-            'lg': 'sm:max-w-lg',
-            'xl': 'sm:max-w-xl',
-            '2xl': 'sm:max-w-2xl',
-        }
-        return options[props.maxWidth]
-    })
+const close = () => {
+    if (props.closeable) {
+        emit('close')
+    }
+}
 
-    const extraClasses = computed(() => {
-        let classes = maxWidthClass.value
-        if (props.fillScreen) {
-            classes += 'inset-0 overflow-y-auto z-50 flex items-center justify-center px-4 py-6 sm:px-0 w-full sm:w-auto h-full sm:h-auto'
-        }
-        return classes
-    })
+const closeOnEscape = (e) => {
+    if (e.key === 'Escape' && props.show) {
+        close()
+    }
+}
+
+onMounted(() => document.addEventListener('keydown', closeOnEscape))
+
+onUnmounted(() => {
+    document.removeEventListener('keydown', closeOnEscape)
+    document.body.style.overflow = null
+})
+
+const maxWidthClass = computed(() => {
+    const options = {
+        'sm': 'sm:max-w-sm',
+        'md': 'sm:max-w-md',
+        'lg': 'sm:max-w-lg',
+        'xl': 'sm:max-w-xl',
+        '2xl': 'sm:max-w-2xl',
+        '3xl': 'sm:max-w-3xl',
+        '4xl': 'sm:max-w-4xl',
+        '5xl': 'sm:max-w-5xl',
+        '6xl': 'sm:max-w-6xl',
+        '7xl': 'sm:max-w-7xl',
+        'full': 'sm:full',
+    }
+    return options[props.maxWidth]
+})
+
+const extraClasses = computed(() => {
+    let classes = maxWidthClass.value
+    if (props.fillScreen) {
+        classes += 'inset-0 overflow-y-auto z-50 flex items-center justify-center px-4 py-6 sm:px-0 w-full sm:w-auto h-full sm:h-auto'
+    }
+    return classes
+})
 </script>
 
 <template>

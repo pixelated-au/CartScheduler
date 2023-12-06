@@ -2,6 +2,8 @@
 
 namespace App\Actions;
 
+use App\Enums\Appontment;
+use App\Enums\ServingAs;
 use App\Models\Shift;
 use App\Models\ShiftUser;
 use App\Models\User;
@@ -18,7 +20,7 @@ class GetAvailableUsersForShift
     }
 
     /** @noinspection UnknownColumnInspection */
-    public function execute(Shift $shift, Carbon $date, bool $showAll): Collection
+    public function execute(Shift $shift, Carbon $date, bool $showUnavailable, bool $showOnlyResponsibleBros, bool $hidePublishers, bool $showOnlyElders, bool $showOnlyMninsterialServants): Collection
     {
         $overlappingShifts = $this->getOverlappingShifts($shift, $date);
 
@@ -59,7 +61,7 @@ class GetAvailableUsersForShift
             ->when($canOnlyBrothersRegister, fn(Builder $query) => $query
                 ->where('users.gender', 'male')
             )
-            ->when($this->settings->enableUserAvailability && !$showAll, fn(Builder $query) => $query
+            ->when($this->settings->enableUserAvailability && !$showUnavailable, fn(Builder $query) => $query
 //                ->join(table: 'user_availabilities', first: 'users.id', operator: '=', second: 'user_availabilities.user_id')
                 ->leftJoin(table: 'user_vacations', first: 'users.id', operator: '=', second: 'user_vacations.user_id')
                 ->tap(fn(Builder $query) => $this->queryIsAvailableOnDayOfWeek($query, $date))
@@ -70,6 +72,18 @@ class GetAvailableUsersForShift
                     ->where('end_date', '>=', $date)
                 ])
                 ->having('vacations_count', '=', 0)
+            )
+            ->when($showOnlyResponsibleBros, fn(Builder $query) => $query
+                ->where('users.responsible_brother', true)
+            )
+            ->when($hidePublishers, fn(Builder $query) => $query
+                ->where('users.serving_as', '!=', ServingAs::Publisher->value)
+            )
+            ->when($showOnlyElders, fn(Builder $query) => $query
+                ->where('users.appointment', '=', Appontment::Elder->value)
+            )
+            ->when($showOnlyMninsterialServants, fn(Builder $query) => $query
+                ->where('users.appointment', '=', Appontment::MinisterialServant->value)
             )
             ->get();
     }

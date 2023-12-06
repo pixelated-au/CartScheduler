@@ -1,5 +1,5 @@
 <script setup>
-    import Accordion from '@/Components/Accordion.vue'
+    import Accordion from '@/Components/LocationAccordion.vue'
     import ComponentSpinner from '@/Components/ComponentSpinner.vue'
     import BookedSlot from '@/Components/Icons/BookedSlot.vue'
     import EmptySlot from '@/Components/Icons/EmptySlot.vue'

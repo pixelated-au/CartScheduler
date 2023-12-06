@@ -1,5 +1,5 @@
 <script setup>
-    import Accordion from '@/Components/Accordion.vue'
+    import Accordion from '@/Components/LocationAccordion.vue'
     import EmptySlot from '@/Components/Icons/EmptySlot.vue'
     import Female from '@/Components/Icons/Female.vue'
     import JetButton from '@/Jetstream/Button.vue'
@@ -77,7 +77,7 @@
             })
             toast.success(`${volunteerName} was assigned to ${location.name} at ${shift.start_time}`)
         } catch (e) {
-            toast.error(e.response.data.message)
+            toast.error(e.response.message)
 
         } finally {
             await getShifts()

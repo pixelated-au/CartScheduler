@@ -1,21 +1,16 @@
 <script setup>
-import DataTable from "@/Components/DataTable.vue";
-import Comment from "@/Components/Icons/Comment.vue";
+import CheckboxSelectField from "@/Components/CheckboxSelectField.vue";
 import QuestionCircle from "@/Components/Icons/QuestionCircle.vue";
-import UserAdd from "@/Components/Icons/UserAdd.vue";
-import useToast from "@/Composables/useToast";
-import JetButton from '@/Jetstream/Button.vue'
 import JetDialogModal from '@/Jetstream/DialogModal.vue'
 import JetHelpText from "@/Jetstream/HelpText.vue";
 import JetInput from "@/Jetstream/Input.vue";
 import JetLabel from "@/Jetstream/Label.vue";
 import JetSecondaryButton from '@/Jetstream/SecondaryButton.vue'
 import JetToggle from '@/Jetstream/Toggle.vue'
-import FilledShiftsIndicator from "@/Pages/Admin/Dashboard/FilledShiftsIndicator.vue";
-import {format, parse} from "date-fns";
-// noinspection ES6UnusedImports
-import {Menu as VMenu, VTooltip} from 'floating-vue'
-import {computed, inject, ref, watch, watchEffect} from "vue";
+import UserTable from "@/Pages/Admin/Dashboard/UserTable.vue";
+import {format} from "date-fns";
+import {Menu as VMenu} from 'floating-vue'
+import {computed, inject, onBeforeMount, reactive, ref, watch} from "vue";
 
 const props = defineProps({
     show: Boolean,
@@ -31,270 +26,146 @@ const showModal = computed({
     set: value => emit('update:show', value)
 })
 
-const assignVolunteer = (volunteerId, volunteerName) => {
-    emit('assignVolunteer', {volunteerId, volunteerName, location: props.location, shift: props.shift})
-    closeModal()
-}
-
 const closeModal = () => {
     showModal.value = false
 }
 
-const toast = useToast()
-const volunteers = ref([])
-const doShowFilteredVolunteers = ref(true)
+const mainFilters = reactive({
+    doShowFilteredVolunteers: true,
+    doShowOnlyResponsibleBros: false,
+    doHidePublishers: false, // filter by publishers that have appointments
+    doShowOnlyElders: false,
+    doShowOnlyMinisterialServants: false,
+})
 
-watchEffect(async () => {
-    if (!showModal.value) {
+const columnFilters = reactive({
+    gender: {label: 'Gender', value: false},
+    appointment: {label: 'Appointment', value: false},
+    servingAs: {label: 'Serving As', value: false},
+    maritalStatus: {label: 'Marital Status', value: false},
+    birthYear: {label: 'Birth Year', value: false},
+    responsibleBrother: {label: 'Is Responsible Bro?', value: false},
+})
+
+watch(columnFilters, val => {
+    const c = {}
+    for (const key in columnFilters) {
+        if (columnFilters.hasOwnProperty(key)) {
+            c[key] = val[key].value
+        }
+    }
+
+    localStorage.setItem('admin-user-rostering-columns', JSON.stringify(c))
+}, {deep: true})
+
+onBeforeMount(() => {
+    const c = localStorage.getItem('admin-user-rostering-columns')
+    if (!c) {
         return
     }
-    try {
-        const response = await axios.get(`/admin/available-users-for-shift/${props.shift.id}`, {
-            params: {
-                date: format(props.date, 'yyyy-MM-dd'),
-                showAll: doShowFilteredVolunteers.value ? 0 : 1,
-            }
-        })
-        volunteers.value = response.data.data
-    } catch (e) {
-        console.log(e)
-        toast.error('Unable to load volunteers, a critical error has occurred.')
+    const columns = JSON.parse(c)
+    for (const key in columnFilters) {
+        if (columns.hasOwnProperty(key)) {
+            columnFilters[key].value = columns[key]
+        }
     }
 })
 
 const volunteerSearch = ref('')
 
-watch(volunteerSearch, (value) => {
-
-})
-
 const enableUserAvailability = inject('enableUserAvailability', false)
 
-const tableHeaders = computed(() => {
-    const headers = [
-        {
-            text: 'ID',
-            value: 'id',
-            sortable: true,
-            width: '10%',
-        },
-        {
-            text: 'Name',
-            value: 'name',
-            sortable: true,
-        },
-        {
-            text: 'Last Rostered',
-            value: 'lastShift',
-            sortable: true,
-        },
-    ]
-    if (enableUserAvailability) {
-        headers.push({
-            text: 'Availability',
-            value: 'filledShifts',
-            sortable: true,
-        })
-    }
-    headers.push({
-        text: '',
-        value: 'action',
-        sortable: false,
-    })
-    return headers
-})
-
-const calcShiftPercentage = (daysRostered, daysAvailable) => {
-    if (!daysAvailable) {
-        return 0
-    }
-    let sumOfDaysRostered = 0
-    let sumOfDaysAvailable = 0
-    for (const day in daysAvailable) {
-        if (!daysAvailable.hasOwnProperty(day) || !daysAvailable[day]) {
-            continue
-        }
-        // Not using Array.reduce because we're only calculating based on the days a volunteer is available
-        sumOfDaysRostered += daysRostered[day]
-        sumOfDaysAvailable += daysAvailable[day]
-        if (sumOfDaysRostered > sumOfDaysAvailable) {
-            sumOfDaysRostered = sumOfDaysAvailable
-        }
-    }
-    return Math.round((sumOfDaysRostered / sumOfDaysAvailable) * 100)
+const volunteerAssigned = function (data) {
+    emit('assignVolunteer', data)
+    closeModal()
 }
-
-const tableRows = computed(() => {
-    return volunteers.value.map(volunteer => {
-        const prefix = volunteer.gender === 'male' ? 'Bro' : 'Sis'
-        const daysAvailable = {
-            sunday: volunteer.num_sundays,
-            monday: volunteer.num_mondays,
-            tuesday: volunteer.num_tuesdays,
-            wednesday: volunteer.num_wednesdays,
-            thursday: volunteer.num_thursdays,
-            friday: volunteer.num_fridays,
-            saturday: volunteer.num_saturdays,
-        }
-        const daysAlreadyRostered = {
-            sunday: (volunteer.filled_sundays < daysAvailable.sunday ? volunteer.filled_sundays : daysAvailable.sunday) || 0,
-            monday: (volunteer.filled_mondays < daysAvailable.monday ? volunteer.filled_mondays : daysAvailable.monday) || 0,
-            tuesday: (volunteer.filled_tuesdays < daysAvailable.tuesday ? volunteer.filled_tuesdays : daysAvailable.tuesday) || 0,
-            wednesday: (volunteer.filled_wednesdays < daysAvailable.wednesday ? volunteer.filled_wednesdays : daysAvailable.wednesday) || 0,
-            thursday: (volunteer.filled_thursdays < daysAvailable.thursday ? volunteer.filled_thursdays : daysAvailable.thursday) || 0,
-            friday: (volunteer.filled_fridays < daysAvailable.friday ? volunteer.filled_fridays : daysAvailable.friday) || 0,
-            saturday: (volunteer.filled_saturdays < daysAvailable.saturday ? volunteer.filled_saturdays : daysAvailable.saturday) || 0,
-        }
-
-        return {
-            id: volunteer.id,
-            name: `${prefix} ${volunteer.name}`,
-            gender: volunteer.gender,
-            comment: volunteer.availability_comments,
-            lastShift: volunteer.last_shift_date ? volunteer.last_shift_date : null,
-            lastShiftTime: volunteer.last_shift_start_time ? volunteer.last_shift_start_time : null,
-            filledShifts: calcShiftPercentage(daysAlreadyRostered, daysAvailable),
-            daysAlreadyRostered,
-            daysAvailable,
-        }
-    })
-})
-
-const bodyRowClassNameFunction = item =>
-    item.gender === 'male'
-        ? 'bg-blue-100 hover:bg-blue-200 dark:bg-blue-900/40 dark:hover:bg-blue-900/60 transition duration-150 hover:ease-in'
-        : 'bg-pink-100 hover:bg-pink-200 dark:bg-fuchsia-900/40 dark:hover:bg-fuchsia-900/60 transition duration-150 hover:ease-in';
-const bodyItemClassNameFunction = column => {
-    if (column === 'action') return '!text-right';
-    return '';
-};
-
-const formatShiftDate = (shiftDate, shiftTime) => {
-    if (!shiftDate) {
-        return 'Never'
-    }
-    if (!shiftTime) {
-        return format(parse(shiftDate, 'yyyy-MM-dd', new Date()), 'MMM d, yyyy')
-    }
-    return format(parse(`${shiftDate} ${shiftTime}`, 'yyyy-MM-dd HH:mm:ss', new Date()), 'MMM d, yyyy, h:mma')
-}
-
-const toggleLabel = computed(() => doShowFilteredVolunteers.value
-    ? 'Showing available'
-    : 'Showing all')
 </script>
 
 <template>
-    <JetDialogModal :show="showModal" @close="closeModal">
+    <JetDialogModal :show="showModal" maxWidth="7xl" @close="closeModal">
         <template #title>
             Assign a volunteer to {{ location?.name }} on {{ format(props.date, 'MMM d, yyyy') }}
         </template>
 
         <template #content>
-            <div class="max-w-7xl mx-auto pt-10 pb-5">
-                <div class="bg-white dark:bg-gray-900 shadow-xl sm:rounded-lg sm:p-6">
+            <div class="grid grid-cols-6 gap-x-1 max-w-7xl mx-auto pb-5">
+                <div class="col-span-6 bg-white dark:bg-gray-900 shadow-xl sm:rounded-lg sm:p-6">
                     <JetLabel for="search" value="Search for a volunteer"/>
                     <JetInput id="search" v-model="volunteerSearch" type="text" class="mt-1 block w-full"/>
                     <JetHelpText>Search on name</JetHelpText>
                 </div>
-                <div v-if="enableUserAvailability" class="mt-3 flex justify-end items-center">
-                    <div class="flex flex-wrap justify-center w-[150px]">
-                        <JetToggle v-model="doShowFilteredVolunteers">
-                            {{ toggleLabel }}
-                            <v-menu class="ml-1 inline-block">
-                                <span><QuestionCircle/></span>
-                                <template #popper>
-                                    <div class="max-w-[300px]">
-                                        Note: if an expected volunteer is missing, they're likely already rostered.
-                                    </div>
-                                </template>
-                            </v-menu>
-                        </JetToggle>
+                <div
+                    class="col-span-6 sm:col-span-1 mt-3 pb-2 border border-gray-300 dark:border-gray-800 rounded-md shadow-sm sm:flex sm:justify-center sm:items-center">
+                    <div>
+                        <div class="text-center">
+                            Extra Columns
+                        </div>
+                        <div>
+                            <CheckboxSelectField v-model="columnFilters"/>
+                        </div>
                     </div>
+                </div>
+                <div
+                    class="col-span-6 sm:col-span-5 mt-3 pb-2 border border-gray-300 dark:border-gray-800 rounded-md shadow-sm">
+                    <div class="mt-3 ml-3 text-gray-800 dark:text-gray-200 font-normal">Filter By Only...</div>
+                    <div class="flex justify-between items-center">
+                        <div class="flex flex-wrap justify-center w-[150px]">
+                            <JetToggle v-model="mainFilters.doShowOnlyResponsibleBros" class="text-center">
+                                Resp. Bros
+                            </JetToggle>
+                        </div>
+                        <div class="flex flex-wrap justify-center w-[150px]">
+                            <JetToggle v-model="mainFilters.doHidePublishers" class="text-center">
+                                Pioneers
+                                <v-menu class="ml-1 inline-block">
+                                    <span><QuestionCircle/></span>
+                                    <template #popper>
+                                        <div class="max-w-[300px]">
+                                            This includes all other ministry appointments:
+                                            <ul class="list-disc list-inside">
+                                                <li>Regular Pioneer</li>
+                                                <li>Special Pioneer</li>
+                                                <li>Bethel Family Member</li>
+                                                <li>Circuit Overseer</li>
+                                                <li>Field Missionary</li>
+                                            </ul>
+                                        </div>
+                                    </template>
+                                </v-menu>
+                            </JetToggle>
+                        </div>
+                        <div class="flex flex-wrap justify-center w-[150px]">
+                            <JetToggle v-model="mainFilters.doShowOnlyElders" class="text-center">
+                                Elders
+                            </JetToggle>
+                        </div>
+                        <div class="flex flex-wrap justify-center w-[150px]">
+                            <JetToggle v-model="mainFilters.doShowOnlyMinisterialServants" class="text-center">
+                                MS's
+                            </JetToggle>
+                        </div>
+                        <div v-if="enableUserAvailability" class="flex flex-wrap justify-center w-[150px]">
+                            <JetToggle v-model="mainFilters.doShowFilteredVolunteers" class="text-center">
+                                Available
+                                <v-menu class="ml-1 inline-block">
+                                    <span><QuestionCircle/></span>
+                                    <template #popper>
+                                        <div class="max-w-[300px]">
+                                            Note: if an expected volunteer is missing, they're likely already rostered.
+                                        </div>
+                                    </template>
+                                </v-menu>
+                            </JetToggle>
+                        </div>
+                    </div>
+                    <small class="mt-2 col-span-6 block text-center w-full text-gray-600 dark:text-gray-400">These
+                        filters will remove all volunteers who don't match</small>
                 </div>
             </div>
 
-            <div class="volunteers">
-                <data-table
-                    :headers="tableHeaders"
-                    :items="tableRows"
-                    :search-value="volunteerSearch"
-                    :filter-options="[]"
-                    :show-hover="false"
-                    :body-row-class-name="bodyRowClassNameFunction"
-                    :body-item-class-name="bodyItemClassNameFunction">
-                    <template #header-filledShifts="header">
-                        <v-menu class="mr-2 inline-block">
-                            <span><QuestionCircle/></span>
-                            <template #popper>
-                                <div class="max-w-[300px]">
-                                    <p class="text-sm font-bold">Diagram Explanation</p>
-                                    <div class="flex gap-x-1 mt-2 mb-3">
-                                        <small
-                                            class="self-center text-center text-xs border-slate-500 border-r pr-1 mr-2 w-8">
-                                            %<br>62
-                                        </small>
-                                        <template
-                                            v-for="(days, key) in {tu: {a: 3, f: 2}, fr: {a: 1, f: 0}, sa:{a: 4, f: 3}}"
-                                            :key="key">
-                                            <small v-if="days" class="block text-center">
-                                                <span>{{ key }}</span><br>
-                                                <FilledShiftsIndicator :available="days.a" :filled="days.f"/>
-                                            </small>
-                                        </template>
-                                    </div>
-                                    <p class="text-sm mb-3">In this example, the above volunteer has been rostered on
-                                        62% of the shifts he's made himself available for. Each month, he's made himself
-                                        available for 3 Tuesdays, 1 Friday and 4 Saturdays, but <em>this month</em>
-                                        (i.e. the month selected in the calendar) he's only been rostered on for 2
-                                        Tuesdays and 3 Saturdays.</p>
-                                    <p class="text-sm">Note, the percentage figure does not take into account extra
-                                        shifts the volunteer has taken outside of his 'regular' availability. In the
-                                        example above, if the volunteer accepted an extra shift on a Sunday, this wont
-                                        affect the percentage.</p>
-                                </div>
-                            </template>
-                        </v-menu>
-                        {{ header.text }}
-                    </template>
-                    <template #item-name="{name, comment}">
-                        {{ name }}
-                        <template v-if="comment">
-                            <v-menu class="mr-2 inline-block">
-                                <span><Comment/></span>
-                                <template #popper>
-                                    <div>
-                                        <h6>{{ name }} comments:</h6>
-                                        <div>{{ comment }}</div>
-                                    </div>
-                                </template>
-                            </v-menu>
-                        </template>
-                    </template>
-                    <template #item-lastShift="{lastShift, lastShiftTime}">
-                        {{ formatShiftDate(lastShift, lastShiftTime) }}
-                    </template>
-                    <template v-if="enableUserAvailability"
-                              #item-filledShifts="{daysAlreadyRostered, daysAvailable, filledShifts}">
-                        <div class="flex gap-x-1">
-                            <small class="self-center text-center text-xs border-slate-500 border-r pr-1 mr-2 w-8">
-                                %<br>{{ filledShifts }}
-                            </small>
-                            <template v-for="(days, key) in daysAvailable" :key="key">
-                                <small v-if="days" class="block text-center">
-                                    <span>{{ key.substring(0, 2) }}</span><br>
-                                    <FilledShiftsIndicator :available="days" :filled="daysAlreadyRostered[key]"/>
-                                </small>
-                            </template>
-                        </div>
-                    </template>
-                    <template #item-action="{ id, name }">
-                        <JetButton style-type="info" @click="assignVolunteer(id, name)">
-                            <UserAdd color="#fff"/>
-                        </JetButton>
-                    </template>
-                </data-table>
-            </div>
+            <UserTable :shift="shift" :date="date" :location="location" :is-visible="showModal" :text-filter="volunteerSearch"
+                       :main-filters="mainFilters"
+                       :column-filters="columnFilters" @assignVolunteer="volunteerAssigned"/>
 
         </template>
 
