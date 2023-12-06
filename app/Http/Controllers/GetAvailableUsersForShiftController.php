@@ -33,7 +33,7 @@ class GetAvailableUsersForShiftController extends Controller
                 showOnlyResponsibleBros: $request->boolean('showOnlyResponsibleBros'),
                 hidePublishers: $request->boolean('hidePublishers'),
                 showOnlyElders: $request->boolean('showOnlyElders'),
-                showOnlyMninsterialServants: $request->boolean('showOnlyMinisterialServants'),
+                showOnlyMinisterialServants: $request->boolean('showOnlyMinisterialServants'),
             ),
         );
     }

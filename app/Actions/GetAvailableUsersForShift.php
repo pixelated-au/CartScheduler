@@ -20,7 +20,7 @@ class GetAvailableUsersForShift
     }
 
     /** @noinspection UnknownColumnInspection */
-    public function execute(Shift $shift, Carbon $date, bool $showUnavailable, bool $showOnlyResponsibleBros, bool $hidePublishers, bool $showOnlyElders, bool $showOnlyMninsterialServants): Collection
+    public function execute(Shift $shift, Carbon $date, bool $showUnavailable, bool $showOnlyResponsibleBros, bool $hidePublishers, bool $showOnlyElders, bool $showOnlyMinisterialServants): Collection
     {
         $overlappingShifts = $this->getOverlappingShifts($shift, $date);
 
@@ -82,7 +82,7 @@ class GetAvailableUsersForShift
             ->when($showOnlyElders, fn(Builder $query) => $query
                 ->where('users.appointment', '=', Appontment::Elder->value)
             )
-            ->when($showOnlyMninsterialServants, fn(Builder $query) => $query
+            ->when($showOnlyMinisterialServants, fn(Builder $query) => $query
                 ->where('users.appointment', '=', Appontment::MinisterialServant->value)
             )
             ->get();
@@ -90,7 +90,6 @@ class GetAvailableUsersForShift
 
     private function queryIsAvailableOnDayOfWeek(Builder $query, string $date): void
     {
-        /** @noinspection SpellCheckingInspection */
         $query->whereRaw("CASE
                                     WHEN DAYOFWEEK('$date') = 1 THEN user_availabilities.num_sundays
                                     WHEN DAYOFWEEK('$date') = 2 THEN user_availabilities.num_mondays
@@ -104,7 +103,6 @@ class GetAvailableUsersForShift
 
     private function queryIsAvailableAtHour(Builder $query, string $date, int $hour): void
     {
-        /** @noinspection SpellCheckingInspection */
         $query->whereRaw("FIND_IN_SET($hour, CASE
                                     WHEN DAYOFWEEK('$date') = 1 THEN user_availabilities.day_sunday
                                     WHEN DAYOFWEEK('$date') = 2 THEN user_availabilities.day_monday
@@ -134,6 +132,7 @@ class GetAvailableUsersForShift
      */
     private function getDayCounts(Builder $query, Carbon $date): Builder
     {
+        /** @noinspection UnknownColumnInspection */
         return $query->leftJoinSub(DB::query()
             ->selectRaw("user_id")
             ->selectRaw("SUM(num_sundays) AS filled_sundays")
