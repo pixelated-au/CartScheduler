@@ -1,7 +1,7 @@
 import { isAfter, isBefore, parse, parseISO } from 'date-fns'
 import formatISO from 'date-fns/formatISO'
 import { cloneDeep } from 'lodash'
-import {computed, onMounted, ref, shallowRef} from 'vue'
+import {computed, onMounted, ref, shallowRef, watch} from 'vue'
 
 export default function useLocationFilter (canAdmin = false) {
     /**
@@ -14,9 +14,9 @@ export default function useLocationFilter (canAdmin = false) {
     const serverDates = shallowRef({})
 
     const getShifts = async () => {
-        const extra = canAdmin ? '/1' : ''
+        const path = canAdmin ? `/admin/assigned-shifts/${selectedDate.value}` : `/shifts/${selectedDate.value}`
 
-        const response = await axios.get(`/shifts${extra}`)
+        const response = await axios.get(path)
         serverLocations.value = response.data.locations
         serverDates.value = response.data.shifts
         maxReservationDate.value = parseISO(response.data.maxDateReservation)
@@ -30,6 +30,8 @@ export default function useLocationFilter (canAdmin = false) {
         get: () => date.value ? formatISO(date.value, { representation: 'date' }) : '',
         set: (value) => date.value = value,
     })
+
+    watch(selectedDate, () => getShifts())
 
     const emptyShiftsForTime = ref([])
 

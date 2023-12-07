@@ -2,6 +2,7 @@
 
 namespace App\Actions;
 
+use App\Models\User;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
@@ -21,9 +22,14 @@ class GetFreeShiftsData
      *
      * @return \Illuminate\Support\Collection
      */
-    public function execute(string $startDate, string $endDate): Collection
+    public function execute(string $startDate, string $endDate, User $user): Collection
     {
-        $query = DB::raw(/** @lang MySQL */ "
+        $restrictedUserQuery = '';
+        if ($user->is_restricted) {
+            $restrictedUserQuery = " AND shift_user.user_id = :userId";
+        }
+
+        $query = /** @lang MySQL */ "
                 WITH RECURSIVE dates (date) AS
                    (SELECT :startDate
                     UNION ALL
@@ -64,16 +70,22 @@ class GetFreeShiftsData
 
                          LEFT JOIN shift_user ON shifts.id = shift_user.shift_id
                                               AND shift_user.shift_date = dates.date
+                                              AND shift_user.user_id = $user->id
+                                              $restrictedUserQuery
 
                          LEFT JOIN locations ON locations.id = shifts.location_id
                                              AND locations.is_enabled = true
                 ORDER BY dates.date,
                          locations.name,
                          shifts.start_time
-                ",
-        );
+                ";
 
-        $results = DB::select($query, ['startDate' => $startDate, 'endDate' => $endDate]);
+        $params = ['startDate' => $startDate, 'endDate' => $endDate];
+        if ($user->is_restricted) {
+            $params['userId'] = $user->id;
+        }
+
+        $results = DB::select(DB::raw($query), $params);
 
         return collect($results)
             ->map(fn(stdClass $shift) => collect([

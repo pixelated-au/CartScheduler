@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AdminAvailableShiftsController;
 use App\Http\Controllers\AdminCheckForUpdateController;
 use App\Http\Controllers\AdminDashboardController;
 use App\Http\Controllers\AdminRunSoftwareUpdateController;
@@ -61,7 +62,7 @@ Route::post('/set-password', [SetUserPasswordController::class, 'update'])->name
 
 Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified', 'user-enabled'])->group(function () {
     Route::get('/', static fn() => Inertia::render('Dashboard'))->name('dashboard');
-    Route::get('/shifts/{canViewHistorical?}', AvailableShiftsController::class);
+    Route::get('/shifts/{shiftDate}', AvailableShiftsController::class);
     Route::get('/outstanding-reports', MissingReportsForUserController::class);
     Route::post('/reserve-shift', ToggleShiftReservationController::class);
     Route::post('/save-report', SaveShiftReportController::class)->name('save.report');
@@ -113,6 +114,8 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified',
             ]);
             Route::put('/report-tag-sort-order', ReportTagsSortOrderController::class);
             Route::post('/resend-welcome-email', ResendWelcomeEmailController::class)->name('admin.resend-welcome-email');
+
+            Route::get('/assigned-shifts/{shiftDate}', AdminAvailableShiftsController::class);
 
             Route::resource('shifts', ShiftsController::class)->only(['destroy'])->names([
                 'destroy' => 'admin.shifts.destroy',

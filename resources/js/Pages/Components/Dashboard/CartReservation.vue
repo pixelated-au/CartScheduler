@@ -1,68 +1,80 @@
 <script setup>
-    import Accordion from '@/Components/LocationAccordion.vue'
-    import ComponentSpinner from '@/Components/ComponentSpinner.vue'
-    import BookedSlot from '@/Components/Icons/BookedSlot.vue'
-    import EmptySlot from '@/Components/Icons/EmptySlot.vue'
-    import Female from '@/Components/Icons/Female.vue'
-    import Male from '@/Components/Icons/Male.vue'
-    import useToast from '@/Composables/useToast'
-    import useLocationFilter from '@/Pages/Admin/Locations/Composables/useLocationFilter'
-    import DatePicker from '@/Pages/Components/Dashboard/DatePicker.vue'
-    import {format, isSameDay, parse} from 'date-fns'
-    // noinspection ES6UnusedImports
-    import {VTooltip} from 'floating-vue'
-    import {computed, ref} from 'vue'
+import Accordion from '@/Components/LocationAccordion.vue'
+import ComponentSpinner from '@/Components/ComponentSpinner.vue'
+import BookedSlot from '@/Components/Icons/BookedSlot.vue'
+import EmptySlot from '@/Components/Icons/EmptySlot.vue'
+import Female from '@/Components/Icons/Female.vue'
+import Male from '@/Components/Icons/Male.vue'
+import useToast from '@/Composables/useToast'
+import useLocationFilter from '@/Pages/Admin/Locations/Composables/useLocationFilter'
+import DatePicker from '@/Pages/Components/Dashboard/DatePicker.vue'
+import {usePage} from "@inertiajs/inertia-vue3";
+import {format, isSameDay, parse} from 'date-fns'
+// noinspection ES6UnusedImports
+import {VTooltip} from 'floating-vue'
+import {computed, ref} from 'vue'
 
-    defineProps({
-        user: Object,
-    })
+defineProps({
+    user: Object,
+})
 
-    const toast = useToast()
+const toast = useToast()
 
-    const {date, locations, maxReservationDate, serverDates, getShifts} = useLocationFilter()
+const {date, locations, maxReservationDate, serverDates, getShifts} = useLocationFilter()
 
-    const gridCols = {
-        // See tailwind.config.js
-        1: 'grid-cols-sm-reservation-1 sm:grid-cols-reservation-1',
-        2: 'grid-cols-sm-reservation-2 sm:grid-cols-reservation-2',
-        3: 'grid-cols-sm-reservation-3 sm:grid-cols-reservation-3',
-        4: 'grid-cols-sm-reservation-4 sm:grid-cols-reservation-4',
-        5: 'grid-cols-sm-reservation-5 sm:grid-cols-reservation-5',
-    }
+const gridCols = {
+    // See tailwind.config.js
+    1: 'grid-cols-sm-reservation-1 sm:grid-cols-reservation-1',
+    2: 'grid-cols-sm-reservation-2 sm:grid-cols-reservation-2',
+    3: 'grid-cols-sm-reservation-3 sm:grid-cols-reservation-3',
+    4: 'grid-cols-sm-reservation-4 sm:grid-cols-reservation-4',
+    5: 'grid-cols-sm-reservation-5 sm:grid-cols-reservation-5',
+}
 
-    const toggleReservation = async (locationId, shiftId, toggleOn) => {
-        try {
-            const response = await axios.post('/reserve-shift', {
-                location: locationId,
-                shift: shiftId,
-                do_reserve: toggleOn,
-                date: format(date.value, 'yyyy-MM-dd'),
-            })
-            if (toggleOn) {
-                toast.success(response.data)
-            } else {
-                toast.warning(response.data)
-            }
+const toggleReservation = async (locationId, shiftId, toggleOn) => {
+    try {
+        const response = await axios.post('/reserve-shift', {
+            location: locationId,
+            shift: shiftId,
+            do_reserve: toggleOn,
+            date: format(date.value, 'yyyy-MM-dd'),
+        })
+        if (toggleOn) {
+            toast.success(response.data)
+        } else {
+            toast.warning(response.data)
+        }
+        await getShifts()
+
+    } catch (e) {
+        toast.error(e.response.data.message, {timeout: 4000})
+        if (e.response.data.error_code === 100) {
             await getShifts()
-
-        } catch (e) {
-            toast.error(e.response.data.message, {timeout: 4000})
-            if (e.response.data.error_code === 100) {
-                await getShifts()
-            }
         }
     }
+}
 
-    const locationsOnDays = ref([])
-    const flagDates = computed(() => locationsOnDays.value.filter(location => isSameDay(location.date, date.value)))
+const locationsOnDays = ref([])
+const flagDates = computed(() => locationsOnDays.value.filter(location => isSameDay(location.date, date.value)))
 
-    const setLocationMarkers = locations => locationsOnDays.value = locations
-    const isMyShift = location => {
-        return flagDates.value?.findIndex(d => d?.locations.includes(location.id)) >= 0
-    }
+const setLocationMarkers = locations => locationsOnDays.value = locations
+const isMyShift = location => {
+    return flagDates.value?.findIndex(d => d?.locations.includes(location.id)) >= 0
+}
 
-    const today = new Date()
-    const formatTime = time => format(parse(time, 'HH:mm:ss', today), 'h:mm a')
+const today = new Date()
+const formatTime = time => format(parse(time, 'HH:mm:ss', today), 'h:mm a')
+
+const isRestricted = computed(() => {
+    return !usePage().props.value.isUnrestricted
+})
+
+const canShiftBeBookedByUser = (index) => {
+    console.log('can be booked?', !isRestricted.value)
+    return !isRestricted.value
+        && index === shift.filterVolunteers.length - 1
+        && shift.maxedFemales && user.gender === 'female';
+}
 </script>
 
 <template>
@@ -110,6 +122,7 @@
                                         <Male v-else-if="volunteer.gender === 'male'" v-tooltip="volunteer.name"/>
                                         <Female v-else-if="volunteer.gender === 'female'" v-tooltip="volunteer.name"/>
                                     </template>
+                                    <EmptySlot v-else-if="isRestricted" v-tooltip="'You cannot reserve a shift'"/>
                                     <EmptySlot
                                         v-else-if="index === shift.filterVolunteers.length - 1 && shift.maxedFemales && user.gender === 'female'"
                                         color="#79B9ED"

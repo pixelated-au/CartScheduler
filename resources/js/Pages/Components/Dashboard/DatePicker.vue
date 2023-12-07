@@ -35,6 +35,10 @@
         return usePage().props.value.shiftAvailability
     })
 
+    const isRestricted = computed(() => {
+        return !usePage().props.value.isUnrestricted
+    })
+
     const today = new Date()
     const notBefore = props.canViewHistorical
         ? startOfDay(startOfMonth(subMonths(today, 6)))
@@ -60,6 +64,13 @@
     const markers = ref([])
     const highlights = ref([])
 
+    const allowed = computed(() => {
+        if (!isRestricted.value) {
+            return null
+        }
+        return markers.value.map(marker => marker.date)
+    })
+
     watchEffect(() => {
         if (!props.markerDates) {
             return
@@ -79,7 +90,6 @@
             const shiftDateGroup = props.markerDates[date]
 
             const isoDate = parseISO(date)
-
             for (const shiftId in shiftDateGroup) {
                 if (!shiftDateGroup.hasOwnProperty(shiftId)) {
                     continue
@@ -109,7 +119,7 @@
                     freeShiftCount++
                 }
             }
-            if (freeShiftCount > 0) {
+            if (!isRestricted.value && freeShiftCount > 0) {
                 highlighted.push(isoDate)
             }
             if (foundAtLocation.length) {
@@ -152,6 +162,7 @@
                 v-model="selectedDate"
                 :markers="markers"
                 :highlight="highlights"
+                :allowed-dates="allowed"
                 :min-date="notBefore"
                 :max-date="notAfter"
                 :timezone="shiftAvailability.timezone"
