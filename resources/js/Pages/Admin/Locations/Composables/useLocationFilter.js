@@ -12,6 +12,7 @@ export default function useLocationFilter (canAdmin = false) {
     const maxReservationDate = ref(new Date())
     const serverLocations = shallowRef([])
     const serverDates = shallowRef({})
+    const freeShifts = shallowRef([])
 
     const getShifts = async () => {
         const path = canAdmin ? `/admin/assigned-shifts/${selectedDate.value}` : `/shifts/${selectedDate.value}`
@@ -19,6 +20,7 @@ export default function useLocationFilter (canAdmin = false) {
         const response = await axios.get(path)
         serverLocations.value = response.data.locations
         serverDates.value = response.data.shifts
+        freeShifts.value = response.data.freeShifts
         maxReservationDate.value = parseISO(response.data.maxDateReservation)
     }
 
@@ -140,6 +142,7 @@ export default function useLocationFilter (canAdmin = false) {
         locations,
         maxReservationDate,
         serverDates,
+        freeShifts,
         getShifts,
     }
 }

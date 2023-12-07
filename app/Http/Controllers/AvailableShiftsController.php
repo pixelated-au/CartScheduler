@@ -2,7 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Actions\GetFreeShiftsData;
+use App\Actions\GetAvailableShiftsCount;
+use App\Actions\GetUserShiftsData;
 use App\Actions\GetMaxShiftReservationDateAllowed;
 use App\Http\Resources\LocationResource;
 use App\Models\Location;
@@ -20,7 +21,8 @@ use Illuminate\Http\Request;
 class AvailableShiftsController extends Controller
 {
     public function __construct(
-        private readonly GetFreeShiftsData                 $getFreeShiftsData,
+        private readonly GetUserShiftsData                 $getFreeShiftsData,
+        private readonly GetAvailableShiftsCount           $getAvailableShiftsCount,
         private readonly GetMaxShiftReservationDateAllowed $getMaxShiftReservationDateAllowed)
     {
     }
@@ -61,18 +63,22 @@ class AvailableShiftsController extends Controller
                     ->shifts->contains(fn(Shift $shift) => $shift->users->contains(fn(User $shiftUser) => $shiftUser->id === $user->id))
                 )
                 ->each(fn(Location $location) => $location->shifts = $location->shifts->filter(fn(Shift $shift) => $shift
-                    ->users
-                    ->isNotEmpty()
+                        ->users
+                        ->isNotEmpty()
                     && $shift->users
-                    ->contains(fn(User $shiftUser) => $shiftUser->id === $user->id)))
+                        ->contains(fn(User $shiftUser) => $shiftUser->id === $user->id)))
             );
 
-        $endDate   = $this->getMaxShiftReservationDateAllowed->execute()->format('Y-m-d');
-        $startDate = Carbon::today()->format('Y-m-d');
-        $shifts    = $this->getFreeShiftsData->execute($startDate, $endDate, $user);
+        $endDate         = $this->getMaxShiftReservationDateAllowed->execute()->format('Y-m-d');
+        $startDate       = Carbon::today()->format('Y-m-d');
+        $shifts          = $this->getFreeShiftsData->execute($startDate, $endDate, $user);
+        $freeShiftsCount = $user->is_unrestricted
+            ? $this->getAvailableShiftsCount->execute($startDate, $endDate, $user)
+            : [];
 
         return [
             'shifts'             => $shifts,
+            'freeShifts'         => $freeShiftsCount,
             'locations'          => LocationResource::collection($locations),
             'maxDateReservation' => $endDate,
         ];

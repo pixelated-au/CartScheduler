@@ -20,7 +20,7 @@ defineProps({
 
 const toast = useToast()
 
-const {date, locations, maxReservationDate, serverDates, getShifts} = useLocationFilter()
+const {date, locations, maxReservationDate, serverDates, freeShifts, getShifts} = useLocationFilter()
 
 const gridCols = {
     // See tailwind.config.js
@@ -84,6 +84,7 @@ const canShiftBeBookedByUser = (index) => {
                 <DatePicker v-model:date="date"
                             :max-date="maxReservationDate"
                             :locations="locations"
+                            :free-shifts="freeShifts"
                             :user="user"
                             :marker-dates="serverDates"
                             @locations-for-day="setLocationMarkers"/>
