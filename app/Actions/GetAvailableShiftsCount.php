@@ -21,7 +21,7 @@ class GetAvailableShiftsCount
      *
      * @return \Illuminate\Support\Collection
      */
-    public function execute(string $startDate, string $endDate, User $user): Collection
+    public function execute(string $startDate, string $endDate): Collection
     {
         $query = /** @lang MySQL */
             "
