@@ -1,9 +1,9 @@
-import { isAfter, isBefore, parse, parseISO } from 'date-fns'
+import {isAfter, isBefore, parse, parseISO} from 'date-fns'
 import formatISO from 'date-fns/formatISO'
-import { cloneDeep } from 'lodash'
+import {cloneDeep} from 'lodash'
 import {computed, onMounted, ref, shallowRef, watch} from 'vue'
 
-export default function useLocationFilter (canAdmin = false) {
+export default function useLocationFilter(canAdmin = false) {
     /**
      * @param {Date} date
      */
@@ -13,15 +13,21 @@ export default function useLocationFilter (canAdmin = false) {
     const serverLocations = shallowRef([])
     const serverDates = shallowRef({})
     const freeShifts = shallowRef([])
+    const isLoading = ref(false)
 
     const getShifts = async () => {
-        const path = canAdmin ? `/admin/assigned-shifts/${selectedDate.value}` : `/shifts/${selectedDate.value}`
+        isLoading.value = true
+        try {
+            const path = canAdmin ? `/admin/assigned-shifts/${selectedDate.value}` : `/shifts/${selectedDate.value}`
 
-        const response = await axios.get(path)
-        serverLocations.value = response.data.locations
-        serverDates.value = response.data.shifts
-        freeShifts.value = response.data.freeShifts
-        maxReservationDate.value = parseISO(response.data.maxDateReservation)
+            const response = await axios.get(path)
+            serverLocations.value = response.data.locations
+            serverDates.value = response.data.shifts
+            freeShifts.value = response.data.freeShifts
+            maxReservationDate.value = parseISO(response.data.maxDateReservation)
+        } finally {
+            isLoading.value = false
+        }
     }
 
     onMounted(() => {
@@ -29,7 +35,7 @@ export default function useLocationFilter (canAdmin = false) {
     })
 
     const selectedDate = computed({
-        get: () => date.value ? formatISO(date.value, { representation: 'date' }) : '',
+        get: () => date.value ? formatISO(date.value, {representation: 'date'}) : '',
         set: (value) => date.value = value,
     })
 
@@ -139,10 +145,11 @@ export default function useLocationFilter (canAdmin = false) {
     return {
         date,
         emptyShiftsForTime,
+        freeShifts,
+        isLoading,
         locations,
         maxReservationDate,
         serverDates,
-        freeShifts,
         getShifts,
     }
 }

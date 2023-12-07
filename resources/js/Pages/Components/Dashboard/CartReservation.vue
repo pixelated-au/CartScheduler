@@ -1,10 +1,11 @@
 <script setup>
-import Accordion from '@/Components/LocationAccordion.vue'
 import ComponentSpinner from '@/Components/ComponentSpinner.vue'
 import BookedSlot from '@/Components/Icons/BookedSlot.vue'
 import EmptySlot from '@/Components/Icons/EmptySlot.vue'
 import Female from '@/Components/Icons/Female.vue'
 import Male from '@/Components/Icons/Male.vue'
+import Loading from "@/Components/Loading.vue";
+import Accordion from '@/Components/LocationAccordion.vue'
 import useToast from '@/Composables/useToast'
 import useLocationFilter from '@/Pages/Admin/Locations/Composables/useLocationFilter'
 import DatePicker from '@/Pages/Components/Dashboard/DatePicker.vue'
@@ -20,7 +21,7 @@ defineProps({
 
 const toast = useToast()
 
-const {date, locations, maxReservationDate, serverDates, freeShifts, getShifts} = useLocationFilter()
+const {date, freeShifts, isLoading, locations, maxReservationDate, serverDates, getShifts} = useLocationFilter()
 
 const gridCols = {
     // See tailwind.config.js
@@ -78,7 +79,7 @@ const canShiftBeBookedByUser = (index) => {
 </script>
 
 <template>
-    <div class="p-3 grid gap-3 grid-cols-1 sm:grid-cols-[min-content_auto]">
+    <div class="p-3 grid gap-3 grid-cols-1 sm:grid-cols-[min-content_auto] sm:items-stretch">
         <div class="pb-3">
             <ComponentSpinner :show="!locations">
                 <DatePicker v-model:date="date"
@@ -92,7 +93,9 @@ const canShiftBeBookedByUser = (index) => {
             <div class="text-sm text-gray-500 text-center">Blue squares indicate free shifts</div>
         </div>
         <div class="text-sm">
-            <Accordion :items="locations" label="name" uid="id"
+            <Loading v-if="isLoading" class="min-h-[200px] sm:min-h-full"/>
+            <Accordion v-else
+                :items="locations" label="name" uid="id"
                        empty-collection-text="No available locations for this day">
                 <template #label="{label, location}">
                     <span v-if="isMyShift(location)"
