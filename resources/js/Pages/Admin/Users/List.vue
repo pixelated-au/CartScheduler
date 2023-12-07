@@ -72,7 +72,12 @@
                         <a :href="`tel:${mobile_phone}`">{{ mobile_phone }}</a>
                     </template>
                     <template #item-is_enabled="{ is_enabled }">
-                        {{ is_enabled ? 'Yes' : 'No' }}
+                        <div v-if="is_enabled">Yes</div>
+                        <div v-else class="text-red-600 dark:text-red-400">No</div>
+                    </template>
+                    <template #item-is_unrestricted="{ is_unrestricted }">
+                        <div v-if="!is_unrestricted" class="text-red-600 dark:text-red-400">Yes</div>
+                        <div v-else>No</div>
                     </template>
                 </data-table>
             </div>
