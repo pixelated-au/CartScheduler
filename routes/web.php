@@ -5,6 +5,8 @@ use App\Http\Controllers\AdminCheckForUpdateController;
 use App\Http\Controllers\AdminDashboardController;
 use App\Http\Controllers\AdminRunSoftwareUpdateController;
 use App\Http\Controllers\AvailableShiftsController;
+use App\Http\Controllers\DownloadUserImportSpreadsheetController;
+use App\Http\Controllers\DownloadUsersAsSpreadsheetController;
 use App\Http\Controllers\GetAdminUsersController;
 use App\Http\Controllers\GetAvailableUsersForShiftController;
 use App\Http\Controllers\GetReportTagsController;
@@ -135,6 +137,8 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified',
             Route::get('/admin-users', GetAdminUsersController::class)->name('admin.admin-users.get');
             Route::get('/check-update', AdminCheckForUpdateController::class)->name('admin.check-update');
             Route::post('/do-update', AdminRunSoftwareUpdateController::class)->name('admin.do-update');
+            Route::get('/users-as-spreadsheet', DownloadUsersAsSpreadsheetController::class)->name('admin.users-as-spreadsheet');
+            Route::get('/users-import-template', DownloadUserImportSpreadsheetController::class)->name('admin.user-import-template');
 
             //Route::get('/', static fn() => Inertia::render('Admin/Dashboard'))->name('admin.dashboard');
 

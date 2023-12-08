@@ -1,33 +1,37 @@
 <script setup>
-    import DataTable from '@/Components/DataTable.vue'
-    import JetButton from '@/Jetstream/Button.vue'
-    import JetHelpText from '@/Jetstream/HelpText.vue'
-    import JetInput from '@/Jetstream/Input.vue'
-    import JetLabel from '@/Jetstream/Label.vue'
-    import AppLayout from '@/Layouts/AppLayout.vue'
-    import { Inertia } from '@inertiajs/inertia'
-    import { ref } from 'vue'
-    import headers from './Lib/UserDataTableHeaders'
+import DataTable from '@/Components/DataTable.vue'
+import JetButton from '@/Jetstream/Button.vue'
+import JetHelpText from '@/Jetstream/HelpText.vue'
+import JetInput from '@/Jetstream/Input.vue'
+import JetLabel from '@/Jetstream/Label.vue'
+import AppLayout from '@/Layouts/AppLayout.vue'
+import {Inertia} from '@inertiajs/inertia'
+import {ref} from 'vue'
+import headers from './Lib/UserDataTableHeaders'
 
-    defineProps({
-        users: Object,
-        availableRoles: Array,
-        permissions: Object,
-    })
+defineProps({
+    users: Object,
+    availableRoles: Array,
+    permissions: Object,
+})
 
-    const userSearch = ref('')
+const userSearch = ref('')
 
-    const onNewUser = () => {
-        Inertia.visit(route('admin.users.create'))
-    }
+const onNewUser = () => {
+    Inertia.visit(route('admin.users.create'))
+}
 
-    const onImportUsers = () => {
-        Inertia.visit(route('admin.users.import.show'))
-    }
+const onImportUsers = () => {
+    Inertia.visit(route('admin.users.import.show'))
+}
 
-    const handleSelection = (selection) => {
-        Inertia.visit(route('admin.users.edit', selection.id))
-    }
+const onDownloadUsers = async () => {
+    window.location.href = route('admin.users-as-spreadsheet')
+}
+
+const handleSelection = (selection) => {
+    Inertia.visit(route('admin.users.edit', selection.id))
+}
 </script>
 
 <template>
@@ -50,13 +54,25 @@
             </div>
         </template>
 
-        <div class="max-w-7xl mx-auto sm:pt-10 sm:pb-5 sm:px-6 lg:px-8">
-            <div class="bg-white dark:bg-slate-900 shadow-xl sm:rounded-lg py-3 px-4 sm:p-6">
+        <div class="max-w-7xl mx-auto sm:pt-10 sm:pb-5 sm:px-6 lg:px-8 grid gap-3 grid-cols-1 sm:grid-cols-12">
+            <div class="bg-white dark:bg-slate-900 shadow-xl sm:rounded-lg py-3 px-4 sm:p-6 sm:col-span-10">
                 <JetLabel for="search" value="Search for a user:"/>
                 <!-- Overriding background colours for usability -->
-                <JetInput id="search" v-model="userSearch" type="text" class="mt-1 block w-full dark:bg-slate-700 sm:dark:bg-slate-800"/>
+                <JetInput id="search" v-model="userSearch" type="text"
+                          class="mt-1 block w-full dark:bg-slate-700 sm:dark:bg-slate-800"/>
                 <JetHelpText>Search on name, email, phone, role or any field</JetHelpText>
             </div>
+            <div class="hidden sm:flex sm:flex-wrap sm:justify-center sm:items-center col-span-2">
+                <div class="text-center">
+                    <JetButton outline style-type="info" @click="onDownloadUsers">
+                        Download Users
+                    </JetButton>
+                    <div class="mt-2 text-sm text-gray-800 dark:text-gray-400 text-center">Download an Excel
+                        Spreadsheet
+                    </div>
+                </div>
+            </div>
+
         </div>
 
         <div class="max-w-7xl mx-auto pb-10 sm:px-6 lg:px-8">

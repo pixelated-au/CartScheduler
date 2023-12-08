@@ -6,7 +6,6 @@ import {useForm} from '@inertiajs/inertia-vue3'
 import {computed} from 'vue'
 
 defineProps({
-    templateFile: String,
 })
 
 const listRouteAction = () => {
@@ -41,6 +40,10 @@ const validationErrors = computed(() => {
     }
     return errors
 })
+
+const templateFile = route('admin.user-import-template');
+
+
 </script>
 
 <template>

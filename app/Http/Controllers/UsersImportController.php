@@ -20,9 +20,7 @@ class UsersImportController extends Controller
     {
         $this->authorize('import', User::class);
 
-        return Inertia::render('Admin/Users/Import', [
-            'templateFile' => asset('storage/example-user-import.xlsx'),
-        ]);
+        return Inertia::render('Admin/Users/Import');
     }
 
     public function import(Request $request): RedirectResponse
