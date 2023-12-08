@@ -77,6 +77,7 @@ class User extends Authenticatable
         'appointment',
         'serving_as',
         'responsible_brother',
+        'is_unrestricted',
         'password',
         'role',
     ];
