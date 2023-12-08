@@ -44,7 +44,6 @@ class UsersImport implements WithHeadingRow, WithValidation, WithBatchInserts, O
             'marital_status'      => $this->tidyNullableData($rowData['marital_status']),
             'spouse_id'           => $this->tidyNullableData($rowData['spouse_id']),
             'responsible_brother' => $rowData['responsible_brother'] ?: false,
-            'password'            => null,
             'is_unrestricted'     => isset($rowData['is_unrestricted']) ? $rowData['is_unrestricted'] : true,
         ];
 
@@ -54,8 +53,9 @@ class UsersImport implements WithHeadingRow, WithValidation, WithBatchInserts, O
             ++$this->updateCount;
 
         } else {
-            $data['uuid'] = Str::uuid();
-            $user         = User::create($data);
+            $data['uuid']     = Str::uuid();
+            $data['password'] = null;
+            $user             = User::create($data);
             $user->availability()->create();
             ++$this->createCount;
         }
