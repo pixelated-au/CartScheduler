@@ -95,7 +95,7 @@ const canShiftBeBookedByUser = (index) => {
         <div class="text-sm">
             <Loading v-if="isLoading" class="min-h-[200px] sm:min-h-full"/>
             <Accordion v-else
-                :items="locations" label="name" uid="id"
+                       :items="locations" label="name" uid="id"
                        empty-collection-text="No available locations for this day">
                 <template #label="{label, location}">
                     <span v-if="isMyShift(location)"
@@ -117,12 +117,16 @@ const canShiftBeBookedByUser = (index) => {
                                      :key="index"
                                      class="self-center justify-self-center pt-4">
                                     <template v-if="volunteer">
-                                        <button v-if="volunteer.id === user.id"
-                                                type="button"
-                                                class="block"
-                                                @click="toggleReservation(location.id, shift.id, false)">
-                                            <BookedSlot v-tooltip="`${volunteer.name}: Tap to un-reserve this shift`"/>
-                                        </button>
+                                        <template v-if="volunteer.id === user.id">
+                                            <button v-if="!isRestricted"
+                                                    type="button"
+                                                    class="block"
+                                                    @click="toggleReservation(location.id, shift.id, false)">
+                                                <BookedSlot
+                                                    v-tooltip="`${volunteer.name}: Tap to un-reserve this shift`"/>
+                                            </button>
+                                            <BookedSlot v-else/>
+                                        </template>
                                         <Male v-else-if="volunteer.gender === 'male'" v-tooltip="volunteer.name"/>
                                         <Female v-else-if="volunteer.gender === 'female'" v-tooltip="volunteer.name"/>
                                     </template>
