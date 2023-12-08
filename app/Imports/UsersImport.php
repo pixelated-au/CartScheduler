@@ -7,40 +7,50 @@ use App\Enums\Appontment;
 use App\Enums\MaritalStatus;
 use App\Enums\ServingAs;
 use App\Models\User;
-use App\Models\UserAvailability;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Enum;
-use Maatwebsite\Excel\Concerns\ToCollection;
+use Maatwebsite\Excel\Concerns\OnEachRow;
 use Maatwebsite\Excel\Concerns\WithBatchInserts;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Maatwebsite\Excel\Concerns\WithValidation;
+use Maatwebsite\Excel\Row;
 
-class UsersImport implements ToCollection, WithHeadingRow, WithValidation, WithBatchInserts
+class UsersImport implements WithHeadingRow, WithValidation, WithBatchInserts, OnEachRow
 {
-    private int $rowCount = 0;
+    private int $createCount = 0;
+    private int $updateCount = 0;
 
-    public function collection(Collection $collection): void
+
+    public function onRow(Row $row): void
     {
-        foreach ($collection as $row) {
-            $user = User::create([
-                'uuid'                => Str::uuid(),
-                'name'                => $row['name'],
-                'email'               => $row['email'],
-                'mobile_phone'        => $row['mobile_phone'],
-                'gender'              => $row['gender'],
-                'year_of_birth'       => $this->tidyNullableData($row['year_of_birth']),
-                'appointment'         => $this->tidyNullableData($row['appointment']),
-                'serving_as'          => $this->tidyNullableData($row['serving_as']),
-                'marital_status'      => $this->tidyNullableData($row['marital_status']),
-                'spouse_id'           => $this->tidyNullableData($row['spouse_id']),
-                'responsible_brother' => $row['responsible_brother'] ?: false,
-                'password'            => null,
-                'is_unrestricted'     => $row['is_unrestricted'] ?: true,
-            ]);
+        $rowData = $row->toArray();
 
-            UserAvailability::create(['user_id' => $user->id]);
-            ++$this->rowCount;
+        /** @noinspection PhpIssetCanBeReplacedWithCoalesceInspection */
+        $data = [
+            'name'                => $rowData['name'],
+            'email'               => $rowData['email'],
+            'mobile_phone'        => $rowData['mobile_phone'],
+            'gender'              => $rowData['gender'],
+            'year_of_birth'       => $this->tidyNullableData($rowData['year_of_birth']),
+            'appointment'         => $this->tidyNullableData($rowData['appointment']),
+            'serving_as'          => $this->tidyNullableData($rowData['serving_as']),
+            'marital_status'      => $this->tidyNullableData($rowData['marital_status']),
+            'spouse_id'           => $this->tidyNullableData($rowData['spouse_id']),
+            'responsible_brother' => $rowData['responsible_brother'] ?: false,
+            'password'            => null,
+            'is_unrestricted'     => isset($rowData['is_unrestricted']) ? $rowData['is_unrestricted'] : true,
+        ];
+
+        $user = User::where('email', '=', $rowData['email'])->first();
+        if ($user) {
+            $user->update($data);
+            ++$this->updateCount;
+
+        } else {
+            $data['uuid'] = Str::uuid();
+            $user         = User::create($data);
+            $user->availability()->create();
+            ++$this->createCount;
         }
     }
 
@@ -48,7 +58,7 @@ class UsersImport implements ToCollection, WithHeadingRow, WithValidation, WithB
     {
         return [
             'name'                => ['required', 'string', 'max:255'],
-            'email'               => ['required', 'email', 'unique:users,email'],
+            'email'               => ['required', 'email'],
             'mobile_phone'        => ['required', 'string', 'regex:/^([0-9\+\-\s]+)$/', 'min:8', 'max:15'],
             'gender'              => ['required', 'in:male,female,m,f'],
             'year_of_birth'       => ['nullable', 'integer', 'min:' . date('Y') - 100, 'max:' . date('Y')],
@@ -69,6 +79,7 @@ class UsersImport implements ToCollection, WithHeadingRow, WithValidation, WithB
 
     /**
      * @throws \Illuminate\Contracts\Container\BindingResolutionException
+     * @noinspection PhpUnusedParameterInspection
      */
     public function prepareForValidation(array $data, int $index)
     {
@@ -82,9 +93,14 @@ class UsersImport implements ToCollection, WithHeadingRow, WithValidation, WithB
         return 2;
     }
 
-    public function getRowCount(): int
+    public function getCreateCount(): int
     {
-        return $this->rowCount;
+        return $this->createCount;
+    }
+
+    public function getUpdateCount(): int
+    {
+        return $this->updateCount;
     }
 
     public function batchSize(): int

@@ -34,8 +34,19 @@ class UsersImportController extends Controller
         $import = new UsersImport();
         Excel::import($import, $request->file('file'));
 
-        $rowCount = $import->getRowCount();
-        session()->flash('flash.banner', "$rowCount Users were imported!");
+        $createCount = $import->getCreateCount();
+        $updateCount = $import->getUpdateCount();
+        $createMessage = '';
+        $updateMessage = '';
+        if ($createCount) {
+            $createMessage = "$createCount users were imported";
+            $createMessage .= $updateCount ? ' and ' : '!';
+        }
+        if ($updateCount) {
+            $updateMessage = "$updateCount users were updated";
+            $updateMessage .= $createCount ? '!' : '';
+        }
+        session()->flash('flash.banner', $createMessage . $updateMessage);
         session()->flash('flash.bannerStyle', 'success');
 
         return Redirect::route('admin.users.import.show');
