@@ -270,7 +270,7 @@ const cancelButtonText = computed(() => form.isDirty ? 'Cancel' : 'Back')
                 ]"/>
                 <JetInputError :message="form.errors.is_enabled" class="mt-2"/>
             </div>
-            <div class="col-start-3 col-span-4 text-sm">
+            <div class="col-start-3 col-span-4 text-sm text-gray-700 dark:text-gray-300">
                 <p><strong>Restricted users</strong> cannot self-roster and can only access shifts relevant to them.
                     This includes their shift and the shifts either side of their shift.</p>
                 <p class="mt-3"><strong>Inactive users</strong> cannot log into or interact with the system.</p>
