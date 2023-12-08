@@ -36,7 +36,7 @@ class UsersImport implements ToCollection, WithHeadingRow, WithValidation, WithB
                 'spouse_id'           => $this->tidyNullableData($row['spouse_id']),
                 'responsible_brother' => $row['responsible_brother'] ?: false,
                 'password'            => null,
-                'is_unrestricted'     => $row['is_unrestricted'] ?: false,
+                'is_unrestricted'     => $row['is_unrestricted'] ?: true,
             ]);
 
             UserAvailability::create(['user_id' => $user->id]);
