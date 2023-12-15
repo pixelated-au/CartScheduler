@@ -158,7 +158,7 @@
         </div>
         <div class="text-sm">
             <Loading v-if="isLoading" class="min-h-[200px] sm:min-h-full"/>
-            <Accordion v-else :items="locations" label="name" uid="id">
+            <Accordion v-show="!isLoading" :items="locations" label="name" uid="id">
                 <template #label="{label, location}">
                     <span class="dark:text-gray-200">{{ label }}</span>
                 </template>
