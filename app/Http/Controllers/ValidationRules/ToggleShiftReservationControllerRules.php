@@ -11,7 +11,9 @@ use App\Models\Shift;
 use App\Models\ShiftUser;
 use App\Models\User;
 use Carbon\CarbonPeriod;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Query\JoinClause;
 use Illuminate\Support\Carbon;
 use RuntimeException;
 
@@ -62,30 +64,53 @@ class ToggleShiftReservationControllerRules
         ];
     }
 
-    private function isOverlappingShift(User $user, Carbon $shiftDate, int $shift, $fail): void
+    private function isOverlappingShift(User $user, Carbon $shiftDate, int $shiftId, $fail): void
     {
-        $userShiftsOnDate = ShiftUser::with(['shift', 'shift.location'])
-            ->where('user_id', $user->id)
-            ->where('shift_date', $shiftDate->toDateString())
+        $userShiftsOnDate = Shift::select('shifts.*')
+            ->with([
+                'location' => fn(BelongsTo $query) => $query
+                    ->select(['id', 'name'])
+                    ->where('is_enabled', true)
+            ])
+            ->join(table: 'locations', first: fn(JoinClause $query) => $query
+                ->on('locations.id', '=', 'shifts.location_id')
+                ->where('locations.is_enabled', true)
+            )
+            ->rightJoin(table: 'shift_user', first: fn(JoinClause $query) => $query
+                ->on('shift_user.shift_id', '=', 'shifts.id')
+                ->where('shift_user.user_id', $user->id)
+                ->where('shift_user.shift_date', $shiftDate->toDateString())
+            )
+            ->where('shifts.is_enabled', true)
+            ->where(fn(Builder $query) => $query
+                ->whereNull('shifts.available_from')
+                ->orWhere('shifts.available_from', '<=', $shiftDate->toDateString())
+            )
+            ->where(fn(Builder $query) => $query
+                ->whereNull('shifts.available_to')
+                ->orWhere('shifts.available_to', '>=', $shiftDate->toDateString())
+            )
             ->get();
 
-        $requestedShift       = Shift::find($shift);
+
+        $requestedShift       = Shift::find($shiftId);
         $requestedShiftPeriod = CarbonPeriod::create(
             $requestedShift->start_time,
             $requestedShift->end_time,
         );
 
-        $foundOverlappingShift = $userShiftsOnDate->first(
-            fn(ShiftUser $currentShift) => $requestedShiftPeriod->overlaps(
-                CarbonPeriod::create($currentShift->shift->start_time, $currentShift->shift->end_time),
+        /** @var Shift $overlappingShift */
+        $overlappingShift = $userShiftsOnDate->first(
+            fn(Shift $currentShift) => $requestedShiftPeriod->overlaps(
+                CarbonPeriod::create($currentShift->start_time, $currentShift->end_time),
             ),
         );
 
-        if ($foundOverlappingShift) {
-            $start = Carbon::parse($foundOverlappingShift->shift->start_time)->format('h:i a');
-            $end   = Carbon::parse($foundOverlappingShift->shift->end_time)->format('h:i a');
+        if ($overlappingShift) {
+            $start = Carbon::parse($overlappingShift->start_time)->format('h:i a');
+            $end   = Carbon::parse($overlappingShift->end_time)->format('h:i a');
             $fail(
-                "Sorry, another shift that overlaps this shift at {$foundOverlappingShift->shift->location->name} between $start and $end.",
+                "Sorry, another shift that overlaps this shift at {$overlappingShift->location->name} between $start and $end.",
             );
         }
     }
