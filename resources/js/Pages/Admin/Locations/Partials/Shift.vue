@@ -30,12 +30,12 @@
 
     const availableFrom = computed({
         get: () => props.modelValue.available_from,
-        set: value => shift.value.available_from = format(value, 'yyyy-MM-dd'),
+        set: value => shift.value.available_from = value ?format(value, 'yyyy-MM-dd') : null
     })
 
     const availableTo = computed({
         get: () => props.modelValue.available_to,
-        set: value => shift.value.available_to = format(value, 'yyyy-MM-dd'),
+        set: value => shift.value.available_to = value ? format(value, 'yyyy-MM-dd') : null,
     })
 
     const prefixTime = time => {
