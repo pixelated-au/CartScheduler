@@ -2,7 +2,6 @@
 
 namespace App\Actions;
 
-use App\Models\User;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use stdClass;
@@ -53,11 +52,11 @@ SELECT dates.date,
                   WHEN DAYOFWEEK(dates.date) = 6 THEN s.day_friday
                   WHEN DAYOFWEEK(dates.date) = 7 THEN s.day_saturday
                   END = 1)                                              AS max_allowed,
-       IFNULL(count_query.volunteer_count, 0)                           AS volunteer_count,
+       IFNULL(count_query.vc, 0)                                        AS volunteer_count,
        IF((SELECT volunteer_count) < (SELECT max_allowed), TRUE, FALSE) AS has_availability
 FROM dates
          LEFT JOIN (SELECT shift_date,
-                           COUNT(*) AS volunteer_count
+                           COUNT(*) AS vc
                     FROM shift_user
                              LEFT JOIN shifts s ON s.id = shift_user.shift_id
                              LEFT JOIN locations l ON l.id = s.location_id AND l.is_enabled = TRUE
@@ -81,7 +80,7 @@ FROM dates
                     GROUP BY shift_date) AS count_query ON count_query.shift_date = dates.date
 
 
-GROUP BY dates.date
+GROUP BY dates.date, count_query.vc
 ORDER BY dates.date";
 
         $params = ['startDate' => $startDate, 'endDate' => $endDate];
