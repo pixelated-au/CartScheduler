@@ -78,7 +78,7 @@
             })
             toast.success(`${volunteerName} was assigned to ${location.name} at ${shift.start_time}`)
         } catch (e) {
-            toast.error(e.response.message)
+            toast.error(e.response.data.message)
 
         } finally {
             await getShifts()
