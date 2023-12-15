@@ -73,7 +73,7 @@ class AvailableShiftsController extends Controller
         $startDate       = Carbon::today()->format('Y-m-d');
         $shifts          = $this->getFreeShiftsData->execute($startDate, $endDate, $user);
         $freeShiftsCount = $user->is_unrestricted
-            ? $this->getAvailableShiftsCount->execute($startDate, $endDate, $user)
+            ? $this->getAvailableShiftsCount->execute($startDate, $endDate)
             : [];
 
         return [
