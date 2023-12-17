@@ -8,6 +8,13 @@
 
 ## Deployment
 
+## Deployment Issues
+For some reason, the deployment has an issue with the `vendor` directory. Specifically around the Laravel Excel package.
+If the Download Users feature fails, delete the vendor package and run `composer install` again:
+```bash
+rm -rf vendor && composer install
+```
+
 ### cPanel Hosting
 
 cPanel Hosting is a little problematic because the root domain typically needs to be served from the
