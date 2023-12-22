@@ -25,7 +25,7 @@ class UpdateUserLocationsChoicesController extends Controller
 
         $user->rosterLocations()->sync($locationIds);
 
-        session()->flash('flash.banner', $isAdminEdit ? 'volunteer holidays have been updated.' : 'your holidays have been updated.');
+        session()->flash('flash.banner', $isAdminEdit ? 'volunteer preferred locations have been updated.' : 'your preferred locations have been updated.');
         session()->flash('flash.bannerstyle', 'success');
 
         if ($isAdminEdit) {

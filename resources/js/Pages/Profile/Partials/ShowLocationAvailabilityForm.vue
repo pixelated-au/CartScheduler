@@ -8,7 +8,7 @@ import JetLabel from "@/Jetstream/Label.vue";
 import {useForm} from '@inertiajs/inertia-vue3';
 // noinspection ES6UnusedImports
 import {Dropdown as VDropdown, VTooltip} from 'floating-vue'
-import {onMounted, ref} from "vue";
+import {computed, onMounted, ref} from "vue";
 
 const props = defineProps({
     selectedLocations: {
@@ -61,6 +61,29 @@ const onChecked = (locationId, isChecked) => {
     }
 }
 
+const errors = computed(() => Object.keys(form.errors)
+    .map((key) => {
+        const segments = key.split('.');
+        if (!segments.length > 1 || segments[0] !== 'selectedLocations') {
+            return null;
+        }
+
+        const locationIdx = parseInt(segments[segments.length - 1]);
+        return {
+            locationId: form.selectedLocations[locationIdx],
+            message: form.errors[key],
+        };
+    })
+    .filter((error) => error !== null)
+)
+
+const getError = (locationId) => {
+    const error = errors.value.find((error) => error.locationId === locationId)
+    if (!error) {
+        return null
+    }
+    return error.message
+}
 
 const locations = ref()
 onMounted(async () => {
@@ -84,16 +107,17 @@ onMounted(async () => {
         <template #form>
             <div class="col-span-6 grid grid-cols-6 gap-3">
                 <div v-for="location in locations" :key="location.id" class="col-span-2 flex items-center flex-wrap">
-                    <!--                                 v-model:checked="form.enableUserLocationChoices"-->
                     <JetCheckbox :id="`do_enable_location_choice_${location.id}`"
                                  :checked="form.selectedLocations.includes(location.id)"
                                  value="true"
                                  class="mr-3"
                                  @update:checked="onChecked(location.id, $event)"/>
-                    <JetLabel :for="`do_enable_location_choice_${location.id}`" :value="location.name" class="select-none"/>
-                    <JetInputError :message="form.errors.enableUserLocationChoices" class="mt-2"/>
+                    <JetLabel :for="`do_enable_location_choice_${location.id}`" :value="location.name"
+                              class="select-none"/>
+                    <JetInputError :message="getError(location.id)" class="mt-2"/>
                 </div>
             </div>
+            <JetInputError :message="form.errors.featureDisabled" class="col-span-6 mt-2"/>
         </template>
 
         <template #actions>
