@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\AdminUpdateUserFunctionalityAction;
 use App\Http\Requests\UserVacationRequest;
 use App\Models\User;
 use App\Models\UserVacation;
@@ -9,18 +10,17 @@ use Illuminate\Support\Facades\Redirect;
 
 class UpdateUserVacationsController extends Controller
 {
+    public function __construct(private readonly AdminUpdateUserFunctionalityAction $adminUpdateUserFunctionalityAction)
+    {
+    }
+
     public function __invoke(UserVacationRequest $request)
     {
         /** @var User $user */
         $user      = $request->user();
         $this->authorize('update', $user);
 
-        $isOther = false;
-        if ($request->validated('user_id')) {
-            // this means admin is updating another user's availability
-            $isOther = true;
-            $user = User::findOrFail($request->validated('user_id'));
-        }
+        [$isAdminEdit, $user] = $this->adminUpdateUserFunctionalityAction->execute($request);
 
         $vacations = $request->validated('vacations', []);
 
@@ -58,10 +58,10 @@ class UpdateUserVacationsController extends Controller
             $userVacation->delete();
         }
 
-        session()->flash('flash.banner', $isOther ? 'Volunteer holidays have been updated.' : 'Your holidays have been updated.');
+        session()->flash('flash.banner', $isAdminEdit ? 'Volunteer holidays have been updated.' : 'Your holidays have been updated.');
         session()->flash('flash.bannerStyle', 'success');
 
-        if ($isOther) {
+        if ($isAdminEdit) {
             return Redirect::route('admin.users.edit', $user);
         }
         return Redirect::route('user.availability');
