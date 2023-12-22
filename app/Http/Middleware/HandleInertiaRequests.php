@@ -79,6 +79,10 @@ class HandleInertiaRequests extends Middleware
             $custom['needsToUpdateAvailability'] = $this->getNeedsToUpdateAvailability->execute($user);
         }
 
+        if ($this->settings->enableUserLocationChoices) {
+            $custom['enableUserLocationChoices'] = true;
+        }
+
         if ($user?->is_unrestricted) {
             $custom['isUnrestricted'] = true;
         }

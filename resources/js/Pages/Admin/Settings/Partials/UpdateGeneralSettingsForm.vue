@@ -11,37 +11,38 @@ import {useForm} from '@inertiajs/inertia-vue3';
 import {computed} from "vue";
 
 const props = defineProps({
-  settings: Object,
+    settings: Object,
 });
 
 const form = useForm({
-  _method: 'PUT',
-  siteName: props.settings.siteName,
-  systemShiftStartHour: props.settings.systemShiftStartHour,
-  systemShiftEndHour: props.settings.systemShiftEndHour,
-  enableUserAvailability: props.settings.enableUserAvailability,
+    _method: 'PUT',
+    siteName: props.settings.siteName,
+    systemShiftStartHour: props.settings.systemShiftStartHour,
+    systemShiftEndHour: props.settings.systemShiftEndHour,
+    enableUserAvailability: props.settings.enableUserAvailability,
+    enableUserLocationChoices: props.settings.enableUserLocationChoices,
 });
 
 const updateGeneralSettings = () => {
-  form.put(route('admin.general-settings.update'), {
-    errorBag: 'updateGeneralSettings',
-    preserveScroll: true,
-    onSuccess: () => form.defaults(),
-  })
+    form.put(route('admin.general-settings.update'), {
+        errorBag: 'updateGeneralSettings',
+        preserveScroll: true,
+        onSuccess: () => form.defaults(),
+    })
 }
 
 const hours = computed(() => {
-  return Array(24).fill('').map((_, i) => {
-    if (i === 0) {
-      return {label: '12am', value: 0}
-    }
+    return Array(24).fill('').map((_, i) => {
+        if (i === 0) {
+            return {label: '12am', value: 0}
+        }
 
-    if (i === 12) {
-      return {label: '12pm', value: 0}
-    }
+        if (i === 12) {
+            return {label: '12pm', value: 0}
+        }
 
-    return {label: i < 12 ? i + 'am' : i - 12 + 'pm', value: i}
-  });
+        return {label: i < 12 ? i + 'am' : i - 12 + 'pm', value: i}
+    });
 });
 
 </script>
@@ -92,15 +93,29 @@ const hours = computed(() => {
                              v-model:checked="form.enableUserAvailability"
                              value="true"
                              class="mr-3"/>
-                <JetLabel for="enable_user_availability" value="Enable User Availability"/>
+                <JetLabel for="enable_user_availability" value="Enable Volunteer Availability"/>
                 <JetInputError :message="form.errors.enableUserAvailability" class="mt-2"/>
                 <div class="col-span-2 ml-1 text-sm text-gray-600 dark:text-gray-300 w-full">
                     Used for admin based scheduling. Enabling this will prompt users update the times they are available
                     to be rostered on.
-                    <span class="italic">
+                    <em>
                         Note: as soon as this is enabled, users will start to be prompted so it's usually best to warn
                         them first.
-                    </span>
+                    </em>
+                </div>
+            </div>
+
+            <div class="col-span-6 flex items-center flex-wrap">
+                <JetCheckbox id="enable_user_location_choices"
+                             v-model:checked="form.enableUserLocationChoices"
+                             value="true"
+                             class="mr-3"/>
+                <JetLabel for="enable_user_location_choices" value="Allow Volunteers to choose specific locations"/>
+                <JetInputError :message="form.errors.enableUserLocationChoices" class="mt-2"/>
+                <div class="col-span-2 ml-1 text-sm text-gray-600 dark:text-gray-300 w-full">
+                    Used for admin based scheduling. Enabling this will add a new section on the 'availability page'
+                    that allows volunteers to choose which locations they'd like to be rostered onto. <em>This is a
+                    niche setting, you probably will <strong>not</strong> need to enable this feature.</em>
                 </div>
             </div>
         </template>
