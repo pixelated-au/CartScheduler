@@ -36,6 +36,12 @@ export default [
         width: '20%',
     },
     {
+        text: 'Restricted',
+        value: 'is_unrestricted',
+        sortable: true,
+        width: '20%',
+    },
+    {
         text: 'Role',
         value: 'role',
         sortable: true,

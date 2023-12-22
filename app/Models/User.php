@@ -69,6 +69,7 @@ class User extends Authenticatable
         'email',
         'gender',
         'is_enabled',
+        'is_unrestricted',
         'mobile_phone',
         'year_of_birth',
         'marital_status',
@@ -76,6 +77,7 @@ class User extends Authenticatable
         'appointment',
         'serving_as',
         'responsible_brother',
+        'is_unrestricted',
         'password',
         'role',
     ];
@@ -100,8 +102,9 @@ class User extends Authenticatable
      */
     protected $casts = [
         'is_enabled'          => 'boolean',
-        'email_verified_at'   => 'datetime',
+        'is_unrestricted'     => 'boolean',
         'responsible_brother' => 'boolean',
+        'email_verified_at'   => 'datetime',
         'year_of_birth'       => 'integer',
     ];
 
@@ -154,6 +157,15 @@ class User extends Authenticatable
         return Attribute::make(
             get: static function ($value, $attributes) {
                 return isset($attributes['password']) && $attributes['password'];
+            },
+        );
+    }
+
+    protected function isRestricted(): Attribute
+    {
+        return Attribute::make(
+            get: static function ($value, $attributes) {
+                return !$attributes['is_unrestricted'];
             },
         );
     }

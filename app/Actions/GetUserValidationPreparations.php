@@ -50,16 +50,23 @@ class GetUserValidationPreparations
         if (!isset($data['spouse_id'])) {
             $data['spouse_id'] = null;
         }
-        if (!isset($data['responsible_brother'])
-            || trim($data['responsible_brother']) === '0'
-            || trim(strtolower($data['responsible_brother'])) === 'false') {
-            $data['responsible_brother'] = false;
 
-        } else if (trim($data['responsible_brother']) === '1'
-            || trim(strtolower($data['responsible_brother'])) === 'true') {
-            $data['responsible_brother'] = true;
-        }
+        $this->tidyBoolean($data, 'responsible_brother');
+        $this->tidyBoolean($data, 'is_unrestricted');
 
         return $data;
+    }
+
+    protected function tidyBoolean(array &$data, string $fieldName): void
+    {
+        if (!isset($data[$fieldName])
+            || trim($data[$fieldName]) === '0'
+            || trim(strtolower($data[$fieldName])) === 'false') {
+            $data[$fieldName] = false;
+
+        } else if (trim($data[$fieldName]) === '1'
+            || trim(strtolower($data[$fieldName])) === 'true') {
+            $data[$fieldName] = true;
+        }
     }
 }

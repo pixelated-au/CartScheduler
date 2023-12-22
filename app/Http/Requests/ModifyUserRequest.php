@@ -37,7 +37,8 @@ class ModifyUserRequest extends FormRequest
             'serving_as'          => ['nullable', 'string', new Enum(ServingAs::class)],
             'marital_status'      => ['nullable', 'string', new Enum(MaritalStatus::class)],
             'responsible_brother' => ['nullable', 'boolean'],
-            'is_enabled'          => ['boolean']
+            'is_enabled'          => ['boolean'],
+            'is_unrestricted'     => ['boolean'],
         ];
     }
 

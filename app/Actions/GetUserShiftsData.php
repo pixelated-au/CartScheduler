@@ -2,12 +2,13 @@
 
 namespace App\Actions;
 
+use App\Models\User;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use stdClass;
 
-class GetFreeShiftsData
+class GetUserShiftsData
 {
     /**
      * This is a recursive query that will return a list of dates from the start date
@@ -21,9 +22,10 @@ class GetFreeShiftsData
      *
      * @return \Illuminate\Support\Collection
      */
-    public function execute(string $startDate, string $endDate): Collection
+    public function execute(string $startDate, string $endDate, User $user): Collection
     {
-        $query = DB::raw(/** @lang MySQL */ "
+        $query = /** @lang MySQL */
+            "
                 WITH RECURSIVE dates (date) AS
                    (SELECT :startDate
                     UNION ALL
@@ -62,21 +64,23 @@ class GetFreeShiftsData
                                             WHEN DAYOFWEEK(dates.date) = 7 THEN shifts.day_saturday
                                             END = 1
 
-                         LEFT JOIN shift_user ON shifts.id = shift_user.shift_id
+                         INNER JOIN shift_user ON shifts.id = shift_user.shift_id
                                               AND shift_user.shift_date = dates.date
+                                              AND shift_user.user_id = :userId
 
                          LEFT JOIN locations ON locations.id = shifts.location_id
                                              AND locations.is_enabled = true
                 ORDER BY dates.date,
                          locations.name,
                          shifts.start_time
-                ",
-        );
+                ";
 
-        $results = DB::select($query, ['startDate' => $startDate, 'endDate' => $endDate]);
+        $params = ['startDate' => $startDate, 'endDate' => $endDate, 'userId' => $user->id];
+
+        $results = DB::select(DB::raw($query), $params);
 
         return collect($results)
-            ->map(fn(stdClass $shift) => collect([
+            ->map(fn(stdClass $shift) => [
                 'shift_date'     => $shift->date,
                 'shift_id'       => $shift->shift_id,
                 'volunteer_id'   => $shift->volunteer_id,
@@ -85,11 +89,13 @@ class GetFreeShiftsData
                 'available_from' => $shift->available_from ? Carbon::parse($shift->available_from) : null,
                 'available_to'   => $shift->available_to ? Carbon::parse($shift->available_to) : null,
                 'max_volunteers' => (int)$shift->max_volunteers,
-            ]))
+            ])
+//            ->when($user->is_restricted, fn(Collection $shifts) => $shifts
+                ->filter(fn(array $shift) => $shift['volunteer_id'] === $user->id)
+//            )
             ->groupBy([
                 'shift_date',
                 'shift_id',
-            ])
-            ->sortKeys();
+            ]);
     }
 }

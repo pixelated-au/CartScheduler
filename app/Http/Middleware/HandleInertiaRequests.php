@@ -21,8 +21,8 @@ class HandleInertiaRequests extends Middleware
     protected $rootView = 'app';
 
     public function __construct(
-        private readonly GeneralSettings        $settings,
-        private readonly HasNewVersionAvailable $hasNewVersionAvailable,
+        private readonly GeneralSettings               $settings,
+        private readonly HasNewVersionAvailable        $hasNewVersionAvailable,
         private readonly UserNeedsToUpdateAvailability $getNeedsToUpdateAvailability,
     )
     {
@@ -54,17 +54,18 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
+        /** @var User $user */
         $user   = $request->user();
         $custom = [
             'pagePermissions'   => $this->getPageAccessPermissions($user),
             'shiftAvailability' => [
-                'timezone'       => config('app.timezone'),
-                'duration'       => (int)config('cart-scheduler.shift_reservation_duration'),
-                'period'         => config('cart-scheduler.shift_reservation_duration_period'),
-                'releasedDaily'  => config('cart-scheduler.do_release_shifts_daily'),
-                'weekDayRelease' => (int)config('cart-scheduler.release_weekly_shifts_on_day'),
+                'timezone'             => config('app.timezone'),
+                'duration'             => (int)config('cart-scheduler.shift_reservation_duration'),
+                'period'               => config('cart-scheduler.shift_reservation_duration_period'),
+                'releasedDaily'        => config('cart-scheduler.do_release_shifts_daily'),
+                'weekDayRelease'       => (int)config('cart-scheduler.release_weekly_shifts_on_day'),
                 'systemShiftStartHour' => $this->settings->systemShiftStartHour,
-                'systemShiftEndHour' => $this->settings->systemShiftEndHour,
+                'systemShiftEndHour'   => $this->settings->systemShiftEndHour,
             ],
         ];
 
@@ -74,9 +75,14 @@ class HandleInertiaRequests extends Middleware
         }
 
         if ($this->settings->enableUserAvailability) {
-            $custom['enableUserAvailability'] = true;
+            $custom['enableUserAvailability']    = true;
             $custom['needsToUpdateAvailability'] = $this->getNeedsToUpdateAvailability->execute($user);
         }
+
+        if ($user?->is_unrestricted) {
+            $custom['isUnrestricted'] = true;
+        }
+        $custom['user'] = fn() => $user?->only(['id', 'name', 'email']);
 
         return array_merge(parent::share($request), $custom);
     }

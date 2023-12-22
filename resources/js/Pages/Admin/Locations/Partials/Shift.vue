@@ -8,6 +8,7 @@
     import JetSectionBorder from '@/Jetstream/SectionBorder.vue'
     //https://vue3datepicker.com/
     import Datepicker from '@vuepic/vue-datepicker'
+    import {format} from "date-fns";
     import { computed, defineProps, inject, ref } from 'vue'
 
     const props = defineProps({
@@ -24,9 +25,17 @@
 
     const shift = computed({
         get: () => props.modelValue,
-        set: value => {
-            emit('update:modelValue', value)
-        },
+        set: value => emit('update:modelValue', value),
+    })
+
+    const availableFrom = computed({
+        get: () => props.modelValue.available_from,
+        set: value => shift.value.available_from = value ?format(value, 'yyyy-MM-dd') : null
+    })
+
+    const availableTo = computed({
+        get: () => props.modelValue.available_to,
+        set: value => shift.value.available_to = value ? format(value, 'yyyy-MM-dd') : null,
     })
 
     const prefixTime = time => {
@@ -114,7 +123,7 @@
             <Datepicker auto-apply
                         enable-time-picker
                         format="dd/MM/yyyy"
-                        v-model="shift.available_from"
+                        v-model="availableFrom"
                         :id="`available-from-${fieldUnique}`"
                         :close-on-auto-apply="false"
                         :enable-seconds="false"
@@ -130,7 +139,7 @@
             <Datepicker auto-apply
                         enable-time-picker
                         format="dd/MM/yyyy"
-                        v-model="shift.available_to"
+                        v-model="availableTo"
                         :id="`available-to-${fieldUnique}`"
                         :enable-seconds="false"
                         :enable-time-picker="false"

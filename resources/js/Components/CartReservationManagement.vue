@@ -1,4 +1,5 @@
 <script setup>
+    import Loading from "@/Components/Loading.vue";
     import Accordion from '@/Components/LocationAccordion.vue'
     import EmptySlot from '@/Components/Icons/EmptySlot.vue'
     import Female from '@/Components/Icons/Female.vue'
@@ -24,7 +25,7 @@
 
     const toast = useToast()
 
-    const {date, locations, serverDates, getShifts, emptyShiftsForTime} = useLocationFilter(true)
+    const {date, emptyShiftsForTime, isLoading, locations, serverDates, getShifts} = useLocationFilter(true)
 
     const gridCols = {
         // See tailwind.config.js
@@ -77,7 +78,7 @@
             })
             toast.success(`${volunteerName} was assigned to ${location.name} at ${shift.start_time}`)
         } catch (e) {
-            toast.error(e.response.message)
+            toast.error(e.response.data.message)
 
         } finally {
             await getShifts()
@@ -156,7 +157,8 @@
                         @locations-for-day="setLocationMarkers"/>
         </div>
         <div class="text-sm">
-            <Accordion :items="locations" label="name" uid="id">
+            <Loading v-if="isLoading" class="min-h-[200px] sm:min-h-full"/>
+            <Accordion v-show="!isLoading" :items="locations" label="name" uid="id">
                 <template #label="{label, location}">
                     <span class="dark:text-gray-200">{{ label }}</span>
                 </template>

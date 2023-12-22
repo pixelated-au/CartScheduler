@@ -12,6 +12,7 @@
         locations: Array,
         markerDates: Object,
         user: Object,
+        freeShifts: Object,
         canViewHistorical: Boolean,
     })
 
@@ -33,6 +34,10 @@
 
     const shiftAvailability = computed(() => {
         return usePage().props.value.shiftAvailability
+    })
+
+    const isRestricted = computed(() => {
+        return !usePage().props.value.isUnrestricted
     })
 
     const today = new Date()
@@ -58,14 +63,32 @@
     })
 
     const markers = ref([])
-    const highlights = ref([])
+    const highlights = computed(() => {
+        const highlighted = []
+        for (const key in props.freeShifts) {
+            if (!props.freeShifts.hasOwnProperty(key)) {
+                continue
+            }
+            if (!props.freeShifts[key].has_availability) {
+                continue
+            }
+            highlighted.push(parseISO(key))
+        }
+        return highlighted
+    })
+
+    const allowed = computed(() => {
+        if (!isRestricted.value) {
+            return null
+        }
+        return markers.value.map(marker => marker.date)
+    })
 
     watchEffect(() => {
         if (!props.markerDates) {
             return
         }
         const marks = []
-        const highlighted = []
         if (!props.user) {
             return []
         }
@@ -74,20 +97,16 @@
             if (!props.markerDates.hasOwnProperty(date)) {
                 continue
             }
-            let freeShiftCount = 0
             const foundAtLocation = []
             const shiftDateGroup = props.markerDates[date]
 
             const isoDate = parseISO(date)
-
             for (const shiftId in shiftDateGroup) {
                 if (!shiftDateGroup.hasOwnProperty(shiftId)) {
                     continue
                 }
 
                 const shifts = shiftDateGroup[shiftId]
-                let maxVolunteers = 0
-                let volunteerCount = 0
                 for (let shiftCount = 0; shiftCount < shifts.length; shiftCount++) {
                     const shift = shifts[shiftCount]
                     if (isBefore(isoDate, startOfDay(parseISO(shift.available_from)))) {
@@ -96,21 +115,10 @@
                     if (isAfter(isoDate, endOfDay(parseISO(shift.available_to)))) {
                         break
                     }
-                    if (shiftCount === 0) {
-                        // This is set on the first iteration of the loop
-                        maxVolunteers = shift.max_volunteers
-                    }
-                    volunteerCount++
                     if (shift.volunteer_id === props.user?.id) {
                         foundAtLocation.push(shift.location_id)
                     }
                 }
-                if (volunteerCount < maxVolunteers) {
-                    freeShiftCount++
-                }
-            }
-            if (freeShiftCount > 0) {
-                highlighted.push(isoDate)
             }
             if (foundAtLocation.length) {
                 marks.push({
@@ -123,22 +131,7 @@
             }
         }
 
-        for (const allDate of allDates) {
-            // fill in the rest of the empty dates
-            let found = false
-            for (const markerDatesKey in props.markerDates) {
-                if (markerDatesKey === formatISO(allDate, { representation: 'date' })) {
-                    found = true
-                    break
-                }
-            }
-            if (!found) {
-                highlighted.push(allDate)
-            }
-        }
-
         markers.value = marks
-        highlights.value = highlighted
 
         emit('locations-for-day', marks.map(marker => ({ locations: marker.locations, date: marker.date })))
     })
@@ -152,6 +145,7 @@
                 v-model="selectedDate"
                 :markers="markers"
                 :highlight="highlights"
+                :allowed-dates="allowed"
                 :min-date="notBefore"
                 :max-date="notAfter"
                 :timezone="shiftAvailability.timezone"

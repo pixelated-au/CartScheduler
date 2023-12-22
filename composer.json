@@ -20,6 +20,7 @@
         "laravel/sanctum": "^2.15",
         "laravel/tinker": "^2.8",
         "maatwebsite/excel": "^3.1",
+        "maennchen/zipstream-php": "^3.1",
         "psr/simple-cache": "^2.0",
         "spatie/laravel-activitylog": "^4.7",
         "spatie/laravel-ray": "^1.29",

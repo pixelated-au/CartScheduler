@@ -12,6 +12,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
  * @property mixed $gender
  * @property mixed $mobile_phone
  * @property mixed $is_enabled
+ * @property mixed $is_unrestricted
  * @property mixed $year_of_birth
  * @property mixed $appointment
  * @property mixed $serving_as
@@ -39,7 +40,8 @@ class UserAdminResource extends JsonResource
             'spouse_name'         => $this->whenLoaded('spouse', fn() => $this->spouse->name),
             'spouse_id'           => $this->whenNotNull('spouse_id', fn() => $this->spouse_id),
             'is_enabled'          => $this->is_enabled,
-            'responsible_brother' => (boolean)$this->responsible_brother,
+            'is_unrestricted'     => $this->is_unrestricted,
+            'responsible_brother' => $this->responsible_brother,
             'has_logged_in'       => $this->has_logged_in,
             'vacations'           => UserVacationResource::collection($this->whenLoaded('vacations')),
             'availability'        => AvailabilityResource::make($this->whenLoaded('availability')),

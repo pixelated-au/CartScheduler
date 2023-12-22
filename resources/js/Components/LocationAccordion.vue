@@ -1,4 +1,5 @@
 <script setup>
+    import {Accordion} from "flowbite";
     import {computed, nextTick, ref, useSlots, watch} from 'vue'
 
     const props = defineProps({

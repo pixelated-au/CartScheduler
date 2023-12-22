@@ -6,7 +6,6 @@ import {useForm} from '@inertiajs/inertia-vue3'
 import {computed} from 'vue'
 
 defineProps({
-    templateFile: String,
 })
 
 const listRouteAction = () => {
@@ -41,6 +40,10 @@ const validationErrors = computed(() => {
     }
     return errors
 })
+
+const templateFile = route('admin.user-import-template');
+
+
 </script>
 
 <template>
@@ -69,11 +72,46 @@ const validationErrors = computed(() => {
                 class="flex items-center justify-start px-4 py-3 bg-gray-50 dark:bg-gray-900 px-6 shadow rounded-lg rounded-lg">
                 <form class="w-full" @submit.prevent="uploadFile">
                     <div class="w-full">
+                        <div class="text-gray-900 dark:text-gray-300 mb-5">
+                            <h3>User Import</h3>
+                            <div
+                                class="my-5 p-10 border border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 rounded">
+                                <ol class="ml-3 list-decimal list-outside">
+                                    <li class="mb-4">Download and open the <a :href="templateFile">Template Excel
+                                        file</a></li>
+                                    <li class="mb-4"><strong>Closely</strong> follow the instructions that appear at the
+                                        top of the Excel file.
+                                        <ul class="pl-4 list-disc list-outside">
+                                            <li class="mb-2">You can copy and past data from another source into the
+                                                excel file but please make sure the data conforms to the instructions.
+                                            </li>
+                                            <li class="mb-2">If the importer finds an email address that already belongs
+                                                to a user in the system, it will update the data for that user.
+                                                Otherwise, it will create a new user
+                                            </li>
+                                            <li class="mb-2">Note, if you wish to update a users' email address, you'll
+                                                need to do that manually by editing that user on this site.
+                                            </li>
+                                        </ul>
+                                    </li>
+                                    <li class="mb-4">Upload the file. If there are any issues, you will be notified on
+                                        what the issues are and what needs fixing.
+                                        <ul class="pl-4 list-disc list-outside">
+                                            <li class="mb-2">If there are issues, follow the instructions, fix them and
+                                                re-upload.
+                                            </li>
+                                            <li class="mb-2">Note, you may need to reload this page in order for the
+                                                upload to work again
+                                            </li>
+                                        </ul>
+                                    </li>
+                                </ol>
+                            </div>
+                        </div>
                         <div class="flex items-center">
                             <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
                                    for="file-input">
                                 Upload spreadsheet.<br>
-                                <strong>Note, this will email every user a link to log in!</strong>
                             </label>
                         </div>
                         <input

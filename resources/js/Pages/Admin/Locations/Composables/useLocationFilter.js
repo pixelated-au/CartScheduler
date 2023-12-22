@@ -1,25 +1,33 @@
-import { isAfter, isBefore, parse, parseISO } from 'date-fns'
+import {isAfter, isBefore, parse, parseISO} from 'date-fns'
 import formatISO from 'date-fns/formatISO'
-import { cloneDeep } from 'lodash'
-import { computed, onMounted, ref } from 'vue'
+import {cloneDeep} from 'lodash'
+import {computed, onMounted, ref, shallowRef, watch} from 'vue'
 
-export default function useLocationFilter (canAdmin = false) {
+export default function useLocationFilter(canAdmin = false) {
     /**
      * @param {Date} date
      */
     const date = ref(parse('12:00:00', 'HH:mm:ss', new Date()))
 
     const maxReservationDate = ref(new Date())
-    const serverLocations = ref([])
-    const serverDates = ref({})
+    const serverLocations = shallowRef([])
+    const serverDates = shallowRef({})
+    const freeShifts = shallowRef([])
+    const isLoading = ref(false)
 
     const getShifts = async () => {
-        const extra = canAdmin ? '/1' : ''
+        isLoading.value = true
+        try {
+            const path = canAdmin ? `/admin/assigned-shifts/${selectedDate.value}` : `/shifts/${selectedDate.value}`
 
-        const response = await axios.get(`/shifts${extra}`)
-        serverLocations.value = response.data.locations
-        serverDates.value = response.data.shifts
-        maxReservationDate.value = parseISO(response.data.maxDateReservation)
+            const response = await axios.get(path)
+            serverLocations.value = response.data.locations
+            serverDates.value = response.data.shifts
+            freeShifts.value = response.data.freeShifts
+            maxReservationDate.value = parseISO(response.data.maxDateReservation)
+        } finally {
+            isLoading.value = false
+        }
     }
 
     onMounted(() => {
@@ -27,29 +35,27 @@ export default function useLocationFilter (canAdmin = false) {
     })
 
     const selectedDate = computed({
-        get: () => date.value ? formatISO(date.value, { representation: 'date' }) : '',
+        get: () => date.value ? formatISO(date.value, {representation: 'date'}) : '',
         set: (value) => date.value = value,
     })
+
+    watch(selectedDate, () => getShifts())
 
     const emptyShiftsForTime = ref([])
 
     const setReservations = (maxVolunteers, shift, location) => {
+
         const volunteers = shift.filterVolunteers?.sort((a, b) => {
-            if (a.gender > b.gender) {
-                return -1
+            // First, compare genders
+            if (a.gender !== b.gender) {
+                return b.gender.localeCompare(a.gender);
             }
-            if (a.gender < b.gender) {
-                return 1
-            }
-            if (a.shift_id < b.shift_id) {
-                return -1
-            }
-            if (a.shift_id > b.shift_id) {
-                return 1
-            }
-            return 0
-        })
+            // If genders are the same, compare shift_id
+            return a.shift_id - b.shift_id;
+        });
+
         const length = maxVolunteers >= volunteers.length ? maxVolunteers - volunteers.length : maxVolunteers
+
         if (length) {
             const nullArray = Array(length).fill(null)
             shift.filterVolunteers = [...volunteers, ...nullArray]
@@ -135,6 +141,8 @@ export default function useLocationFilter (canAdmin = false) {
     return {
         date,
         emptyShiftsForTime,
+        freeShifts,
+        isLoading,
         locations,
         maxReservationDate,
         serverDates,

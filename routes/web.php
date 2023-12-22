@@ -1,9 +1,12 @@
 <?php
 
+use App\Http\Controllers\AdminAvailableShiftsController;
 use App\Http\Controllers\AdminCheckForUpdateController;
 use App\Http\Controllers\AdminDashboardController;
 use App\Http\Controllers\AdminRunSoftwareUpdateController;
-use App\Http\Controllers\AvailableShiftsForMonthController;
+use App\Http\Controllers\AvailableShiftsController;
+use App\Http\Controllers\DownloadUserImportSpreadsheetController;
+use App\Http\Controllers\DownloadUsersAsSpreadsheetController;
 use App\Http\Controllers\GetAdminUsersController;
 use App\Http\Controllers\GetAvailableUsersForShiftController;
 use App\Http\Controllers\GetReportTagsController;
@@ -59,9 +62,9 @@ Route::post('/set-password', [SetUserPasswordController::class, 'update'])->name
 
 //Route::get('/mail', static fn() => new App\Mail\UserAccountCreated(App\Models\User::find(1)));
 
-Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified'])->group(function () {
+Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified', 'user-enabled'])->group(function () {
     Route::get('/', static fn() => Inertia::render('Dashboard'))->name('dashboard');
-    Route::get('/shifts/{canViewHistorical?}', AvailableShiftsForMonthController::class);
+    Route::get('/shifts/{shiftDate}', AvailableShiftsController::class);
     Route::get('/outstanding-reports', MissingReportsForUserController::class);
     Route::post('/reserve-shift', ToggleShiftReservationController::class);
     Route::post('/save-report', SaveShiftReportController::class)->name('save.report');
@@ -114,6 +117,8 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
             Route::put('/report-tag-sort-order', ReportTagsSortOrderController::class);
             Route::post('/resend-welcome-email', ResendWelcomeEmailController::class)->name('admin.resend-welcome-email');
 
+            Route::get('/assigned-shifts/{shiftDate}', AdminAvailableShiftsController::class);
+
             Route::resource('shifts', ShiftsController::class)->only(['destroy'])->names([
                 'destroy' => 'admin.shifts.destroy',
             ]);
@@ -132,6 +137,8 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
             Route::get('/admin-users', GetAdminUsersController::class)->name('admin.admin-users.get');
             Route::get('/check-update', AdminCheckForUpdateController::class)->name('admin.check-update');
             Route::post('/do-update', AdminRunSoftwareUpdateController::class)->name('admin.do-update');
+            Route::get('/users-as-spreadsheet', DownloadUsersAsSpreadsheetController::class)->name('admin.users-as-spreadsheet');
+            Route::get('/users-import-template', DownloadUserImportSpreadsheetController::class)->name('admin.user-import-template');
 
             //Route::get('/', static fn() => Inertia::render('Admin/Dashboard'))->name('admin.dashboard');
 

@@ -42,8 +42,8 @@ class UpdateLocationRequest extends FormRequest
             'shifts.*.day_sunday'     => ['boolean'],
             'shifts.*.start_time'     => ['required', 'date_format:H:i:s'],
             'shifts.*.end_time'       => ['required', 'date_format:H:i:s'],
-            'shifts.*.available_from' => ['nullable', 'date'], // Note, extra validation is done in withValidator()
-            'shifts.*.available_to'   => ['nullable', 'date'], // Note, extra validation is done in withValidator()
+            'shifts.*.available_from' => ['nullable', 'date', 'date_format:Y-m-d'], // Note, extra validation is done in withValidator()
+            'shifts.*.available_to'   => ['nullable', 'date', 'date_format:Y-m-d'], // Note, extra validation is done in withValidator()
             'shifts.*.is_enabled'     => ['nullable', 'boolean'],
         ];
     }

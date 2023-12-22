@@ -72,6 +72,10 @@ class LocationsController extends Controller
     {
         DB::beginTransaction();
         $shifts = $request->validated('shifts');
+        // TODO implement the deletion of volunteer shifts when a shift or a location has been disabled.
+        // TODO Note the shift class that has an observer that will delete the volunteer shifts when a shift is
+        // TODO restricted by date. A similar mechanism could be used. Also do the same for when a volunteer
+        // TODO is 'deactivated'. Also, add some info on the front-end so 'admin' knows that this will happen
         foreach ($shifts as $shift) {
             if (isset($shift['id'])) {
                 $shiftModel = Shift::find($shift['id']);
