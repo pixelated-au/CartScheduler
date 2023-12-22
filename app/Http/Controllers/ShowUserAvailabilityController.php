@@ -21,6 +21,7 @@ class ShowUserAvailabilityController extends Controller
         return Inertia::render('Profile/ShowAvailability', [
             'vacations' => UserVacationResource::collection($user->vacations->all()),
             'availability' => AvailabilityResource::make($availability),
+            'selectedLocations' => $user->rosterLocations->pluck('id'),
         ]);
     }
 }

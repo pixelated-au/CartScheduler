@@ -5,6 +5,7 @@ namespace App\Models;
 use Database\Factories\LocationFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
@@ -47,6 +48,7 @@ class Location extends Model
         return $this->hasMany(Shift::class);
     }
 
+    /** @noinspection SpellCheckingInspection */
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()

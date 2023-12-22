@@ -195,6 +195,11 @@ class User extends Authenticatable
         return $this->hasMany(UserVacation::class);
     }
 
+    public function rosterLocations(): BelongsToMany
+    {
+        return $this->belongsToMany(related: Location::class, table: 'user_roster_locations');
+    }
+
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()

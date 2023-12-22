@@ -10,6 +10,7 @@ use App\Http\Controllers\DownloadUsersAsSpreadsheetController;
 use App\Http\Controllers\GetAdminUsersController;
 use App\Http\Controllers\GetAvailableUsersForShiftController;
 use App\Http\Controllers\GetReportTagsController;
+use App\Http\Controllers\GetUserLocationChoicesController;
 use App\Http\Controllers\LocationsController;
 use App\Http\Controllers\MissingReportsForUserController;
 use App\Http\Controllers\MoveUserToNewShiftController;
@@ -26,6 +27,7 @@ use App\Http\Controllers\ToggleShiftReservationController;
 use App\Http\Controllers\ToggleUserOntoShiftReservationController;
 use App\Http\Controllers\UpdateAllowedSettingsUsersController;
 use App\Http\Controllers\UpdateGeneralSettingsController;
+use App\Http\Controllers\UpdateUserLocationsChoicesController;
 use App\Http\Controllers\UpdateUserRegularAvailabilityController;
 use App\Http\Controllers\UpdateUserVacationsController;
 use App\Http\Controllers\UsersController;
@@ -74,6 +76,10 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified',
     Route::get('/user/availability', ShowUserAvailabilityController::class)->name('user.availability');
     Route::put('/user/availability', UpdateUserRegularAvailabilityController::class)->name('update.user.availability');
     Route::put('/user/vacations', UpdateUserVacationsController::class)->name('update.user.vacations');
+
+    Route::get('/user/available-locations', GetUserLocationChoicesController::class)->name('user.location-choices');
+    Route::put('/user/available-locations', UpdateUserLocationsChoicesController::class)->name('update.user.location-choices');
+
 
     Route::prefix('admin')
         ->middleware('is-admin')
