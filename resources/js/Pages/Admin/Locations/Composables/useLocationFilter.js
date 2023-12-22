@@ -44,22 +44,19 @@ export default function useLocationFilter(canAdmin = false) {
     const emptyShiftsForTime = ref([])
 
     const setReservations = (maxVolunteers, shift, location) => {
+
         const volunteers = shift.filterVolunteers?.sort((a, b) => {
-            if (a.gender > b.gender) {
-                return -1
+            if (a.gender !== b.gender) {
+                // If genders are different, sort in descending order of gender (ie, male first)
+                return b.gender - a.gender;
+            } else {
+                // If genders are the same, sort in ascending order of shift_id
+                return a.shift_id - b.shift_id;
             }
-            if (a.gender < b.gender) {
-                return 1
-            }
-            if (a.shift_id < b.shift_id) {
-                return -1
-            }
-            if (a.shift_id > b.shift_id) {
-                return 1
-            }
-            return 0
-        })
+        });
+
         const length = maxVolunteers >= volunteers.length ? maxVolunteers - volunteers.length : maxVolunteers
+
         if (length) {
             const nullArray = Array(length).fill(null)
             shift.filterVolunteers = [...volunteers, ...nullArray]
