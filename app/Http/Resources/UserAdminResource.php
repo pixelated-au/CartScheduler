@@ -21,6 +21,9 @@ use Illuminate\Http\Resources\Json\JsonResource;
  * @property mixed $spouse_id
  * @property mixed $responsible_brother
  * @property mixed $has_logged_in
+ * @property mixed $vacations
+ * @property mixed $availability
+ * @property mixed $rosterLocations
  */
 class UserAdminResource extends JsonResource
 {
@@ -45,6 +48,7 @@ class UserAdminResource extends JsonResource
             'has_logged_in'       => $this->has_logged_in,
             'vacations'           => UserVacationResource::collection($this->whenLoaded('vacations')),
             'availability'        => AvailabilityResource::make($this->whenLoaded('availability')),
+            'selectedLocations'   => $this->whenLoaded('rosterLocations', fn() => $this->rosterLocations->pluck('id')),
         ];
     }
 }

@@ -47,8 +47,8 @@ onMounted(() => {
                 <div>
                     <ShowVacationsAvailabilityForm :vacations="vacations?.data"  class="mt-10 sm:mt-0" />
                     <template v-if="canChooseLocations">
-                    <JetSectionBorder />
-                    <ShowLocationAvailabilityForm :selected-locations="selectedLocations"  class="mt-10 sm:mt-0"/>
+                        <JetSectionBorder/>
+                        <ShowLocationAvailabilityForm :selected-locations="selectedLocations" class="mt-10 sm:mt-0"/>
                     </template>
                     <JetSectionBorder />
                     <ShowRegularAvailabilityForm :availability="availability?.data"  class="mt-10 sm:mt-0" />

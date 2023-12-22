@@ -51,7 +51,7 @@ class UsersController extends Controller
         UserAvailability::where('user_id', $user->id)
             ->firstOr(fn() => UserAvailability::create(['user_id' => $user->id]));
         return Inertia::render('Admin/Users/Edit', [
-            'editUser' => UserAdminResource::make($user->load(['spouse', 'vacations', 'availability'])),
+            'editUser' => UserAdminResource::make($user->load(['spouse', 'vacations', 'availability', 'rosterLocations'])),
         ]);
     }
 
