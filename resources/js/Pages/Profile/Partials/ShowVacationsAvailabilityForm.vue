@@ -70,8 +70,7 @@ const deleteVacation = (idx) => form.deletedVacations = [...form.deletedVacation
         </template>
 
         <template #description>
-            Indicate when {{ props.userId ? 'this volunteer' : 'you' }} may be on holiday or are unable to be
-            rostered.
+            Indicate when {{ props.userId ? 'this volunteer' : 'you' }} may be on holiday or are unable to be rostered.
         </template>
 
         <template #form>

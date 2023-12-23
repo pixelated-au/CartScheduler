@@ -99,9 +99,7 @@ onMounted(async () => {
         </template>
 
         <template #description>
-            Indicate which locations
-            {{ props.userId ? 'this volunteer' : 'you' }}
-            are convenient for you to volunteer at.
+            Indicate which locations are convenient for {{ props.userId ? 'this volunteer' : 'you' }} to volunteer at.
         </template>
 
         <template #form>
