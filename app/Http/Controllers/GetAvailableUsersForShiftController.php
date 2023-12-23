@@ -33,7 +33,7 @@ class GetAvailableUsersForShiftController extends Controller
             $this->getUsersForShift->execute(
                 shift: $shift,
                 date: $request->date('date'),
-                showUnavailable: $request->boolean('showAll'),
+                showOnlyAvailable: !$request->boolean('showAll'),
                 showOnlyResponsibleBros: $request->boolean('showOnlyResponsibleBros'),
                 hidePublishers: $request->boolean('hidePublishers'),
                 showOnlyElders: $request->boolean('showOnlyElders'),

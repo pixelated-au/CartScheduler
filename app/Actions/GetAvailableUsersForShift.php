@@ -21,7 +21,7 @@ class GetAvailableUsersForShift
     }
 
     /** @noinspection UnknownColumnInspection */
-    public function execute(Shift $shift, Carbon $date, bool $showUnavailable, bool $showOnlyResponsibleBros, bool $hidePublishers, bool $showOnlyElders, bool $showOnlyMinisterialServants): Collection
+    public function execute(Shift $shift, Carbon $date, bool $showOnlyAvailable, bool $showOnlyResponsibleBros, bool $hidePublishers, bool $showOnlyElders, bool $showOnlyMinisterialServants): Collection
     {
         $overlappingShifts = $this->getOverlappingShifts($shift, $date);
 
@@ -34,7 +34,9 @@ class GetAvailableUsersForShift
                 ->addSelect(['filled_sundays', 'filled_mondays', 'filled_tuesdays', 'filled_wednesdays', 'filled_thursdays', 'filled_fridays', 'filled_saturdays'])
                 ->tap(fn(Builder $query) => $this->getDayCounts($query, $date)))
             ->addSelect(['num_sundays', 'num_mondays', 'num_tuesdays', 'num_wednesdays', 'num_thursdays', 'num_fridays', 'num_saturdays', 'comments'])
-            ->leftJoin(table: 'user_availabilities', first: 'users.id', operator: '=', second: 'user_availabilities.user_id')
+            ->when($this->settings->enableUserAvailability, fn(Builder $query) => $query
+                ->leftJoin(table: 'user_availabilities', first: 'users.id', operator: '=', second: 'user_availabilities.user_id')
+            )
             ->leftJoinSub(
                 query: DB::query()
                     ->select(['user_id'])
@@ -53,7 +55,10 @@ class GetAvailableUsersForShift
                             ->orWhere('shifts.available_to', '>=', $date)
                         )
                     )
-//                    ->join(table: 'shifts', first: 'shift_user.shift_id', operator: '=', second: 'shifts.id')
+                    ->join(table: 'locations', first: fn(JoinClause $join) => $join
+                        ->on('shifts.location_id', '=', 'locations.id')
+                        ->where('locations.is_enabled', true)
+                    )
                     ->groupBy('user_id'),
                 as: 'last_shift',
                 first: 'last_shift.user_id',
@@ -61,7 +66,6 @@ class GetAvailableUsersForShift
                 second: 'users.id')
             ->where('users.is_enabled', true)
             ->whereDoesntHave('bookings', fn(Builder $query) => $query
-//                ->join(table: 'shifts', first: 'shift_user.shift_id', operator: '=', second: 'shifts.id')
                 ->join(table: 'shifts', first: fn(JoinClause $join) => $join
                     ->on('shift_user.shift_id', '=', 'shifts.id')
                     ->where('shifts.is_enabled', true)
@@ -86,17 +90,20 @@ class GetAvailableUsersForShift
             ->when($canOnlyBrothersRegister, fn(Builder $query) => $query
                 ->where('users.gender', 'male')
             )
-            ->when($this->settings->enableUserAvailability && !$showUnavailable, fn(Builder $query) => $query
-//                ->join(table: 'user_availabilities', first: 'users.id', operator: '=', second: 'user_availabilities.user_id')
-                ->leftJoin(table: 'user_vacations', first: 'users.id', operator: '=', second: 'user_vacations.user_id')
+            ->when($this->settings->enableUserAvailability && $showOnlyAvailable, fn(Builder $query) => $query
                 ->tap(fn(Builder $query) => $this->queryIsAvailableOnDayOfWeek($query, $date))
                 ->tap(fn(Builder $query) => $this->queryIsAvailableAtHour($query, $date, $shift->start_hour))
                 ->tap(fn(Builder $query) => $this->queryIsAvailableAtHour($query, $date, $shift->end_hour))
+                ->leftJoin(table: 'user_vacations', first: 'users.id', operator: '=', second: 'user_vacations.user_id')
                 ->withCount(['vacations as vacations_count' => fn(Builder $query) => $query
                     ->where('start_date', '<=', $date)
                     ->where('end_date', '>=', $date)
                 ])
                 ->having('vacations_count', '=', 0)
+            )
+            ->when($this->settings->enableUserLocationChoices && $showOnlyAvailable, fn(Builder $query) => $query
+                ->leftJoin(table: 'user_roster_locations', first: 'users.id', operator: '=', second: 'user_roster_locations.user_id')
+                ->where('user_roster_locations.location_id', $shift->location_id)
             )
             ->when($showOnlyResponsibleBros, fn(Builder $query) => $query
                 ->where('users.responsible_brother', true)
