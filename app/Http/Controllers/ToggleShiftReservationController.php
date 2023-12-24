@@ -20,7 +20,8 @@ class ToggleShiftReservationController extends Controller
     public function __invoke(Request $request)
     {
         $user = $request->user();
-        if (!$user->is_unrestricted) {
+
+        if ($user->is_restricted) {
             return ErrorApiResource::create('You do not have permission to do this', ErrorApiResource::CODE_NOT_ALLOWED, 422);
         }
         $data = $this->validate($request, $this->toggleShiftReservationControllerRules->execute($user, $request->all()));

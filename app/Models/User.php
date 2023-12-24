@@ -165,7 +165,7 @@ class User extends Authenticatable
     {
         return Attribute::make(
             get: static function ($value, $attributes) {
-                return !$attributes['is_unrestricted'];
+                return isset($attributes['is_unrestricted']) && !$attributes['is_unrestricted'];
             },
         );
     }
