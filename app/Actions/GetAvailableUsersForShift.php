@@ -226,4 +226,5 @@ class GetAvailableUsersForShift
     {
         return 'day_' . strtolower($date->format('l'));
     }
+
 }
