@@ -94,7 +94,7 @@ const canShiftBeBookedByUser = (index) => {
         </div>
         <div class="text-sm">
             <Loading v-if="isLoading" class="min-h-[200px] sm:min-h-full"/>
-            <Accordion v-else
+            <Accordion v-show="!isLoading"
                        :items="locations" label="name" uid="id"
                        empty-collection-text="No available locations for this day">
                 <template #label="{label, location}">
