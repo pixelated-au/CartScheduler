@@ -227,4 +227,9 @@ class GetAvailableUsersForShift
         return 'day_' . strtolower($date->format('l'));
     }
 
+    private function ignreme(): array
+    {
+        // do nothing
+        return [];
+    }
 }
