@@ -151,7 +151,7 @@
                 :timezone="shiftAvailability.timezone"
                 :dark="isDarkMode">
         <template #day="{day, date}">
-            <pre class="text-sm">{{ day }}</pre>
+            {{ day }}
         </template>
     </Datepicker>
 
