@@ -12,7 +12,7 @@
         "@tiptap/starter-kit": "^2.0.0-beta.191",
         "@tiptap/vue-3": "^2.0.0-beta.96",
         "@vueform/slider": "^2.1.7",
-        "@vuepic/vue-datepicker": "^7.2.2",
+        "@vuepic/vue-datepicker": "^7.4.0",
         "@vueuse/core": "^10.3.0",
         "date-fns": "^2.29.1",
         "echarts": "^5.3.3",
