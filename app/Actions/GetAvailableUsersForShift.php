@@ -45,14 +45,8 @@ class GetAvailableUsersForShift
                     ->join(table: 'shifts', first: fn(JoinClause $join) => $join
                         ->on('shift_user.shift_id', '=', 'shifts.id')
                         ->where('shifts.is_enabled', true)
-                        ->where(fn(JoinClause $query) => $query
-                            ->whereNull('shifts.available_from')
-                            ->orWhere('shifts.available_from', '<=', $date)
-                        )
-                        ->where(fn(JoinClause $query) => $query
-                            ->whereNull('shifts.available_to')
-                            ->orWhere('shifts.available_to', '>=', $date)
-                        )
+                    // Note, not "excluding" 'shifts.available_from' and 'shifts.available_to' here, because we want
+                    // to include shifts that are disabled by the date.
                     )
                     ->join(table: 'locations', first: fn(JoinClause $join) => $join
                         ->on('shifts.location_id', '=', 'locations.id')
@@ -68,14 +62,6 @@ class GetAvailableUsersForShift
                 ->join(table: 'shifts', first: fn(JoinClause $join) => $join
                     ->on('shift_user.shift_id', '=', 'shifts.id')
                     ->where('shifts.is_enabled', true)
-                    ->where(fn(JoinClause $query) => $query
-                        ->whereNull('shifts.available_from')
-                        ->orWhere('shifts.available_from', '<=', $date)
-                    )
-                    ->where(fn(JoinClause $query) => $query
-                        ->whereNull('shifts.available_to')
-                        ->orWhere('shifts.available_to', '>=', $date)
-                    )
                 )
                 ->join(table: 'locations', first: 'shifts.location_id', operator: '=', second: 'locations.id')
                 ->where('shift_date', $date)
@@ -225,11 +211,5 @@ class GetAvailableUsersForShift
     private function getDayOfWeekForDate(Carbon $date): string
     {
         return 'day_' . strtolower($date->format('l'));
-    }
-
-    private function ignreme(): array
-    {
-        // do nothing
-        return [];
     }
 }
