@@ -310,7 +310,7 @@ $dp__cell_size: auto;
 
     .dp__main.dp__flex_display {
         width: 100%;
-        @media (min-width: 460px) and (max-width: 639px) {
+        @media (min-width: 500px) and (max-width: 639px) {
             width: 80%;
             margin: 0 auto;
         }
@@ -339,9 +339,11 @@ $dp__cell_size: auto;
             .dp__cell_inner {
                 @media (max-width: 500px) {
                     min-height: calc(100vw / 9);
+                    min-width: calc(100vw / 9);
                 }
                 @media (min-width: 500px) and (max-width: 639px) {
                     min-height: calc(100vw / 10);
+                    min-width: calc(100vw / 10);
                 }
             }
         }
