@@ -183,6 +183,9 @@ const calcShiftPercentage = (daysRostered, daysAvailable) => {
             sumOfDaysRostered = sumOfDaysAvailable
         }
     }
+    if (sumOfDaysAvailable === 0) {
+        return 0
+    }
     return Math.round((sumOfDaysRostered / sumOfDaysAvailable) * 100)
 }
 
@@ -233,6 +236,7 @@ watchEffect(async () => {
     }
 })
 
+const hasDaysAvailable = daysAvailable => Object.values(daysAvailable).some(day => day > 0)
 
 </script>
 <template>
@@ -322,14 +326,17 @@ watchEffect(async () => {
             </template>
             <template #item-filledShifts="{daysAlreadyRostered, daysAvailable, filledShifts}">
                 <div class="flex gap-x-1">
-                    <small class="self-center text-center text-xs border-slate-500 border-r pr-1 mr-2 w-8">
-                        %<br>{{ filledShifts }}
-                    </small>
-                    <template v-for="(days, key) in daysAvailable" :key="key">
-                        <small v-if="days" class="block text-center">
-                            <span>{{ key.substring(0, 2) }}</span><br>
-                            <FilledShiftsIndicator :available="days" :filled="daysAlreadyRostered[key]"/>
+                    <small v-if="!hasDaysAvailable(daysAvailable)" class="italic pl-5">Not set</small>
+                    <template v-else>
+                        <small class="self-center text-center text-xs border-slate-500 border-r pr-1 mr-2 w-8">
+                            %<br>{{ filledShifts }}
                         </small>
+                        <template v-for="(days, key) in daysAvailable" :key="key">
+                            <small v-if="days" class="block text-center">
+                                <span>{{ key.substring(0, 2) }}</span><br>
+                                <FilledShiftsIndicator :available="days" :filled="daysAlreadyRostered[key]"/>
+                            </small>
+                        </template>
                     </template>
                 </div>
             </template>
