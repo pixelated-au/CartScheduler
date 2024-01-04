@@ -76,7 +76,7 @@
 
 <style>
 .ProseMirror {
-    @apply p-3 focus-visible:rounded-md focus:border-0 focus-within:border-0 focus-visible:ring focus-visible:ring-1 focus-visible:ring-gray-500 focus-visible:ring-opacity-50;
+    @apply p-3 focus-visible:rounded-md focus:border-0 focus-within:border-0 focus-visible:ring-1 focus-visible:ring-gray-500 focus-visible:ring-opacity-50;
 }
 
 .ProseMirror:focus {
