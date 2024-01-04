@@ -20,12 +20,13 @@ use Illuminate\Support\Facades\DB;
 class MoveUserToNewShiftController extends Controller
 {
     public function __construct(
-        private readonly DoShiftReservation             $doShiftReservation,
-        private readonly ValidateShiftIsAvailableAction $validateShiftIsAvailableAction,
+        private readonly DoShiftReservation                           $doShiftReservation,
+        private readonly ValidateShiftIsAvailableAction               $validateShiftIsAvailableAction,
         private readonly ValidateVolunteerIsAllowedToBeRosteredAction $validateVolunteerIsAllowedToBeRosteredAction,
     )
     {
     }
+
     public function __invoke(Request $request)
     {
         $request->validate([
@@ -49,16 +50,16 @@ class MoveUserToNewShiftController extends Controller
             'shifts'       => fn(HasMany $query) => $query->whereBetween('start_time', $range),
             'shifts.users' => fn(BelongsToMany $query) => $query->wherePivot('shift_date', $date->toDateString()),
         ])
-                            ->where('id', $request->get('location_id'))
-                            ->where('is_enabled', true)
-                            ->first();
+            ->where('id', $request->get('location_id'))
+            ->where('is_enabled', true)
+            ->first();
 
         if (!$location) {
             return ErrorApiResource::create('Location not found',
                 ErrorApiResource::CODE_LOCATION_NOT_FOUND, 422);
         }
 
-        $shift = $location->shifts->first(); // Should only be 1 matching shift
+        $shift = $location->shifts->first(); // Should only be 1 matching shift due to the whereBetween() query above.
         if (!$shift) {
             return ErrorApiResource::create('No shift found for this location at this time',
                 ErrorApiResource::CODE_SHIFT_NOT_FOUND, 422);
