@@ -39,6 +39,12 @@ const form = computed({
     <!-- Description -->
     <div class="col-span-6 sm:col-span-full">
         <JetLabel for="description" value="Description"/>
+        <p class="mb-1 text-sm italic text-gray-500 dark:text-gray-500">
+            NOTE: As part of standard HTML, empty paragraphs won't appear. A future update will have the ability to create arbitrary spacing
+        </p>
+        <p class="mb-1 text-sm text-gray-700 dark:text-gray-300">
+            Return/Enter creates a new paragraph. Holding the Shift key while pressing Return/Enter will insert a line break.
+        </p>
         <TextEditor v-model="form.description"/>
         <JetInputError :message="form.errors.description" class="mt-2"/>
     </div>

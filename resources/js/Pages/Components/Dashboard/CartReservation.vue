@@ -169,10 +169,28 @@ const canShiftBeBookedByUser = (index) => {
     </div>
 </template>
 
-<style>
-.description ul,
-.description ol {
-    padding-left: 1.5em;
-    list-style: auto;
+<style lang="scss">
+.description {
+    p {
+        @apply mb-3;
+    }
+
+    ul, ol {
+        @apply pl-5;
+        li p {
+            @apply mb-0.5;
+        }
+    }
+    ul {
+        @apply list-disc;
+    }
+
+    ol {
+        @apply list-decimal;
+    }
+
+    strong {
+        @apply font-bold
+    }
 }
 </style>
