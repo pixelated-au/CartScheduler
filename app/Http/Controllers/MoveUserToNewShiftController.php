@@ -11,6 +11,7 @@ use App\Exceptions\VolunteerIsAllowedException;
 use App\Models\Location;
 use App\Models\Shift;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Http\Request;
@@ -47,7 +48,16 @@ class MoveUserToNewShiftController extends Controller
         ];
 
         $location = Location::with([
-            'shifts'       => fn(HasMany $query) => $query->whereBetween('start_time', $range),
+            'shifts'       => fn(HasMany $query) => $query->whereBetween('start_time', $range)
+                ->where('shifts.is_enabled', true)
+                ->where(fn(Builder $query) => $query
+                    ->whereNull('shifts.available_from')
+                    ->orWhere('shifts.available_from', '<=', $date)
+                )
+                ->where(fn(Builder $query) => $query
+                    ->whereNull('shifts.available_to')
+                    ->orWhere('shifts.available_to', '>=', $date)
+                ),
             'shifts.users' => fn(BelongsToMany $query) => $query->wherePivot('shift_date', $date->toDateString()),
         ])
             ->where('id', $request->get('location_id'))
