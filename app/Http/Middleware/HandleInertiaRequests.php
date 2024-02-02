@@ -54,6 +54,11 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
+        if ($request->expectsJson()) {
+            // return because we don't need this data for json requests
+            return [];
+        }
+
         /** @var User $user */
         $user   = $request->user();
         $custom = [
