@@ -1,8 +1,8 @@
 <script setup>
-    import { BarChart } from 'echarts/charts.js'
-    import { GridComponent, LegendComponent, TitleComponent, TooltipComponent } from 'echarts/components.js'
-    import { use } from 'echarts/core.js'
-    import { CanvasRenderer } from 'echarts/renderers.js'
+    import { BarChart } from 'echarts/charts'
+    import { GridComponent, LegendComponent, TitleComponent, TooltipComponent } from 'echarts/components'
+    import { use } from 'echarts/core'
+    import { CanvasRenderer } from 'echarts/renderers'
     import { computed, inject, provide } from 'vue'
     import VChart, { THEME_KEY } from 'vue-echarts'
 
