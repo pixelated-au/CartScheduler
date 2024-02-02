@@ -330,9 +330,11 @@ const hasDaysAvailable = daysAvailable => Object.values(daysAvailable).some(day 
                 {{ birthYear }}
             </template>
             <template #item-mobilePhone="{mobilePhone}">
-                <a :href="`tel:${mobilePhone}`" class="sm:hidden">{{ mobilePhone }}</a>
-                <span class="hidden sm:block">{{ mobilePhone }}</span>
-
+                <div class="flex flex-wrap justify-center">
+                    <small class="text-xs w-full text-center">{{ mobilePhone }}</small>
+                    <a :href="`tel:${mobilePhone}`" class="block p-2"><img src="/images/phone.svg" class="min-w-16 min-h-16 dark:invert" alt="Phone"/></a>
+                    <a :href="`sms:${mobilePhone}`" class="block p-2"><img src="/images/sms.svg" class="min-w-16 min-h-16 dark:invert" alt="SMS"/></a>
+                </div>
             </template>
             <template #item-lastShift="{lastShift, lastShiftTime}">
                 {{ formatShiftDate(lastShift, lastShiftTime) }}
@@ -368,6 +370,22 @@ const hasDaysAvailable = daysAvailable => Object.values(daysAvailable).some(day 
 
     thead th {
         @apply select-none;
+    }
+}
+
+.phone-actions {
+    width: 16px;
+    height: 16px;
+    max-width: 16px;
+    max-height: 16px;
+    @apply bg-slate-700 dark:bg-slate-400 bg-no-repeat block;
+
+    &.phone {
+        mask: url('/images/phone.svg');
+    }
+
+    &.sms {
+        mask: url('/images/sms.svg');
     }
 }
 </style>

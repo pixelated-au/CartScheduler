@@ -36,7 +36,7 @@ const indicators = computed(() => {
     max-width: 8px;
     max-height: 8px;
     background-repeat: no-repeat;
-    @apply bg-slate-700 dark:bg-slate-400;
+    @apply bg-slate-700 dark:bg-slate-400 ;
     mask: url('/images/circle-line.svg');
 
     &.fill {
