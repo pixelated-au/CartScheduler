@@ -17,7 +17,6 @@ class UserNeedsToUpdateAvailability
         if (!$user) {
             return false;
         }
-
         if (!$this->settings->enableUserAvailability) {
             return false;
         }
@@ -40,7 +39,7 @@ class UserNeedsToUpdateAvailability
             return true;
         }
 
-        if ($availability->updated_at->diff(Carbon::now())->m >= 1) {
+        if ($availability->updated_at->diffInMonths(Carbon::now()) >= 1) {
             return true;
         }
 
