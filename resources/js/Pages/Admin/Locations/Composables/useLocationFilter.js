@@ -1,49 +1,50 @@
-import {isAfter, isBefore, parse, parseISO} from 'date-fns'
-import formatISO from 'date-fns/formatISO'
-import {cloneDeep} from 'lodash'
-import {computed, onMounted, ref, shallowRef, watch} from 'vue'
+import {isAfter, isBefore, parse, parseISO} from 'date-fns';
+import formatISO from 'date-fns/formatISO';
+import {cloneDeep} from 'lodash';
+import {computed, onMounted, ref, shallowRef, watch} from 'vue';
 
 export default function useLocationFilter(canAdmin = false) {
     /**
      * @param {Date} date
      */
-    const date = ref(parse('12:00:00', 'HH:mm:ss', new Date()))
+    const date = ref(parse('12:00:00', 'HH:mm:ss', new Date()));
 
-    const maxReservationDate = ref(new Date())
-    const serverLocations = shallowRef([])
-    const serverDates = shallowRef({})
-    const freeShifts = shallowRef([])
-    const isLoading = ref(false)
+    const maxReservationDate = ref(new Date());
+    const serverLocations = shallowRef([]);
+    const serverDates = shallowRef({});
+    const freeShifts = shallowRef([]);
+    const isLoading = ref(false);
 
     const getShifts = async () => {
-        isLoading.value = true
+        isLoading.value = true;
         try {
-            const path = canAdmin ? `/admin/assigned-shifts/${selectedDate.value}` : `/shifts/${selectedDate.value}`
+            const path = canAdmin ? `/admin/assigned-shifts/${selectedDate.value}` : `/shifts/${selectedDate.value}`;
 
-            const response = await axios.get(path)
-            serverLocations.value = response.data.locations
-            serverDates.value = response.data.shifts
-            freeShifts.value = response.data.freeShifts
-            maxReservationDate.value = parseISO(response.data.maxDateReservation)
+            const response = await axios.get(path);
+            serverLocations.value = response.data.locations;
+            serverDates.value = response.data.shifts;
+            freeShifts.value = response.data.freeShifts;
+            maxReservationDate.value = parseISO(response.data.maxDateReservation);
         } finally {
-            isLoading.value = false
+            isLoading.value = false;
         }
-    }
+    };
 
     onMounted(() => {
-        getShifts()
-    })
+        getShifts();
+    });
 
     const selectedDate = computed({
         get: () => date.value ? formatISO(date.value, {representation: 'date'}) : '',
         set: (value) => date.value = value,
-    })
+    });
 
-    watch(selectedDate, () => getShifts())
+    watch(selectedDate, () => getShifts());
 
-    const emptyShiftsForTime = ref([])
+    const emptyShiftsForTime = ref([]);
 
     const setReservations = (maxVolunteers, shift, location) => {
+        shift.hasFreeShifts = false;
 
         const volunteers = shift.filterVolunteers?.sort((a, b) => {
             // First, compare genders
@@ -54,11 +55,13 @@ export default function useLocationFilter(canAdmin = false) {
             return a.shift_id - b.shift_id;
         });
 
-        const length = maxVolunteers >= volunteers.length ? maxVolunteers - volunteers.length : maxVolunteers
+        const length = maxVolunteers >= volunteers.length ? maxVolunteers - volunteers.length : maxVolunteers;
 
         if (length) {
-            const nullArray = Array(length).fill(null)
-            shift.filterVolunteers = [...volunteers, ...nullArray]
+            shift.hasFreeShifts = true;
+            const nullArray = Array(length).fill(null);
+            shift.filterVolunteers = [...volunteers, ...nullArray];
+
             emptyShiftsForTime.value.push({
                 startTime: parse(shift.start_time, 'HH:mm:ss', date.value),
                 endTime: parse(shift.end_time, 'HH:mm:ss', date.value),
@@ -68,75 +71,83 @@ export default function useLocationFilter(canAdmin = false) {
                 days: shift.js_days,
                 available_from: shift.available_from,
                 available_to: shift.available_to,
-            })
+            });
         }
-    }
+    };
 
     const addShift = (shifts, shift) => {
         if (shift.available_from) {
-            const from = parseISO(shift.available_from)
+            const from = parseISO(shift.available_from);
             if (isBefore(date.value, from)) {
-                return false
+                return false;
             }
         }
         if (shift.available_to) {
             // const to = parseISO(shift.available_to)
-            const to = parseISO(`${shift.available_to}T23:59:59`)
+            const to = parseISO(`${shift.available_to}T23:59:59`);
             if (isAfter(date.value, to)) {
-                return false
+                return false;
             }
         }
-        shifts.push(shift)
-        return true
-    }
+        shifts.push(shift);
+        return true;
+    };
 
     const addLocation = (mappedLocations, location, shift) => {
-        const alreadyAddedLocation = mappedLocations.find(l => l.id === location.id)
+        const alreadyAddedLocation = mappedLocations.find(l => l.id === location.id);
         if (!alreadyAddedLocation) {
-            location.filterShifts = []
+            location.filterShifts = [];
             if (addShift(location.filterShifts, shift)) {
-                mappedLocations.push(location)
+                mappedLocations.push(location);
             }
         } else {
             if (!alreadyAddedLocation.filterShifts.find(s => s.id === shift.id)) {
-                addShift(alreadyAddedLocation.filterShifts, shift)
+                addShift(alreadyAddedLocation.filterShifts, shift);
             }
         }
 
-    }
+    };
 
     const locations = computed(() => {
         if (!serverLocations?.value) {
-            return []
+            return [];
         }
-        const mappedLocations = []
-        const myLocations = cloneDeep(serverLocations.value)
-        emptyShiftsForTime.value = []
+        const mappedLocations = [];
+        const myLocations = cloneDeep(serverLocations.value);
+        emptyShiftsForTime.value = [];
+
         for (const location of myLocations) {
+            location.hasFreeShifts = false;
+            let locationHasFreeShifts = false;
             for (const shift of location.shifts) {
-                const volunteers = shift.volunteers
-                shift.filterVolunteers = volunteers.filter(volunteer => volunteer.shift_date === selectedDate.value)
-                delete shift.volunteers
+                const volunteers = shift.volunteers;
+                shift.filterVolunteers = volunteers.filter(volunteer => volunteer.shift_date === selectedDate.value);
+                delete shift.volunteers;
                 if (location.requires_brother) {
-                    let femaleCount = 0
+                    let femaleCount = 0;
                     for (const filVolunteer of shift.filterVolunteers) {
                         if (filVolunteer.gender === 'female') {
-                            femaleCount++
+                            femaleCount++;
                         }
                     }
-                    shift.maxedFemales = femaleCount >= location.max_volunteers - 1
+                    shift.maxedFemales = femaleCount >= location.max_volunteers - 1;
                 }
-                setReservations(location.max_volunteers, shift, location)
-                const dayOfWeek = date.value.getDay()
-                const mappedDay = shift.js_days[dayOfWeek]
+                setReservations(location.max_volunteers, shift, location);
+                if (shift.hasFreeShifts) {
+                    locationHasFreeShifts = true;
+                }
+                const dayOfWeek = date.value.getDay();
+                const mappedDay = shift.js_days[dayOfWeek];
                 if (mappedDay === true) {
-                    addLocation(mappedLocations, location, shift)
+                    addLocation(mappedLocations, location, shift);
                 }
             }
-            delete location.shifts
+
+            location.hasFreeShifts = locationHasFreeShifts;
+            delete location.shifts;
         }
-        return mappedLocations
-    })
+        return mappedLocations;
+    });
 
     return {
         date,
@@ -147,5 +158,5 @@ export default function useLocationFilter(canAdmin = false) {
         maxReservationDate,
         serverDates,
         getShifts,
-    }
+    };
 }
