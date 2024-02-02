@@ -78,7 +78,7 @@ const extraClasses = computed(() => {
 <template>
     <teleport to="body">
         <transition leave-active-class="duration-200">
-            <div v-show="show" class="fixed flex items-center justify-center inset-0 overflow-y-auto z-50 px-4 py-6 sm:px-0" scroll-region>
+            <div v-show="show" class="fixed top-0 bottom-0 left-0 right-0 flex items-center justify-center inset-0 z-50 px-4 py-6 sm:px-0">
                 <transition enter-active-class="ease-out duration-300"
                             enter-from-class="opacity-0"
                             enter-to-class="opacity-100"
@@ -97,7 +97,7 @@ const extraClasses = computed(() => {
                             leave-from-class="opacity-100 translate-y-0 sm:scale-100"
                             leave-to-class="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95">
                     <div v-show="show"
-                         class="bg-white dark:bg-gray-900 rounded-lg shadow-xl transform transition-all"
+                         class="bg-white dark:bg-gray-900 rounded-lg transform transition-all max-h-dvh sm:max-h-full max-w-full flex flex-col pb-1.5"
                          :class="extraClasses">
                         <slot v-if="show"/>
                     </div>

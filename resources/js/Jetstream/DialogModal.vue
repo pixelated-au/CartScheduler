@@ -24,8 +24,8 @@
 </script>
 
 <template>
-    <Modal :show="show" :max-width="maxWidth" :closeable="closeable" @close="close">
-        <div class="px-6 py-4">
+    <Modal fill-screen :show="show" :max-width="maxWidth" :closeable="closeable" @close="close">
+        <div class="px-6 py-4 overflow-y-auto flex-1 w-full">
             <div class="text-lg dark:bg-gray-900 dark:text-gray-100">
                 <slot name="title"/>
             </div>
@@ -35,7 +35,7 @@
             </div>
         </div>
 
-        <div class="flex flex-row justify-end px-6 py-4 bg-gray-100 dark:bg-gray-900 dark:text-gray-100 text-right">
+        <div class="flex flex-row justify-end w-full px-6 py-4 bg-gray-100 dark:bg-gray-900 dark:text-gray-100 text-right">
             <slot name="footer"/>
         </div>
     </Modal>
