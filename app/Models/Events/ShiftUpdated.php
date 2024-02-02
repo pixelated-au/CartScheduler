@@ -7,11 +7,14 @@ use App\Models\ShiftUser;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 
+/**
+ * @deprecated This class has unintended consequences.
+ */
 class ShiftUpdated
 {
     public function __construct(private readonly Shift $shift)
     {
-        $this->deleteOrphanedVolunteerShifts();
+//        $this->deleteOrphanedVolunteerShifts();
     }
 
     public function deleteOrphanedVolunteerShifts(): void

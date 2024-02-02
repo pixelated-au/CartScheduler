@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\Models\Events\ShiftUpdated;
 use Database\Factories\ShiftFactory;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -58,7 +57,7 @@ class Shift extends Model
     ];
 
     protected $dispatchesEvents = [
-        'updated' => ShiftUpdated::class,
+//        'updated' => ShiftUpdated::class,
     ];
 
     protected function availableFrom(): Attribute
