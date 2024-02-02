@@ -1,5 +1,5 @@
 <script setup>
-import {computed, ref} from "vue";
+import {computed} from "vue";
 
 const props = defineProps({
     filled: Number,
@@ -38,6 +38,7 @@ const indicators = computed(() => {
     background-repeat: no-repeat;
     @apply bg-slate-700 dark:bg-slate-400;
     mask: url('/images/circle-line.svg');
+
     &.fill {
         mask: url('/images/circle-fill.svg');
     }
