@@ -45,6 +45,7 @@ const columnFilters = reactive({
     maritalStatus: {label: 'Marital Status', value: false},
     birthYear: {label: 'Birth Year', value: false},
     responsibleBrother: {label: 'Is Responsible Bro?', value: false},
+    mobilePhone: {label: 'Phone', value: false},
 })
 
 watch(columnFilters, val => {
@@ -108,13 +109,13 @@ const volunteerAssigned = function (data) {
                 <div
                     class="col-span-6 sm:col-span-5 mt-3 pb-2 border border-gray-300 dark:border-gray-800 rounded-md shadow-sm">
                     <div class="mt-3 ml-3 text-gray-800 dark:text-gray-200 font-normal">Filter By Only...</div>
-                    <div class="flex justify-between items-center">
-                        <div class="flex flex-wrap justify-center w-[150px]">
+                    <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 items-center">
+                        <div class="flex flex-wrap justify-center">
                             <JetToggle v-model="mainFilters.doShowOnlyResponsibleBros" class="text-center">
                                 Resp. Bros
                             </JetToggle>
                         </div>
-                        <div class="flex flex-wrap justify-center w-[150px]">
+                        <div class="flex flex-wrap justify-center">
                             <JetToggle v-model="mainFilters.doHidePublishers" class="text-center">
                                 Pioneers
                                 <v-menu class="ml-1 inline-block">
@@ -134,17 +135,17 @@ const volunteerAssigned = function (data) {
                                 </v-menu>
                             </JetToggle>
                         </div>
-                        <div class="flex flex-wrap justify-center w-[150px]">
+                        <div class="flex flex-wrap justify-center">
                             <JetToggle v-model="mainFilters.doShowOnlyElders" class="text-center">
                                 Elders
                             </JetToggle>
                         </div>
-                        <div class="flex flex-wrap justify-center w-[150px]">
+                        <div class="flex flex-wrap justify-center">
                             <JetToggle v-model="mainFilters.doShowOnlyMinisterialServants" class="text-center">
                                 MS's
                             </JetToggle>
                         </div>
-                        <div v-if="enableUserAvailability" class="flex flex-wrap justify-center w-[150px]">
+                        <div v-if="enableUserAvailability" class="flex flex-wrap justify-center">
                             <JetToggle v-model="mainFilters.doShowFilteredVolunteers" class="text-center">
                                 Available
                                 <v-menu class="ml-1 inline-block">

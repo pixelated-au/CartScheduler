@@ -78,7 +78,7 @@ const extraClasses = computed(() => {
 <template>
     <teleport to="body">
         <transition leave-active-class="duration-200">
-            <div v-show="show" class="fixed top-0 bottom-0 left-0 right-0 flex items-center justify-center inset-0 z-50 px-4 py-6 sm:px-0">
+            <div v-show="show" class="fixed top-0 bottom-0 left-0 right-0 flex items-center justify-center inset-0 z-50 px-4 py-6">
                 <transition enter-active-class="ease-out duration-300"
                             enter-from-class="opacity-0"
                             enter-to-class="opacity-100"

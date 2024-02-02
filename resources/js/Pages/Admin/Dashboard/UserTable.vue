@@ -105,6 +105,13 @@ const tableHeaders = computed(() => {
             sortable: true,
         })
     }
+    if (props.columnFilters.mobilePhone.value) {
+        headers.push({
+            text: 'Phone',
+            value: 'mobilePhone',
+            sortable: false,
+        })
+    }
     headers.push({
         text: 'Last Shift',
         value: 'lastShift',
@@ -160,6 +167,7 @@ const tableRows = computed(() => {
             servingAs: volunteer.serving_as,
             maritalStatus: volunteer.marital_status,
             birthYear: volunteer.birth_year,
+            mobilePhone: volunteer.mobile_phone,
             daysAlreadyRostered,
             daysAvailable,
         }
@@ -320,6 +328,11 @@ const hasDaysAvailable = daysAvailable => Object.values(daysAvailable).some(day 
             </template>
             <template #item-birthYear="{birthYear}">
                 {{ birthYear }}
+            </template>
+            <template #item-mobilePhone="{mobilePhone}">
+                <a :href="`tel:${mobilePhone}`" class="sm:hidden">{{ mobilePhone }}</a>
+                <span class="hidden sm:block">{{ mobilePhone }}</span>
+
             </template>
             <template #item-lastShift="{lastShift, lastShiftTime}">
                 {{ formatShiftDate(lastShift, lastShiftTime) }}
