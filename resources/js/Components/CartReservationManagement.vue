@@ -1,149 +1,155 @@
 <script setup>
-    import Loading from "@/Components/Loading.vue";
-    import Accordion from '@/Components/LocationAccordion.vue'
-    import EmptySlot from '@/Components/Icons/EmptySlot.vue'
-    import Female from '@/Components/Icons/Female.vue'
-    import JetButton from '@/Jetstream/Button.vue'
-    import JetConfirmModal from '@/Jetstream/ConfirmationModal.vue'
-    import Male from '@/Components/Icons/Male.vue'
-    import useToast from '@/Composables/useToast'
-    import useLocationFilter from '@/Pages/Admin/Locations/Composables/useLocationFilter'
-    import DatePicker from '@/Pages/Components/Dashboard/DatePicker.vue'
-    import axios from 'axios'
-    import {format, parse} from 'date-fns'
-    // noinspection ES6UnusedImports
-    import {VTooltip} from 'floating-vue'
-    import {computed, inject, reactive, ref} from 'vue'
-    import UserActionsModal from "@/Pages/Admin/Dashboard/UserActionsModal.vue";
-    import MoveUserSelectField from "@/Components/MoveUserSelectField.vue";
-    import UserAdd from "@/Components/Icons/UserAdd.vue";
-    import UserRemove from "@/Components/Icons/UserRemove.vue";
+import EmptySlot from '@/Components/Icons/EmptySlot.vue'
+import Female from '@/Components/Icons/Female.vue'
+import Male from '@/Components/Icons/Male.vue'
+import UserAdd from "@/Components/Icons/UserAdd.vue";
+import UserRemove from "@/Components/Icons/UserRemove.vue";
+import Loading from "@/Components/Loading.vue";
+import Accordion from '@/Components/LocationAccordion.vue'
+import MoveUserSelectField from "@/Components/MoveUserSelectField.vue";
+import useToast from '@/Composables/useToast'
+import JetButton from '@/Jetstream/Button.vue'
+import JetConfirmModal from '@/Jetstream/ConfirmationModal.vue'
+import UserActionsModal from "@/Pages/Admin/Dashboard/UserActionsModal.vue";
+import useLocationFilter from '@/Pages/Admin/Locations/Composables/useLocationFilter'
+import DatePicker from '@/Pages/Components/Dashboard/DatePicker.vue'
+import axios from 'axios'
+import {format, parse} from 'date-fns'
+// noinspection ES6UnusedImports
+import {VTooltip} from 'floating-vue'
+import {computed, reactive, ref} from 'vue'
 
-    defineProps({
-        user: Object,
-    })
+defineProps({
+    user: Object,
+})
 
-    const toast = useToast()
+const toast = useToast()
 
-    const {date, emptyShiftsForTime, isLoading, locations, serverDates, getShifts} = useLocationFilter(true)
+const {date, emptyShiftsForTime, isLoading, locations, serverDates, getShifts} = useLocationFilter(true)
 
-    const gridCols = {
-        // See tailwind.config.js
-        1: 'grid-cols-reservation-1',
-        2: 'grid-cols-reservation-2',
-        3: 'grid-cols-reservation-3',
-        4: 'grid-cols-reservation-4',
-        5: 'grid-cols-reservation-5',
+const gridCols = {
+    // See tailwind.config.js
+    1: 'grid-cols-reservation-1',
+    2: 'grid-cols-reservation-2',
+    3: 'grid-cols-reservation-3',
+    4: 'grid-cols-reservation-4',
+    5: 'grid-cols-reservation-5',
+}
+
+const locationsOnDays = ref([])
+
+const setLocationMarkers = locations => locationsOnDays.value = locations
+
+const selectedMoveUser = ref(null)
+/** Note this is a get/set computed property so we can set it to null when the modal is closed **/
+const showMoveUserModal = computed({
+    get: () => !!selectedMoveUser.value,
+    set: value => selectedMoveUser.value = value ? selectedMoveUser.value : null,
+})
+
+const promptMoveVolunteer = (selection, volunteer, shift) => selectedMoveUser.value = {selection, volunteer, shift}
+
+const moveVolunteer = async (volunteerId, locationId, shiftId) => {
+    selectedMoveUser.value = null
+    try {
+        await axios.put('/admin/move-volunteer-to-shift', {
+            user_id: volunteerId,
+            location_id: locationId,
+            old_shift_id: shiftId,
+            date: format(date.value, 'yyyy-MM-dd'),
+        })
+        toast.success('User was moved!')
+    } catch (e) {
+        toast.error(e.response.data.message)
+
+    } finally {
+        await getShifts()
     }
+}
 
-    const locationsOnDays = ref([])
+const assignVolunteer = async ({volunteerId, volunteerName, location, shift}) => {
+    try {
+        await axios.put('/admin/toggle-shift-for-user', {
+            do_reserve: true,
+            user: volunteerId,
+            location: location.id,
+            shift: shift.id,
+            date: format(date.value, 'yyyy-MM-dd'),
+        })
+        toast.success(`${volunteerName} was assigned to ${location.name} at ${shift.start_time}`)
+    } catch (e) {
+        toast.error(e.response.data.message)
 
-    const setLocationMarkers = locations => locationsOnDays.value = locations
-
-    const selectedMoveUser = ref(null)
-    /** Note this is a get/set computed property so we can set it to null when the modal is closed **/
-    const showMoveUserModal = computed({
-        get: () => !!selectedMoveUser.value,
-        set: value => selectedMoveUser.value = value ? selectedMoveUser.value : null,
-    })
-
-    const promptMoveVolunteer = (selection, volunteer, shift) => selectedMoveUser.value = {selection, volunteer, shift}
-
-    const moveVolunteer = async (volunteerId, locationId, shiftId) => {
-        selectedMoveUser.value = null
-        try {
-            await axios.put('/admin/move-volunteer-to-shift', {
-                user_id: volunteerId,
-                location_id: locationId,
-                old_shift_id: shiftId,
-                date: format(date.value, 'yyyy-MM-dd'),
-            })
-            toast.success('User was moved!')
-        } catch (e) {
-            toast.error(e.response.data.message)
-
-        } finally {
-            await getShifts()
-        }
+    } finally {
+        await getShifts()
     }
+}
 
-    const assignVolunteer = async ({volunteerId, volunteerName, location, shift}) => {
-        try {
-            await axios.put('/admin/toggle-shift-for-user', {
-                do_reserve: true,
-                user: volunteerId,
-                location: location.id,
-                shift: shift.id,
-                date: format(date.value, 'yyyy-MM-dd'),
-            })
-            toast.success(`${volunteerName} was assigned to ${location.name} at ${shift.start_time}`)
-        } catch (e) {
-            toast.error(e.response.data.message)
+const removeVolunteer = async () => {
+    try {
+        await axios.delete('/admin/toggle-shift-for-user', {
+            data: {
+                do_reserve: false,
+                user: selectedRemoveUser.value.volunteer.id,
+                location: selectedRemoveUser.value.location.id,
+                shift: selectedRemoveUser.value.shift.id,
+                date: format(selectedRemoveUser.value.date, 'yyyy-MM-dd'),
+            }
+        })
+        toast.warning(`${selectedRemoveUser.value.volunteer.name} was removed from ${selectedRemoveUser.value.location.name} at ${selectedRemoveUser.value.shift.start_time}`)
+        selectedRemoveUser.value = null
+    } catch (e) {
+        toast.error(e.response.data.message)
 
-        } finally {
-            await getShifts()
-        }
+    } finally {
+        await getShifts()
     }
+}
 
-    const removeVolunteer = async () => {
-        try {
-            await axios.delete('/admin/toggle-shift-for-user', {
-                data: {
-                    do_reserve: false,
-                    user: selectedRemoveUser.value.volunteer.id,
-                    location: selectedRemoveUser.value.location.id,
-                    shift: selectedRemoveUser.value.shift.id,
-                    date: format(selectedRemoveUser.value.date, 'yyyy-MM-dd'),
-                }
-            })
-            toast.warning(`${selectedRemoveUser.value.volunteer.name} was removed from ${selectedRemoveUser.value.location.name} at ${selectedRemoveUser.value.shift.start_time}`)
-            selectedRemoveUser.value = null
-        } catch (e) {
-            toast.error(e.response.data.message)
+const today = new Date()
+const formatTime = time => format(parse(time, 'HH:mm:ss', today), 'h:mm a')
 
-        } finally {
-            await getShifts()
-        }
+const showUserAddModal = ref(false)
+
+const rowClass = gender => {
+    if (gender === 'male') {
+        return 'bg-blue-100 hover:bg-blue-200 dark:bg-blue-900/40 dark:hover:bg-blue-900/60'
+    } else if (gender === 'female') {
+        return 'bg-pink-100 hover:bg-pink-200 dark:bg-fuchsia-900/40 dark:hover:bg-fuchsia-900/60'
     }
-
-    const today = new Date()
-    const formatTime = time => format(parse(time, 'HH:mm:ss', today), 'h:mm a')
-
-    const showUserAddModal = ref(false)
-
-    const rowClass = gender => {
-        if (gender === 'male') {
-            return 'bg-blue-100 hover:bg-blue-200 dark:bg-blue-900/40 dark:hover:bg-blue-900/60'
-        } else if (gender === 'female') {
-            return 'bg-pink-100 hover:bg-pink-200 dark:bg-fuchsia-900/40 dark:hover:bg-fuchsia-900/60'
-        }
-        return 'bg-slate-200 dark:bg-slate-700 dark:text-gray-50'
-    };
+    return 'bg-slate-200 dark:bg-slate-700 dark:text-gray-50'
+};
 
 
-    const assignUserData = reactive({
-        shift: null,
-        location: null,
-    })
+const assignUserData = reactive({
+    shift: null,
+    location: null,
+})
 
-    const doShowAssignVolunteerModal = (shift, location) => {
-        assignUserData.shift = shift
-        assignUserData.location = location
-        showUserAddModal.value = true
+const doShowAssignVolunteerModal = (shift, location) => {
+    assignUserData.shift = shift
+    assignUserData.location = location
+    showUserAddModal.value = true
+}
+
+const selectedRemoveUser = ref(null)
+
+const setRemoveUser = (volunteer, shift, location, date) =>
+    selectedRemoveUser.value = {volunteer, shift, location, date}
+
+/** Note this is a get/set computed property so we can set it to null when the modal is closed **/
+const showRemoveVolunteerModal = computed({
+    get: () => !!selectedRemoveUser.value,
+    set: value => selectedRemoveUser.value = value ? selectedRemoveUser.value : null,
+})
+
+const removeTooltip = name => `Remove ${name} from this shift`
+
+const locationClasses = function(location) {
+    if (location.hasFreeShifts) {
+        return 'text-orange-800 dark:text-orange-300 border-b-2 border-orange-500'
     }
-
-    const selectedRemoveUser = ref(null)
-
-    const setRemoveUser = (volunteer, shift, location, date) =>
-        selectedRemoveUser.value = {volunteer, shift, location, date}
-
-    /** Note this is a get/set computed property so we can set it to null when the modal is closed **/
-    const showRemoveVolunteerModal = computed({
-        get: () => !!selectedRemoveUser.value,
-        set: value => selectedRemoveUser.value = value ? selectedRemoveUser.value : null,
-    })
-
-    const removeTooltip = name => `Remove ${name} from this shift`
+}
 </script>
 
 <template>
@@ -160,7 +166,7 @@
             <Loading v-if="isLoading" class="min-h-[200px] sm:min-h-full"/>
             <Accordion v-show="!isLoading" :items="locations" label="name" uid="id">
                 <template #label="{label, location}">
-                    <span class="dark:text-gray-200">{{ label }}</span>
+                    <span class="dark:text-gray-200" :class="locationClasses(location)">{{ label }}</span>
                 </template>
                 <template v-slot="{location}">
                     <div class="w-full grid gap-x-2 gap-y-4" :class="gridCols[location.max_volunteers]">
@@ -195,20 +201,20 @@
                                             }}</a>
                                         </div>
                                         <div class="col-span-2 grid grid-cols-2 gap-1.5 lg:flex lg:gap-3">
-                                        <MoveUserSelectField class="inline-block"
-                                                             :volunteer="volunteer"
-                                                             :date="date"
-                                                             :shift="shift"
-                                                             :location-id="location.id"
-                                                             :empty-shifts-for-time="emptyShiftsForTime"
-                                                             @update:modelValue="promptMoveVolunteer($event, volunteer, shift)"/>
-                                        <div class="text-right">
-                                            <JetButton style-type="danger"
-                                                       v-tooltip="removeTooltip(volunteer.name)"
-                                                       @click="setRemoveUser(volunteer, shift, location, date)">
-                                                <UserRemove color="#000"/>
-                                            </JetButton>
-                                        </div>
+                                            <MoveUserSelectField class="inline-block"
+                                                                 :volunteer="volunteer"
+                                                                 :date="date"
+                                                                 :shift="shift"
+                                                                 :location-id="location.id"
+                                                                 :empty-shifts-for-time="emptyShiftsForTime"
+                                                                 @update:modelValue="promptMoveVolunteer($event, volunteer, shift)"/>
+                                            <div class="text-right">
+                                                <JetButton style-type="danger"
+                                                           v-tooltip="removeTooltip(volunteer.name)"
+                                                           @click="setRemoveUser(volunteer, shift, location, date)">
+                                                    <UserRemove color="#000"/>
+                                                </JetButton>
+                                            </div>
                                         </div>
                                     </div>
 
