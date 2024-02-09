@@ -146,7 +146,7 @@ const showRemoveVolunteerModal = computed({
 const removeTooltip = name => `Remove ${name} from this shift`;
 
 const locationClasses = location => location.freeShifts
-    ? 'border-amber-500 text-amber-500 group-hover:bg-amber-500 group-hover:text-amber-800'
+    ? 'border-amber-600 text-amber-500 group-hover:bg-amber-500 group-hover:text-amber-800'
     : 'text-gray-400 dark:text-gray-500 border-gray-400 group-hover:bg-gray-400 group-hover:text-gray-50';
 </script>
 
@@ -169,7 +169,7 @@ const locationClasses = location => location.freeShifts
                         <div class="ml-1 py-1.5 group flex items-center">
                             <div
                                 :class="locationClasses(location)"
-                                class="ml-1 mr-3 w-4 h-4 flex items-center justify-center rounded-full border transition-colors text-xs leading-none">
+                                class="ml-1 mr-2 w-5 h-5 flex items-center justify-center rounded-full border transition-colors text-xs leading-none">
                                 {{ location.freeShifts }}
                             </div>
                             <div class="min-w-5 hidden sm:block">
