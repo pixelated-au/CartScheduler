@@ -46,6 +46,14 @@ class AvailableShiftsController extends Controller
         $locations = Location::with([
             'shifts'       => fn(HasMany $query) => $query
                 ->where('shifts.is_enabled', true)
+                ->where(fn(Builder $query) => $query
+                    ->whereNull('shifts.available_from')
+                    ->orWhere('shifts.available_from', '<=', $selectedDate)
+                )
+                ->where(fn(Builder $query) => $query
+                    ->whereNull('shifts.available_to')
+                    ->orWhere('shifts.available_to', '>=', $selectedDate)
+                )
                 ->orderBy('shifts.start_time'),
             'shifts.users' => fn(BelongsToMany $query) => $query
                 ->where('shift_user.shift_date', '=', $selectedDate)
