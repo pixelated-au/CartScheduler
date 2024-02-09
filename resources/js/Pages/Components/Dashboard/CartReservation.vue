@@ -110,9 +110,8 @@ const locationLabel = computed(() => {
                        label="name" uid="id"
                        empty-collection-text="No available locations for this day">
                 <template #label="{label, location}">
-                    <div :class="locationLabel[location.id].classes" v-tooltip="locationLabel[location.id].tooltip"
-                         class="flex items-center">
-                        {{ label }}
+                    <div class="flex items-center">
+                        <span :class="locationLabel[location.id].classes" v-tooltip="locationLabel[location.id].tooltip">{{ label }}</span>
                         <div class="ml-2 py-1.5 group flex items-center" v-if="!isRestricted && location.freeShifts">
                             <div
                                 class="ml-1 mr-3 w-2 h-2 rounded-full bg-amber-500 group-hover:bg-amber-600 group-hover:dark:bg-amber-200 transition-colors"></div>
