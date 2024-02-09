@@ -54,6 +54,15 @@ class AvailableShiftsController extends Controller
                     ->whereNull('shifts.available_to')
                     ->orWhere('shifts.available_to', '>=', $selectedDate)
                 )
+                ->whereRaw("CASE
+                                    WHEN DAYOFWEEK('$selectedDate') = 1 THEN shifts.day_sunday
+                                    WHEN DAYOFWEEK('$selectedDate') = 2 THEN shifts.day_monday
+                                    WHEN DAYOFWEEK('$selectedDate') = 3 THEN shifts.day_tuesday
+                                    WHEN DAYOFWEEK('$selectedDate') = 4 THEN shifts.day_wednesday
+                                    WHEN DAYOFWEEK('$selectedDate') = 5 THEN shifts.day_thursday
+                                    WHEN DAYOFWEEK('$selectedDate') = 6 THEN shifts.day_friday
+                                    WHEN DAYOFWEEK('$selectedDate') = 7 THEN shifts.day_saturday
+                                    END = 1")
                 ->orderBy('shifts.start_time'),
             'shifts.users' => fn(BelongsToMany $query) => $query
                 ->where('shift_user.shift_date', '=', $selectedDate)
