@@ -1,31 +1,31 @@
 <script setup>
-import EmptySlot from '@/Components/Icons/EmptySlot.vue'
-import Female from '@/Components/Icons/Female.vue'
-import Male from '@/Components/Icons/Male.vue'
+import EmptySlot from '@/Components/Icons/EmptySlot.vue';
+import Female from '@/Components/Icons/Female.vue';
+import Male from '@/Components/Icons/Male.vue';
 import UserAdd from "@/Components/Icons/UserAdd.vue";
 import UserRemove from "@/Components/Icons/UserRemove.vue";
 import Loading from "@/Components/Loading.vue";
-import Accordion from '@/Components/LocationAccordion.vue'
+import Accordion from '@/Components/LocationAccordion.vue';
 import MoveUserSelectField from "@/Components/MoveUserSelectField.vue";
-import useToast from '@/Composables/useToast'
-import JetButton from '@/Jetstream/Button.vue'
-import JetConfirmModal from '@/Jetstream/ConfirmationModal.vue'
+import useToast from '@/Composables/useToast';
+import JetButton from '@/Jetstream/Button.vue';
+import JetConfirmModal from '@/Jetstream/ConfirmationModal.vue';
 import UserActionsModal from "@/Pages/Admin/Dashboard/UserActionsModal.vue";
-import useLocationFilter from '@/Pages/Admin/Locations/Composables/useLocationFilter'
-import DatePicker from '@/Pages/Components/Dashboard/DatePicker.vue'
-import axios from 'axios'
-import {format, parse} from 'date-fns'
+import useLocationFilter from '@/Pages/Admin/Locations/Composables/useLocationFilter';
+import DatePicker from '@/Pages/Components/Dashboard/DatePicker.vue';
+import axios from 'axios';
+import {format, parse} from 'date-fns';
 // noinspection ES6UnusedImports
-import {VTooltip} from 'floating-vue'
-import {computed, reactive, ref} from 'vue'
+import {VTooltip} from 'floating-vue';
+import {computed, reactive, ref} from 'vue';
 
 defineProps({
     user: Object,
-})
+});
 
-const toast = useToast()
+const toast = useToast();
 
-const {date, emptyShiftsForTime, isLoading, locations, serverDates, getShifts} = useLocationFilter(true)
+const {date, emptyShiftsForTime, isLoading, locations, serverDates, getShifts} = useLocationFilter(true);
 
 const gridCols = {
     // See tailwind.config.js
@@ -34,38 +34,38 @@ const gridCols = {
     3: 'grid-cols-reservation-3',
     4: 'grid-cols-reservation-4',
     5: 'grid-cols-reservation-5',
-}
+};
 
-const locationsOnDays = ref([])
+const locationsOnDays = ref([]);
 
-const setLocationMarkers = locations => locationsOnDays.value = locations
+const setLocationMarkers = locations => locationsOnDays.value = locations;
 
-const selectedMoveUser = ref(null)
+const selectedMoveUser = ref(null);
 /** Note this is a get/set computed property so we can set it to null when the modal is closed **/
 const showMoveUserModal = computed({
     get: () => !!selectedMoveUser.value,
     set: value => selectedMoveUser.value = value ? selectedMoveUser.value : null,
-})
+});
 
-const promptMoveVolunteer = (selection, volunteer, shift) => selectedMoveUser.value = {selection, volunteer, shift}
+const promptMoveVolunteer = (selection, volunteer, shift) => selectedMoveUser.value = {selection, volunteer, shift};
 
 const moveVolunteer = async (volunteerId, locationId, shiftId) => {
-    selectedMoveUser.value = null
+    selectedMoveUser.value = null;
     try {
         await axios.put('/admin/move-volunteer-to-shift', {
             user_id: volunteerId,
             location_id: locationId,
             old_shift_id: shiftId,
             date: format(date.value, 'yyyy-MM-dd'),
-        })
-        toast.success('User was moved!')
+        });
+        toast.success('User was moved!');
     } catch (e) {
-        toast.error(e.response.data.message)
+        toast.error(e.response.data.message);
 
     } finally {
-        await getShifts()
+        await getShifts();
     }
-}
+};
 
 const assignVolunteer = async ({volunteerId, volunteerName, location, shift}) => {
     try {
@@ -75,15 +75,15 @@ const assignVolunteer = async ({volunteerId, volunteerName, location, shift}) =>
             location: location.id,
             shift: shift.id,
             date: format(date.value, 'yyyy-MM-dd'),
-        })
-        toast.success(`${volunteerName} was assigned to ${location.name} at ${shift.start_time}`)
+        });
+        toast.success(`${volunteerName} was assigned to ${location.name} at ${shift.start_time}`);
     } catch (e) {
-        toast.error(e.response.data.message)
+        toast.error(e.response.data.message);
 
     } finally {
-        await getShifts()
+        await getShifts();
     }
-}
+};
 
 const removeVolunteer = async () => {
     try {
@@ -94,62 +94,60 @@ const removeVolunteer = async () => {
                 location: selectedRemoveUser.value.location.id,
                 shift: selectedRemoveUser.value.shift.id,
                 date: format(selectedRemoveUser.value.date, 'yyyy-MM-dd'),
-            }
-        })
-        toast.warning(`${selectedRemoveUser.value.volunteer.name} was removed from ${selectedRemoveUser.value.location.name} at ${selectedRemoveUser.value.shift.start_time}`)
-        selectedRemoveUser.value = null
+            },
+        });
+        toast.warning(`${selectedRemoveUser.value.volunteer.name} was removed from ${selectedRemoveUser.value.location.name} at ${selectedRemoveUser.value.shift.start_time}`);
+        selectedRemoveUser.value = null;
     } catch (e) {
-        toast.error(e.response.data.message)
+        toast.error(e.response.data.message);
 
     } finally {
-        await getShifts()
+        await getShifts();
     }
-}
+};
 
-const today = new Date()
-const formatTime = time => format(parse(time, 'HH:mm:ss', today), 'h:mm a')
+const today = new Date();
+const formatTime = time => format(parse(time, 'HH:mm:ss', today), 'h:mm a');
 
-const showUserAddModal = ref(false)
+const showUserAddModal = ref(false);
 
 const rowClass = gender => {
     if (gender === 'male') {
-        return 'bg-blue-100 hover:bg-blue-200 dark:bg-blue-900/40 dark:hover:bg-blue-900/60'
+        return 'bg-blue-100 hover:bg-blue-200 dark:bg-blue-900/40 dark:hover:bg-blue-900/60';
     } else if (gender === 'female') {
-        return 'bg-pink-100 hover:bg-pink-200 dark:bg-fuchsia-900/40 dark:hover:bg-fuchsia-900/60'
+        return 'bg-pink-100 hover:bg-pink-200 dark:bg-fuchsia-900/40 dark:hover:bg-fuchsia-900/60';
     }
-    return 'bg-slate-200 dark:bg-slate-700 dark:text-gray-50'
+    return 'bg-slate-200 dark:bg-slate-700 dark:text-gray-50';
 };
 
 
 const assignUserData = reactive({
     shift: null,
     location: null,
-})
+});
 
 const doShowAssignVolunteerModal = (shift, location) => {
-    assignUserData.shift = shift
-    assignUserData.location = location
-    showUserAddModal.value = true
-}
+    assignUserData.shift = shift;
+    assignUserData.location = location;
+    showUserAddModal.value = true;
+};
 
-const selectedRemoveUser = ref(null)
+const selectedRemoveUser = ref(null);
 
 const setRemoveUser = (volunteer, shift, location, date) =>
-    selectedRemoveUser.value = {volunteer, shift, location, date}
+    selectedRemoveUser.value = {volunteer, shift, location, date};
 
 /** Note this is a get/set computed property so we can set it to null when the modal is closed **/
 const showRemoveVolunteerModal = computed({
     get: () => !!selectedRemoveUser.value,
     set: value => selectedRemoveUser.value = value ? selectedRemoveUser.value : null,
-})
+});
 
-const removeTooltip = name => `Remove ${name} from this shift`
+const removeTooltip = name => `Remove ${name} from this shift`;
 
-const locationClasses = function(location) {
-    if (location.hasFreeShifts) {
-        return 'text-orange-800 dark:text-orange-300 border-b-2 border-orange-500'
-    }
-}
+const locationClasses = location => location.freeShifts
+    ? 'border-amber-500 text-amber-500 group-hover:bg-amber-500 group-hover:text-amber-800'
+    : 'text-gray-400 dark:text-gray-500 border-gray-400 group-hover:bg-gray-400 group-hover:text-gray-50';
 </script>
 
 <template>
@@ -166,7 +164,22 @@ const locationClasses = function(location) {
             <Loading v-if="isLoading" class="min-h-[200px] sm:min-h-full"/>
             <Accordion v-show="!isLoading" :items="locations" label="name" uid="id">
                 <template #label="{label, location}">
-                    <span class="dark:text-gray-200" :class="locationClasses(location)">{{ label }}</span>
+                    <div class="dark:text-gray-200 flex items-center">
+                        {{ label }}
+                        <div class="ml-1 py-1.5 group flex items-center">
+                            <div
+                                :class="locationClasses(location)"
+                                class="ml-1 mr-3 w-4 h-4 flex items-center justify-center rounded-full border transition-colors text-xs leading-none">
+                                {{ location.freeShifts }}
+                            </div>
+                            <div class="min-w-5 hidden sm:block">
+                                <div
+                                    class="w-0 overflow-x-hidden whitespace-nowrap group-hover:w-full text-gray-600 dark:text-gray-400 text-sm transition-all">
+                                    shifts remaining
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </template>
                 <template v-slot="{location}">
                     <div class="w-full grid gap-x-2 gap-y-4" :class="gridCols[location.max_volunteers]">

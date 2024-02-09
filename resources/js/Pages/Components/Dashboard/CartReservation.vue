@@ -1,27 +1,27 @@
 <script setup>
-import ComponentSpinner from '@/Components/ComponentSpinner.vue'
-import BookedSlot from '@/Components/Icons/BookedSlot.vue'
-import EmptySlot from '@/Components/Icons/EmptySlot.vue'
-import Female from '@/Components/Icons/Female.vue'
-import Male from '@/Components/Icons/Male.vue'
+import ComponentSpinner from '@/Components/ComponentSpinner.vue';
+import BookedSlot from '@/Components/Icons/BookedSlot.vue';
+import EmptySlot from '@/Components/Icons/EmptySlot.vue';
+import Female from '@/Components/Icons/Female.vue';
+import Male from '@/Components/Icons/Male.vue';
 import Loading from "@/Components/Loading.vue";
-import Accordion from '@/Components/LocationAccordion.vue'
-import useToast from '@/Composables/useToast'
-import useLocationFilter from '@/Pages/Admin/Locations/Composables/useLocationFilter'
-import DatePicker from '@/Pages/Components/Dashboard/DatePicker.vue'
+import Accordion from '@/Components/LocationAccordion.vue';
+import useToast from '@/Composables/useToast';
+import useLocationFilter from '@/Pages/Admin/Locations/Composables/useLocationFilter';
+import DatePicker from '@/Pages/Components/Dashboard/DatePicker.vue';
 import {usePage} from "@inertiajs/inertia-vue3";
-import {format, isSameDay, parse} from 'date-fns'
+import {format, isSameDay, parse} from 'date-fns';
 // noinspection ES6UnusedImports
-import {VTooltip} from 'floating-vue'
-import {computed, ref} from 'vue'
+import {VTooltip} from 'floating-vue';
+import {computed, ref} from 'vue';
 
 defineProps({
     user: Object,
-})
+});
 
-const toast = useToast()
+const toast = useToast();
 
-const {date, freeShifts, isLoading, locations, maxReservationDate, serverDates, getShifts} = useLocationFilter()
+const {date, freeShifts, isLoading, locations, maxReservationDate, serverDates, getShifts} = useLocationFilter();
 
 const gridCols = {
     // See tailwind.config.js
@@ -30,7 +30,7 @@ const gridCols = {
     3: 'grid-cols-sm-reservation-3 sm:grid-cols-reservation-3',
     4: 'grid-cols-sm-reservation-4 sm:grid-cols-reservation-4',
     5: 'grid-cols-sm-reservation-5 sm:grid-cols-reservation-5',
-}
+};
 
 const toggleReservation = async (locationId, shiftId, toggleOn) => {
     try {
@@ -39,43 +39,53 @@ const toggleReservation = async (locationId, shiftId, toggleOn) => {
             shift: shiftId,
             do_reserve: toggleOn,
             date: format(date.value, 'yyyy-MM-dd'),
-        })
+        });
         if (toggleOn) {
-            toast.success(response.data)
+            toast.success(response.data);
         } else {
-            toast.warning(response.data)
+            toast.warning(response.data);
         }
-        await getShifts()
+        await getShifts();
 
     } catch (e) {
-        toast.error(e.response.data.message, {timeout: 4000})
+        toast.error(e.response.data.message, {timeout: 4000});
         if (e.response.data.error_code === 100) {
-            await getShifts()
+            await getShifts();
         }
     }
-}
+};
 
-const locationsOnDays = ref([])
-const flagDates = computed(() => locationsOnDays.value.filter(location => isSameDay(location.date, date.value)))
+const locationsOnDays = ref([]);
+const flagDates = computed(() => locationsOnDays.value.filter(location => isSameDay(location.date, date.value)));
 
-const setLocationMarkers = locations => locationsOnDays.value = locations
+const setLocationMarkers = locations => locationsOnDays.value = locations;
 const isMyShift = location => {
-    return flagDates.value?.findIndex(d => d?.locations.includes(location.id)) >= 0
-}
+    return flagDates.value?.findIndex(d => d?.locations.includes(location.id)) >= 0;
+};
 
-const today = new Date()
-const formatTime = time => format(parse(time, 'HH:mm:ss', today), 'h:mm a')
+const today = new Date();
+const formatTime = time => format(parse(time, 'HH:mm:ss', today), 'h:mm a');
 
 const isRestricted = computed(() => {
-    return !usePage().props.value.isUnrestricted
-})
+    return !usePage().props.value.isUnrestricted;
+});
 
-const canShiftBeBookedByUser = (index) => {
-    console.log('can be booked?', !isRestricted.value)
-    return !isRestricted.value
-        && index === shift.filterVolunteers.length - 1
-        && shift.maxedFemales && user.gender === 'female';
-}
+const locationLabel = computed(() => {
+    const labelData = {};
+    for (const location of locations.value) {
+        const classes = [];
+        let tooltip = undefined;
+        if (isMyShift(location)) {
+            classes.push(...['text-green-800', 'dark:text-green-300', 'border-b-2', 'border-green-500']);
+            tooltip = 'You have at least one shift';
+        } else {
+            classes.push('dark:text-gray-200');
+        }
+        labelData[location.id] = {classes, tooltip};
+    }
+    return labelData;
+});
+
 </script>
 
 <template>
@@ -95,18 +105,36 @@ const canShiftBeBookedByUser = (index) => {
         <div class="text-sm">
             <Loading v-if="isLoading" class="min-h-[200px] sm:min-h-full"/>
             <Accordion v-show="!isLoading"
-                       :items="locations" label="name" uid="id"
+                       :items="locations"
+                       :expand-first="locations.length === 1"
+                       label="name" uid="id"
                        empty-collection-text="No available locations for this day">
                 <template #label="{label, location}">
-                    <span v-if="isMyShift(location)"
-                          class="text-green-800 dark:text-green-300 border-b-2 border-green-500"
-                          v-tooltip="'You have at least one shift'">
+                    <div :class="locationLabel[location.id].classes" v-tooltip="locationLabel[location.id].tooltip"
+                         class="flex items-center">
                         {{ label }}
-                    </span>
-                    <span v-else class="dark:text-gray-200">{{ label }}</span>
+                        <div class="ml-2 py-1.5 group flex items-center" v-if="!isRestricted && location.freeShifts">
+                            <div
+                                class="ml-1 mr-3 w-2 h-2 rounded-full bg-amber-500 group-hover:bg-amber-600 group-hover:dark:bg-amber-200 transition-colors"></div>
+                            <div class="min-w-5 hidden sm:block">
+                                <div
+                                    class="w-0 overflow-x-hidden whitespace-nowrap group-hover:w-full text-gray-600 dark:text-gray-400 text-sm transition-all">
+                                    shifts still available
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </template>
                 <template v-slot="{location}">
                     <div class="w-full">
+                        <div v-if="!isRestricted && location.freeShifts" class="sm:hidden ml-3 mb-2 group flex">
+                        <div class="px-2 py-0.5 flex items-center border rounded-full border-amber-500 dark:border-amber-600">
+                            <div
+                                class="mr-1 w-2 h-2 rounded-full bg-amber-600 dark:bg-amber-500"></div>
+                            <div class="text-amber-600 dark:text-amber-500 text-sm">free shifts still available at this location</div>
+                        </div>
+                        </div>
+
                         <div v-html="location.description" class="description w-full p-3 pt-0 dark:text-gray-100"></div>
                         <div class="w-full grid gap-x-2 gap-y-2 sm:gap-y-4" :class="gridCols[location.max_volunteers]">
                             <template v-for="shift in location.filterShifts" :key="shift.id">
@@ -181,6 +209,7 @@ const canShiftBeBookedByUser = (index) => {
             @apply mb-0.5;
         }
     }
+
     ul {
         @apply list-disc;
     }

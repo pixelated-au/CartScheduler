@@ -23,6 +23,7 @@ export default function useLocationFilter(canAdmin = false) {
             const response = await axios.get(path);
             serverLocations.value = response.data.locations;
             serverDates.value = response.data.shifts;
+            // next two props used in non-admin view
             freeShifts.value = response.data.freeShifts;
             maxReservationDate.value = parseISO(response.data.maxDateReservation);
         } finally {
@@ -44,7 +45,7 @@ export default function useLocationFilter(canAdmin = false) {
     const emptyShiftsForTime = ref([]);
 
     const setReservations = (maxVolunteers, shift, location) => {
-        shift.hasFreeShifts = false;
+        shift.freeShifts = 0;
 
         const volunteers = shift.filterVolunteers?.sort((a, b) => {
             // First, compare genders
@@ -58,7 +59,7 @@ export default function useLocationFilter(canAdmin = false) {
         const length = maxVolunteers >= volunteers.length ? maxVolunteers - volunteers.length : maxVolunteers;
 
         if (length) {
-            shift.hasFreeShifts = true;
+            shift.freeShifts = length;
             const nullArray = Array(length).fill(null);
             shift.filterVolunteers = [...volunteers, ...nullArray];
 
@@ -105,20 +106,47 @@ export default function useLocationFilter(canAdmin = false) {
                 addShift(alreadyAddedLocation.filterShifts, shift);
             }
         }
-
     };
+    /**
+     * @typedef {Object} LocationData
+     * @property {number} id - The location's identifier.
+     * @property {string} name - The location's name.
+     * @property {boolean} requires_brother - Indicates if the location requires a brother.
+     * @property {number} max_volunteers - The maximum number of volunteers that the location can accommodate.
+     * @property {boolean} hasFreeShifts - Indicates if the location has available shifts.
+     * @property {FilterShift[]} filterShifts - The filtered shifts for the location.
+     *
+     * @typedef {Object} FilterShift
+     * @property {number} id - The shift's identifier.
+     * @property {Object[]} volunteers - The volunteers for the shift.
+     * @property {Object[]} filterVolunteers - The volunteers filtered based on the selected date.
+     * @property {boolean} maxedFemales - Indicates if the maximum number of female volunteers has been reached.
+     * @property {boolean} hasFreeShifts - Indicates if the shift has available slots for volunteers.
+     * @property {Object[]} js_days - Shows the availability of the shift throughout the week.
+     */
 
+    /**
+     * @type {import('vue').ComputedRef<LocationData[]>} - An array of locations that have available shifts.
+     *
+     * This computed function filters and maps server locations and then returns an array of locations
+     * which have available shifts. The availability of shifts is determined based on the number of
+     * volunteers and the selected date. The function also takes into account the gender requirement
+     * of a location and whether the maximum number of female volunteers has been reached for
+     * each location.
+     */
     const locations = computed(() => {
         if (!serverLocations?.value) {
             return [];
         }
+        /** @type {LocationData[]} */
         const mappedLocations = [];
-        const myLocations = cloneDeep(serverLocations.value);
+        let myLocations = cloneDeep(serverLocations.value);
         emptyShiftsForTime.value = [];
 
         for (const location of myLocations) {
-            location.hasFreeShifts = false;
-            let locationHasFreeShifts = false;
+            location.freeShifts = 0;
+            /** @type {number} */
+            let freeShifts = 0;
             for (const shift of location.shifts) {
                 const volunteers = shift.volunteers;
                 shift.filterVolunteers = volunteers.filter(volunteer => volunteer.shift_date === selectedDate.value);
@@ -133,9 +161,8 @@ export default function useLocationFilter(canAdmin = false) {
                     shift.maxedFemales = femaleCount >= location.max_volunteers - 1;
                 }
                 setReservations(location.max_volunteers, shift, location);
-                if (shift.hasFreeShifts) {
-                    locationHasFreeShifts = true;
-                }
+
+                freeShifts += shift.freeShifts;
                 const dayOfWeek = date.value.getDay();
                 const mappedDay = shift.js_days[dayOfWeek];
                 if (mappedDay === true) {
@@ -143,9 +170,12 @@ export default function useLocationFilter(canAdmin = false) {
                 }
             }
 
-            location.hasFreeShifts = locationHasFreeShifts;
+            location.freeShifts += freeShifts;
             delete location.shifts;
         }
+        // just to clear up some memory
+        myLocations = null;
+
         return mappedLocations;
     });
 

@@ -3,9 +3,14 @@
     import {computed, nextTick, ref, useSlots, watch} from 'vue'
 
     const props = defineProps({
+        /** * @type {LocationData[]} */
         items: Array,
         label: String,
         uid: String,
+        expandFirst: {
+            type: Boolean,
+            default: false,
+        },
         emptyCollectionText: {
             type: String,
             default: 'No items found.',
@@ -16,14 +21,6 @@
 
     const useLabelSlot = computed(() => !!slots.label)
 
-    const parentNodes = computed(() => {
-        return props.items.map(item => ({
-            key: item[props.uid],
-            label: item[props.label],
-            data: item,
-        }))
-    })
-
     const compId = Math.random().toString(36).substring(2, 9)
 
     const compItems = ref()
@@ -31,6 +28,8 @@
     const computeItems = (tabs) => {
         const i = []
         let index = 0
+        let active = props.expandFirst
+
         for (const item of tabs) {
             const key = item.dataset.key
             const id = `accordion-label-${key}-${compId}`
@@ -38,9 +37,10 @@
                 id: id,
                 triggerEl: item.querySelector(`#${id}`),
                 targetEl: item.querySelector(`#accordion-body-${key}-${compId}`),
-                active: false,
+                active: active,
             })
             index++
+            active = false
         }
         // return i
         compItems.value = i
@@ -75,16 +75,16 @@
         <div data-accordion="collapse"
              data-active-classes="bg-purple-400 dark:bg-gray-900 text-gray-900 dark:text-white"
              data-inactive-classes="text-gray-500 dark:text-gray-400">
-            <template v-if="parentNodes?.length">
-                <div v-for="item in parentNodes" :key="item.key" :ref="skipUnwrap.myTabs" :data-key="item.key">
-                    <h2 :id="`accordion-label-${item.key}-${compId}`" class="text-xl">
+            <template v-if="items?.length">
+                <div v-for="item in items" :key="item[uid]" :ref="skipUnwrap.myTabs" :data-key="item[uid]">
+                    <h2 :id="`accordion-label-${item[uid]}-${compId}`" class="text-xl">
                         <button type="button"
                                 class="flex items-center justify-between w-full py-2 px-3 font-bold text-base text-left text-gray-600 border-b border-gray-200 last:border-b-0 dark:border-gray-700 dark:text-gray-400"
-                                data-accordion-target="#accordion-flush-body-1"
+                                :data-accordion-target="`#accordion-flush-body-${item[uid]}`"
                                 aria-expanded="true"
-                                aria-controls="accordion-flush-body-1">
-                            <slot v-if="useLabelSlot" :label="item.label" :location="item.data" name="label"/>
-                            <span v-else>{{ item.label }}</span>
+                                :aria-controls="`accordion-flush-body-${item[uid]}`">
+                            <slot v-if="useLabelSlot" :label="item[label]" :location="item" name="label"/>
+                            <span v-else>{{ item[label] }}</span>
                             <svg data-accordion-icon
                                  class="w-6 h-6 rotate-180 shrink-0"
                                  fill="currentColor"
@@ -96,11 +96,11 @@
                             </svg>
                         </button>
                     </h2>
-                    <div :id="`accordion-body-${item.key}-${compId}`"
+                    <div :id="`accordion-body-${item[uid]}-${compId}`"
                          class="hidden"
                          aria-labelledby="accordion-flush-heading-1">
                         <div class="py-5 font-light border-b border-gray-200 dark:border-gray-700 flex">
-                            <slot :location="item.data"/>
+                            <slot :location="item"/>
                         </div>
                     </div>
                 </div>
