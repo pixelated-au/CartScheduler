@@ -62,7 +62,7 @@ SELECT dates.date
      , IFNULL(count_query.vc, 0)                                        AS volunteer_count
      , IF((SELECT volunteer_count) < (SELECT max_allowed), TRUE, FALSE) AS has_availability
 FROM dates
-       JOIN (SELECT shift_date
+       LEFT JOIN (SELECT shift_date
                   , COUNT(*) AS vc
              FROM shift_user
                     JOIN shifts s
