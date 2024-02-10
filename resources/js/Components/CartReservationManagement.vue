@@ -25,7 +25,7 @@ defineProps({
 
 const toast = useToast();
 
-const {date, emptyShiftsForTime, isLoading, locations, serverDates, getShifts} = useLocationFilter(true);
+const {date, emptyShiftsForTime, isLoading, locations, freeShifts, serverDates, getShifts} = useLocationFilter(true);
 
 const gridCols = {
     // See tailwind.config.js
@@ -157,6 +157,7 @@ const locationClasses = location => location.freeShifts
                         v-model:date="date"
                         :locations="locations"
                         :user="user"
+                        :free-shifts="freeShifts"
                         :marker-dates="serverDates"
                         @locations-for-day="setLocationMarkers"/>
         </div>
