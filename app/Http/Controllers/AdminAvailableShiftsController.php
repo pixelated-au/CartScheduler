@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\GetAvailableShiftsCount;
 use App\Http\Resources\LocationResource;
 use App\Models\Location;
 use App\Models\User;
@@ -15,6 +16,9 @@ use Illuminate\Http\Request;
 
 class AdminAvailableShiftsController extends Controller
 {
+    public function __construct(private readonly GetAvailableShiftsCount $getAvailableShiftsCount)
+    {
+    }
 
     public function __invoke(Request $request, string $shiftDate)
     {
@@ -59,8 +63,16 @@ class AdminAvailableShiftsController extends Controller
             ->where('is_enabled', true)
             ->get();
 
+        $startDate       = Carbon::today()->format('Y-m-d');
+        $endDate         = Carbon::today()->addMonths(4)->endOfMonth()->format('Y-m-d');
+        $freeShiftsCount = $user->is_unrestricted
+            ? $this->getAvailableShiftsCount->execute($startDate, $endDate)
+            : [];
+
+
         return [
-            'locations' => LocationResource::collection($locations),
+            'freeShifts' => $freeShiftsCount,
+            'locations'  => LocationResource::collection($locations),
         ];
     }
 }
