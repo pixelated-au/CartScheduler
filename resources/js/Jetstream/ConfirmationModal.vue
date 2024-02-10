@@ -24,7 +24,7 @@
 </script>
 
 <template>
-    <Modal :show="show" :max-width="maxWidth" :closeable="closeable" @close="close">
+    <Modal fill-screen :show="show" :max-width="maxWidth" :closeable="closeable" @close="close">
         <div class="bg-white dark:bg-gray-900 px-4 pt-5 pb-4 sm:p-6 sm:pb-4 overflow-y-auto w-full">
             <div class="sm:flex sm:items-start">
                 <div class="mx-auto shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 dark:bg-red-800 sm:mx-0 sm:h-10 sm:w-10">
