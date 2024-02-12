@@ -37,12 +37,9 @@ const emit = defineEmits([
 ]);
 
 const selectedDate = computed({
-    get() {
-        return props.date;
-    },
-    set(value) {
-        emit('update:date', parse('12:00:00', 'HH:mm:ss', value));
-    },
+    get: () => props.date,
+    // set the date at midday to be safe...
+    set:(value) => emit('update:date', parse('12:00:00', 'HH:mm:ss', value)),
 });
 
 const shiftAvailability = computed(() => {
@@ -164,7 +161,6 @@ watchEffect(() => {
                 :allowed-dates="allowed"
                 :min-date="notBefore"
                 :max-date="notAfter"
-                :timezone="shiftAvailability.timezone"
                 :dark="isDarkMode">
         <template #day="{day, date}">
             {{ day }}
