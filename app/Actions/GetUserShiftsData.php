@@ -48,7 +48,7 @@ class GetUserShiftsData
                          INNER JOIN shift_user ON shift_user.shift_date = dates.date
                                               AND shift_user.user_id = :userId
 
-                         INNER JOIN shifts ON shifts.is_enabled = true
+                         INNER JOIN shifts ON shifts.is_enabled = TRUE
                                           AND shifts.id = shift_user.shift_id
                                           AND (
                                             shifts.available_from IS NULL
@@ -69,7 +69,7 @@ class GetUserShiftsData
                                             END = 1
 
                          INNER JOIN locations ON locations.id = shifts.location_id
-                                             AND locations.is_enabled = true
+                                             AND locations.is_enabled = TRUE
                 ORDER BY dates.date,
                          locations.name,
                          shifts.start_time
@@ -81,7 +81,8 @@ class GetUserShiftsData
 
         return collect($results)
             ->map(fn(stdClass $shift) => [
-                'shift_date'     => $shift->date,
+                'date_group'     => $shift->date,
+                'shift_date'     => Carbon::parse("{$shift->date}T{$shift->start_time}"),
                 'shift_id'       => $shift->shift_id,
                 'volunteer_id'   => $shift->volunteer_id,
                 'start_time'     => $shift->start_time,
@@ -90,11 +91,9 @@ class GetUserShiftsData
                 'available_to'   => $shift->available_to ? Carbon::parse($shift->available_to) : null,
                 'max_volunteers' => (int)$shift->max_volunteers,
             ])
-//            ->when($user->is_restricted, fn(Collection $shifts) => $shifts
-                ->filter(fn(array $shift) => $shift['volunteer_id'] === $user->id)
-//            )
+            ->filter(fn(array $shift) => $shift['volunteer_id'] === $user->id)
             ->groupBy([
-                'shift_date',
+                'date_group',
                 'shift_id',
             ]);
     }
