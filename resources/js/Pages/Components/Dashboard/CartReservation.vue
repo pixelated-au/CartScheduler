@@ -10,7 +10,7 @@ import useToast from '@/Composables/useToast';
 import useLocationFilter from '@/Pages/Admin/Locations/Composables/useLocationFilter';
 import DatePicker from '@/Pages/Components/Dashboard/DatePicker.vue';
 import {usePage} from "@inertiajs/inertia-vue3";
-import {format, isSameDay, parse} from 'date-fns';
+import {format, isSameDay, parse, parseISO} from 'date-fns';
 import {utcToZonedTime} from "date-fns-tz";
 // noinspection ES6UnusedImports
 import {VTooltip} from 'floating-vue';
@@ -69,7 +69,7 @@ const toggleReservation = async (locationId, shiftId, toggleOn) => {
 const locationsOnDays = ref([]);
 const flagDates = computed(() =>
     locationsOnDays.value.filter(
-        location => isSameDay(utcToZonedTime(location.date, timezone.value), date.value),
+        location => isSameDay(location.date, date.value),
     ),
 );
 
