@@ -45,7 +45,11 @@ class GetUserShiftsData
                        locations.name
 
                 FROM dates
-                         LEFT JOIN shifts ON shifts.is_enabled = true
+                         INNER JOIN shift_user ON shift_user.shift_date = dates.date
+                                              AND shift_user.user_id = :userId
+
+                         INNER JOIN shifts ON shifts.is_enabled = true
+                                          AND shifts.id = shift_user.shift_id
                                           AND (
                                             shifts.available_from IS NULL
                                             OR shifts.available_from <= dates.date
@@ -64,11 +68,7 @@ class GetUserShiftsData
                                             WHEN DAYOFWEEK(dates.date) = 7 THEN shifts.day_saturday
                                             END = 1
 
-                         INNER JOIN shift_user ON shifts.id = shift_user.shift_id
-                                              AND shift_user.shift_date = dates.date
-                                              AND shift_user.user_id = :userId
-
-                         LEFT JOIN locations ON locations.id = shifts.location_id
+                         INNER JOIN locations ON locations.id = shifts.location_id
                                              AND locations.is_enabled = true
                 ORDER BY dates.date,
                          locations.name,
