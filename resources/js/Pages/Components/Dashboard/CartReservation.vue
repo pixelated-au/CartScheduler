@@ -11,6 +11,7 @@ import useLocationFilter from '@/Pages/Admin/Locations/Composables/useLocationFi
 import DatePicker from '@/Pages/Components/Dashboard/DatePicker.vue';
 import {usePage} from "@inertiajs/inertia-vue3";
 import {format, isSameDay, parse} from 'date-fns';
+import {utcToZonedTime} from "date-fns-tz";
 // noinspection ES6UnusedImports
 import {VTooltip} from 'floating-vue';
 import {computed, ref} from 'vue';
@@ -21,7 +22,17 @@ defineProps({
 
 const toast = useToast();
 
-const {date, freeShifts, isLoading, locations, maxReservationDate, serverDates, getShifts} = useLocationFilter();
+const timezone = computed(() => usePage().props.value.shiftAvailability.timezone);
+
+const {
+    date,
+    freeShifts,
+    isLoading,
+    locations,
+    maxReservationDate,
+    serverDates,
+    getShifts,
+} = useLocationFilter(timezone);
 
 const gridCols = {
     // See tailwind.config.js
@@ -56,7 +67,11 @@ const toggleReservation = async (locationId, shiftId, toggleOn) => {
 };
 
 const locationsOnDays = ref([]);
-const flagDates = computed(() => locationsOnDays.value.filter(location => isSameDay(location.date, date.value)));
+const flagDates = computed(() =>
+    locationsOnDays.value.filter(
+        location => isSameDay(utcToZonedTime(location.date, timezone.value), date.value),
+    ),
+);
 
 const setLocationMarkers = locations => locationsOnDays.value = locations;
 const isMyShift = location => {
@@ -66,9 +81,7 @@ const isMyShift = location => {
 const today = new Date();
 const formatTime = time => format(parse(time, 'HH:mm:ss', today), 'h:mm a');
 
-const isRestricted = computed(() => {
-    return !usePage().props.value.isUnrestricted;
-});
+const isRestricted = computed(() => !usePage().props.value.isUnrestricted);
 
 const locationLabel = computed(() => {
     const labelData = {};

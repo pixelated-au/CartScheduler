@@ -1,139 +1,156 @@
 <script setup>
-    import { usePage } from '@inertiajs/inertia-vue3'
+import {usePage} from '@inertiajs/inertia-vue3';
 
-    //https://vue3datepicker.com/
-    import Datepicker from '@vuepic/vue-datepicker'
-    import { addDays, addMonths, endOfDay, endOfMonth, formatISO, isAfter, isBefore, parse, parseISO, startOfDay, startOfMonth, subMonths } from 'date-fns'
-    import { computed, defineEmits, defineProps, inject, onMounted, ref, watchEffect } from 'vue'
+//https://vue3datepicker.com/
+import Datepicker from '@vuepic/vue-datepicker';
+import {
+    addDays,
+    addMonths,
+    endOfDay,
+    endOfMonth,
+    isAfter,
+    isBefore,
+    parse,
+    parseISO,
+    startOfDay,
+    startOfMonth,
+    subMonths,
+} from 'date-fns';
+import {utcToZonedTime, zonedTimeToUtc} from "date-fns-tz";
+import {computed, defineEmits, defineProps, inject, onMounted, ref, watchEffect} from 'vue';
 
-    const props = defineProps({
-        date: Date,
-        maxDate: Date,
-        locations: Array,
-        markerDates: Object,
-        user: Object,
-        freeShifts: Object,
-        canViewHistorical: Boolean,
-    })
+const props = defineProps({
+    date: Date,
+    maxDate: Date,
+    locations: Array,
+    markerDates: Object,
+    user: Object,
+    freeShifts: Object,
+    canViewHistorical: Boolean,
+});
 
-    const isDarkMode = inject('darkMode', false)
+const isDarkMode = inject('darkMode', false);
 
-    const emit = defineEmits([
-        'update:date',
-        'locations-for-day',
-    ])
+const emit = defineEmits([
+    'update:date',
+    'locations-for-day',
+]);
 
-    const selectedDate = computed({
-        get () {
-            return props.date
-        },
-        set (value) {
-            emit('update:date', parse('12:00:00', 'HH:mm:ss', value))
-        },
-    })
+const selectedDate = computed({
+    get() {
+        return props.date;
+    },
+    set(value) {
+        emit('update:date', parse('12:00:00', 'HH:mm:ss', value));
+    },
+});
 
-    const shiftAvailability = computed(() => {
-        return usePage().props.value.shiftAvailability
-    })
+const shiftAvailability = computed(() => {
+    return usePage().props.value.shiftAvailability;
+});
 
-    const isRestricted = computed(() => {
-        return !usePage().props.value.isUnrestricted
-    })
+const isRestricted = computed(() => {
+    return !usePage().props.value.isUnrestricted;
+});
 
-    const today = new Date()
-    const notBefore = props.canViewHistorical
-        ? startOfDay(startOfMonth(subMonths(today, 6)))
-        : startOfDay(today)
+const today = new Date();
+const notBefore = props.canViewHistorical
+    ? startOfDay(startOfMonth(subMonths(today, 6)))
+    : startOfDay(today);
 
-    const notAfter = computed(() =>
-        props.canViewHistorical
-            ? endOfMonth(addMonths(notBefore, 12))
-            : props.maxDate)
+const notAfter = computed(() =>
+    props.canViewHistorical
+        ? endOfMonth(addMonths(notBefore, 12))
+        : props.maxDate);
 
-    const allDates = []
-    const getAllDates = () => {
-        for (let i = notBefore; i < notAfter.value; i = addDays(i, 1)) {
-            allDates.push(i)
+const allDates = [];
+const getAllDates = () => {
+    for (let i = notBefore; i < notAfter.value; i = addDays(i, 1)) {
+        allDates.push(i);
+    }
+};
+
+onMounted(() => {
+    getAllDates();
+});
+
+const markers = ref([]);
+const highlights = computed(() => {
+    const highlighted = [];
+    for (const key in props.freeShifts) {
+        if (!props.freeShifts.hasOwnProperty(key)) {
+            continue;
+        }
+        if (!props.freeShifts[key].has_availability) {
+            continue;
+        }
+        highlighted.push(parseISO(key));
+    }
+    return highlighted;
+});
+
+const allowed = computed(() => {
+    if (!isRestricted.value) {
+        return null;
+    }
+    return markers.value.map(marker => marker.date);
+});
+
+watchEffect(() => {
+    if (!props.markerDates) {
+        return;
+    }
+    const marks = [];
+    if (!props.user) {
+        return [];
+    }
+
+    for (const date in props.markerDates) {
+        if (!props.markerDates.hasOwnProperty(date)) {
+            continue;
+        }
+        const foundAtLocation = [];
+        const shiftDateGroup = props.markerDates[date];
+
+        let isoDate = undefined;
+        for (const shiftId in shiftDateGroup) {
+            if (!shiftDateGroup.hasOwnProperty(shiftId)) {
+                continue;
+            }
+
+            const shifts = shiftDateGroup[shiftId];
+            for (let shiftCount = 0; shiftCount < shifts.length; shiftCount++) {
+                const shift = shifts[shiftCount];
+                if (!isoDate) {
+                    isoDate = utcToZonedTime(shift.shift_date, shiftAvailability.value.timezone)
+                }
+                // TODO is this isBefore and isAfter still needed?
+                if (isBefore(isoDate, startOfDay(parseISO(shift.available_from)))) {
+                    break;
+                }
+                if (isAfter(isoDate, endOfDay(parseISO(shift.available_to)))) {
+                    break;
+                }
+                if (shift.volunteer_id === props.user?.id) {
+                    foundAtLocation.push(shift.location_id);
+                }
+            }
+        }
+        if (foundAtLocation.length) {
+            marks.push({
+                date: isoDate,
+                type: 'line',
+                color: '#0E9F6E',
+                tooltip: [{text: `You have a shift`, color: '#0E9F6E'}],
+                locations: foundAtLocation,
+            });
         }
     }
 
-    onMounted(() => {
-        getAllDates()
-    })
+    markers.value = marks;
 
-    const markers = ref([])
-    const highlights = computed(() => {
-        const highlighted = []
-        for (const key in props.freeShifts) {
-            if (!props.freeShifts.hasOwnProperty(key)) {
-                continue
-            }
-            if (!props.freeShifts[key].has_availability) {
-                continue
-            }
-            highlighted.push(parseISO(key))
-        }
-        return highlighted
-    })
-
-    const allowed = computed(() => {
-        if (!isRestricted.value) {
-            return null
-        }
-        return markers.value.map(marker => marker.date)
-    })
-
-    watchEffect(() => {
-        if (!props.markerDates) {
-            return
-        }
-        const marks = []
-        if (!props.user) {
-            return []
-        }
-
-        for (const date in props.markerDates) {
-            if (!props.markerDates.hasOwnProperty(date)) {
-                continue
-            }
-            const foundAtLocation = []
-            const shiftDateGroup = props.markerDates[date]
-
-            const isoDate = parseISO(date)
-            for (const shiftId in shiftDateGroup) {
-                if (!shiftDateGroup.hasOwnProperty(shiftId)) {
-                    continue
-                }
-
-                const shifts = shiftDateGroup[shiftId]
-                for (let shiftCount = 0; shiftCount < shifts.length; shiftCount++) {
-                    const shift = shifts[shiftCount]
-                    if (isBefore(isoDate, startOfDay(parseISO(shift.available_from)))) {
-                        break
-                    }
-                    if (isAfter(isoDate, endOfDay(parseISO(shift.available_to)))) {
-                        break
-                    }
-                    if (shift.volunteer_id === props.user?.id) {
-                        foundAtLocation.push(shift.location_id)
-                    }
-                }
-            }
-            if (foundAtLocation.length) {
-                marks.push({
-                    date: isoDate,
-                    type: 'line',
-                    color: '#0E9F6E',
-                    tooltip: [{ text: `You have a shift`, color: '#0E9F6E' }],
-                    locations: foundAtLocation,
-                })
-            }
-        }
-
-        markers.value = marks
-
-        emit('locations-for-day', marks.map(marker => ({ locations: marker.locations, date: marker.date })))
-    })
+    emit('locations-for-day', marks.map(marker => ({locations: marker.locations, date: marker.date})));
+});
 </script>
 <template>
     <Datepicker inline

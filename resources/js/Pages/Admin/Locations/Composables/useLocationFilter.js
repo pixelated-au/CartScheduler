@@ -1,14 +1,16 @@
+import {usePage} from "@inertiajs/inertia-vue3";
 import {isAfter, isBefore, parse, parseISO} from 'date-fns';
+import {utcToZonedTime} from "date-fns-tz";
 import formatISO from 'date-fns/formatISO';
 import {cloneDeep} from 'lodash';
 import {computed, onMounted, ref, shallowRef, watch} from 'vue';
 
-export default function useLocationFilter(canAdmin = false) {
+export default function useLocationFilter(timezone, canAdmin = false) {
+
     /**
      * @param {Date} date
      */
-    const date = ref(parse('12:00:00', 'HH:mm:ss', new Date()));
-
+    const date = ref(utcToZonedTime(new Date(), timezone.value));
     const maxReservationDate = ref(new Date());
     const serverLocations = shallowRef([]);
     const serverDates = shallowRef({});
@@ -25,7 +27,7 @@ export default function useLocationFilter(canAdmin = false) {
             serverDates.value = response.data.shifts;
             // next two props used in non-admin view
             freeShifts.value = response.data.freeShifts;
-            maxReservationDate.value = parseISO(response.data.maxDateReservation);
+            maxReservationDate.value = utcToZonedTime(response.data.maxDateReservation, timezone.value);
         } finally {
             isLoading.value = false;
         }
@@ -35,10 +37,11 @@ export default function useLocationFilter(canAdmin = false) {
         getShifts();
     });
 
-    const selectedDate = computed({
-        get: () => date.value ? formatISO(date.value, {representation: 'date'}) : '',
-        set: (value) => date.value = value,
-    });
+    const selectedDate = computed( () =>
+        date.value
+            ? formatISO(date.value, {representation: 'date'})
+            : ''
+    );
 
     watch(selectedDate, () => getShifts());
 
@@ -78,14 +81,16 @@ export default function useLocationFilter(canAdmin = false) {
 
     const addShift = (shifts, shift) => {
         if (shift.available_from) {
-            const from = parseISO(shift.available_from);
+            const from = utcToZonedTime(shift.available_from, timezone.value);
+            // const from = parseISO(shift.available_from);
             if (isBefore(date.value, from)) {
                 return false;
             }
         }
         if (shift.available_to) {
             // const to = parseISO(shift.available_to)
-            const to = parseISO(`${shift.available_to}T23:59:59`);
+            const to = utcToZonedTime(`${shift.available_to}T23:59:59`, timezone.value);
+            // const to = parseISO(`${shift.available_to}T23:59:59`);
             if (isAfter(date.value, to)) {
                 return false;
             }
