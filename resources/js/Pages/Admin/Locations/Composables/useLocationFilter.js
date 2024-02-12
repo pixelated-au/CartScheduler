@@ -16,8 +16,11 @@ export default function useLocationFilter(timezone, canAdmin = false) {
     const freeShifts = shallowRef([]);
     const isLoading = ref(false);
 
-    const getShifts = async () => {
-        isLoading.value = true;
+    const getShifts = async (showLoader = true) => {
+        let timeoutId;
+        if (showLoader) {
+            timeoutId = setTimeout(() => isLoading.value = true, 1000);
+        }
         try {
             const path = canAdmin ? `/admin/assigned-shifts/${selectedDate.value}` : `/shifts/${selectedDate.value}`;
 
@@ -28,7 +31,10 @@ export default function useLocationFilter(timezone, canAdmin = false) {
             freeShifts.value = response.data.freeShifts;
             maxReservationDate.value = utcToZonedTime(response.data.maxDateReservation, timezone.value);
         } finally {
-            isLoading.value = false;
+            if (showLoader) {
+                isLoading.value = false;
+                clearTimeout(timeoutId);
+            }
         }
     };
 
