@@ -7,9 +7,9 @@
         items: Array,
         label: String,
         uid: String,
-        expandFirst: {
-            type: Boolean,
-            default: false,
+        expandItem: {
+            type: Number,
+            default: undefined,
         },
         emptyCollectionText: {
             type: String,
@@ -28,7 +28,6 @@
     const computeItems = (tabs) => {
         const i = []
         let index = 0
-        let active = props.expandFirst
 
         for (const item of tabs) {
             const key = item.dataset.key
@@ -37,10 +36,9 @@
                 id: id,
                 triggerEl: item.querySelector(`#${id}`),
                 targetEl: item.querySelector(`#accordion-body-${key}-${compId}`),
-                active: active,
+                active: props.expandItem === index,
             })
             index++
-            active = false
         }
         // return i
         compItems.value = i
