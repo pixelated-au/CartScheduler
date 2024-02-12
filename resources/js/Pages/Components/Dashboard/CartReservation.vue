@@ -10,10 +10,10 @@ import useToast from '@/Composables/useToast';
 import useLocationFilter from '@/Pages/Admin/Locations/Composables/useLocationFilter';
 import DatePicker from '@/Pages/Components/Dashboard/DatePicker.vue';
 import {usePage} from "@inertiajs/inertia-vue3";
-import {format, isSameDay, parse, parseISO} from 'date-fns';
-import {utcToZonedTime} from "date-fns-tz";
+import {format, isSameDay, parse} from 'date-fns';
 // noinspection ES6UnusedImports
 import {VTooltip} from 'floating-vue';
+import {debounce} from "lodash";
 import {computed, ref} from 'vue';
 
 defineProps({
@@ -43,8 +43,16 @@ const gridCols = {
     5: 'grid-cols-sm-reservation-5 sm:grid-cols-reservation-5',
 };
 
+const isReserving = ref(false);
 const toggleReservation = async (locationId, shiftId, toggleOn) => {
+    if (isReserving.value) {
+        return;
+    }
+    const timeoutId = setTimeout(() => isLoading.value = true, 1000);
+
     try {
+        isReserving.value = true;
+
         const response = await axios.post('/reserve-shift', {
             location: locationId,
             shift: shiftId,
@@ -56,13 +64,17 @@ const toggleReservation = async (locationId, shiftId, toggleOn) => {
         } else {
             toast.warning(response.data);
         }
-        await getShifts();
+        await getShifts(false);
 
     } catch (e) {
         toast.error(e.response.data.message, {timeout: 4000});
         if (e.response.data.error_code === 100) {
-            await getShifts();
+            await getShifts(false);
         }
+    } finally {
+        isReserving.value = false;
+        clearTimeout(timeoutId);
+        isLoading.value = false;
     }
 };
 
@@ -83,20 +95,38 @@ const formatTime = time => format(parse(time, 'HH:mm:ss', today), 'h:mm a');
 
 const isRestricted = computed(() => !usePage().props.value.isUnrestricted);
 
+const firstReservationForUser = ref(undefined);
+
 const locationLabel = computed(() => {
+    firstReservationForUser.value = undefined;
     const labelData = {};
+    let index = 0;
     for (const location of locations.value) {
         const classes = [];
         let tooltip = undefined;
         if (isMyShift(location)) {
             classes.push(...['text-green-800', 'dark:text-green-300', 'border-b-2', 'border-green-500']);
             tooltip = 'You have at least one shift';
+            if (firstReservationForUser.value === undefined) {
+                firstReservationForUser.value = index;
+            }
         } else {
             classes.push('dark:text-gray-200');
         }
         labelData[location.id] = {classes, tooltip};
+        index++;
     }
     return labelData;
+});
+
+const accordionExpandIndex = computed(() => {
+    if (locations.length === 1) {
+        return 0;
+    }
+    if (firstReservationForUser.value !== undefined) {
+        return firstReservationForUser.value;
+    }
+    return undefined;
 });
 
 </script>
@@ -119,7 +149,7 @@ const locationLabel = computed(() => {
             <Loading v-if="isLoading" class="min-h-[200px] sm:min-h-full"/>
             <Accordion v-show="!isLoading"
                        :items="locations"
-                       :expand-first="locations.length === 1"
+                       :expand-item="accordionExpandIndex"
                        label="name" uid="id"
                        empty-collection-text="No available locations for this day">
                 <template #label="{label, location}">
