@@ -111,7 +111,8 @@ const locationLabel = computed(() => {
                        empty-collection-text="No available locations for this day">
                 <template #label="{label, location}">
                     <div class="flex items-center">
-                        <span :class="locationLabel[location.id].classes" v-tooltip="locationLabel[location.id].tooltip">{{ label }}</span>
+                        <span :class="locationLabel[location.id].classes"
+                              v-tooltip="locationLabel[location.id].tooltip">{{ label }}</span>
                         <div class="ml-2 py-1.5 group flex items-center" v-if="!isRestricted && location.freeShifts">
                             <div
                                 class="ml-1 mr-3 w-2 h-2 rounded-full bg-amber-500 group-hover:bg-amber-600 group-hover:dark:bg-amber-200 transition-colors"></div>
@@ -127,11 +128,13 @@ const locationLabel = computed(() => {
                 <template v-slot="{location}">
                     <div class="w-full">
                         <div v-if="!isRestricted && location.freeShifts" class="sm:hidden ml-3 mb-2 group flex">
-                        <div class="px-2 py-0.5 flex items-center border rounded-full border-amber-500 dark:border-amber-600">
                             <div
-                                class="mr-1 w-2 h-2 rounded-full bg-amber-600 dark:bg-amber-500"></div>
-                            <div class="text-amber-600 dark:text-amber-500 text-sm">free shifts still available at this location</div>
-                        </div>
+                                class="px-2 py-0.5 flex items-center border rounded-full border-amber-500 dark:border-amber-600">
+                                <div class="mr-1 w-2 h-2 rounded-full bg-amber-500"></div>
+                                <div class="text-amber-600 dark:text-amber-500 text-sm">
+                                    free shifts still available at this location
+                                </div>
+                            </div>
                         </div>
 
                         <div v-html="location.description" class="description w-full p-3 pt-0 dark:text-gray-100"></div>
