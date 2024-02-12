@@ -45,11 +45,10 @@
         ? startOfDay(startOfMonth(subMonths(today, 6)))
         : startOfDay(today)
 
-    const notAfter = computed(() => {
-        return props.canViewHistorical
+    const notAfter = computed(() =>
+        props.canViewHistorical
             ? endOfMonth(addMonths(notBefore, 12))
-            : props.maxDate
-    })
+            : props.maxDate)
 
     const allDates = []
     const getAllDates = () => {
