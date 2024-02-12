@@ -13,6 +13,7 @@ import JetConfirmModal from '@/Jetstream/ConfirmationModal.vue';
 import UserActionsModal from "@/Pages/Admin/Dashboard/UserActionsModal.vue";
 import useLocationFilter from '@/Pages/Admin/Locations/Composables/useLocationFilter';
 import DatePicker from '@/Pages/Components/Dashboard/DatePicker.vue';
+import {usePage} from "@inertiajs/inertia-vue3";
 import axios from 'axios';
 import {format, parse} from 'date-fns';
 // noinspection ES6UnusedImports
@@ -24,8 +25,8 @@ defineProps({
 });
 
 const toast = useToast();
-
-const {date, emptyShiftsForTime, isLoading, locations, freeShifts, serverDates, getShifts} = useLocationFilter(true);
+const timezone = computed(() => usePage().props.value.shiftAvailability.timezone);
+const {date, emptyShiftsForTime, isLoading, locations, freeShifts, serverDates, getShifts} = useLocationFilter(timezone, true);
 
 const gridCols = {
     // See tailwind.config.js
@@ -50,6 +51,7 @@ const showMoveUserModal = computed({
 const promptMoveVolunteer = (selection, volunteer, shift) => selectedMoveUser.value = {selection, volunteer, shift};
 
 const moveVolunteer = async (volunteerId, locationId, shiftId) => {
+    const timeoutId = setTimeout(() => isLoading.value = true, 1000);
     selectedMoveUser.value = null;
     try {
         await axios.put('/admin/move-volunteer-to-shift', {
@@ -63,11 +65,14 @@ const moveVolunteer = async (volunteerId, locationId, shiftId) => {
         toast.error(e.response.data.message);
 
     } finally {
-        await getShifts();
+        await getShifts(false);
+        clearTimeout(timeoutId);
+        isLoading.value = false;
     }
 };
 
 const assignVolunteer = async ({volunteerId, volunteerName, location, shift}) => {
+    const timeoutId = setTimeout(() => isLoading.value = true, 1000);
     try {
         await axios.put('/admin/toggle-shift-for-user', {
             do_reserve: true,
@@ -81,11 +86,14 @@ const assignVolunteer = async ({volunteerId, volunteerName, location, shift}) =>
         toast.error(e.response.data.message);
 
     } finally {
-        await getShifts();
+        await getShifts(false);
+        clearTimeout(timeoutId);
+        isLoading.value = false;
     }
 };
 
 const removeVolunteer = async () => {
+    const timeoutId = setTimeout(() => isLoading.value = true, 1000);
     try {
         await axios.delete('/admin/toggle-shift-for-user', {
             data: {
@@ -102,7 +110,9 @@ const removeVolunteer = async () => {
         toast.error(e.response.data.message);
 
     } finally {
-        await getShifts();
+        await getShifts(false);
+        clearTimeout(timeoutId);
+        isLoading.value = false;
     }
 };
 
