@@ -1,5 +1,4 @@
-import {usePage} from "@inertiajs/inertia-vue3";
-import {isAfter, isBefore, parse, parseISO} from 'date-fns';
+import {isAfter, isBefore, parse} from 'date-fns';
 import {utcToZonedTime} from "date-fns-tz";
 import formatISO from 'date-fns/formatISO';
 import {cloneDeep} from 'lodash';
@@ -37,10 +36,10 @@ export default function useLocationFilter(timezone, canAdmin = false) {
         getShifts();
     });
 
-    const selectedDate = computed( () =>
+    const selectedDate = computed(() =>
         date.value
             ? formatISO(date.value, {representation: 'date'})
-            : ''
+            : '',
     );
 
     watch(selectedDate, () => getShifts());
@@ -67,6 +66,7 @@ export default function useLocationFilter(timezone, canAdmin = false) {
             shift.filterVolunteers = [...volunteers, ...nullArray];
 
             emptyShiftsForTime.value.push({
+                // no need to timezone here, because we are only extracting the time
                 startTime: parse(shift.start_time, 'HH:mm:ss', date.value),
                 endTime: parse(shift.end_time, 'HH:mm:ss', date.value),
                 location: location.name,
