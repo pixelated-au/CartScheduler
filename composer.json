@@ -14,7 +14,7 @@
         "bugsnag/bugsnag-laravel": "^2.0",
         "codedge/laravel-selfupdater": "dev-dev/github-release-files",
         "guzzlehttp/guzzle": "^7.2",
-        "inertiajs/inertia-laravel": "^0.5.2",
+        "inertiajs/inertia-laravel": "^v0.6.11",
         "laravel/framework": "^v9.52",
         "laravel/jetstream": "^v2.16",
         "laravel/sanctum": "^2.15",
@@ -29,14 +29,14 @@
         "tightenco/ziggy": "^1.0"
     },
     "require-dev": {
-        "roave/security-advisories": "dev-latest",
         "barryvdh/laravel-debugbar": "^3.7",
         "fakerphp/faker": "^1.9.1",
         "laravel/pint": "^1.0",
-        "laravel/sail": "^v1.22",
+        "laravel/sail": "^v1.28.0",
         "mockery/mockery": "^1.4.4",
-        "nunomaduro/collision": "^6.1",
-        "phpunit/phpunit": "^9.5.10",
+        "nunomaduro/collision": "^v6.4.0",
+        "phpunit/phpunit": "^9.6.16",
+        "roave/security-advisories": "dev-latest",
         "spatie/laravel-ignition": "^1.0"
     },
     "repositories": [
