@@ -14,10 +14,16 @@
         </testsuite>
     </testsuites>
     <coverage processUncoveredFiles="true">
+        <report>
+          <html outputDirectory="tests/code-coverage" highLowerBound="80"/>
+        </report>
         <include>
             <directory suffix=".php">./app</directory>
         </include>
     </coverage>
+    <logging>
+        <testdoxText outputFile="php://stdout"/>
+    </logging>
     <php>
         <env name="APP_ENV" value="testing"/>
         <env name="BCRYPT_ROUNDS" value="4"/>
