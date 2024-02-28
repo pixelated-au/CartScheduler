@@ -7,7 +7,6 @@ use App\Actions\ErrorApiResource;
 use App\Actions\ValidateShiftIsAvailableAction;
 use App\Actions\ValidateVolunteerIsAllowedToBeRosteredAction;
 use App\Exceptions\ShiftAvailabilityException;
-use App\Exceptions\VolunteerIsAllowedException;
 use App\Models\Location;
 use App\Models\Shift;
 use App\Models\User;
@@ -81,11 +80,10 @@ class MoveUserToNewShiftController extends Controller
             return ErrorApiResource::create($e->getMessage(), $e->getExceptionType(), 422);
         }
 
-        $user = User::find($request->get('user_id'));
-        try {
-            $this->validateVolunteerIsAllowedToBeRosteredAction->execute($location, $user, $shift->users);
-        } catch (VolunteerIsAllowedException $e) {
-            return ErrorApiResource::create($e->getMessage(), $e->getExceptionType(), 422);
+        $user      = User::find($request->get('user_id'));
+        $isAllowed = $this->validateVolunteerIsAllowedToBeRosteredAction->execute($location, $user, $shift->users);
+        if (is_string($isAllowed)) {
+            return ErrorApiResource::create($isAllowed, ErrorApiResource::CODE_BROTHER_REQUIRED, 422);
         }
 
         return DB::transaction(

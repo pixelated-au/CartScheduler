@@ -5,7 +5,6 @@ namespace App\Http\Controllers\ValidationRules;
 use App\Actions\GetMaxShiftReservationDateAllowed;
 use App\Actions\ValidateVolunteerIsAllowedToBeRosteredAction;
 use App\Enums\DBPeriod;
-use App\Exceptions\VolunteerIsAllowedException;
 use App\Models\Location;
 use App\Models\Shift;
 use App\Models\ShiftUser;
@@ -136,11 +135,9 @@ class ToggleShiftReservationControllerRules
         }
 
         $currentVolunteers = $shiftUsers->map(fn(ShiftUser $shiftUser) => $shiftUser->user);
-
-        try {
-            $this->validateVolunteerIsAllowedToBeRosteredAction->execute($location, $user, $currentVolunteers);
-        } catch (VolunteerIsAllowedException $e) {
-            $fail($e->getMessage());
+        $isAllowed         = $this->validateVolunteerIsAllowedToBeRosteredAction->execute($location, $user, $currentVolunteers);
+        if (is_string($isAllowed)) {
+            $fail($isAllowed);
         }
     }
 
