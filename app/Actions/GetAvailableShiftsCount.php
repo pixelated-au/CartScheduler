@@ -9,9 +9,10 @@ use stdClass;
 class GetAvailableShiftsCount
 {
     /**
-     * This is a recursive query that will return a list of dates from the start date
-     * to the end date, and then join that list of dates to the shifts table to get
-     * the shifts for that date.
+     * Returns 3 properties for each date in the range: volunteer_count, max_volunteers, has_availability
+     * - volunteer_count: the number of volunteers already signed up for a shift on that date
+     * - max_volunteers: the maximum number of volunteers allowed for a shift on that date
+     * - has_availability: a boolean indicating whether there is still availability for a shift on that date
      *
      * Parameters line up with those in cart-scheduler config
      *
