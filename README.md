@@ -94,3 +94,4 @@ will be available in this interface.
   - [ ] Create relationships between users so admin can assign user and their relationship to a shift
 - [ ] Allow users to book another user onto a shift
 - [ ] Support dark mode for toast notifications
+- [ ] Test that disabled users are removed from future shifts
