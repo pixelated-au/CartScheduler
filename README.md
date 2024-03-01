@@ -95,3 +95,4 @@ will be available in this interface.
 - [ ] Allow users to book another user onto a shift
 - [ ] Support dark mode for toast notifications
 - [ ] Test that disabled users are removed from future shifts
+- [ ] Test that if a disabled shift is re-enabled, it doesn't conflict with existing shifts
