@@ -23,10 +23,6 @@ class GetAvailableShiftsCount
      */
     public function execute(string $startDate, string $endDate): Collection
     {
-        // TODO TEST THE FOLLOWING: INACTIVE LOCATIONS, SHIFTS DISABLED, SHIFTS WITH NO AVAILABLE_FROM,
-        // TODO SHIFTS WITH AVAILABLE_FROM > TODAY, SHIFTS WITH AVAILABLE_FROM < TODAY, SHIFTS WITH AVAILABLE_FROM
-        // TODO BETWEEN TODAY AND TOMORROW, SHIFTS WITH AVAILABLE_TO > TOMORROW, SHIFTS WITH AVAILABLE_TO < TOMORROW,
-        // TODO SHIFTS WITH AVAILABLE_TO BETWEEN TODAY AND TOMORROW, ETC
         $query = /** @lang MySQL */
             "WITH RECURSIVE dates (date) AS
                  (SELECT :startDate
