@@ -88,7 +88,9 @@ will be available in this interface.
 
 ## TODO:
 
-- [ ] Temporary volunteer
+- [ ] Facility to detect if a volunteer's 'availability' conflicts with a shift
+- [ ] Facility to detect if a shift lost a volunteer after removing themselves - and causing the shift to be closed
+- [x] Temporary volunteer
 - [ ] Implement Testing
 - [x] Implement feature for admin to remove a user from a shift in addition to moving them to another shift
   - [ ] Create relationships between users so admin can assign user and their relationship to a shift
