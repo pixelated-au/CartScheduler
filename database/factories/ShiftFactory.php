@@ -14,9 +14,8 @@ class ShiftFactory extends Factory
             $this->faker->dateTimeBetween('now', '+1 month'),
             $this->faker->dateTimeBetween('+1 month', '+2 months'),
         );
-
         return [
-            'location_id'    => Location::inRandomOrder()->first()->id,
+            'location_id'    => Location::inRandomOrder()?->first()?->id,
             'day_monday'     => $this->faker->boolean(),
             'day_tuesday'    => true,
             'day_wednesday'  => true,
