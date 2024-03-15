@@ -56,7 +56,6 @@ class ToggleShiftReservationControllerRules
                         return;
                     }
                     $date = Carbon::createFromFormat('Y-m-d', $value);
-                    /** @noinspection PhpParamsInspection - will always parse because of previous validation */
                     $this->isShiftInAllowedPeriod($date, $fail);
                 },
             ],
@@ -168,7 +167,7 @@ class ToggleShiftReservationControllerRules
     private function isUserActive(User $user, array $data, $fail): void
     {
         if (!$data['do_reserve'] || !isset($data['user'])) {
-            // test only if there is a 'user' key (admin only feature) and adding to a shift
+            // test only if there is a 'user' key (admin-only feature) and adding to a shift
             return;
         }
         if (!$user->is_enabled) {
