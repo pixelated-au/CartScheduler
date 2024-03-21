@@ -21,6 +21,12 @@ class ShiftAvailabilityException extends RuntimeException
             ->setExceptionType(ErrorApiResource::CODE_SHIFT_NO_LONGER_AVAILABLE);
     }
 
+    public static function shiftIsFull(): self
+    {
+        return (new self('Shift is at maximum capacity'))
+            ->setExceptionType(ErrorApiResource::CODE_SHIFT_AT_MAX_CAPACITY);
+    }
+
     public function getExceptionType(): string
     {
         return $this->exceptionType;

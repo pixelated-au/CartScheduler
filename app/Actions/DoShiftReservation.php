@@ -9,13 +9,13 @@ use Illuminate\Support\Facades\Auth;
 
 class DoShiftReservation
 {
-    public function execute(Shift $shift, Location $location, int $userId, Carbon|\Carbon\Carbon $shiftDate): bool
+    public function __construct(private readonly ValidateShiftIsNotFullAction $validateShiftIsNotFullAction)
     {
-        $assignedUsers = $shift->users()->wherePivot('shift_date', $shiftDate->toDateString())->get();
-        // using >= just in case we've had some type of data error
-        if ($assignedUsers->count() >= $location->max_volunteers) {
-            return false;
-        }
+    }
+
+    public function execute(Shift $shift, Location $location, int $userId, Carbon|\Carbon\Carbon $shiftDate): void
+    {
+        $this->validateShiftIsNotFullAction->execute($shift, $shiftDate);
 
         $shift->users()->attach($userId, ['shift_date' => $shiftDate]);
         activity()
@@ -27,8 +27,6 @@ class DoShiftReservation
                 'shift.location.name' => $location->name,
             ])
             ->log('shift_reserved');
-
-        return true;
     }
 
 }

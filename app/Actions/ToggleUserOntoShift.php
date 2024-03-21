@@ -30,13 +30,13 @@ class ToggleUserOntoShift
      *     - 'location': The ID of the location where the shift is located.
      *     - 'do_reserve': A boolean flag indicating whether to reserve the shift. If false, the shift will be un-reserved.
      *
-     * @return string The status of the shift reservation or un-reservation. Possible values are:
+     * @return ToggleReservationStatus The status of the shift reservation or un-reservation. Possible values are:
      *     - ToggleReservationStatus::RESERVATION_MADE: The shift was successfully reserved.
      *     - ToggleReservationStatus::NO_AVAILABLE_SHIFTS: No available shifts to reserve.
      *     - ToggleReservationStatus::RESERVATION_REMOVED: The shift was successfully unreserved.
      * @throws RuntimeException if the user cannot be removed from the shift.
      */
-    public function execute(User $user, array $data): string
+    public function execute(User $user, array $data): ToggleReservationStatus
     {
         return Cache::lock('shift_reservation', 10)->block(10, function () use ($user, $data) {
             // If 'data' contains a user key, toggle that user onto a shift. Otherwise, toggle the current user.
@@ -54,11 +54,9 @@ class ToggleUserOntoShift
             /** @var Shift $shift */
             $shift = $location->shifts->first();
             if ($data['do_reserve']) {
-                $didReserve = $this->doShiftReservation->execute($shift, $location, $userIdToToggle, $shiftDate);
+                $this->doShiftReservation->execute($shift, $location, $userIdToToggle, $shiftDate);
 
-                return $didReserve
-                    ? ToggleReservationStatus::RESERVATION_MADE
-                    : ToggleReservationStatus::NO_AVAILABLE_SHIFTS;
+                return ToggleReservationStatus::RESERVATION_MADE;
             }
 
             $removeCount = $shift->users()->wherePivot('shift_date', '=', $shiftDate->format('Y-m-d'))->detach($userIdToToggle);

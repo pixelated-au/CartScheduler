@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Actions\DoShiftReservation;
 use App\Actions\ErrorApiResource;
 use App\Actions\ValidateShiftIsAvailableAction;
+use App\Actions\ValidateShiftIsNotFullAction;
 use App\Actions\ValidateVolunteerIsAllowedToBeRosteredAction;
 use App\Exceptions\ShiftAvailabilityException;
 use App\Models\Location;
@@ -23,6 +24,7 @@ class MoveUserToNewShiftController extends Controller
         private readonly DoShiftReservation                           $doShiftReservation,
         private readonly ValidateShiftIsAvailableAction               $validateShiftIsAvailableAction,
         private readonly ValidateVolunteerIsAllowedToBeRosteredAction $validateVolunteerIsAllowedToBeRosteredAction,
+        private readonly ValidateShiftIsNotFullAction                 $validateShiftIsNotFullAction,
     )
     {
     }
@@ -63,34 +65,38 @@ class MoveUserToNewShiftController extends Controller
             ->where('is_enabled', true)
             ->first();
 
-        if (!$location) {
-            return ErrorApiResource::create('Location not found',
-                ErrorApiResource::CODE_LOCATION_NOT_FOUND, 422);
-        }
-
-        $shift = $location->shifts->first(); // Should only be 1 matching shift due to the whereBetween() query above.
-        if (!$shift) {
-            return ErrorApiResource::create('No shift found for this location at this time',
-                ErrorApiResource::CODE_SHIFT_NOT_FOUND, 422);
-        }
-
         try {
+
+            if (!$location) {
+                return ErrorApiResource::create('Location not found',
+                    ErrorApiResource::CODE_LOCATION_NOT_FOUND, 422);
+            }
+
+            $shift = $location->shifts->first(); // Should only be 1 matching shift due to the whereBetween() query above.
+            if (!$shift) {
+                return ErrorApiResource::create('No shift found for this location at this time',
+                    ErrorApiResource::CODE_SHIFT_NOT_FOUND, 422);
+            }
+
             $this->validateShiftIsAvailableAction->execute($shift, $date);
+
+            $user      = User::find($request->get('user_id'));
+            $isAllowed = $this->validateVolunteerIsAllowedToBeRosteredAction->execute($location, $user, $shift->users);
+            if (is_string($isAllowed)) {
+                return ErrorApiResource::create($isAllowed, ErrorApiResource::CODE_BROTHER_REQUIRED, 422);
+            }
+
+            $this->validateShiftIsNotFullAction->execute($shift, $date);
+
+            DB::transaction(
+                function () use ($date, $location, $shift, $request, $oldShift) {
+                    $oldShift->users()->detach($request->get('user_id'));
+
+                    $this->doShiftReservation->execute($shift, $location, $request->get('user_id'), $date);
+                });
         } catch (ShiftAvailabilityException $e) {
             return ErrorApiResource::create($e->getMessage(), $e->getExceptionType(), 422);
         }
-
-        $user      = User::find($request->get('user_id'));
-        $isAllowed = $this->validateVolunteerIsAllowedToBeRosteredAction->execute($location, $user, $shift->users);
-        if (is_string($isAllowed)) {
-            return ErrorApiResource::create($isAllowed, ErrorApiResource::CODE_BROTHER_REQUIRED, 422);
-        }
-
-        return DB::transaction(
-            function () use ($date, $location, $shift, $request, $oldShift) {
-                $oldShift->users()->detach($request->get('user_id'));
-
-                return $this->doShiftReservation->execute($shift, $location, $request->get('user_id'), $date);
-            });
+        return response()->noContent();
     }
 }
