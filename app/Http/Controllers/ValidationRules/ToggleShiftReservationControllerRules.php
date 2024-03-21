@@ -25,7 +25,7 @@ class ToggleShiftReservationControllerRules
     {
     }
 
-    public function execute(User $user, array $data, bool $isAdmin = false)
+    public function execute(User $user, array $data, bool $isAdmin = false): array
     {
         return [
             'location'   => ['required', 'integer', 'exists:locations,id'],
