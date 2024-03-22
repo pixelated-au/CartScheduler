@@ -82,7 +82,64 @@ class LocationsAndShiftsTest extends TestCase
 
     public function test_admin_can_add_location_with_two_shifts(): void
     {
-        $this->markTestSkipped('Not implemented yet.');
+        $admin = User::factory()->adminRoleUser()->create(['is_enabled' => true]);
+
+        $shift = [
+            'day_monday'     => true,
+            'day_tuesday'    => true,
+            'day_wednesday'  => false,
+            'day_thursday'   => true,
+            'day_friday'     => true,
+            'day_saturday'   => true,
+            'day_sunday'     => true,
+            'start_time'     => '10:00:00',
+            'end_time'       => '13:30:00',
+            'is_enabled'     => true,
+            'available_from' => null,
+            'available_to'   => null,
+        ];
+
+
+        $response = $this->actingAs($admin)
+            ->postJson('/admin/locations', [
+                'name'             => 'A test city',
+                'description'      => '<p>lorem ipsum dolor sit amet</p>',
+                'min_volunteers'   => 2,
+                'max_volunteers'   => 3,
+                'requires_brother' => true,
+                'is_enabled'       => true,
+                'shifts'           => [
+                    $shift,
+                    [
+                        ...$shift,
+                        'day_wednesday'  => true,
+                        'day_saturday'   => false,
+                        'start_time'     => '14:00:00',
+                        'end_time'       => '17:30:00',
+                        'available_from' => '2021-01-01',
+                        'available_to'   => '2021-01-31',
+                    ],
+                ],
+            ]);
+        $response->assertRedirect('http://localhost/admin/locations/1/edit');
+        $this->assertDatabaseCount('locations', 1);
+        $this->assertDatabaseCount('shifts', 2);
+        $this->assertDatabaseHas('shifts', [
+                'day_wednesday'  => 0,
+                'day_saturday'   => 1,
+                'start_time'     => '10:00:00',
+                'end_time'       => '13:30:00',
+                'available_from' => null,
+                'available_to'   => null,
+            ]);
+        $this->assertDatabaseHas('shifts', [
+                'day_wednesday'  => 1,
+                'day_saturday'   => 0,
+                'start_time'     => '14:00:00',
+                'end_time'       => '17:30:00',
+                'available_from' => '2021-01-01 00:00:00',
+                'available_to'   => '2021-01-31 23:59:59',
+            ]);
     }
 
     public function test_admin_can_edit_location_and_shift(): void
