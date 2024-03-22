@@ -179,8 +179,37 @@ class GetAvailableShiftsCountTest extends TestCase
 
     }
 
-    public function test_only_shifts_on_day_of_week_show()
+    public function test_only_shifts_on_day_of_week_have_availability(): void
     {
+        $this->buildLocationWithShiftsFromArray([
+            'day_monday'    => true,
+            'day_tuesday'   => true,
+            'day_wednesday' => true,
+            'day_thursday'  => true,
+            'day_friday'    => true,
+            'day_saturday'  => false,
+            'day_sunday'    => false,
+        ]);
+
+        $result = $this->getAvailableShiftsCount->execute('2022-10-01', '2022-10-31')->toArray();
+        $this->assertFalse($result['2022-10-01']['has_availability']); // Saturday
+        $this->assertFalse($result['2022-10-02']['has_availability']);
+        $this->assertTrue($result['2022-10-03']['has_availability']);
+        $this->assertTrue($result['2022-10-04']['has_availability']);
+        $this->assertTrue($result['2022-10-05']['has_availability']);
+        $this->assertTrue($result['2022-10-06']['has_availability']);
+        $this->assertTrue($result['2022-10-07']['has_availability']);
+
+        $this->assertFalse($result['2022-10-08']['has_availability']);
+        $this->assertFalse($result['2022-10-09']['has_availability']);
+        $this->assertTrue($result['2022-10-10']['has_availability']);
+        $this->assertTrue($result['2022-10-11']['has_availability']);
+        $this->assertTrue($result['2022-10-12']['has_availability']);
+        $this->assertTrue($result['2022-10-13']['has_availability']);
+        $this->assertTrue($result['2022-10-14']['has_availability']);
+        $this->assertFalse($result['2022-10-15']['has_availability']);
+        $this->assertFalse($result['2022-10-16']['has_availability']);
+
     }
 
     private function buildLocationWithShiftsFromArray(array ...$shifts): Location
