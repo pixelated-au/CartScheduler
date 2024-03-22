@@ -2,24 +2,82 @@
 
 namespace Tests\Feature\App\Admin;
 
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class LocationsAndShiftsTest extends TestCase
 {
     use RefreshDatabase;
-//TODO IMPLEMENT AND TEST CREATING A SHIFT AT THE SAME TIME AS AN EXISTING SHIFT BUT ONLY ALLOW IF THE EXISTING SHIFT IS DISABLED OR IS WITHIN THE 'ALLOWED' TIMEFRAME
-// ALSO WITH THE ABOVE, MAKE SURE IF A SHIFT IS AVAILABLE AT THE SAME TIME, THEN A 'DISABLED' SHIFT CAN'T BE ENABLED
-// TEST RESTRICTED VOLUNTEER FUNCTIONS
+
+//TODO TEST RESTRICTED VOLUNTEER FUNCTIONS
 
     public function test_admin_can_add_location_with_no_shifts(): void
     {
-        $this->markTestSkipped('Not implemented yet.');
+        $admin = User::factory()->adminRoleUser()->create(['is_enabled' => true]);
+
+        $response = $this->actingAs($admin)
+            ->postJson('/admin/locations', [
+                'name'             => 'A test city',
+                'description'      => 'lorem ipsum dolor sit amet',
+                'min_volunteers'   => 2,
+                'max_volunteers'   => 3,
+                'requires_brother' => true,
+                'is_enabled'       => true,
+                'shifts'           => [],
+            ]);
+        $response->assertRedirect('http://localhost/admin/locations/1/edit');
+        $this->assertDatabaseCount('locations', 1);
     }
 
     public function test_admin_can_add_location_with_one_shift(): void
     {
-        $this->markTestSkipped('Not implemented yet.');
+        $admin = User::factory()->adminRoleUser()->create(['is_enabled' => true]);
+
+        $response = $this->actingAs($admin)
+            ->postJson('/admin/locations', [
+                'name'             => 'A test city',
+                'description'      => '<p>lorem ipsum dolor sit amet</p>',
+                'min_volunteers'   => 2,
+                'max_volunteers'   => 3,
+                'requires_brother' => true,
+                'is_enabled'       => true,
+                'shifts'           => [
+                    // Note there are multiple shifts so we're using an array containing an array of shift(...s)
+                    [
+                        'day_monday'     => true,
+                        'day_tuesday'    => true,
+                        'day_wednesday'  => false,
+                        'day_thursday'   => true,
+                        'day_friday'     => true,
+                        'day_saturday'   => true,
+                        'day_sunday'     => true,
+                        'start_time'     => '10:00:00',
+                        'end_time'       => '13:30:00',
+                        'is_enabled'     => true,
+                        'available_from' => null,
+                        'available_to'   => null,
+                    ]
+                ],
+            ]);
+        $response->assertRedirect('http://localhost/admin/locations/1/edit');
+        $this->assertDatabaseCount('locations', 1);
+        $this->assertDatabaseCount('shifts', 1);
+        $this->assertDatabaseHas('shifts', [
+            'day_monday'     => 1,
+            'day_tuesday'    => 1,
+            'day_wednesday'  => 0,
+            'day_thursday'   => 1,
+            'day_friday'     => 1,
+            'day_saturday'   => 1,
+            'day_sunday'     => 1,
+            'start_time'     => "10:00:00",
+            'end_time'       => "13:30:00",
+            'is_enabled'     => 1,
+            'location_id'    => 1,
+            'available_from' => null,
+            'available_to'   => null,
+        ]);
     }
 
     public function test_admin_can_add_location_with_two_shifts(): void
