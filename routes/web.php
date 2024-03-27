@@ -66,7 +66,7 @@ Route::post('/set-password', [SetUserPasswordController::class, 'update'])->name
 
 Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified', 'user-enabled'])->group(function () {
     Route::get('/', static fn() => Inertia::render('Dashboard'))->name('dashboard');
-    Route::get('/shifts/{shiftDate}', AvailableShiftsController::class);
+    Route::get('/shifts/{shiftDate}', AvailableShiftsController::class)->where(['shiftDate' => '\d\d\d\d-\d\d-\d\d']);
     Route::get('/outstanding-reports', MissingReportsForUserController::class);
     Route::post('/reserve-shift', ToggleShiftReservationController::class);
     Route::post('/save-report', SaveShiftReportController::class)->name('save.report');
@@ -123,7 +123,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified',
             Route::put('/report-tag-sort-order', ReportTagsSortOrderController::class);
             Route::post('/resend-welcome-email', ResendWelcomeEmailController::class)->name('admin.resend-welcome-email');
 
-            Route::get('/assigned-shifts/{shiftDate}', AdminAvailableShiftsController::class);
+            Route::get('/assigned-shifts/{shiftDate}', AdminAvailableShiftsController::class)->where(['shiftDate' => '\d\d\d\d-\d\d-\d\d']);
 
             Route::resource('shifts', ShiftsController::class)->only(['destroy'])->names([
                 'destroy' => 'admin.shifts.destroy',
