@@ -17,8 +17,8 @@ class UpdateLocationRequest extends FormRequest
     {
         // Force the location id to be the same as the location id in the route
         $locationId = $this->route('location')->id;
-        $shifts = collect($this->get('shifts', []));
-        $shifts = $shifts->map(function (array $shift) use ($locationId) {
+        $shifts     = collect($this->get('shifts', []));
+        $shifts     = $shifts->map(function (array $shift) use ($locationId) {
             $shift['location_id'] = $locationId;
             return $shift;
         });
@@ -53,26 +53,40 @@ class UpdateLocationRequest extends FormRequest
             'shifts.*.day_friday'     => ['boolean'],
             'shifts.*.day_saturday'   => ['boolean'],
             'shifts.*.day_sunday'     => ['boolean'],
-            'shifts.*.start_time'     => ['required', 'date_format:H:i:s'],
-            'shifts.*.end_time'       => ['required', 'date_format:H:i:s'],
-            'shifts.*.available_from' => ['nullable', 'date', 'date_format:Y-m-d'], // Note, extra validation is done in withValidator()
-            'shifts.*.available_to'   => ['nullable', 'date', 'date_format:Y-m-d'], // Note, extra validation is done in withValidator()
+            // Note, extra validation is done in withValidator()
+            'shifts.*.start_time'     => ['required', 'date_format:H:i:s', 'before_or_equal:shifts.*.end_time'],
+            // Note, extra validation is done in withValidator()
+            'shifts.*.end_time'       => ['required', 'date_format:H:i:s', 'after_or_equal:shifts.*.start_time'],
+            // Note, extra validation is done in withValidator()
+            'shifts.*.available_from' => ['nullable', 'date', 'date_format:Y-m-d'],
+            // Note, extra validation is done in withValidator()
+            'shifts.*.available_to'   => ['nullable', 'date', 'date_format:Y-m-d'],
             'shifts.*.is_enabled'     => ['nullable', 'boolean'],
         ];
     }
 
-    /** @noinspection PhpUnused */
+    /**
+     * TODO this will need to be changed after upgrading past Laravel 9
+     * @noinspection PhpUnused
+     */
     public function withValidator(Validator $validator): void
     {
-        $validator->sometimes(
-            'shifts.*.available_from',
-            'before_or_equal:shifts.*.available_to',
-            fn(Fluent $input, Fluent $shiftData) => (bool)$shiftData->get('available_to'));
+        $validator->after(function (Validator $validator) {
 
-        $validator->sometimes(
-            'shifts.*.available_to',
-            'after_or_equal:shifts.*.available_from',
-            fn(Fluent $input, Fluent $shiftData) => (bool)$shiftData->get('available_from'));
+            $this->compareAvailableDates($validator);
+
+            // Validate that available_from is before available_to only if the latter is present
+            $validator->sometimes(
+                'shifts.*.available_from',
+                'before_or_equal:shifts.*.available_to',
+                fn(Fluent $input, Fluent $shiftData) => (bool)$shiftData->get('available_to'));
+
+            // Validate that available_to is after available_from only if the latter is present
+            $validator->sometimes(
+                'shifts.*.available_to',
+                'after_or_equal:shifts.*.available_from',
+                fn(Fluent $input, Fluent $shiftData) => (bool)$shiftData->get('available_from'));
+        });
     }
 
     public function messages(): array
@@ -85,6 +99,8 @@ class UpdateLocationRequest extends FormRequest
             'mobile_phone.max'                        => $formatMsg,
             'shifts.*.start_time.date_format'         => 'Please use the format HH:mm:ss',
             'shifts.*.end_time.date_format'           => 'Please use the format HH:mm:ss',
+            'shifts.*.start_time.before_or_equal'     => "The 'start' time must be before the 'end' time.",
+            'shifts.*.end_time.after_or_equal'        => "The 'end' time must be after the 'start' time. ",
             'shifts.*.available_from.date'            => "The 'available from' date must be a valid date and time",
             'shifts.*.available_to.date'              => "The 'available to' date must be a valid date and time",
             'shifts.*.available_from.before_or_equal' => "The 'available from' date must be before or the same as the 'available to' date",
@@ -92,4 +108,55 @@ class UpdateLocationRequest extends FormRequest
         ];
     }
 
+    protected function compareAvailableDates(Validator $validator): void
+    {
+        $shifts = $this->get('shifts', []);
+
+        foreach ($shifts as $index1 => $shift1) {
+            if (!$shift1['is_enabled']) {
+                continue;
+            }
+
+            $errorShifts = 0;
+            foreach ($shifts as $index2 => $shift2) {
+                if (!$shift2['is_enabled'] || $index1 === $index2) {
+                    continue;
+                }
+
+                $timesOverlap = $shift1['start_time'] < $shift2['end_time'] && $shift1['end_time'] > $shift2['start_time'];
+                // For overlapping periods with available_from and available_to
+                $bothSetsOfDates = isset($shift1['available_from'], $shift1['available_to'], $shift2['available_from'], $shift2['available_to']);
+                if ($bothSetsOfDates) {
+                    $datesOverlap = $shift1['available_from'] < $shift2['available_to'] && $shift1['available_to'] > $shift2['available_from'];
+                    if ($datesOverlap && $timesOverlap) {
+                        $errorShifts = 110;
+                    }
+                }
+
+                // For overlapping periods with only available_from or available_to
+                $eitherSetOfDatesShift1 = isset($shift1['available_from']) || isset($shift1['available_to']);
+                $noDatesShift2          = !isset($shift2['available_from']) && !isset($shift2['available_to']);
+                if ($eitherSetOfDatesShift1 && $noDatesShift2 && $timesOverlap) {
+                    $errorShifts = 120;
+                }
+
+                $eitherSetOfDatesShift1 = !isset($shift1['available_from']) && !isset($shift1['available_to']);
+                $noDatesShift2          = isset($shift2['available_from']) || isset($shift2['available_to']);
+                if ($eitherSetOfDatesShift1 && $noDatesShift2 && $timesOverlap) {
+                    $errorShifts = 121;
+                }
+
+                // For shifts with no available_from or available_to
+                $noDatesBoth = !isset($shift1['available_from']) && !isset($shift1['available_to']) && !isset($shift2['available_from']) && !isset($shift2['available_to']);
+                if ($noDatesBoth && $timesOverlap) {
+                    $errorShifts = 130;
+                }
+
+                if ($errorShifts) {
+                    $validator->errors()->add("shifts.$index1.available_from", "There is an active shift that conflicts with this shift between {$shift1['start_time']} and {$shift1['end_time']}. Only one shift per timeslot can be enabled. [Code: $errorShifts]");
+                }
+            }
+
+        }
+    }
 }
