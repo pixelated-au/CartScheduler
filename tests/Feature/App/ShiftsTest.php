@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\App;
 
+use App\Enums\DBPeriod;
 use App\Models\Location;
 use App\Models\Shift;
 use App\Models\ShiftUser;
@@ -28,27 +29,9 @@ class ShiftsTest extends TestCase
          * 20 21 22 23 24 25 26
          * 27 28
         */
-        Config::set('cart-scheduler.shift_reservation_duration', 3); // 3 weeks
-        Config::set('cart-scheduler.shift_reservation_duration_period', 'WEEK');
-        Config::set('cart-scheduler.do_release_shifts_daily', false); // Released once per week
-        Config::set('cart-scheduler.release_weekly_shifts_on_day', 'MON'); // Monday
-        Config::set('cart-scheduler.release_new_shifts_at_time', '14:00'); // 2:00 PM
+        $this->setConfig(3, DBPeriod::Week, false, 'MON', '14:00');
 
-        $startDate = CarbonImmutable::createFromTimeString('2023-02-02 12:30:00');
-
-        Location::factory()
-            ->state(['max_volunteers' => 3])
-            ->has(Shift::factory()
-                ->everyDay9am()
-                ->hasAttached(
-                    User::factory()
-                        ->userRoleUser()
-                        ->count(3)
-                        ->state(['is_enabled' => true])
-                    , ['shift_date' => $startDate->addDay()->toDateString()]
-                )
-            )
-            ->create();
+        $startDate = $this->generateDBData('2023-02-02 12:30:00');
 
         $user = ShiftUser::with('user')->first()->user;
 
@@ -94,27 +77,9 @@ class ShiftsTest extends TestCase
          * 20 21 22 23 24 25 26
          * 27 28
         */
-        Config::set('cart-scheduler.shift_reservation_duration', 1); // 1 week
-        Config::set('cart-scheduler.shift_reservation_duration_period', 'WEEK');
-        Config::set('cart-scheduler.do_release_shifts_daily', false); // Released once per week
-        Config::set('cart-scheduler.release_weekly_shifts_on_day', 'MON');
-        Config::set('cart-scheduler.release_new_shifts_at_time', '12:30'); // 12:30 PM
+        $this->setConfig(1, DBPeriod::Week, false, 'MON', '12:30');
 
-        $startDate = CarbonImmutable::createFromTimeString('2023-02-02 12:30:00');
-
-        Location::factory()
-            ->state(['max_volunteers' => 3])
-            ->has(Shift::factory()
-                ->everyDay9am()
-                ->hasAttached(
-                    User::factory()
-                        ->userRoleUser()
-                        ->count(3)
-                        ->state(['is_enabled' => true])
-                    , ['shift_date' => $startDate->addDay()->toDateString()]
-                )
-            )
-            ->create();
+        $startDate = $this->generateDBData('2023-02-02 12:30:00');
 
         $user = ShiftUser::with('user')->first()->user;
         $this->travelTo($startDate);
@@ -159,27 +124,9 @@ class ShiftsTest extends TestCase
 
     public function test_user_cannot_retrieve_shifts_before_today(): void
     {
-        Config::set('cart-scheduler.shift_reservation_duration', 1);
-        Config::set('cart-scheduler.shift_reservation_duration_period', 'MONTH');
-        Config::set('cart-scheduler.do_release_shifts_daily', false);
-        Config::set('cart-scheduler.release_new_shifts_at_time', '12:00');
+        $this->setConfig(1, DBPeriod::Month, false, 'MON', '12:00');
 
-        $startDate = CarbonImmutable::createFromTimeString('2023-01-01 00:00:00');
-
-        Location::factory()
-            ->state(['max_volunteers' => 3])
-            ->has(Shift::factory()
-                ->everyDay9am()
-                ->hasAttached(
-                    User::factory()
-                        ->userRoleUser()
-                        ->count(3)
-                        ->state(['is_enabled' => true])
-                    // Add shifts so the system works; it doesn't show any free shifts if there's no shift in the system
-                    , ['shift_date' => $startDate->subMonth()->toDateString()]
-                )
-            )
-            ->create();
+        $startDate = $this->generateDBData('2023-01-01 00:00:00');
 
         $user = ShiftUser::with('user')->first()->user;
 
@@ -195,27 +142,9 @@ class ShiftsTest extends TestCase
 
     public function test_user_cannot_retrieve_shifts_after_allowed_shift_timeframe(): void
     {
-        Config::set('cart-scheduler.shift_reservation_duration', 1);
-        Config::set('cart-scheduler.shift_reservation_duration_period', 'MONTH');
-        Config::set('cart-scheduler.do_release_shifts_daily', false);
-        Config::set('cart-scheduler.release_new_shifts_at_time', '12:00');
+        $this->setConfig(1, DBPeriod::Month, false, 'MON', '12:00');
 
-        $startDate = CarbonImmutable::createFromTimeString('2023-01-01 00:00:00');
-
-        Location::factory()
-            ->state(['max_volunteers' => 3])
-            ->has(Shift::factory()
-                ->everyDay9am()
-                ->hasAttached(
-                    User::factory()
-                        ->userRoleUser()
-                        ->count(3)
-                        ->state(['is_enabled' => true])
-                    // Add shifts so the system works; it doesn't show any free shifts if there's no shift in the system
-                    , ['shift_date' => $startDate->subMonth()->toDateString()]
-                )
-            )
-            ->create();
+        $startDate = $this->generateDBData('2023-01-01 00:00:00');
 
         $user = ShiftUser::with('user')->first()->user;
 
@@ -231,27 +160,9 @@ class ShiftsTest extends TestCase
 
     public function test_available_shifts_released_daily_for_month(): void
     {
-        Config::set('cart-scheduler.shift_reservation_duration', 1);
-        Config::set('cart-scheduler.shift_reservation_duration_period', 'MONTH');
-        Config::set('cart-scheduler.do_release_shifts_daily', true);
-        Config::set('cart-scheduler.release_new_shifts_at_time', '00:00');
+        $this->setConfig(1, DBPeriod::Month, true, 'SUN', '00:00');
 
-        $startDate = CarbonImmutable::createFromTimeString('2023-01-15 00:00:00');
-
-        Location::factory()
-            ->state(['max_volunteers' => 3])
-            ->has(Shift::factory()
-                ->everyDay9am()
-                ->hasAttached(
-                    User::factory()
-                        ->userRoleUser()
-                        ->count(3)
-                        ->state(['is_enabled' => true])
-                    // Add shifts so the system works; it doesn't show any free shifts if there's no shift in the system
-                    , ['shift_date' => $startDate->subMonth()->toDateString()]
-                )
-            )
-            ->create();
+        $startDate = $this->generateDBData('2023-01-15 00:00:00');
 
         $user = ShiftUser::with('user')->first()->user;
 
@@ -264,27 +175,9 @@ class ShiftsTest extends TestCase
 
     public function test_available_shifts_released_daily_for_month_after_time(): void
     {
-        Config::set('cart-scheduler.shift_reservation_duration', 1);
-        Config::set('cart-scheduler.shift_reservation_duration_period', 'MONTH');
-        Config::set('cart-scheduler.do_release_shifts_daily', true);
-        Config::set('cart-scheduler.release_new_shifts_at_time', '12:00');
+        $this->setConfig(1, DBPeriod::Month, true, 'SUN', '12:00');
 
-        $startDate = CarbonImmutable::createFromTimeString('2023-01-15 11:59:59');
-
-        Location::factory()
-            ->state(['max_volunteers' => 3])
-            ->has(Shift::factory()
-                ->everyDay9am()
-                ->hasAttached(
-                    User::factory()
-                        ->userRoleUser()
-                        ->count(3)
-                        ->state(['is_enabled' => true])
-                    // Add shifts so the system works; it doesn't show any free shifts if there's no shift in the system
-                    , ['shift_date' => $startDate->subMonth()->toDateString()]
-                )
-            )
-            ->create();
+        $startDate = $this->generateDBData('2023-01-15 11:59:59');
 
         $user = ShiftUser::with('user')->first()->user;
 
@@ -303,27 +196,9 @@ class ShiftsTest extends TestCase
 
     public function test_available_shifts_released_daily_for_two_months(): void
     {
-        Config::set('cart-scheduler.shift_reservation_duration', 2);
-        Config::set('cart-scheduler.shift_reservation_duration_period', 'MONTH');
-        Config::set('cart-scheduler.do_release_shifts_daily', true);
-        Config::set('cart-scheduler.release_new_shifts_at_time', '00:00');
+        $this->setConfig(2, DBPeriod::Month, true, 'SUN', '00:00');
 
-        $startDate = CarbonImmutable::createFromTimeString('2023-01-15 00:00:00');
-
-        Location::factory()
-            ->state(['max_volunteers' => 3])
-            ->has(Shift::factory()
-                ->everyDay9am()
-                ->hasAttached(
-                    User::factory()
-                        ->userRoleUser()
-                        ->count(3)
-                        ->state(['is_enabled' => true])
-                    // Add shifts so the system works; it doesn't show any free shifts if there's no shift in the system
-                    , ['shift_date' => $startDate->subMonth()->toDateString()]
-                )
-            )
-            ->create();
+        $startDate = $this->generateDBData('2023-01-15 00:00:00');
 
         $user = ShiftUser::with('user')->first()->user;
 
@@ -336,27 +211,9 @@ class ShiftsTest extends TestCase
 
     public function test_available_shifts_released_daily_for_week(): void
     {
-        Config::set('cart-scheduler.shift_reservation_duration', 1);
-        Config::set('cart-scheduler.shift_reservation_duration_period', 'WEEK');
-        Config::set('cart-scheduler.do_release_shifts_daily', true);
-        Config::set('cart-scheduler.release_new_shifts_at_time', '00:00');
+        $this->setConfig(1, DBPeriod::Week, true, 'SUN', '00:00');
 
-        $startDate = CarbonImmutable::createFromTimeString('2023-01-15 00:00:01');
-
-        Location::factory()
-            ->state(['max_volunteers' => 3])
-            ->has(Shift::factory()
-                ->everyDay9am()
-                ->hasAttached(
-                    User::factory()
-                        ->userRoleUser()
-                        ->count(3)
-                        ->state(['is_enabled' => true])
-                    // Add shifts so the system works; it doesn't show any free shifts if there's no shift in the system
-                    , ['shift_date' => $startDate->subMonth()->toDateString()]
-                )
-            )
-            ->create();
+        $startDate = $this->generateDBData('2023-01-15 00:00:01');
 
         $user = ShiftUser::with('user')->first()->user;
 
@@ -369,27 +226,9 @@ class ShiftsTest extends TestCase
 
     public function test_available_shifts_released_daily_for_one_week_after_time(): void
     {
-        Config::set('cart-scheduler.shift_reservation_duration', 1);
-        Config::set('cart-scheduler.shift_reservation_duration_period', 'WEEK');
-        Config::set('cart-scheduler.do_release_shifts_daily', true);
-        Config::set('cart-scheduler.release_new_shifts_at_time', '12:00');
+        $this->setConfig(1, DBPeriod::Week, true, 'SUN', '12:00');
 
-        $startDate = CarbonImmutable::createFromTimeString('2023-01-15 11:59:59');
-
-        Location::factory()
-            ->state(['max_volunteers' => 3])
-            ->has(Shift::factory()
-                ->everyDay9am()
-                ->hasAttached(
-                    User::factory()
-                        ->userRoleUser()
-                        ->count(3)
-                        ->state(['is_enabled' => true])
-                    // Add shifts so the system works; it doesn't show any free shifts if there's no shift in the system
-                    , ['shift_date' => $startDate->subMonth()->toDateString()]
-                )
-            )
-            ->create();
+        $startDate = $this->generateDBData('2023-01-15 11:59:59');
 
         $user = ShiftUser::with('user')->first()->user;
 
@@ -409,27 +248,9 @@ class ShiftsTest extends TestCase
 
     public function test_available_shifts_released_daily_for_three_weeks(): void
     {
-        Config::set('cart-scheduler.shift_reservation_duration', 3);
-        Config::set('cart-scheduler.shift_reservation_duration_period', 'WEEK');
-        Config::set('cart-scheduler.do_release_shifts_daily', true);
-        Config::set('cart-scheduler.release_new_shifts_at_time', '00:00');
+        $this->setConfig(3, DBPeriod::Week, true, 'SUN', '00:00');
 
-        $startDate = CarbonImmutable::createFromTimeString('2023-01-15 11:00:01');
-
-        Location::factory()
-            ->state(['max_volunteers' => 3])
-            ->has(Shift::factory()
-                ->everyDay9am()
-                ->hasAttached(
-                    User::factory()
-                        ->userRoleUser()
-                        ->count(3)
-                        ->state(['is_enabled' => true])
-                    // Add shifts so the system works; it doesn't show any free shifts if there's no shift in the system
-                    , ['shift_date' => $startDate->subMonth()->toDateString()]
-                )
-            )
-            ->create();
+        $startDate = $this->generateDBData('2023-01-15 11:00:01');
 
         $user = ShiftUser::with('user')->first()->user;
 
@@ -442,26 +263,9 @@ class ShiftsTest extends TestCase
 
     public function test_available_shifts_released_once_per_month(): void
     {
-        Config::set('cart-scheduler.shift_reservation_duration', 1);
-        Config::set('cart-scheduler.shift_reservation_duration_period', 'MONTH');
-        Config::set('cart-scheduler.do_release_shifts_daily', false);
+        $this->setConfig(1, DBPeriod::Month, false, 'MON', '00:00');
 
-        $startDate = CarbonImmutable::createFromTimeString('2023-01-25 00:00:00');
-
-        Location::factory()
-            ->state(['max_volunteers' => 3])
-            ->has(Shift::factory()
-                ->everyDay9am()
-                ->hasAttached(
-                    User::factory()
-                        ->userRoleUser()
-                        ->count(3)
-                        ->state(['is_enabled' => true])
-                    // Add shifts so the system works; it doesn't show any free shifts if there's no shift in the system
-                    , ['shift_date' => $startDate->subMonth()->toDateString()]
-                )
-            )
-            ->create();
+        $startDate = $this->generateDBData('2023-01-25 00:00:00');
 
         $user = ShiftUser::with('user')->first()->user;
 
@@ -474,27 +278,9 @@ class ShiftsTest extends TestCase
 
     public function test_available_shifts_released_once_per_month_at_a_time(): void
     {
-        Config::set('cart-scheduler.shift_reservation_duration', 1);
-        Config::set('cart-scheduler.shift_reservation_duration_period', 'MONTH');
-        Config::set('cart-scheduler.do_release_shifts_daily', false);
-        Config::set('cart-scheduler.release_new_shifts_at_time', '12:00');
+        $this->setConfig(1, DBPeriod::Month, false, 'MON', '12:00');
 
-        $startDate = CarbonImmutable::createFromTimeString('2023-02-01 11:59:59');
-
-        Location::factory()
-            ->state(['max_volunteers' => 3])
-            ->has(Shift::factory()
-                ->everyDay9am()
-                ->hasAttached(
-                    User::factory()
-                        ->userRoleUser()
-                        ->count(3)
-                        ->state(['is_enabled' => true])
-                    // Add shifts so the system works; it doesn't show any free shifts if there's no shift in the system
-                    , ['shift_date' => $startDate->subMonth()->toDateString()]
-                )
-            )
-            ->create();
+        $startDate = $this->generateDBData('2023-02-01 11:59:59');
 
         $user = ShiftUser::with('user')->first()->user;
 
@@ -522,11 +308,42 @@ class ShiftsTest extends TestCase
 
     public function test_available_shifts_released_beginning_of_month_for_three_month_duration(): void
     {
-        Config::set('cart-scheduler.shift_reservation_duration', 3);
-        Config::set('cart-scheduler.shift_reservation_duration_period', 'MONTH');
-        Config::set('cart-scheduler.do_release_shifts_daily', false);
+        $this->setConfig(3, DBPeriod::Month, false, 'MON', '00:00');
 
-        $startDate = CarbonImmutable::createFromTimeString('2023-01-25 00:00:00');
+        $startDate = $this->generateDBData('2023-01-25 00:00:00');
+
+        $user = ShiftUser::with('user')->first()->user;
+
+        $this->travelTo($startDate);
+        $response = $this->actingAs($user)->getJson("/shifts/{$startDate->toDateString()}");
+        $response->assertJsonCount(96, 'freeShifts');
+        $response->assertJsonFragment(['maxDateReservation' => '2023-04-30']);
+        $this->assertJsonHasKeys($response, 'freeShifts', '2023-01-25', '2023-04-30');
+    }
+
+    /**
+     * @param int $duration A number representing days or months. i.e., 14 could = 14 days or 2 could = 2 months
+     * @param \App\Enums\DBPeriod $period Days or Months
+     * @param bool $dailyRelease If true, new shifts are released daily
+     * @param string $dayOfWeekRelease This is only used for month releases. Set to the day shifts are to be released
+     * @param string $timeOfDayRelease What time of the day shall new shifts be released?
+     * @return void
+     */
+    protected function setConfig(int $duration, DBPeriod $period, bool $dailyRelease, string $dayOfWeekRelease, string $timeOfDayRelease): void
+    {
+        Config::set('cart-scheduler.shift_reservation_duration', $duration);
+        Config::set('cart-scheduler.shift_reservation_duration_period', $period->value);
+        Config::set('cart-scheduler.do_release_shifts_daily', $dailyRelease);
+        Config::set('cart-scheduler.release_weekly_shifts_on_day', $dayOfWeekRelease);
+        Config::set('cart-scheduler.release_new_shifts_at_time', $timeOfDayRelease);
+    }
+
+    /**
+     * @param string $timeString Eg '2023-01-25 00:00:00'
+     */
+    protected function generateDBData(string $timeString): CarbonImmutable
+    {
+        $startDate = CarbonImmutable::createFromTimeString($timeString);
 
         Location::factory()
             ->state(['max_volunteers' => 3])
@@ -538,17 +355,11 @@ class ShiftsTest extends TestCase
                         ->count(3)
                         ->state(['is_enabled' => true])
                     // Add shifts so the system works; it doesn't show any free shifts if there's no shift in the system
-                    , ['shift_date' => $startDate->subMonth()->toDateString()]
+                    , ['shift_date' => $startDate->toDateString()]
                 )
             )
             ->create();
 
-        $user = ShiftUser::with('user')->first()->user;
-
-        $this->travelTo($startDate);
-        $response = $this->actingAs($user)->getJson("/shifts/{$startDate->toDateString()}");
-        $response->assertJsonCount(96, 'freeShifts');
-        $response->assertJsonFragment(['maxDateReservation' => '2023-04-30']);
-        $this->assertJsonHasKeys($response, 'freeShifts', '2023-01-25', '2023-04-30');
+        return $startDate;
     }
 }
