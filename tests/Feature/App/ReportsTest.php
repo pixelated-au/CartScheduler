@@ -9,6 +9,7 @@ use App\Models\ShiftUser;
 use App\Models\User;
 use Carbon\CarbonImmutable;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Spatie\Tags\Tag;
 use Tests\TestCase;
 use Tests\Traits\ExtraFunctions;
 
@@ -79,11 +80,77 @@ class ReportsTest extends TestCase
 
     public function test_user_can_submit_report_with_tags(): void
     {
-        $this->markTestSkipped('Not implemented yet.');
+        $user = User::factory()->male()->create(['is_enabled' => true]);
+        $tag  = Tag::findOrCreate('test_tag', 'reports');
+
+        $shift = Shift::factory()->everyDay9am()->for(Location::factory())->create();
+
+        $this->assertDatabaseCount('reports', 0);
+
+        ShiftUser::factory()
+            ->state(['shift_date' => '2023-01-01'])
+            ->for($shift, 'shift')
+            ->for($user, 'user')
+            ->create();
+
+        $reportData = [
+            'shift_date'          => '2023-01-01',
+            'shift_id'            => $shift->getKey(),
+            'start_time'          => '09:00:00',
+            'shift_was_cancelled' => false,
+            'placements_count'    => 2,
+            'videos_count'        => 3,
+            'requests_count'      => 4,
+            'comments'            => 'A test comment',
+            'tags'                => [$tag->id],
+        ];
+
+        $this->actingAs($user)->postJson('/save-report', $reportData);
+
+        $this->assertDatabaseCount('reports', 1);
+        $report = Report::first();
+        $this->assertEquals($reportData['shift_date'], $report->shift_date);
+        $this->assertEquals($reportData['shift_id'], $report->shift_id);
+        $this->assertEquals($reportData['shift_was_cancelled'], $report->shift_was_cancelled);
+        $this->assertEquals($reportData['placements_count'], $report->placements_count);
+        $this->assertEquals($reportData['videos_count'], $report->videos_count);
+        $this->assertEquals($reportData['requests_count'], $report->requests_count);
+        $this->assertEquals($reportData['comments'], $report->comments);
+        $this->assertEquals($reportData['tags'][0], $report->tags->first()->id);
     }
 
-    public function test_user_can_submit_canceled_shift(): void
+    public function test_validate_sister_cannot_submit_report_if_brother_only_is_specified(): void
     {
-        $this->markTestSkipped('Not implemented yet.');
+        $user = User::factory()->female()->create(['is_enabled' => true]);
+        $tag  = Tag::findOrCreate('test_tag', 'reports');
+
+        $shift = Shift::factory()
+            ->everyDay9am()
+            ->for(Location::factory()->state(['requires_brother' => true]))
+            ->create();
+
+        $this->assertDatabaseCount('reports', 0);
+
+        ShiftUser::factory()
+            ->state(['shift_date' => '2023-01-01'])
+            ->for($shift, 'shift')
+            ->for($user, 'user')
+            ->create();
+
+        $reportData = [
+            'shift_date'          => '2023-01-01',
+            'shift_id'            => $shift->getKey(),
+            'start_time'          => '09:00:00',
+            'shift_was_cancelled' => false,
+            'placements_count'    => 2,
+            'videos_count'        => 3,
+            'requests_count'      => 4,
+            'comments'            => 'A test comment',
+            'tags'                => [$tag->id],
+        ];
+
+        $response = $this->actingAs($user)->postJson('/save-report', $reportData);
+        $response->assertStatus(422);
+        $this->assertDatabaseCount('reports', 0);
     }
 }
