@@ -31,7 +31,7 @@ class GetAvailableShiftsCountTest extends TestCase
         parent::setUp();
     }
 
-    public function test_rostered_volunteers_are_being_calculated_properly()
+    public function test_rostered_volunteers_are_being_calculated_properly(): void
     {
         $users = User::factory()->count(5)->create(['is_enabled' => true]);
 
@@ -70,7 +70,7 @@ class GetAvailableShiftsCountTest extends TestCase
         $this->assertTrue($first['has_availability']);
     }
 
-    public function test_inactive_locations_dont_show()
+    public function test_inactive_locations_dont_show(): void
     {
         $this->buildLocationWithShiftsFromCallback(
             count: 4,
@@ -82,7 +82,7 @@ class GetAvailableShiftsCountTest extends TestCase
         $this->assertEquals(3, $result['2022-10-01']['max_volunteers']);
     }
 
-    public function test_inactive_shifts_dont_show()
+    public function test_inactive_shifts_dont_show(): void
     {
         $location = $this->buildLocationWithShiftsFromCallback(
             count: 3,
@@ -100,7 +100,7 @@ class GetAvailableShiftsCountTest extends TestCase
         $this->assertEquals(6, $result['2022-10-01']['max_volunteers']);
     }
 
-    public function test_only_shifts_between_available_dates_show()
+    public function test_only_shifts_between_available_dates_show(): void
     {
         $this->buildLocationWithShiftsFromArray(
             ['start_time' => '09:00:00', 'end_time' => '12:00:00', 'is_enabled' => false],
@@ -118,7 +118,7 @@ class GetAvailableShiftsCountTest extends TestCase
         $this->assertEquals(6, $result['2022-10-25']['max_volunteers']);
     }
 
-    public function test_shifts_not_available_dont_show()
+    public function test_shifts_not_available_dont_show(): void
     {
         $this->buildLocationWithShiftsFromArray(
             ['start_time' => '09:00:00', 'end_time' => '12:00:00', 'available_from' => '2022-10-15']
@@ -132,7 +132,7 @@ class GetAvailableShiftsCountTest extends TestCase
         $this->assertEquals(0, $result['2022-10-01']['max_volunteers']);
     }
 
-    public function test_only_shifts_on_available_from_show()
+    public function test_only_shifts_on_available_from_show(): void
     {
         $this->buildLocationWithShiftsFromArray(
             ['start_time' => '09:00:00', 'end_time' => '12:00:00', 'available_from' => '2022-10-15'],
@@ -144,7 +144,7 @@ class GetAvailableShiftsCountTest extends TestCase
         $this->assertEquals(3, $result['2022-10-15']['max_volunteers']);
     }
 
-    public function test_only_shifts_after_available_from_with_no_available_to_show()
+    public function test_only_shifts_after_available_from_with_no_available_to_show(): void
     {
         $this->buildLocationWithShiftsFromArray(
             ['start_time' => '09:00:00', 'end_time' => '12:00:00', 'available_from' => '2022-09-01']
@@ -155,7 +155,7 @@ class GetAvailableShiftsCountTest extends TestCase
         $this->assertEquals(3, $result['2022-10-15']['max_volunteers']);
     }
 
-    public function test_only_shifts_on_available_to_show()
+    public function test_only_shifts_on_available_to_show(): void
     {
         $this->buildLocationWithShiftsFromArray(
             ['start_time' => '09:00:00', 'end_time' => '12:00:00', 'available_to' => '2022-10-15'],
@@ -167,7 +167,7 @@ class GetAvailableShiftsCountTest extends TestCase
         $this->assertEquals(0, $result['2022-10-16']['max_volunteers']);
     }
 
-    public function test_only_shifts_before_available_to_with_no_available_from_show()
+    public function test_only_shifts_before_available_to_with_no_available_from_show(): void
     {
         $this->buildLocationWithShiftsFromArray(
             ['start_time' => '09:00:00', 'end_time' => '12:00:00', 'available_to' => '2022-11-15'],
