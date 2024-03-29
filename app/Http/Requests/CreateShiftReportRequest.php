@@ -30,6 +30,7 @@ class CreateShiftReportRequest extends FormRequest
     public function messages(): array
     {
         return [
+            'start_time'                  => 'The start time needs to be in the format h:m:s',
             'shift_was_cancelled.boolean' => 'Shift was cancelled must be a boolean',
             'placements_count.integer'    => 'Placements count must be a whole number',
             'videos_count.integer'        => 'Videos count must be a whole number',
