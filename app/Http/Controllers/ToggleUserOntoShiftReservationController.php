@@ -35,7 +35,7 @@ class ToggleUserOntoShiftReservationController extends Controller
         return match ($status) {
             ToggleReservationStatus::RESERVATION_MADE => response('Reservation made', 200),
             ToggleReservationStatus::RESERVATION_REMOVED => response('Reservation removed', 200),
-            ToggleReservationStatus::NO_AVAILABLE_SHIFTS => ErrorApiResource::create('No available shifts', ErrorApiResource::CODE_NO_AVAILABLE_SHIFTS, 422),
+            ToggleReservationStatus::NO_AVAILABLE_SHIFTS => ErrorApiResource::create('Shift is at maximum capacity', ErrorApiResource::CODE_NO_AVAILABLE_SHIFTS, 422),
         };
     }
 }
