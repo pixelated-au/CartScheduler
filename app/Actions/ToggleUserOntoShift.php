@@ -3,6 +3,7 @@
 namespace App\Actions;
 
 use App\Enums\ToggleReservationStatus;
+use App\Exceptions\ShiftAvailabilityException;
 use App\Models\Location;
 use App\Models\Shift;
 use App\Models\User;
@@ -34,7 +35,6 @@ class ToggleUserOntoShift
      *     - ToggleReservationStatus::RESERVATION_MADE: The shift was successfully reserved.
      *     - ToggleReservationStatus::NO_AVAILABLE_SHIFTS: No available shifts to reserve.
      *     - ToggleReservationStatus::RESERVATION_REMOVED: The shift was successfully unreserved.
-     * @throws RuntimeException if the user cannot be removed from the shift.
      */
     public function execute(User $user, array $data): ToggleReservationStatus
     {
@@ -54,7 +54,11 @@ class ToggleUserOntoShift
             /** @var Shift $shift */
             $shift = $location->shifts->first();
             if ($data['do_reserve']) {
-                $this->doShiftReservation->execute($shift, $location, $userIdToToggle, $shiftDate);
+                try {
+                    $this->doShiftReservation->execute($shift, $location, $userIdToToggle, $shiftDate);
+                } catch (ShiftAvailabilityException) {
+                    return ToggleReservationStatus::NO_AVAILABLE_SHIFTS;
+                }
 
                 return ToggleReservationStatus::RESERVATION_MADE;
             }
