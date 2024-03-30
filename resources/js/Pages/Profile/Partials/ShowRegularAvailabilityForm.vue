@@ -232,8 +232,8 @@ watch(() => form.comments, (value, oldValue) => {
 
             <div
                 class="col-span-6 text-gray-700 dark:text-gray-100 items-stretch bg-slate-200 dark:bg-slate-800 border border-gray-200 dark:border-gray-900 rounded p-3">
-                <JetLabel for="comments" value="Comments (optional)"/>
-                <textarea id="comments"
+                <JetLabel for="availability-comments" value="Comments (optional)"/>
+                <textarea id="availability-comments"
                           class="border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 rounded-md shadow-sm w-full h-40 dark:bg-slate-800 dark:border-slate-700 dark:text-white"
                           v-model="form.comments"/>
                 <div class="text-sm">{{ commentsRemainingCharacters }} characters remaining</div>
