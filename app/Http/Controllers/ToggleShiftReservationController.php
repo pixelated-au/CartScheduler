@@ -20,13 +20,13 @@ class ToggleShiftReservationController extends Controller
     public function __invoke(Request $request)
     {
         $user = $request->user();
-
         if ($user->is_restricted) {
             return ErrorApiResource::create('You do not have permission to do this', ErrorApiResource::CODE_NOT_ALLOWED, 422);
         }
-        $data = $this->validate($request, $this->toggleShiftReservationControllerRules->execute($user, $request->all()));
-        $status = $this->toggleUserOntoShift->execute($user, $data);
 
+        $data = $request->validate($this->toggleShiftReservationControllerRules->execute($user, $request->all()));
+
+        $status = $this->toggleUserOntoShift->execute($user, $data);
         return match ($status) {
             ToggleReservationStatus::RESERVATION_MADE => response('Reservation made', 200),
             ToggleReservationStatus::RESERVATION_REMOVED => response('Reservation removed', 200),
