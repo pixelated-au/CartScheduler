@@ -2,12 +2,10 @@
 
 namespace App\Actions;
 
-use App\Exceptions\ShiftAvailabilityException;
 use App\Models\Location;
 use App\Models\Shift;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Validation\ValidationException;
 
 class DoShiftReservation
 {
@@ -15,13 +13,12 @@ class DoShiftReservation
     {
     }
 
+    /**
+     * @throws \App\Exceptions\ShiftAvailabilityException
+     */
     public function execute(Shift $shift, Location $location, int $userId, Carbon|\Carbon\Carbon $shiftDate): void
     {
-        try {
-            $this->validateShiftIsNotFullAction->execute($shift, $shiftDate);
-        } catch (ShiftAvailabilityException $e) {
-            throw ValidationException::withMessages(['shift' => $e->getMessage()]);
-        }
+        $this->validateShiftIsNotFullAction->execute($shift, $shiftDate);
 
         $shift->users()->attach($userId, ['shift_date' => $shiftDate]);
         activity()

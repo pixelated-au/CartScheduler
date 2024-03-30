@@ -8,6 +8,9 @@ use Illuminate\Support\Carbon;
 
 class ValidateShiftIsNotFullAction
 {
+    /**
+     * @throws \App\Exceptions\ShiftAvailabilityException
+     */
     public function execute(Shift $shift, Carbon $date): void
     {
         $shift->loadMissing(['location', 'users']);
