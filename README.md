@@ -94,6 +94,9 @@ will be available in this interface.
 - [ ] Make reporting optional
 - [ ] Imporove the reports table
 - [ ] Make publication reporting optional
+- Reports:
+  - [ ] Show restricted volunteers
+  - [ ] Show who has outstanding reports
 - [x] Temporary volunteer
 - [ ] Implement Testing
 - [x] Implement feature for admin to remove a user from a shift in addition to moving them to another shift
