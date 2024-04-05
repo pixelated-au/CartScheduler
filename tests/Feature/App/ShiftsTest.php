@@ -9,14 +9,15 @@ use App\Models\ShiftUser;
 use App\Models\User;
 use Carbon\CarbonImmutable;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Config;
 use Tests\TestCase;
 use Tests\Traits\JsonAssertions;
+use Tests\Traits\SetConfig;
 
 class ShiftsTest extends TestCase
 {
     use RefreshDatabase;
     use JsonAssertions;
+    use SetConfig;
 
     public function test_retrieve_shifts_over_three_weeks(): void
     {
