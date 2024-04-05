@@ -5,6 +5,7 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Auth\SessionGuard;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 
 class IsUserEnabledMiddleware
@@ -21,7 +22,10 @@ class IsUserEnabledMiddleware
                     $guard->logout();
                 }
             }
-            return response()->redirectTo('/');
+            if ($request->expectsJson()) {
+                return response()->json(['message' => 'Unauthorised'], Response::HTTP_UNAUTHORIZED);
+            }
+            return redirect('/');
         }
         return $next($request);
     }
