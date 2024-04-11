@@ -14,6 +14,8 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Query\JoinClause;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 use RuntimeException;
 
 class ToggleShiftReservationControllerRules
@@ -25,20 +27,36 @@ class ToggleShiftReservationControllerRules
     {
     }
 
+    //TODO Can this be migrated to a FormRequest class?
     public function execute(User $user, array $data, bool $isAdmin = false): array
     {
+        $shiftDate = Carbon::parse($data['date']);
+        $dayOfWeek = Str::of('day_')->append($shiftDate->dayName)->lower();
+
         return [
-            'location'   => ['required', 'integer', 'exists:locations,id'],
+            'location'   => [
+                'bail',
+                'required',
+                'integer',
+                Rule::exists('locations', 'id')
+                    ->where('is_enabled', true),
+            ],
             'shift'      => [
+                'bail',
                 'required',
                 'integer',
                 'exists:shifts,id',
-                function ($attribute, $value, $fail) use ($user, $data) {
+                Rule::exists('shifts', 'id')
+                    ->where('is_enabled', true)
+                    ->where($dayOfWeek, true),
+                Rule::unique('shift_user', 'shift_id')
+                    ->where('user_id', (int)$user->id)
+                    ->where('shift_date', $shiftDate->toDateString()),
+                function ($attribute, $value, $fail) use ($user, $data, $shiftDate) {
                     // only validate if adding a shift
                     if (!$data['do_reserve']) {
                         return;
                     }
-                    $shiftDate = Carbon::parse($data['date']);
                     $this->isOverlappingShift($user, $shiftDate, $data['shift'], $fail);
                     $this->isUserAllowedToReserveShifts($user, $shiftDate, $data['shift'], $fail);
                     $this->isUserActive($user, $data, $fail);
