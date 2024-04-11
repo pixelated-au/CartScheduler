@@ -50,14 +50,17 @@
         "psr-4": {
             "App\\": "app/",
             "Database\\Factories\\": "database/factories/",
-            "Database\\Factories\\Sequences": "database/factories/sequences",
+            "Database\\Factories\\Sequences\\": "database/factories/sequences",
             "Database\\Seeders\\": "database/seeders/"
         }
     },
     "autoload-dev": {
         "psr-4": {
             "Tests\\": "tests/"
-        }
+        },
+        "files": [
+            "tests/macros.php"
+        ]
     },
     "scripts": {
         "post-autoload-dump": [
