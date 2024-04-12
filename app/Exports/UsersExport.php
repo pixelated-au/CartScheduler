@@ -22,12 +22,14 @@ use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 class UsersExport extends DefaultValueBinder implements FromQuery, ShouldAutoSize, WithHeadings, WithCustomValueBinder, WithDefaultStyles, WithMapping, WithStyles
 {
     private bool $excludeData = false;
-    public function excludeData()
+    public function excludeData(): static
     {
         $this->excludeData = true;
         return $this;
     }
-    public function includeData()
+
+    /** @noinspection PhpUnused */
+    public function includeData(): static
     {
         $this->excludeData = false;
         return $this;
@@ -104,7 +106,7 @@ class UsersExport extends DefaultValueBinder implements FromQuery, ShouldAutoSiz
     /**
      * @throws \PhpOffice\PhpSpreadsheet\Exception
      */
-    protected function applyInstructions(Worksheet $sheet)
+    protected function applyInstructions(Worksheet $sheet): void
     {
         $richText = new RichText();
 
@@ -148,13 +150,13 @@ class UsersExport extends DefaultValueBinder implements FromQuery, ShouldAutoSiz
         if ($bold || $underline) {
             $formatted = $richText->createTextRun($text . $this->newLine($newLine));
             if ($bold) {
-                $formatted->getFont()->setBold(true);
+                $formatted->getFont()?->setBold(true);
             }
             if ($underline) {
-                $formatted->getFont()->setUnderline(true);
+                $formatted->getFont()?->setUnderline(true);
             }
         } else {
-            $formatted = $richText->createText($text . $this->newLine($newLine));
+            $richText->createText($text . $this->newLine($newLine));
         }
     }
 
