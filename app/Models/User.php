@@ -131,6 +131,7 @@ class User extends Authenticatable
      */
     protected function mobilePhone(): Attribute
     {
+        // todo https://github.com/Propaganistas/Laravel-Phone
         return Attribute::make(
             get: static function ($value) {
                 if (preg_match('/^(\d{4})(\d{3})(\d{3})$/', $value, $matches)) {
