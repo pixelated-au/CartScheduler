@@ -76,6 +76,16 @@ class UserFactory extends Factory
         });
     }
 
+    public function enabled(): Factory
+    {
+        return $this->state(function (array $attributes) {
+            return [
+                'role'       => 'user',
+                'is_enabled' => true,
+            ];
+        });
+    }
+
     public function female(): Factory
     {
         return $this->state(function (array $attributes) {
