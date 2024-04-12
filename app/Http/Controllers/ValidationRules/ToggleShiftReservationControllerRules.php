@@ -32,7 +32,6 @@ class ToggleShiftReservationControllerRules
     {
         $shiftDate = Carbon::parse($data['date']);
         $dayOfWeek = Str::of('day_')->append($shiftDate->dayName)->lower();
-
         return [
             'location'   => [
                 'bail',
@@ -49,9 +48,14 @@ class ToggleShiftReservationControllerRules
                 Rule::exists('shifts', 'id')
                     ->where('is_enabled', true)
                     ->where($dayOfWeek, true),
-                Rule::unique('shift_user', 'shift_id')
-                    ->where('user_id', (int)$user->id)
-                    ->where('shift_date', $shiftDate->toDateString()),
+                Rule::when($data['do_reserve'] === true,
+                    static function () use ($shiftDate, $user, $data) {
+                        if ($data['do_reserve'] === true) {
+                            Rule::unique('shift_user', 'shift_id')
+                                ->where('user_id', (int)$user->id)
+                                ->where('shift_date', $shiftDate->toDateString());
+                        }
+                    }),
                 function ($attribute, $value, $fail) use ($user, $data, $shiftDate) {
                     // only validate if adding a shift
                     if (!$data['do_reserve']) {
@@ -131,6 +135,9 @@ class ToggleShiftReservationControllerRules
         }
     }
 
+    /**
+     * @throws \RuntimeException
+     */
     private function isUserAllowedToReserveShifts(User $user, Carbon $shiftDate, int $shiftId, $fail): void
     {
         $location = Location::whereRelation('shifts', 'id', $shiftId)->first();
