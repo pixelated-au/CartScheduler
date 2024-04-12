@@ -32,7 +32,10 @@ class UsersImport implements WithHeadingRow, WithValidation, WithBatchInserts, O
     {
         $rowData = $row->toArray();
 
-        /** @noinspection PhpIssetCanBeReplacedWithCoalesceInspection */
+        /**
+         * @noinspection PhpIssetCanBeReplacedWithCoalesceInspection
+         * @noinspection NullCoalescingOperatorCanBeUsedInspection
+         */
         $data = [
             'name'                => $rowData['name'],
             'email'               => $rowData['email'],
@@ -88,7 +91,7 @@ class UsersImport implements WithHeadingRow, WithValidation, WithBatchInserts, O
      * @throws \Illuminate\Contracts\Container\BindingResolutionException
      * @noinspection PhpUnusedParameterInspection
      */
-    public function prepareForValidation(array $data, int $index)
+    public function prepareForValidation(array $data, int $index): array
     {
         $getUserValidationPreparations = app()->make(GetUserValidationPreparations::class);
 
