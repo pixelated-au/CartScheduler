@@ -59,7 +59,8 @@ class UsersController extends Controller
     {
         $user->update($request->validated());
 
-        return Redirect::route('admin.users.edit', $user);
+        session()->flash('flash.banner', "User $user->name successfully modified.");
+        return Redirect::route('admin.users.edit', $user->fresh());
     }
 
     public function destroy(User $user): RedirectResponse
