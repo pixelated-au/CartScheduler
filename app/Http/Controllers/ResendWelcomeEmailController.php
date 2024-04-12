@@ -47,17 +47,10 @@ class ResendWelcomeEmailController extends Controller
 
     protected function sendCreatePassword(User $user): JsonResponse
     {
-        $sent = Mail::to($user->email)->send(new UserAccountCreated($user));
-        if ($sent && $sent->getMessageId()) {
-            return response()->json([
-                'message' => 'Welcome email was sent',
-                'sent'    => $sent->getMessageId(),
-            ]);
-        }
-
+        Mail::to($user->email)->send(new UserAccountCreated($user));
         return response()->json([
-            'message' => 'An error occurred. Email was not sent',
-        ], 500);
+            'message' => 'Welcome email was sent',
+        ]);
     }
 
 }
