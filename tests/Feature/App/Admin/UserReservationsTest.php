@@ -379,54 +379,36 @@ class UserReservationsTest extends TestCase
     public function test_sister_cannot_be_moved_to_a_shift_requiring_a_brother(): void
     {
         $admin     = User::factory()->adminRoleUser()->create(['is_enabled' => true]);
-        $locations = Location::factory()
-            ->count(2)
-            ->state([
-                'max_volunteers'   => 3,
-                'requires_brother' => true,
-            ])
+        $sister    = User::factory()->female()->create();
+
+        /** @var Location $location */
+        $location = Location::factory()
+            ->state(['max_volunteers'   => 3, 'requires_brother' => true])
             ->has(Shift::factory()
                 ->everyDay9am()
                 ->hasAttached(User::factory()
-                    ->userRoleUser()
-                    ->count(3)
-                    ->state([
-                        'is_enabled' => true,
-                        'gender'     => 'female'
-                    ])
+                    ->female()
+                    ->count(2)
                     , ['shift_date' => '2023-01-03']
                 )
             )
             ->create();
 
-        $shifts = $locations->map->shifts->flatten();
-
-        // Just to be sure we have the correct number of shifts
-        $this->assertCount(2, $shifts);
-        $this->assertCount(3, $shifts[0]->users);
-        $this->assertCount(3, $shifts[1]->users);
-
-        // Remove a user from second shift - to enable a user to move into the spot
-        $shifts[1]->users()->detach($shifts[1]->users->last());
-        $shifts[1]->refresh();
-        $this->assertCount(2, $shifts[1]->users);
+        $this->assertDatabaseCount('shift_user', 2);
 
         $date = '2023-01-03'; // A Tuesday
 
         $response = $this->actingAs($admin)
             ->putJson("/admin/move-volunteer-to-shift", [
                 'date'         => $date,
-                'location_id'  => $shifts[1]->location->id,
-                'old_shift_id' => $shifts[0]->getKey(),
-                'user_id'      => $shifts[0]->users->last()->getKey(),
+                'location_id'  => $location->shifts[0]->location->id,
+                'old_shift_id' => $location->shifts[0]->getKey(),
+                'user_id'      => $sister->getKey(),
             ]);
 
         $response->assertStatus(422);
         $response->assertJsonPath('error_code', ErrorApiResource::CODE_BROTHER_REQUIRED);
-        $shifts->each->refresh();
-
-        $this->assertCount(3, $shifts[0]->users);
-        $this->assertCount(2, $shifts[1]->users);
+        $this->assertDatabaseCount('shift_user', 2);
     }
 
 
