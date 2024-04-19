@@ -95,6 +95,7 @@ will be available in this interface.
 - [ ] Imporove the reports table
 - [ ] Make publication reporting optional
 - Reports:
+  - [ ] Feature to disable the reporting feature
   - [ ] Show restricted volunteers
   - [ ] Show who has outstanding reports
 - [x] Temporary volunteer
