@@ -37,7 +37,7 @@ class UsersController extends Controller
         $data['password'] = null; // Set it to null. Once set, the user will be unable to log in
         $data['uuid']     = Str::uuid();
 
-        // The users model will automatically send a welcome email via the created event
+        // The user model will automatically send a welcome email via the created event
         $user = User::unguarded(static fn() => User::create($data));
 
         session()->flash('flash.banner', "User $user->name successfully created.");
