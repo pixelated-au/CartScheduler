@@ -14,7 +14,7 @@ class UserVacationRequest extends FormRequest
             'vacations.*.start_date'  => ['required', 'date'],
             'vacations.*.end_date'    => ['required', 'date'],
             'vacations.*.description' => ['nullable', 'string', 'max:255'],
-            'deletedVacations.*.id'   => ['integer', 'exists:user_vacations,id'],
+            'deletedVacations.*.id'   => ['required', 'integer', 'exists:user_vacations,id'],
         ];
     }
 
