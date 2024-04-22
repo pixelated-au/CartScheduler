@@ -3,7 +3,9 @@
 namespace Tests\Feature\App\Admin;
 
 use App\Mail\UserAccountCreated;
+use App\Models\Location;
 use App\Models\User;
+use App\Settings\GeneralSettings;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
@@ -268,5 +270,113 @@ class UsersTest extends TestCase
         $this->assertEquals('0412345678', $storedDbValue);
 
         $this->assertEquals('0412 345 678', $user->fresh()->mobile_phone);
+    }
+
+    public function test_admin_can_add_update_delete_user_vacations(): void
+    {
+        $admin = User::factory()->adminRoleUser()->state(['is_enabled' => true])->create();
+        $user  = User::factory()->enabled()->create();
+
+        $vacationData = [
+            'user_id'   => $user->getKey(),
+            'vacations' => [
+                ['start_date' => '2023-01-01', 'end_date' => '2023-01-15', 'description' => 'Testing'],
+                ['start_date' => '2023-02-01', 'end_date' => '2023-02-15', 'description' => 'Testing 2'],
+            ],
+        ];
+
+        $this->actingAs($admin)
+            ->putJson("/user/vacations", $vacationData)
+            ->assertRedirect("/admin/users/{$user->getKey()}/edit");
+
+        $user->refresh()->load(['vacations']);
+        $this->assertCount(2, $user->vacations);
+        $this->assertSame('Testing', $user->vacations[0]->description);
+        $this->assertSame('Testing 2', $user->vacations[1]->description);
+        $vacation              = $user->vacations[0];
+        $vacation->start_date  = '2023-01-07';
+        $vacation->description = 'Testing Updated';
+        $this->actingAs($admin)
+            ->putJson("/user/vacations", [
+                'user_id'   => $user->getKey(),
+                'vacations' => [$vacation->toArray()],
+            ])
+            ->assertRedirect("/admin/users/{$user->getKey()}/edit");
+
+        $user->refresh()->load(['vacations']);
+        $this->assertCount(2, $user->vacations);
+        $this->assertSame('2023-01-07', $user->vacations[0]->start_date);
+        $this->assertSame('Testing Updated', $user->vacations[0]->description);
+        $this->assertSame('Testing 2', $user->vacations[1]->description);
+
+        $this->actingAs($admin)
+            ->putJson("/user/vacations", [
+                'user_id'          => $user->getKey(),
+                'deletedVacations' => [['id' => $vacation->getKey()]],
+            ])
+            ->assertRedirect("/admin/users/{$user->getKey()}/edit");
+
+        $user->refresh()->load(['vacations']);
+        $this->assertCount(1, $user->vacations);
+        $this->assertSame('Testing 2', $user->vacations[0]->description);
+    }
+
+    public function test_admin_can_maintain_user_location_choices(): void
+    {
+        $settings                            = app()->make(GeneralSettings::class);
+        $settings->enableUserLocationChoices = true;
+        $settings->save();
+
+        $admin     = User::factory()->adminRoleUser()->state(['is_enabled' => true])->create();
+        $user      = User::factory()->enabled()->create();
+        $locations = Location::factory()->count(3)->create();
+
+        $choiceData = [
+            'user_id'           => $user->getKey(),
+            'selectedLocations' => [
+                $locations[0]->getKey(),
+                $locations[2]->getKey(),
+            ],
+        ];
+
+        $this->actingAs($admin)
+            ->putJson("/user/available-locations", $choiceData)
+            ->assertRedirect("/admin/users/{$user->getKey()}/edit")
+            ->assertSessionHas('flash.banner', "volunteer preferred locations have been updated.");
+
+        $user->refresh()->load(['rosterLocations']);
+        $this->assertCount(2, $user->rosterLocations);
+        $this->assertSame($locations[0]->name, $user->rosterLocations[0]->name);
+        $this->assertSame($locations[2]->name, $user->rosterLocations[1]->name);
+        $this->assertNotSame($locations[1]->name, $user->rosterLocations[0]->name, 'Verify data is not duplicated');
+
+        $choiceData['selectedLocations'][1] = $locations[1]->getKey();
+
+        $this->actingAs($admin)
+            ->putJson("/user/available-locations", $choiceData)
+            ->assertRedirect("/admin/users/{$user->getKey()}/edit");
+
+        $user->refresh()->load(['rosterLocations']);
+        $this->assertSame($locations[0]->name, $user->rosterLocations[0]->name);
+        $this->assertSame($locations[1]->name, $user->rosterLocations[1]->name);
+    }
+
+    public function test_admin_cant_maintain_disabled_feature_of_user_location_choices(): void
+    {
+        $admin     = User::factory()->adminRoleUser()->state(['is_enabled' => true])->create();
+        $user      = User::factory()->enabled()->create();
+        $locations = Location::factory()->count(3)->create();
+
+        $choiceData = [
+            'user_id'           => $user->getKey(),
+            'selectedLocations' => [
+                $locations[0]->getKey(),
+                $locations[2]->getKey(),
+            ],
+        ];
+
+        $this->actingAs($admin)
+            ->putJson("/user/available-locations", $choiceData)
+            ->assertInvalid(['featureDisabled']);
     }
 }
