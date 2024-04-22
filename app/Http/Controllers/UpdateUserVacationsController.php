@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Actions\AdminUpdateUserFunctionalityAction;
+use App\Actions\IsAdminForUpdateOfUserAction;
 use App\Http\Requests\UserVacationRequest;
 use App\Models\User;
 use App\Models\UserVacation;
@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Redirect;
 
 class UpdateUserVacationsController extends Controller
 {
-    public function __construct(private readonly AdminUpdateUserFunctionalityAction $adminUpdateUserFunctionalityAction)
+    public function __construct(private readonly IsAdminForUpdateOfUserAction $isAdminForUpdateOfUserAction)
     {
     }
 
@@ -21,32 +21,28 @@ class UpdateUserVacationsController extends Controller
     public function __invoke(UserVacationRequest $request)
     {
         /** @var User $user */
-        $user      = $request->user();
+        $user = $request->user();
         $this->authorize('update', $user);
 
-        [$isAdminEdit, $user] = $this->adminUpdateUserFunctionalityAction->execute($request);
+        [$isAdminEdit, $user] = $this->isAdminForUpdateOfUserAction->execute($request);
 
         $vacations = $request->validated('vacations', []);
 
         foreach ($vacations as $vacation) {
             if (isset($vacation['id'])) {
-                /** @var \App\Models\UserVacation $userVacation */
                 $userVacation = $user->vacations()->find($vacation['id']);
                 if (!$userVacation) {
                     continue;
                 }
-                $userVacation->start_date  = $vacation['start_date'];
-                $userVacation->end_date    = $vacation['end_date'];
-                $userVacation->description = $vacation['description'];
-                $userVacation->save();
             } else {
-                $userVacation              = new UserVacation();
-                $userVacation->start_date  = $vacation['start_date'];
-                $userVacation->end_date    = $vacation['end_date'];
-                $userVacation->description = $vacation['description'];
-                $userVacation->user_id     = $user->id;
-                $userVacation->save();
+                $userVacation          = new UserVacation();
+                $userVacation->user_id = $user->id;
             }
+
+            $userVacation->start_date  = $vacation['start_date'];
+            $userVacation->end_date    = $vacation['end_date'];
+            $userVacation->description = $vacation['description'];
+            $userVacation->save();
         }
 
         $deleted = $request->validated('deletedVacations', []);

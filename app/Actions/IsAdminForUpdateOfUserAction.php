@@ -2,13 +2,10 @@
 
 namespace App\Actions;
 
-use App\Http\Controllers\UpdateUserLocationsChoicesController;
-use App\Http\Requests\UserLocationChoicesRequest;
 use App\Models\User;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Facades\Redirect;
 
-class AdminUpdateUserFunctionalityAction
+class IsAdminForUpdateOfUserAction
 {
     /**
      * @param \Illuminate\Foundation\Http\FormRequest $request - Expects an option 'user_id' to be set if admin is editing another user's availability.

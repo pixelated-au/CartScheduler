@@ -2,24 +2,28 @@
 
 namespace App\Http\Controllers;
 
-use App\Actions\AdminUpdateUserFunctionalityAction;
+use App\Actions\IsAdminForUpdateOfUserAction;
 use App\Http\Requests\UserLocationChoicesRequest;
 use App\Models\User;
 use Illuminate\Support\Facades\Redirect;
 
 class UpdateUserLocationsChoicesController extends Controller
 {
-    public function __construct(private readonly AdminUpdateUserFunctionalityAction $adminUpdateUserFunctionalityAction)
+    public function __construct(private readonly IsAdminForUpdateOfUserAction $isAdminForUpdateOfUserAction)
     {
     }
 
+    /**
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+     * @throws \Illuminate\Auth\Access\AuthorizationException
+     */
     public function __invoke(UserLocationChoicesRequest $request)
     {
         /** @var user $user */
         $user = $request->user();
         $this->authorize('update', $user);
 
-        [$isAdminEdit, $user] = $this->adminUpdateUserFunctionalityAction->execute($request);
+        [$isAdminEdit, $user] = $this->isAdminForUpdateOfUserAction->execute($request);
 
         $locationIds = $request->validated('selectedLocations', []);
 
