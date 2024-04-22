@@ -20,6 +20,9 @@
         <include>
             <directory suffix=".php">./app</directory>
         </include>
+        <exclude>
+            <directory suffix=".php">./app/Actions/Jetstream</directory>
+        </exclude>
     </coverage>
     <logging>
         <testdoxText outputFile="php://stdout"/>
