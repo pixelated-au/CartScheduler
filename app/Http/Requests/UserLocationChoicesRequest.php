@@ -12,7 +12,8 @@ class UserLocationChoicesRequest extends FormRequest
     {
         return [
             'user_id'             => ['integer', 'exists:users,id'],
-            'selectedLocations.*' => ['nullable', 'integer', 'exists:locations,id'],
+            'selectedLocations'   => ['nullable'],
+            'selectedLocations.*' => ['integer', 'exists:locations,id'],
         ];
     }
 
