@@ -13,6 +13,7 @@ class AdminUpdateUserFunctionalityAction
     /**
      * @param \Illuminate\Foundation\Http\FormRequest $request - Expects an option 'user_id' to be set if admin is editing another user's availability.
      * @return array{isAdminEdit: bool, user: User} Returns an associative array with 'isAdminEdit' indicating if admin is editing the user, and 'user' as the User instance.
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
      */
     public function execute(FormRequest $request): array
     {
