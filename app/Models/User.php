@@ -106,6 +106,7 @@ class User extends Authenticatable
         'responsible_brother' => 'boolean',
         'email_verified_at'   => 'datetime',
         'year_of_birth'       => 'integer',
+        //TODO add in a Role enum class
     ];
 
     /**
