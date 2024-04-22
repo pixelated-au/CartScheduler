@@ -14,6 +14,10 @@ class UpdateUserVacationsController extends Controller
     {
     }
 
+    /**
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+     * @throws \Illuminate\Auth\Access\AuthorizationException
+     */
     public function __invoke(UserVacationRequest $request)
     {
         /** @var User $user */
