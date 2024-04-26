@@ -8,6 +8,10 @@ use Illuminate\Support\Facades\Redirect;
 
 class UpdateUserRegularAvailabilityController extends Controller
 {
+    /**
+     * @throws \Illuminate\Auth\Access\AuthorizationException
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+     */
     public function __invoke(UserAvailabilityRequest $request)
     {
         $user = $request->user();
@@ -17,7 +21,7 @@ class UpdateUserRegularAvailabilityController extends Controller
         if ($request->validated('user_id')) {
             // this means admin is updating another user's availability
             $isOther = true;
-            $user = User::findOrFail($request->validated('user_id'));
+            $user    = User::findOrFail($request->validated('user_id'));
         }
         $user->load('availability');
         $availability = $user->availability ?? $user->availability()->create();
