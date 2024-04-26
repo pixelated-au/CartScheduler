@@ -8,6 +8,10 @@ use Illuminate\Support\Facades\Auth;
 
 class IsAdminMiddleware
 {
+    /**
+     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     */
     public function handle(Request $request, Closure $next)
     {
         // This shouldn't really be necessary as we have policies implemented, but it's a good idea to be safe.
