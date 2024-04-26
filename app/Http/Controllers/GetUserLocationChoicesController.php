@@ -3,14 +3,23 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\LocationChoiceResource;
-use App\Http\Resources\ReportTagResource;
 use App\Models\Location;
-use Spatie\Tags\Tag;
+use App\Settings\GeneralSettings;
+use Illuminate\Validation\ValidationException;
 
 class GetUserLocationChoicesController extends Controller
 {
+    /**
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
+     * @throws \Illuminate\Validation\ValidationException
+     */
     public function __invoke()
     {
+        $settings = app()->make(GeneralSettings::class);
+        if (!$settings->enableUserLocationChoices) {
+            throw ValidationException::withMessages(['featureDisabled' => 'User location choices are not enabled.']);
+        }
+
         $locations = Location::where('is_enabled', true)->orderBy('name')->get();
         return LocationChoiceResource::collection($locations);
     }
