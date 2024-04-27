@@ -2,12 +2,37 @@
 
 namespace App\Http\Requests;
 
+use App\Settings\GeneralSettings;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
 class UserAvailabilityRequest extends FormRequest
 {
+    /**
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
+     * @noinspection PhpUnused
+     */
+    public function withValidator(\Illuminate\Validation\Validator $validator): void
+    {
+        // TODO AFTER upgrade to laravel V10, THIS NEEDS TO BE CONVERTED TO THE FUNCTION after()
+        $settings = app()->make(GeneralSettings::class);
+        $validator->after(function (Validator $validator) use ($settings) {
+            if (!$settings->enableUserAvailability) {
+                $validator->errors()->add('featureDisabled', 'Choosing availability is not enabled.');
+            }
+        });
+        // Laravel V10 syntax
+        //        return [
+        //            function (Validator $validator) use ($settings) {
+        //                if (!$settings->enableUserLocationChoices) {
+        //                    $validator->errors()->add('featureDisabled', 'User location choices are not enabled.');
+        //                }
+        //            },
+        //        ];
+    }
+
+
     public function rules(): array
     {
         return [
