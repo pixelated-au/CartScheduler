@@ -6,27 +6,47 @@
 
 ***
 
-## Deployment
-
 ## Deployment Issues
+
 For some reason, the deployment has an issue with the `vendor` directory. Specifically around the Laravel Excel package.
 If the Download Users feature fails, delete the vendor package and run `composer install` again:
+
 ```bash
 rm -rf vendor && composer install
 ```
 
+## Deployment
+
+### Downloading and Extracting the Release
+
+You can download the latest release from the [releases page](https://github.com/pixelated-au/CartScheduler/releases).
+If using the command line, you can download the release using `wget`:
+
+```bash
+wget https://github.com/pixelated-au/CartScheduler/releases/latest/download/release.zip
+```
+
+Extract the release to a directory on your server. For example you cauld name the directory `smpw_app`
+or `cart-scheduler`.
+
 ### cPanel Hosting
 
-cPanel Hosting is a little problematic because the root domain typically needs to be served from the
-directory `~/public_html`. This means the default laravel directory structure which is served
-from `/public`. If you are serving from an addon domain, it's easier because you can setup a directory structure to
-suit. For example, you could setup a domain `mydomain.example.com` and set the directory
-to `~/mydomain.example.com/public`.
+cPanel Hosting is a little problematic because the root domain typically needs to be served from the directory
+`~/public_html`. This means the default laravel directory structure which is served from `/public`. If you are serving
+from an addon domain, it's easier because you can setup a directory structure to suit. For example, you could setup a
+domain `mydomain.example.com` and set the directory to `~/mydomain.example.com/public`.
 
-To get some advice on bypassing this, here are some resources:
+Alternatively, you can setup a simlink to the `public` directory. In the example below, replace `[MY ACCOUNT]` with your
+cPanel account name:
 
-- https://hafizmohammed.medium.com/how-to-deploy-laravel-in-cpanel-the-right-way-78d0a767d5a2
-- https://filippotoso.medium.com/how-to-host-a-laravel-app-on-a-cpanel-shared-hosting-a45793be73c3
+```bash
+mv public_html public_html.bak && ln -s /home/[MY ACCOUNT]/smpw_app/public /home/[MY ACCOUNT]/public_html
+```
+
+> [!IMPORTANT]
+> :warning: If you are using cPanel, in the instructions below, you may need to replace the default PHP version with PHP 8.x by
+> replacing `php` with `ea-php81` in the commands below. You can check the PHP version by running `php -v`. If the 
+> version is below 8.1, you will need to use the `ea-php81` command. An example is provided below
 
 ### Standard Deployment
 
@@ -90,18 +110,19 @@ will be available in this interface.
 
 - [ ] Facility to detect if a volunteer's 'availability' conflicts with a shift
 - [ ] Facility to detect if a shift lost a volunteer after removing themselves - and causing the shift to be closed
-- [ ] Test that if a shifts can't be defined at the same day/time unless there is a start and end date that doesn't overlap
+- [ ] Test that if a shifts can't be defined at the same day/time unless there is a start and end date that doesn't
+  overlap
 - [ ] Make reporting optional
 - [ ] Imporove the reports table
 - [ ] Make publication reporting optional
 - Reports:
-  - [ ] Feature to disable the reporting feature
-  - [ ] Show restricted volunteers
-  - [ ] Show who has outstanding reports
+    - [ ] Feature to disable the reporting feature
+    - [ ] Show restricted volunteers
+    - [ ] Show who has outstanding reports
 - [x] Temporary volunteer
 - [ ] Implement Testing
 - [x] Implement feature for admin to remove a user from a shift in addition to moving them to another shift
-  - [ ] Create relationships between users so admin can assign user and their relationship to a shift
+    - [ ] Create relationships between users so admin can assign user and their relationship to a shift
 - [ ] Allow users to book another user onto a shift
 - [ ] Support dark mode for toast notifications
 - [ ] Test that disabled users are removed from future shifts
