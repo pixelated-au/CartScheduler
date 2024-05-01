@@ -19,7 +19,7 @@ rm -rf vendor && composer install
 
 ### Downloading and Extracting the Release
 
-You can download the latest release from the [releases page](https://github.com/pixelated-au/CartScheduler/releases).
+You can [download the latest release here](https://github.com/pixelated-au/CartScheduler/releases).
 If using the command line, you can download the release using `wget`:
 
 ```bash
@@ -64,6 +64,7 @@ To deploy a release requires the following steps:
       MAIL_HOST=localhost
       ``` 
 1. SSH into the server if you haven't yet already.
+1. Make sure the permissions on the `storage` folder are set to 775. Navigate to the installed directory and use this: `find . -type d -exec chmod 775 {} \;`
 1. Run the following command to enable the Laravel cache:
     ```bash
     php artisan key:generate \
