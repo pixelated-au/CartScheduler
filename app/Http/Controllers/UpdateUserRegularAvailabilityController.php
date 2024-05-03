@@ -2,26 +2,30 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\IsAdminForUpdateOfUserAction;
 use App\Http\Requests\UserAvailabilityRequest;
 use App\Models\User;
 use Illuminate\Support\Facades\Redirect;
 
 class UpdateUserRegularAvailabilityController extends Controller
 {
+    public function __construct(private readonly IsAdminForUpdateOfUserAction $isAdminForUpdateOfUserAction)
+    {
+    }
+
     /**
-     * @throws \Illuminate\Auth\Access\AuthorizationException
+     * @param \App\Http\Requests\UserAvailabilityRequest $request
+     * @return \Illuminate\Http\RedirectResponse
      * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     public function __invoke(UserAvailabilityRequest $request)
     {
-        $user = $request->user();
-        $this->authorize('update', $user);
+        [$isAdminEdit, $user] = $this->isAdminForUpdateOfUserAction->execute($request);
 
-        $isOther = false;
         if ($request->validated('user_id')) {
-            // this means admin is updating another user's availability
-            $isOther = true;
-            $user    = User::findOrFail($request->validated('user_id'));
+            $user = User::findOrFail($request->validated('user_id'));
         }
         $user->load('availability');
         $availability = $user->availability ?? $user->availability()->create();
@@ -47,10 +51,10 @@ class UpdateUserRegularAvailabilityController extends Controller
         $user->availability = $availability;
         $user->availability->save();
 
-        session()->flash('flash.banner', $isOther ? 'Volunteer availability has been updated.' : 'Your availability has been updated.');
+        session()->flash('flash.banner', $isAdminEdit ? 'Volunteer availability has been updated.' : 'Your availability has been updated.');
         session()->flash('flash.bannerStyle', 'success');
 
-        if ($isOther) {
+        if ($isAdminEdit) {
             return Redirect::route('admin.users.edit', $user);
         }
         return Redirect::route('user.availability');
