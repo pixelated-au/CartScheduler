@@ -17,7 +17,6 @@ class UpdateUserVacationsController extends Controller
     /**
      * @param \App\Http\Requests\UserVacationRequest $request
      * @return \Illuminate\Http\RedirectResponse
-     * @throws \Illuminate\Auth\Access\AuthorizationException
      * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
      * @throws \Symfony\Component\HttpKernel\Exception\HttpException
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
@@ -25,9 +24,6 @@ class UpdateUserVacationsController extends Controller
     public function __invoke(UserVacationRequest $request)
     {
         /** @var User $user */
-        $user = $request->user();
-        $this->authorize('update', $user);
-
         [$isAdminEdit, $user] = $this->isAdminForUpdateOfUserAction->execute($request);
 
         $vacations = $request->validated('vacations', []);
@@ -40,7 +36,7 @@ class UpdateUserVacationsController extends Controller
                 }
             } else {
                 $userVacation          = new UserVacation();
-                $userVacation->user_id = $user->id;
+                $userVacation->user_id = $user->getKey();
             }
 
             $userVacation->start_date  = $vacation['start_date'];
