@@ -5,6 +5,7 @@ namespace App\Http\Requests;
 use App\Settings\GeneralSettings;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Fluent;
 use Illuminate\Validation\Rule;
 
 class UserAvailabilityRequest extends FormRequest
@@ -35,21 +36,23 @@ class UserAvailabilityRequest extends FormRequest
 
     public function rules(): array
     {
+        // These rules can produce unexpected results due to the prepareForValidation method manipulating the data
         return [
-            'user_id'         => ['integer', 'exists:users,id'],
-            'day_monday'      => ['nullable', 'present', Rule::requiredIf(fn() => $this->input('num_mondays', 0) > 0), 'array'],
+            'user_id' => ['integer', 'exists:users,id'],
+
+            'day_monday'      => ['nullable', 'present', Rule::when(static fn(Fluent $data) => $data->get('num_mondays', 0) > 0, ['array', 'min:2'])],
             'day_monday.*'    => ['required', 'integer', 'min:0', 'max:23'],
-            'day_tuesday'     => ['nullable', 'present', Rule::requiredIf(fn() => $this->input('num_tuesdays', 0) > 0), 'array'],
+            'day_tuesday'     => ['nullable', 'present', Rule::when(static fn(Fluent $data) => $data->get('num_tuesdays', 0) > 0, ['array', 'min:2'])],
             'day_tuesday.*'   => ['required', 'integer', 'min:0', 'max:23'],
-            'day_wednesday'   => ['nullable', 'present', Rule::requiredIf(fn() => $this->input('num_wednesdays', 0) > 0), 'array'],
+            'day_wednesday'   => ['nullable', 'present', Rule::when(static fn(Fluent $data) => $data->get('num_wednesdays', 0) > 0, ['array', 'min:2'])],
             'day_wednesday.*' => ['required', 'integer', 'min:0', 'max:23'],
-            'day_thursday'    => ['nullable', 'present', Rule::requiredIf(fn() => $this->input('num_thursdays', 0) > 0), 'array'],
+            'day_thursday'    => ['nullable', 'present', Rule::when(static fn(Fluent $data) => $data->get('num_thursdays', 0) > 0, ['array', 'min:2'])],
             'day_thursday.*'  => ['required', 'integer', 'min:0', 'max:23'],
-            'day_friday'      => ['nullable', 'present', Rule::requiredIf(fn() => $this->input('num_fridays', 0) > 0), 'array'],
+            'day_friday'      => ['nullable', 'present', Rule::when(static fn(Fluent $data) => $data->get('num_fridays', 0) > 0, ['array', 'min:2'])],
             'day_friday.*'    => ['required', 'integer', 'min:0', 'max:23'],
-            'day_saturday'    => ['nullable', 'present', Rule::requiredIf(fn() => $this->input('num_saturdays', 0) > 0), 'array'],
+            'day_saturday'    => ['nullable', 'present', Rule::when(static fn(Fluent $data) => $data->get('num_saturdays', 0) > 0, ['array', 'min:2'])],
             'day_saturday.*'  => ['required', 'integer', 'min:0', 'max:23'],
-            'day_sunday'      => ['nullable', 'present', Rule::requiredIf(fn() => $this->input('num_sundays', 0) > 0), 'array'],
+            'day_sunday'      => ['nullable', 'present', Rule::when(static fn(Fluent $data) => $data->get('num_sundays', 0) > 0, ['array', 'min:2'])],
             'day_sunday.*'    => ['required', 'integer', 'min:0', 'max:23'],
 
             'num_mondays'    => ['required', 'integer', 'min:0', 'max:4'],
@@ -77,7 +80,7 @@ class UserAvailabilityRequest extends FormRequest
 
     protected function parseDay(string $dayOfWeek): void
     {
-        if ($this->input("num_{$dayOfWeek}s", 0) === 0) {
+        if (empty($this->input('day_' . $dayOfWeek)) || $this->input("num_{$dayOfWeek}s", 0) === 0) {
             // if there are no 'days' set for $dayOfWeek, reset the day to an empty array
             $this->merge(["day_$dayOfWeek" => null]);
             return;
