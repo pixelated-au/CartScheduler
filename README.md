@@ -113,18 +113,22 @@ will be available in this interface.
 - [ ] Facility to detect if a shift lost a volunteer after removing themselves - and causing the shift to be closed
 - [ ] Test that if a shifts can't be defined at the same day/time unless there is a start and end date that doesn't
   overlap
-- [ ] Make reporting optional
-- [ ] Imporove the reports table
+- [ ] Improve the reports table
 - [ ] Make publication reporting optional
 - Reports:
+    - [ ] Make reporting of literature optional
     - [ ] Feature to disable the reporting feature
     - [ ] Show restricted volunteers
     - [ ] Show who has outstanding reports
 - [x] Temporary volunteer
-- [ ] Implement Testing
 - [x] Implement feature for admin to remove a user from a shift in addition to moving them to another shift
     - [ ] Create relationships between users so admin can assign user and their relationship to a shift
 - [ ] Allow users to book another user onto a shift
 - [ ] Support dark mode for toast notifications
 - [ ] Test that disabled users are removed from future shifts
 - [ ] Test that if a disabled shift is re-enabled, it doesn't conflict with existing shifts
+- [ ] Feature to flag shifts as not self-bookable
+- [ ] Content pages feature
+- [ ] Day overseer feature
+- [ ] User tags feature
+- [ ] Notifications feature
