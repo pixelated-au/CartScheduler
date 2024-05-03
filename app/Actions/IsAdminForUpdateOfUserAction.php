@@ -19,7 +19,7 @@ class IsAdminForUpdateOfUserAction
     public function execute(FormRequest $request): array
     {
         $isAdminEdit = false;
-        if ($request->validated('user_id')) {
+        if ($request->has('user_id')) {
             abort_if($request->user()->role !== Role::Admin->value, Response::HTTP_UNAUTHORIZED, 'Unauthorized');
 
             // this means admin is updating another user's availability
