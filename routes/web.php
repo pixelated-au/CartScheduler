@@ -71,7 +71,13 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified',
     Route::post('/reserve-shift', ToggleShiftReservationController::class);
     Route::post('/save-report', SaveShiftReportController::class)->name('save.report');
     Route::get('/get-report-tags', GetReportTagsController::class);
-    Route::post('/set-viewed-availability', fn (Request $request) => $request->user()->availability->touch())->name('set.viewed-availability');
+    Route::post('/set-viewed-availability', static function (Request $request) {
+        $user = $request->user();
+        if (!$user->availability) {
+            $user->load('availability');
+        }
+        $user->availability->touch();
+    })->name('set.viewed-availability');
 
     Route::get('/user/availability', ShowUserAvailabilityController::class)->name('user.availability');
     Route::put('/user/availability', UpdateUserRegularAvailabilityController::class)->name('update.user.availability');
