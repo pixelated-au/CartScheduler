@@ -28,14 +28,15 @@ class UserNeedsToUpdateAvailability
             return true;
         }
 
-        if ($availability->created_at->eq($availability->updated_at)
-            && !$availability->num_mondays
+        if (!$availability->num_mondays
             && !$availability->num_tuesdays
             && !$availability->num_wednesdays
             && !$availability->num_thursdays
             && !$availability->num_fridays
             && !$availability->num_saturdays
-            && !$availability->num_sundays) {
+            && !$availability->num_sundays
+            && $availability->created_at->eq($availability->updated_at)
+        ) {
             return true;
         }
 
