@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Fluent;
 use Illuminate\Validation\Validator;
 
@@ -66,7 +67,7 @@ class UpdateLocationRequest extends FormRequest
     }
 
     /**
-     * TODO this will need to be changed after upgrading past Laravel 9
+     * TODO this will need to be changed after upgrading past Laravel 9 when migrating to laravel 10+
      * @noinspection PhpUnused
      */
     public function withValidator(Validator $validator): void
@@ -113,13 +114,13 @@ class UpdateLocationRequest extends FormRequest
         $shifts = $this->get('shifts', []);
 
         foreach ($shifts as $index1 => $shift1) {
-            if (!$shift1['is_enabled']) {
+            if (!isset($shift1['is_enabled']) || !$shift1['is_enabled']) {
                 continue;
             }
 
             $errorShifts = 0;
             foreach ($shifts as $index2 => $shift2) {
-                if (!$shift2['is_enabled'] || $index1 === $index2) {
+                if (!isset($shift2['is_enabled']) || !$shift2['is_enabled'] || $index1 === $index2) {
                     continue;
                 }
 
@@ -152,8 +153,11 @@ class UpdateLocationRequest extends FormRequest
                     $errorShifts = 130;
                 }
 
+                $startTime = Carbon::now()->setTimeFromTimeString($shift1['start_time'])->format('H:i');
+                $endTime   = Carbon::now()->setTimeFromTimeString($shift1['end_time'])->format('H:i');
+
                 if ($errorShifts) {
-                    $validator->errors()->add("shifts.$index1.available_from", "There is an active shift that conflicts with this shift between {$shift1['start_time']} and {$shift1['end_time']}. Only one shift per timeslot can be enabled. [Code: $errorShifts]");
+                    $validator->errors()->add("shifts.$index1.start_time", "There is an active shift that conflicts with this shift between {$startTime} and {$endTime}. Only one shift per timeslot can be enabled. [Code: $errorShifts]");
                 }
             }
 
