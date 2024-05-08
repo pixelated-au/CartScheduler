@@ -417,12 +417,12 @@ class LocationsAndShiftsTest extends TestCase
                 ]
             ]);
 
-        $response->assertInvalid(['shifts.0.available_from', 'shifts.1.available_from']);
+        $response->assertInvalid(['shifts.0.start_time', 'shifts.1.start_time']);
         $errors = $response->json('errors');
 
-        $this->assertStringContainsStringIgnoringCase('[Code: 130]', $errors['shifts.0.available_from'][0]);
-        $this->assertStringContainsStringIgnoringCase('[Code: 130]', $errors['shifts.1.available_from'][0]);
-        $this->assertStringContainsStringIgnoringCase('[Code: 130]', $errors['shifts.2.available_from'][0]);
+        $this->assertStringContainsStringIgnoringCase('[Code: 130]', $errors['shifts.0.start_time'][0]);
+        $this->assertStringContainsStringIgnoringCase('[Code: 130]', $errors['shifts.1.start_time'][0]);
+        $this->assertStringContainsStringIgnoringCase('[Code: 130]', $errors['shifts.2.start_time'][0]);
 
         $this->assertDatabaseCount('locations', 1);
         $this->assertDatabaseCount('shifts', 1);
@@ -488,11 +488,11 @@ class LocationsAndShiftsTest extends TestCase
                 ]
             ]);
 
-        $response->assertInvalid(['shifts.0.available_from', 'shifts.1.available_from']);
+        $response->assertInvalid(['shifts.0.start_time', 'shifts.1.start_time']);
         $errors = $response->json('errors');
 
-        $this->assertStringContainsStringIgnoringCase('[Code: 121]', $errors['shifts.0.available_from'][0]);
-        $this->assertStringContainsStringIgnoringCase('[Code: 120]', $errors['shifts.1.available_from'][0]);
+        $this->assertStringContainsStringIgnoringCase('[Code: 121]', $errors['shifts.0.start_time'][0]);
+        $this->assertStringContainsStringIgnoringCase('[Code: 120]', $errors['shifts.1.start_time'][0]);
 
         $this->assertDatabaseCount('locations', 1);
         $this->assertDatabaseCount('shifts', 1);
@@ -553,11 +553,11 @@ class LocationsAndShiftsTest extends TestCase
                 ]
             ]);
 
-        $response->assertInvalid(['shifts.0.available_from', 'shifts.1.available_from']);
+        $response->assertInvalid(['shifts.0.start_time', 'shifts.1.start_time']);
         $errors = $response->json('errors');
 
-        $this->assertStringContainsStringIgnoringCase('[Code: 110]', $errors['shifts.0.available_from'][0]);
-        $this->assertStringContainsStringIgnoringCase('[Code: 110]', $errors['shifts.1.available_from'][0]);
+        $this->assertStringContainsStringIgnoringCase('[Code: 110]', $errors['shifts.0.start_time'][0]);
+        $this->assertStringContainsStringIgnoringCase('[Code: 110]', $errors['shifts.1.start_time'][0]);
 
         $this->assertDatabaseCount('locations', 1);
         $this->assertDatabaseCount('shifts', 1);
@@ -666,5 +666,31 @@ class LocationsAndShiftsTest extends TestCase
 
         $this->assertDatabaseCount('locations', 1);
         $this->assertDatabaseCount('shifts', 0);
+    }
+
+    public function test_re_enabling_disabled_shift_does_not_conflict_with_existing_shifts(): void
+    {
+        $admin = User::factory()->adminRoleUser()->create(['is_enabled' => true]);
+
+        /** @var \App\Models\Location $location */
+        $location = Location::factory()
+            ->has(
+                Shift::factory()
+                    ->everyDay9am()
+                    ->count(2)
+                    ->sequence(['is_enabled' => false], ['is_enabled' => true])
+            )
+            ->create();
+
+        $location->load('shifts');
+
+        $location->shifts->setHidden(['location_id', 'updated_at', 'created_at']);
+        $lArray                            = $location->setHidden(['id', 'updated_at', 'created_at'])->toArray();
+        $lArray['shifts'][0]['is_enabled'] = true;
+
+        $this->actingAs($admin)
+            ->putJson("/admin/locations/$location->id", $lArray)
+            ->assertUnprocessable()
+            ->assertInvalid(['shifts.0.start_time', 'shifts.1.start_time']);
     }
 }
