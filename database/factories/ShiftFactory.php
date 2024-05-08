@@ -5,6 +5,7 @@ namespace Database\Factories;
 use App\Models\Location;
 use Carbon\CarbonPeriod;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Carbon;
 
 class ShiftFactory extends Factory
 {
@@ -14,6 +15,9 @@ class ShiftFactory extends Factory
             $this->faker->dateTimeBetween('now', '+1 month'),
             $this->faker->dateTimeBetween('+1 month', '+2 months'),
         );
+
+        $startTime = Carbon::now()->setTimeFromTimeString($this->faker->randomElement(['9:00', '12:00', '15:00']));
+
         return [
             'location_id'    => Location::inRandomOrder()?->first()?->id,
             'day_monday'     => $this->faker->boolean(),
@@ -23,8 +27,8 @@ class ShiftFactory extends Factory
             'day_friday'     => true,
             'day_saturday'   => $this->faker->boolean(),
             'day_sunday'     => $this->faker->boolean(),
-            'start_time'     => $this->faker->randomElement(['09:00:00', '12:00:00', '15:00:00']),
-            'end_time'       => $this->faker->randomElement(['12:00:00', '15:00:00', '18:00:00']),
+            'start_time'     => $startTime->format('H:i:s'),
+            'end_time'       => $startTime->addHours(3)->format('H:i:s'),
             'available_from' => $available->first(),
             'available_to'   => $available->last(),
             'is_enabled'     => true,
