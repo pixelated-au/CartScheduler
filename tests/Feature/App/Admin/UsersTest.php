@@ -5,9 +5,11 @@ namespace Tests\Feature\App\Admin;
 use App\Mail\UserAccountCreated;
 use App\Models\Location;
 use App\Models\User;
+use App\Models\UserAvailability;
 use App\Settings\GeneralSettings;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
@@ -319,6 +321,35 @@ class UsersTest extends TestCase
         $user->refresh()->load(['vacations']);
         $this->assertCount(1, $user->vacations);
         $this->assertSame('Testing 2', $user->vacations[0]->description);
+    }
+
+    public function test_admin_can_add_update_user_regular_availability(): void
+    {
+        $settings                         = app()->make(GeneralSettings::class);
+        $settings->enableUserAvailability = true;
+        $settings->save();
+
+        $admin        = User::factory()->adminRoleUser()->state(['is_enabled' => true])->create();
+        $user         = User::factory()->enabled()->create();
+        $availability = UserAvailability::factory()->wedThuTenToOne()->state(['user_id' => $user->getKey()])->makeOne();
+
+        $this->assertDatabaseEmpty('user_availabilities');
+        $this->actingAs($admin)
+            ->putJson("/user/availability", $availability->toArray())
+            ->assertRedirect("/admin/users/{$user->getKey()}/edit");
+        $this->assertDatabaseCount('user_availabilities', 1);
+        $this->assertDatabaseHas('user_availabilities', Arr::except($availability->getAttributes(), ['created_at', 'updated_at']));
+
+        $availability->num_wednesdays = 0;
+        $availability->num_fridays    = 1;
+        $availability->day_wednesday  = null;
+        $availability->day_friday     = range(10, 13);
+        $availability->comments       = "Testing";
+
+        $this->actingAs($admin)
+            ->putJson("/user/availability", $availability->toArray())
+            ->assertRedirect("/admin/users/{$user->getKey()}/edit");
+        $this->assertDatabaseHas('user_availabilities', Arr::except($availability->getAttributes(), ['created_at', 'updated_at']));
     }
 
     public function test_admin_can_maintain_user_location_choices(): void
