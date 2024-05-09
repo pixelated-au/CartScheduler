@@ -48,28 +48,55 @@ class UserAvailabilityFactory extends Factory
         ];
     }
 
+    public function wedThuTenToOne(): Factory
+    {
+        return $this->state(function (array $attributes) {
+            return [
+                'day_monday'     => null,
+                'day_tuesday'    => null,
+                'day_wednesday'  => $this->getHourRange(10, 13),
+                'day_thursday'   => $this->getHourRange(10, 13),
+                'day_friday'     => null,
+                'day_saturday'   => null,
+                'day_sunday'     => null,
+                'num_mondays'    => 0,
+                'num_tuesdays'   => 0,
+                'num_wednesdays' => 2,
+                'num_thursdays'  => 1,
+                'num_fridays'    => 0,
+                'num_saturdays'  => 0,
+                'num_sundays'    => 0,
+            ];
+        });
+    }
+
     private function availability(): ?array
     {
-        // 10% chance of full-day
+        // 20% chance of full-day
         if ($this->faker->boolean(20)) {
-            return $this->dayParts
-                ->filter(fn(AvailabilityHours $availability) => $availability->value >= 7 && $availability->value <= 18)
-                ->toArray();
+            return $this->getHourRange(7, 18);
         }
 
-        // 10% chance of morning
+        // 20% chance of morning
         if ($this->faker->boolean(20)) {
-            return $this->dayParts
-                ->filter(fn(AvailabilityHours $availability) => $availability->value >= 7 && $availability->value <= 12)
-                ->toArray();
+            return $this->getHourRange(7, 12);
         }
 
-        // 10% chance of afternoon
+        // 20% chance of afternoon
         if ($this->faker->boolean(20)) {
-            return $this->dayParts
-                ->filter(fn(AvailabilityHours $availability) => $availability->value >= 12 && $availability->value <= 18)
-                ->toArray();
+            return $this->getHourRange(12, 18);
         }
         return null;
     }
+
+    /**
+     * @return mixed[]
+     */
+    public function getHourRange(int $start, int $end): array
+    {
+        return $this->dayParts
+            ->filter(fn(AvailabilityHours $availability) => $availability->value >= $start && $availability->value <= $end)
+            ->toArray();
+    }
+
 }
