@@ -53,9 +53,7 @@ class UserAvailabilityFactory extends Factory
         // 10% chance of full-day
         if ($this->faker->boolean(20)) {
             return $this->dayParts
-                ->filter(function (AvailabilityHours $availability) {
-                    return $availability->value >= 7 && $availability->value <= 18;
-                })
+                ->filter(fn(AvailabilityHours $availability) => $availability->value >= 7 && $availability->value <= 18)
                 ->toArray();
         }
 
