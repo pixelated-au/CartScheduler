@@ -378,12 +378,12 @@ class UserReservationsTest extends TestCase
 
     public function test_sister_cannot_be_moved_to_a_shift_requiring_a_brother(): void
     {
-        $admin     = User::factory()->adminRoleUser()->create(['is_enabled' => true]);
-        $sister    = User::factory()->female()->create();
+        $admin  = User::factory()->adminRoleUser()->create(['is_enabled' => true]);
+        $sister = User::factory()->female()->create();
 
         /** @var Location $location */
         $location = Location::factory()
-            ->state(['max_volunteers'   => 3, 'requires_brother' => true])
+            ->state(['max_volunteers' => 3, 'requires_brother' => true])
             ->has(Shift::factory()
                 ->everyDay9am()
                 ->hasAttached(User::factory()
@@ -412,11 +412,14 @@ class UserReservationsTest extends TestCase
     }
 
 
+    /**
+     * @template TKey of array-key
+     */
     public function test_move_volunteer_when_duplicate_shifts_with_one_disabled(): void
     {
         $admin = User::factory()->adminRoleUser()->create(['is_enabled' => true]);
 
-        /** @var Collection<Location> $locations */
+        /** @var \Illuminate\Support\Collection<TKey, Location> $locations */
         $locations   = collect();
         $locations[] = Location::factory()
             ->state(['max_volunteers' => 3])
@@ -519,11 +522,14 @@ class UserReservationsTest extends TestCase
         $this->assertCount(3, $shifts[2]->users);
     }
 
+    /**
+     * @template TKey of array-key
+     */
     public function test_fail_move_volunteer_when_only_shift_is_disabled(): void
     {
         $admin = User::factory()->adminRoleUser()->create(['is_enabled' => true]);
 
-        /** @var Collection<Location> $locations */
+        /** @var \Illuminate\Support\Collection<TKey, Location> $locations */
         $locations   = collect();
         $locations[] = Location::factory()
             ->state(['max_volunteers' => 3])
@@ -580,4 +586,5 @@ class UserReservationsTest extends TestCase
         $this->assertCount(3, $shifts[0]->users);
         $this->assertCount(2, $shifts[1]->users);
     }
+
 }
