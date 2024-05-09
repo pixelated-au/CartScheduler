@@ -132,3 +132,4 @@ will be available in this interface.
 - [ ] Day overseer feature
 - [ ] User tags feature
 - [ ] Notifications feature
+- [ ] If a location or a shift is "re-enabled", the system should first look for schedule conflicts and show those to the admin 
