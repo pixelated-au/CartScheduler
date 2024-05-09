@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature;
+namespace App;
 
 use App\Enums\AvailabilityHours;
 use App\Models\Location;
