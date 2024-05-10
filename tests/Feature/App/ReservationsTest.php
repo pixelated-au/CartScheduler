@@ -956,4 +956,37 @@ class ReservationsTest extends TestCase
             ->assertOk()
             ->assertContent('Reservation made');
     }
+
+    public function test_user_can_see_shifts_and_can_only_access_approved_data(): void
+    {
+        $users = User::factory()->enabled()->count(4)->create();
+        $date  = '2023-01-03'; // A Tuesday
+        Location::factory()
+            ->has(
+                Shift::factory()
+                    ->hasAttached($users, ['shift_date' => $date])
+                    ->everyDay9am()
+            )
+            ->create();
+
+
+        $this->travelTo('2023-01-02 09:00:00');
+
+        $this->assertDatabaseCount('shift_user', $users->count());
+
+        $this->actingAs($users[0])
+            ->getJson("/shifts/$date")
+            ->assertOk()
+            ->ray()
+            ->assertJsonCount($users->count(), 'locations.0.shifts.0.volunteers')
+            ->assertJsonFragment(['name' => $users[0]->name, 'mobile_phone' => $users[0]->mobile_phone, 'id' => $users[0]->id])
+            ->assertJsonFragment(['name' => $users[1]->name, 'mobile_phone' => $users[1]->mobile_phone])
+            ->assertJsonFragment(['name' => $users[2]->name, 'mobile_phone' => $users[2]->mobile_phone])
+            ->assertJsonFragment(['name' => $users[3]->name, 'mobile_phone' => $users[3]->mobile_phone])
+            ->assertJsonMissingPath('locations.0.shifts.0.volunteers.1.id')
+            ->assertJsonMissingPath('locations.0.shifts.0.volunteers.2.id')
+            ->assertJsonMissingPath('locations.0.shifts.0.volunteers.1.email')
+            ->assertJsonMissingPath('locations.0.shifts.0.volunteers.2.email')
+        ;
+    }
 }
