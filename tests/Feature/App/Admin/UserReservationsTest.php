@@ -485,14 +485,14 @@ class UserReservationsTest extends TestCase
         $this->assertCount(2, $shifts[2]->users);
 
         // Now move the volunteer back to the first shift, disable shift 2 and enable shift 3. Then try again.
-        $response = $this->actingAs($admin)
+        $this->actingAs($admin)
             ->putJson("/admin/move-volunteer-to-shift", [
                 'date'         => $date,
                 'location_id'  => $shifts[0]->location->id,
                 'old_shift_id' => $shifts[1]->getKey(),
                 'user_id'      => $movingUserId,
-            ]);
-        $response->assertSuccessful();
+            ])
+            ->assertSuccessful();
         $shifts->each->refresh();
 
         $this->assertCount(3, $shifts[0]->users);
