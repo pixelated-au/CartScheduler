@@ -2,6 +2,8 @@
 
 namespace App\Http\Resources;
 
+use App\Enums\Role;
+use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
@@ -20,12 +22,13 @@ class UserResource extends JsonResource
 {
     public function toArray($request): array
     {
+        $isAdmin = $request->user()->role === Role::Admin->value;
         return [
-            'id'                    => $this->id,
+            'id'                    => $this->when($isAdmin || $this->id === $request->user()->id, $this->id),
             'name'                  => $this->name,
             'gender'                => $this->gender,
             'mobile_phone'          => $this->mobile_phone,
-            'email'                 => $this->email,
+            'email'                 => $this->when($isAdmin,$this->email),
             'is_unrestricted'       => $this->when($this->is_unrestricted, $this->is_unrestricted),
             'shift_id'              => $this->whenPivotLoaded('shift_user', fn() => $this->pivot['shift_id']),
             'shift_date'            => $this->whenPivotLoaded('shift_user', fn() => $this->pivot['shift_date']),
