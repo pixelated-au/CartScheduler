@@ -977,7 +977,6 @@ class ReservationsTest extends TestCase
         $this->actingAs($users[0])
             ->getJson("/shifts/$date")
             ->assertOk()
-            ->ray()
             ->assertJsonCount($users->count(), 'locations.0.shifts.0.volunteers')
             ->assertJsonFragment(['name' => $users[0]->name, 'mobile_phone' => $users[0]->mobile_phone, 'id' => $users[0]->id])
             ->assertJsonFragment(['name' => $users[1]->name, 'mobile_phone' => $users[1]->mobile_phone])
