@@ -56,12 +56,12 @@ class ToggleShiftReservationControllerRules
                                 ->where('shift_date', $shiftDate->toDateString());
                         }
                     }),
-                function ($attribute, $value, $fail) use ($user, $data, $shiftDate) {
+                function ($attribute, $value, $fail) use ($user, $data, $shiftDate, $isAdmin) {
                     // only validate if adding a shift
                     if (!$data['do_reserve']) {
                         return;
                     }
-                    $this->isOverlappingShift($user, $shiftDate, $data['shift'], $fail);
+                    $this->isOverlappingShift($user, $shiftDate, $data['shift'], $isAdmin, $fail);
                     $this->isUserAllowedToReserveShifts($user, $shiftDate, $data['shift'], $fail);
                     $this->isUserActive($user, $data, $fail);
                 },
@@ -84,7 +84,7 @@ class ToggleShiftReservationControllerRules
         ];
     }
 
-    private function isOverlappingShift(User $user, Carbon $shiftDate, int $shiftId, $fail): void
+    private function isOverlappingShift(User $user, Carbon $shiftDate, int $shiftId, bool $isAdmin, $fail): void
     {
         $userShiftsOnDate = Shift::select('shifts.*')
             ->with([
@@ -127,11 +127,13 @@ class ToggleShiftReservationControllerRules
         );
 
         if ($overlappingShift) {
-            $start = Carbon::parse($overlappingShift->start_time)->format('h:i a');
-            $end   = Carbon::parse($overlappingShift->end_time)->format('h:i a');
-            $fail(
-                "Sorry, another shift that overlaps this shift at {$overlappingShift->location->name} between $start and $end.",
-            );
+            $start   = Carbon::parse($overlappingShift->start_time)->format('h:i a');
+            $end     = Carbon::parse($overlappingShift->end_time)->format('h:i a');
+            $message = $isAdmin
+                ? "Sorry, $user->name is already on a shift that overlaps this shift at {$overlappingShift->location->name} between $start and $end."
+                : "Sorry, you're already assigned to shift at this time\n{$overlappingShift->location->name} - {$overlappingShift->start_time} and {$overlappingShift->end_time}.";
+
+            $fail($message);
         }
     }
 
