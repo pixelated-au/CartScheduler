@@ -66,4 +66,85 @@ class RestrictedVolunteerTest extends TestCase
 
         $this->assertDatabaseCount('shift_user', 1);
     }
+
+    public function test_restricted_user_cannot_see_shifts_outside_of_their_own_roster(): void
+    {
+        $users = User::factory()
+            ->enabled()
+            ->count(4)
+            ->sequence(['is_unrestricted' => false], ['is_unrestricted' => true], ['is_unrestricted' => true], ['is_unrestricted' => true])
+            ->create();
+
+        $date  = '2023-01-03'; // A Tuesday
+        $date2 = '2023-01-04';
+        Location::factory()
+            ->has(
+                Shift::factory()
+                    ->hasAttached($users, ['shift_date' => $date])
+                    ->everyDay9am()
+            )
+            ->create();
+
+        Location::factory()
+            ->has(
+                Shift::factory()
+                    ->hasAttached(
+                        User::factory()->enabled()->count(2),
+                        ['shift_date' => $date]
+                    )
+                    ->hasAttached(
+                        User::factory()->enabled()->count(2),
+                        ['shift_date' => $date2]
+                    )
+                    ->everyDay9am()
+            )
+            ->create();
+
+
+        $this->travelTo('2023-01-02 09:00:00');
+
+        $this->assertDatabaseCount('shift_user', 8);
+
+        $this->actingAs($users[0])
+            ->getJson("/shifts/$date")
+            ->assertOk()
+            ->assertJsonCount($users->count(), 'locations.0.shifts.0.volunteers')
+            ->assertJsonFragment(['name' => $users[0]->name, 'mobile_phone' => $users[0]->mobile_phone, 'id' => $users[0]->id])
+            ->assertJsonFragment(['name' => $users[1]->name, 'mobile_phone' => $users[1]->mobile_phone])
+            ->assertJsonFragment(['name' => $users[2]->name, 'mobile_phone' => $users[2]->mobile_phone])
+            ->assertJsonFragment(['name' => $users[3]->name, 'mobile_phone' => $users[3]->mobile_phone])
+            ->assertJsonMissingPath('locations.0.shifts.0.volunteers.1.id')
+            ->assertJsonMissingPath('locations.0.shifts.0.volunteers.2.id')
+            ->assertJsonMissingPath('locations.0.shifts.0.volunteers.1.email')
+            ->assertJsonMissingPath('locations.0.shifts.0.volunteers.2.email')
+            ->assertJsonMissingPath('locations.1');
+
+        $this->actingAs($users[0])
+            ->getJson("/shifts/$date2")
+            ->assertOk()
+            ->assertJsonMissingPath('locations.0')
+            ->assertJsonMissingPath('locations.1');
+
+        // Confirm that unrestricted users can see other shifts
+        $this->actingAs($users[1])
+            ->getJson("/shifts/$date")
+            ->assertOk()
+            ->assertJsonCount($users->count(), 'locations.0.shifts.0.volunteers')
+            ->assertJsonFragment(['name' => $users[0]->name, 'mobile_phone' => $users[0]->mobile_phone, 'id' => $users[0]->id])
+            ->assertJsonFragment(['name' => $users[1]->name, 'mobile_phone' => $users[1]->mobile_phone])
+            ->assertJsonFragment(['name' => $users[2]->name, 'mobile_phone' => $users[2]->mobile_phone])
+            ->assertJsonFragment(['name' => $users[3]->name, 'mobile_phone' => $users[3]->mobile_phone])
+            // Same day but different location but same time
+            ->assertJsonHasKeys('locations.1.shifts.0.volunteers.0', 'name')
+            ->assertJsonHasKeys('locations.1.shifts.0.volunteers.1', 'name');
+
+        $this->actingAs($users[1])
+            ->getJson("/shifts/$date2")
+            ->assertOk()
+            // Next day, same location different time
+            ->assertJsonCount(0, 'locations.0.shifts.0.volunteers')
+            ->assertJsonCount(2, 'locations.1.shifts.0.volunteers')
+            ->assertJsonHasKeys('locations.1.shifts.0.volunteers.0', 'name')
+            ->assertJsonHasKeys('locations.1.shifts.0.volunteers.1', 'name');
+    }
 }
