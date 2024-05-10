@@ -11,6 +11,7 @@ class UserSeeder extends Seeder
     {
         User::unsetEventDispatcher();// stops the UserAccountCreated mail from being sent
         User::factory()->devUser()->create();
+        User::factory()->testUser()->create();
         User::factory()->adminRoleUser()->count(3)->create();
         $husband            = User::factory()->create([
             'name'           => 'Husband',

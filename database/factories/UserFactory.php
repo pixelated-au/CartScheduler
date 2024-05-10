@@ -55,6 +55,19 @@ class UserFactory extends Factory
         });
     }
 
+    public function testUser(): Factory
+    {
+        return $this->state(function (array $attributes) {
+            return [
+                'name'        => 'User',
+                'email'       => 'test@example.com',
+                'role'        => 'user',
+                'gender'      => 'male',
+                'appointment' => 'elder'
+            ];
+        });
+    }
+
     public function adminRoleUser(): Factory
     {
         return $this->state(function (array $attributes) {
