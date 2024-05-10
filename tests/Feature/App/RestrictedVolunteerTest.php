@@ -130,8 +130,8 @@ class RestrictedVolunteerTest extends TestCase
             ->getJson("/shifts/$date")
             ->assertOk()
             ->assertJsonCount($users->count(), 'locations.0.shifts.0.volunteers')
-            ->assertJsonFragment(['name' => $users[0]->name, 'mobile_phone' => $users[0]->mobile_phone, 'id' => $users[0]->id])
-            ->assertJsonFragment(['name' => $users[1]->name, 'mobile_phone' => $users[1]->mobile_phone])
+            ->assertJsonFragment(['name' => $users[0]->name, 'mobile_phone' => $users[0]->mobile_phone])
+            ->assertJsonFragment(['name' => $users[1]->name, 'mobile_phone' => $users[1]->mobile_phone, 'id' => $users[1]->id])
             ->assertJsonFragment(['name' => $users[2]->name, 'mobile_phone' => $users[2]->mobile_phone])
             ->assertJsonFragment(['name' => $users[3]->name, 'mobile_phone' => $users[3]->mobile_phone])
             // Same day but different location but same time
