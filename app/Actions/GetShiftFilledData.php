@@ -12,8 +12,8 @@ class GetShiftFilledData
         $start     = Carbon::today();
         $startDate = $start->format('Y-m-d');
         $endDate   = (match ($duration) {
-            'fortnight' => $start->addWeeks(2),
-            default => $start->addMonth(),
+            'fortnight' => $start->addWeeks(2)->subDay(),
+            default => $start->addMonth()->subDay(),
         })->format('Y-m-d');
 
         $params = ['startDate' => $startDate, 'endDate' => $endDate];
