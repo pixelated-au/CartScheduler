@@ -39,7 +39,7 @@ class MoveUserToNewShiftController extends Controller
         ]);
 
         $oldShift = Shift::find($request->get('old_shift_id'));
-        $date     = Carbon::parse($request->get('date'));
+        $date     = Carbon::createFromTimeString($request->get('date') . 'T12:00:00');
         //$startTime = $oldShift->start_time;
         $startTime = $date->copy()->setTimeFromTimeString($oldShift->start_time);
 
