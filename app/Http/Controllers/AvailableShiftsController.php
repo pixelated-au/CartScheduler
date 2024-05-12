@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Actions\GetAvailableShiftsCount;
-use App\Actions\GetUserShiftsData;
 use App\Actions\GetMaxShiftReservationDateAllowed;
+use App\Actions\GetUserShiftsData;
 use App\Http\Resources\LocationResource;
 use App\Models\Location;
 use App\Models\Shift;
@@ -21,7 +21,7 @@ use Illuminate\Http\Request;
 class AvailableShiftsController extends Controller
 {
     public function __construct(
-        private readonly GetUserShiftsData                 $getFreeShiftsData,
+        private readonly GetUserShiftsData                 $getUserShiftsData,
         private readonly GetAvailableShiftsCount           $getAvailableShiftsCount,
         private readonly GetMaxShiftReservationDateAllowed $getMaxShiftReservationDateAllowed)
     {
@@ -88,7 +88,7 @@ class AvailableShiftsController extends Controller
 
         $endDate         = $this->getMaxShiftReservationDateAllowed->execute()->format('Y-m-d');
         $startDate       = Carbon::today()->format('Y-m-d');
-        $shifts          = $this->getFreeShiftsData->execute($startDate, $endDate, $user);
+        $shifts          = $this->getUserShiftsData->execute($startDate, $endDate, $user);
         $freeShiftsCount = $user->is_unrestricted
             ? $this->getAvailableShiftsCount->execute($startDate, $endDate)
             : [];
