@@ -11,3 +11,8 @@ TestResponse::macro('assertJsonHasKeys', function (string $jsonPath, string ...$
     }
     return $this;
 });
+
+TestResponse::macro('assertContainsStringIgnoringCase', function (string $jsonPath, string $string) {
+    Assert::assertStringContainsStringIgnoringCase($string, $this->json($jsonPath));
+    return $this;
+});
