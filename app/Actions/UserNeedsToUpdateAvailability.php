@@ -21,10 +21,9 @@ class UserNeedsToUpdateAvailability
             return false;
         }
 
-        $user->load('availability');
-        $availability = $user->availability;
+        $availability = $user->load('availability')->availability;
 
-        if (empty($availability)) {
+        if (!$availability) {
             return true;
         }
 
