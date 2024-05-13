@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection PhpUnusedParameterInspection */
 
 namespace Database\Factories;
 
@@ -18,5 +18,32 @@ class LocationFactory extends Factory
             'longitude'        => (string)$this->faker->randomFloat(6, 143, 144),
             'is_enabled'       => true,
         ];
+    }
+
+    public function threeVolunteers(): self
+    {
+        return $this->state(function (array $attributes) {
+            return [
+                'max_volunteers' => 3,
+            ];
+        });
+    }
+
+    public function requiresBrother(): self
+    {
+        return $this->state(function (array $attributes) {
+            return [
+                'requires_brother' => true,
+            ];
+        });
+    }
+
+    public function allPublishers(): self
+    {
+        return $this->state(function (array $attributes) {
+            return [
+                'requires_brother' => false,
+            ];
+        });
     }
 }
