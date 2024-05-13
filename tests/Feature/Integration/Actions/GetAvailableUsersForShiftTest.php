@@ -7,6 +7,10 @@ use App\Models\Location;
 use App\Models\Shift;
 use App\Models\ShiftUser;
 use App\Models\User;
+use App\Models\UserAvailability;
+use App\Models\UserVacation;
+use App\Settings\GeneralSettings;
+use Illuminate\Database\Eloquent\Factories\Sequence;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
 use Tests\TestCase;
@@ -16,11 +20,13 @@ class GetAvailableUsersForShiftTest extends TestCase
     use RefreshDatabase;
 
     private GetAvailableUsersForShift $getAvailableUsersForShift;
+    private GeneralSettings $settings;
 
     protected function setUp(): void
     {
         parent::setUp();
         $this->getAvailableUsersForShift = $this->app->make(GetAvailableUsersForShift::class);
+        $this->settings                  = $this->app->make(GeneralSettings::class);
     }
 
     public function test_show_users_with_no_overlapping_shifts(): void
@@ -39,7 +45,6 @@ class GetAvailableUsersForShiftTest extends TestCase
         /** @var \Illuminate\Support\Collection $unattachedUsers */
         $unattachedUsers = $users->get(1);
 
-
         $dateRange = collect();
         $attachedUsers->chunk(3)
             ->get(0)
@@ -56,7 +61,7 @@ class GetAvailableUsersForShiftTest extends TestCase
             ->create();
 
         // Note, 'un-available' users still exclude users who are on a shift at the same time - hence making sure the
-        // true and false values have the same result
+        // true and false values have the same result because 'enableUserAvailability' is not set to true
         $showOnlyAvailableValues = [true, false];
         foreach ($showOnlyAvailableValues as $showOnlyAvailable) {
             $availableUsers = $this->getAvailableUsersForShift->execute(
@@ -74,6 +79,72 @@ class GetAvailableUsersForShiftTest extends TestCase
             /** @var User $availableUser */
             foreach ($availableUsers as $availableUser) {
                 $this->assertTrue($unattachedUsers->contains(fn(User $user) => $user->getKey() === $availableUser->getKey()));
+            }
+        }
+    }
+
+    public function test_show_users_who_are_available_on_day_and_hour_and_arnt_on_vacation(): void
+    {
+        $this->settings->enableUserAvailability = true;
+        $this->settings->save();
+
+        $locations = Location::factory()
+            ->state(['max_volunteers' => 3])
+            ->count(2)
+            ->has(Shift::factory()->everyDay9am())
+            ->create();
+
+        $locations->load('shifts');
+
+        $users       = User::factory()->count(10)->enabled()->create();
+        $chosenUsers = $users->filter(fn(User $user, int $key) => $key >= 2 && $key <= 4);
+
+        // Set the first 5 users to be available on the 15th (ie monday). Everyone else should be unavailable
+        UserAvailability::factory()
+            ->count(10)
+            ->state(new Sequence(
+                fn(Sequence $sequence) => [
+                    'user_id'     => $users[$sequence->index]->id,
+                    'day_monday'  => $sequence->index < 5 ? range(8, 12) : null,
+                    'num_mondays' => $sequence->index < 5 ? random_int(1, 4) : 0,
+                ]
+            ))
+            ->create();
+
+        // Set a vacation for the first 4 users
+        UserVacation::factory()
+            ->count(4)
+            ->state(new Sequence(
+                fn(Sequence $sequence) => match ($sequence->index) {
+                    // on holiday over the shift - should be unavailable
+                    0 => ['user_id' => $users[0]->id, 'start_date' => '2023-05-10', 'end_date' => '2023-05-25'],
+                    // on holiday day of the shift - should be unavailable
+                    1 => ['user_id' => $users[1]->id, 'start_date' => '2023-05-15', 'end_date' => '2023-05-15'],
+                    // on holiday before the shift - should be available
+                    2 => ['user_id' => $users[2]->id, 'start_date' => '2023-05-05', 'end_date' => '2023-05-14'],
+                    // on holiday after the shift - should be available
+                    3 => ['user_id' => $users[3]->id, 'start_date' => '2023-05-16', 'end_date' => '2023-05-25'],
+                    // remaining users don't have a vacation set
+                }
+            ))
+            ->create();
+
+        $showOnlyAvailableValues = [true, false];
+        foreach ($showOnlyAvailableValues as $showOnlyAvailable) {
+            $availableUsers = $this->getAvailableUsersForShift->execute(
+                shift: $locations[1]->shifts[0],
+                date: Carbon::parse('2023-05-15'),
+                showOnlyAvailable: $showOnlyAvailable,
+                showOnlyResponsibleBros: false,
+                hidePublishers: false,
+                showOnlyElders: false,
+                showOnlyMinisterialServants: false,
+            );
+
+            $this->assertCount($showOnlyAvailable ? 3 : $users->count(), $availableUsers);
+
+            foreach ($chosenUsers as $chosenUser) {
+                $this->assertTrue($availableUsers->contains(fn(User $user) => $user->getKey() === $chosenUser->getKey()));
             }
         }
     }
@@ -415,4 +486,10 @@ class GetAvailableUsersForShiftTest extends TestCase
             $this->assertTrue($remainingUsers->contains(fn(User $user) => $user->getKey() === $availableUser->getKey()));
         }
     }
+
+    /**
+     * @param \App\Models\User $user
+     * @param array{int, int, int, int, int, int, int, int} $days
+     * @return \App\Models\UserAvailability
+     */
 }
