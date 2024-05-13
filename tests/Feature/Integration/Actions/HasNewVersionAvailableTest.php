@@ -20,8 +20,8 @@ class HasNewVersionAvailableTest extends TestCase
 
     public function test_has_new_version_available_is_returning_correct_data(): void
     {
-        $this->settings->availableVersion = '1.0.0';
         $this->settings->currentVersion   = '1.0.0';
+        $this->settings->availableVersion = '1.0.0';
         $this->settings->save();
 
         $this->assertFalse($this->hasNewVersionAvailable->execute());
@@ -30,5 +30,13 @@ class HasNewVersionAvailableTest extends TestCase
         $this->settings->save();
 
         $this->assertTrue($this->hasNewVersionAvailable->execute());
+
+        $this->settings->currentVersion   = '';
+        $this->settings->save();
+        $this->assertFalse($this->hasNewVersionAvailable->execute());
+        $this->settings->currentVersion   = '1.0.0';
+        $this->settings->availableVersion = '';
+        $this->settings->save();
+        $this->assertFalse($this->hasNewVersionAvailable->execute());
     }
 }
