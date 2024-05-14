@@ -985,7 +985,27 @@ class ReservationsTest extends TestCase
             ->assertJsonMissingPath('locations.0.shifts.0.volunteers.1.id')
             ->assertJsonMissingPath('locations.0.shifts.0.volunteers.2.id')
             ->assertJsonMissingPath('locations.0.shifts.0.volunteers.1.email')
-            ->assertJsonMissingPath('locations.0.shifts.0.volunteers.2.email')
-        ;
+            ->assertJsonMissingPath('locations.0.shifts.0.volunteers.2.email');
+    }
+
+    public function test_remove_volunteer_when_not_attached_to_shift(): void
+    {
+        $location = Location::factory()
+            ->threeVolunteers()
+            ->allPublishers()
+            ->has(Shift::factory()->everyDay9am())
+            ->create();
+
+        $user = User::factory()->enabled()->create();
+
+        $this->travelTo('2023-01-02 09:00:00');
+        $this->actingAs($user)->postJson('/reserve-shift', [
+            'location'   => $location->id,
+            'shift'      => $location->shifts[0]->id,
+            'do_reserve' => false, // setting this to false should fail
+            'date'       => '2023-01-03',
+        ])
+            ->assertUnprocessable()
+            ->assertInvalid('shift');
     }
 }
