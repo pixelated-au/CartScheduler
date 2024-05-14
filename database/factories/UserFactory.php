@@ -44,7 +44,7 @@ class UserFactory extends Factory
         ];
     }
 
-    public function devUser(): Factory
+    public function devUser(): self
     {
         return $this->state(function (array $attributes) {
             return [
@@ -57,7 +57,7 @@ class UserFactory extends Factory
         });
     }
 
-    public function testUser(): Factory
+    public function testUser(): self
     {
         return $this->state(function (array $attributes) {
             return [
@@ -70,7 +70,7 @@ class UserFactory extends Factory
         });
     }
 
-    public function adminRoleUser(): Factory
+    public function adminRoleUser(): self
     {
         return $this->state(function (array $attributes) {
             return [
@@ -81,7 +81,7 @@ class UserFactory extends Factory
         });
     }
 
-    public function userRoleUser(): Factory
+    public function userRoleUser(): self
     {
         return $this->state(function (array $attributes) {
             return [
@@ -91,7 +91,7 @@ class UserFactory extends Factory
         });
     }
 
-    public function enabled(): Factory
+    public function enabled(): self
     {
         return $this->state(function (array $attributes) {
             return [
@@ -101,7 +101,7 @@ class UserFactory extends Factory
         });
     }
 
-    public function responsibleBrother(): Factory
+    public function responsibleBrother(): self
     {
         return $this->state(function (array $attributes) {
             return [
@@ -112,7 +112,7 @@ class UserFactory extends Factory
         });
     }
 
-    public function female(): Factory
+    public function female(): self
     {
         return $this->state(function (array $attributes) {
             return [
@@ -121,7 +121,7 @@ class UserFactory extends Factory
         });
     }
 
-    public function male(): Factory
+    public function male(): self
     {
         return $this->state(function (array $attributes) {
             return [
@@ -130,7 +130,7 @@ class UserFactory extends Factory
         });
     }
 
-    public function publisher(): Factory
+    public function publisher(): self
     {
         return $this->state(function (array $attributes) {
             return [
@@ -141,7 +141,7 @@ class UserFactory extends Factory
         });
     }
 
-    public function pioneer(): Factory
+    public function pioneer(): self
     {
         return $this->state(function (array $attributes) {
             return [
@@ -152,7 +152,7 @@ class UserFactory extends Factory
         });
     }
 
-    public function ministerialServant(): Factory
+    public function ministerialServant(): self
     {
         return $this->state(function (array $attributes) {
             return [
@@ -164,7 +164,7 @@ class UserFactory extends Factory
         });
     }
 
-    public function elder(): Factory
+    public function elder(): self
     {
         return $this->state(function (array $attributes) {
             return [
@@ -181,7 +181,7 @@ class UserFactory extends Factory
      *
      * @return Factory
      */
-    public function unverified(): Factory
+    public function unverified(): self
     {
         return $this->state(function (array $attributes) {
             return [
