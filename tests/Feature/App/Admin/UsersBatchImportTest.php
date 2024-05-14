@@ -4,18 +4,32 @@ namespace Tests\Feature\App\Admin;
 
 use App\Mail\UserAccountCreated;
 use App\Models\User;
-use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Notification;
+use Inertia\Testing\AssertableInertia;
 use Tests\TestCase;
 
 class UsersBatchImportTest extends TestCase
 {
     use RefreshDatabase;
 
+    public function test_only_admin_can_load_import_users_page(): void
+    {
+        $admin = User::factory()->enabled()->adminRoleUser()->create();
+        $user  = User::factory()->enabled()->create();
+
+        $this->actingAs($user)
+            ->get("/admin/users/import")
+            ->assertForbidden();
+
+        $this->actingAs($admin)
+            ->getJson("/admin/users/import")
+            ->assertInertia(fn(AssertableInertia $page) => $page
+                ->component('Admin/Users/Import')
+            )
+            ->assertOk();
+    }
 
     public function test_admin_can_batch_import_three_users_and_users_receive_emails(): void
     {
