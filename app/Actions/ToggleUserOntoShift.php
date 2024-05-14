@@ -63,10 +63,8 @@ class ToggleUserOntoShift
                 return ToggleReservationStatus::RESERVATION_MADE;
             }
 
-            $removeCount = $shift->users()->wherePivot('shift_date', '=', $shiftDate->format('Y-m-d'))->detach($userIdToToggle);
-            if (!$removeCount) {
-                throw new RuntimeException('Could not remove user from shift');
-            }
+            $this->detachUserFromShift($shift, $shiftDate, $userIdToToggle);
+
             activity()
                 ->performedOn($shift)
                 ->causedBy($user)
@@ -79,5 +77,16 @@ class ToggleUserOntoShift
 
             return ToggleReservationStatus::RESERVATION_REMOVED;
         });
+    }
+
+    /**
+     * @throws \RuntimeException
+     */
+    protected function detachUserFromShift(Shift $shift, bool|Carbon $shiftDate, mixed $userIdToToggle): void
+    {
+        $removeCount = $shift->users()->wherePivot('shift_date', '=', $shiftDate->format('Y-m-d'))->detach($userIdToToggle);
+        if (!$removeCount) {
+            throw new RuntimeException('Could not remove user from shift');
+        }
     }
 }
