@@ -73,6 +73,9 @@ class GeneralSettingsTest extends TestCase
         $generalSettings->systemShiftEndHour        = 13;
         $generalSettings->enableUserAvailability    = false;
         $generalSettings->enableUserLocationChoices = false;
+        $generalSettings->currentVersion            = '1.0.0';
+        $generalSettings->availableVersion          = '1.0.1';
+        $generalSettings->allowedSettingsUsers      = [1];
         $generalSettings->save();
 
         $this->actingAs($admin)
@@ -85,7 +88,9 @@ class GeneralSettingsTest extends TestCase
                     ->where('systemShiftEndHour', 13)
                     ->where('enableUserAvailability', false)
                     ->where('enableUserLocationChoices', false)
-                    ->etc()
+                    ->where('currentVersion', '1.0.0')
+                    ->where('availableVersion', '1.0.1')
+                    ->where('allowedSettingsUsers', [1])
                 )
             );
     }
