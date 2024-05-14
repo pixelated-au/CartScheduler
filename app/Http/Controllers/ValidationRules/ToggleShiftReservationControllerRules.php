@@ -49,13 +49,17 @@ class ToggleShiftReservationControllerRules
                     ->where('is_enabled', true)
                     ->where($dayOfWeek, true),
                 Rule::when($data['do_reserve'] === true,
-                    static function () use ($shiftDate, $user, $data) {
-                        if ($data['do_reserve'] === true) {
-                            Rule::unique('shift_user', 'shift_id')
-                                ->where('user_id', (int)$user->id)
-                                ->where('shift_date', $shiftDate->toDateString());
-                        }
-                    }),
+                    [
+                        Rule::unique('shift_user', 'shift_id')
+                            ->where('user_id', (int)$user->id)
+                            ->where('shift_date', $shiftDate->toDateString())
+                    ],
+                    [
+                        Rule::exists('shift_user', 'shift_id')
+                            ->where('user_id', (int)$user->id)
+                            ->where('shift_date', $shiftDate->toDateString())
+                    ]
+                ),
                 function ($attribute, $value, $fail) use ($user, $data, $shiftDate, $isAdmin) {
                     // only validate if adding a shift
                     if (!$data['do_reserve']) {
