@@ -6,6 +6,7 @@ use App\Mail\UserAccountCreated;
 use App\Models\Location;
 use App\Models\User;
 use App\Models\UserAvailability;
+use App\Models\UserVacation;
 use App\Settings\GeneralSettings;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -15,11 +16,78 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Str;
+use Inertia\Testing\AssertableInertia;
 use Tests\TestCase;
 
 class UsersTest extends TestCase
 {
     use RefreshDatabase;
+
+    public function test_admin_can_retrieve_all_users(): void
+    {
+        $admin = User::factory()->enabled()->adminRoleUser()->create();
+        User::factory()->enabled()->count(5)->create();
+
+        $this->actingAs($admin)
+            ->get("/admin/users")
+            ->assertOk()
+            ->assertInertia(fn(AssertableInertia $page) => $page
+                ->component('Admin/Users/List')
+                ->has('users.data', 6)
+            );
+    }
+
+    public function test_admin_can_show_create_user_form(): void
+    {
+        $admin = User::factory()->enabled()->adminRoleUser()->create();
+
+        $this->actingAs($admin)
+            ->getJson("/admin/users/create")
+            ->assertOk()
+            ->assertInertia(fn(AssertableInertia $page) => $page
+                ->component('Admin/Users/Add')
+            );
+    }
+
+    public function test_admin_can_show_edit_user_form(): void
+    {
+        $admin = User::factory()->enabled()->adminRoleUser()->create();
+
+        $mondayHours = range(8, 12);
+
+        $wife    = User::factory()->enabled()->female()->create();
+        $husband = User::factory()
+            ->enabled()
+            ->male()
+            ->state(['spouse_id' => $wife->id])
+            ->has(
+                UserAvailability::factory()
+                    ->state([
+                        'day_monday'  => $mondayHours,
+                        'num_mondays' => 3,
+                    ])
+                , 'availability')
+            ->has(UserVacation::factory(), 'vacations')
+            ->has(Location::factory()->count(2), 'rosterLocations')
+            ->create();
+
+        $this->actingAs($admin)
+            ->get("/admin/users/$husband->id/edit")
+            ->assertInertia(fn(AssertableInertia $page) => $page
+                ->component('Admin/Users/Edit')
+                ->has('editUser.data', fn(AssertableInertia $data) => $data
+                    ->where('id', $husband->id)
+                    ->where('spouse_name', $husband->spouse->name)
+                    ->where('spouse_id', $husband->spouse->id)
+                    ->where('selectedLocations.0', $husband->rosterLocations[0]->id)
+                    ->where('vacations.0.id', $husband->vacations[0]->id)
+                    ->where('availability.user_id', $husband->id)
+                    ->where('availability.day_monday', $mondayHours)
+                    ->where('availability.comments', $husband->availability->comments)
+                    ->etc()
+                )
+            );
+    }
 
     public function test_admin_can_add_new_user_and_user_receives_email(): void
     {
