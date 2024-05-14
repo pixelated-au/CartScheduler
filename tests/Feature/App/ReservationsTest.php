@@ -24,7 +24,7 @@ class ReservationsTest extends TestCase
 
         $this->travelTo($startDate);
         $location = Location::factory()
-            ->state(['requires_brother' => false])
+            ->allPublishers()
             ->has(Shift::factory()->everyDay9am())
             ->create();
 
@@ -69,7 +69,8 @@ class ReservationsTest extends TestCase
         $this->travelTo($startDate);
         /** @var Location $location */
         $location = Location::factory()
-            ->state(['requires_brother' => true, 'max_volunteers' => 3])
+            ->requiresBrother()
+            ->threeVolunteers()
             ->has(
                 Shift::factory()
                     ->everyDay9am()
@@ -104,7 +105,8 @@ class ReservationsTest extends TestCase
         $this->travelTo($startDate);
         /** @var Location $location */
         $location = Location::factory()
-            ->state(['requires_brother' => true, 'max_volunteers' => 3])
+            ->requiresBrother()
+            ->threeVolunteers()
             ->has(
                 Shift::factory()
                     ->everyDay9am()
@@ -154,7 +156,7 @@ class ReservationsTest extends TestCase
 
         $this->travelTo($startDate);
         $location = Location::factory()
-            ->state(['max_volunteers' => 3])
+            ->threeVolunteers()
             ->has(Shift::factory()->everyDay9am())
             ->create();
 
@@ -280,7 +282,8 @@ class ReservationsTest extends TestCase
         $this->travelTo($startDate);
         /** @var Location $location */
         $location = Location::factory()
-            ->state(['requires_brother' => true, 'max_volunteers' => 3])
+            ->requiresBrother()
+            ->threeVolunteers()
             ->has(
                 Shift::factory()
                     ->everyDay9am()
@@ -313,7 +316,8 @@ class ReservationsTest extends TestCase
         $this->travelTo($startDate);
         /** @var Location $location */
         $location = Location::factory()
-            ->state(['requires_brother' => true, 'max_volunteers' => 3])
+            ->requiresBrother()
+            ->threeVolunteers()
             ->has(
                 Shift::factory()
                     ->everyDay9am()
@@ -347,7 +351,8 @@ class ReservationsTest extends TestCase
         $this->travelTo($startDate);
         /** @var Location $location */
         $location = Location::factory()
-            ->state(['requires_brother' => false, 'max_volunteers' => 3])
+            ->allPublishers()
+            ->threeVolunteers()
             ->has(
                 Shift::factory()
                     ->everyDay9am()
@@ -382,7 +387,8 @@ class ReservationsTest extends TestCase
         $this->travelTo($startDate);
         /** @var Location $location */
         $location = Location::factory()
-            ->state(['requires_brother' => true, 'max_volunteers' => 3])
+            ->requiresBrother()
+            ->threeVolunteers()
             ->has(
                 Shift::factory()
                     ->everyDay9am()
@@ -417,7 +423,8 @@ class ReservationsTest extends TestCase
         $this->travelTo($startDate);
         /** @var Location $location */
         $location = Location::factory()
-            ->state(['requires_brother' => true, 'max_volunteers' => 3])
+            ->requiresBrother()
+            ->threeVolunteers()
             ->has(
                 Shift::factory()
                     ->everyDay9am()
@@ -452,7 +459,8 @@ class ReservationsTest extends TestCase
         $this->travelTo($startDate);
         /** @var Location $location */
         $location = Location::factory()
-            ->state(['requires_brother' => false, 'max_volunteers' => 3])
+            ->allPublishers()
+            ->threeVolunteers()
             ->has(
                 Shift::factory()
                     ->everyDay9am()
@@ -486,7 +494,8 @@ class ReservationsTest extends TestCase
         $this->travelTo($startDate);
         /** @var Location $location */
         $location = Location::factory()
-            ->state(['requires_brother' => true, 'max_volunteers' => 3])
+            ->requiresBrother()
+            ->threeVolunteers()
             ->has(
                 Shift::factory()
                     ->everyDay9am()
@@ -521,7 +530,9 @@ class ReservationsTest extends TestCase
 
         $this->travelTo($startDate);
         $location = Location::factory()
-            ->state(['requires_brother' => true, 'max_volunteers' => 3, 'is_enabled' => false])
+            ->requiresBrother()
+            ->threeVolunteers()
+            ->state(['is_enabled' => false])
             ->has(Shift::factory()->everyDay9am())
             ->create();
 
@@ -548,7 +559,8 @@ class ReservationsTest extends TestCase
         $this->travelTo($startDate);
         /** @var Location $location */
         $location = Location::factory()
-            ->state(['requires_brother' => true, 'max_volunteers' => 3])
+            ->requiresBrother()
+            ->threeVolunteers()
             ->has(
                 Shift::factory()
                     ->state(['is_enabled' => false])
@@ -579,7 +591,8 @@ class ReservationsTest extends TestCase
         $this->travelTo($startDate);
         /** @var Location $location */
         $location = Location::factory()
-            ->state(['requires_brother' => true, 'max_volunteers' => 3])
+            ->requiresBrother()
+            ->threeVolunteers()
             ->has(
                 Shift::factory()
                     ->everyDay9am()
@@ -610,8 +623,8 @@ class ReservationsTest extends TestCase
 
         $this->travelTo($startDate);
         $locations = Location::factory()
+            ->threeVolunteers()
             ->count(2)
-            ->state(['max_volunteers' => 3])
             ->has(
                 Shift::factory()
                     ->everyDay9am()
@@ -656,8 +669,8 @@ class ReservationsTest extends TestCase
         $this->travelTo($startDate);
 
         $locations = Location::factory()
+            ->threeVolunteers()
             ->count(2)
-            ->state(['max_volunteers' => 3])
             ->has(
                 Shift::factory()
                     ->count(1)
@@ -712,7 +725,7 @@ class ReservationsTest extends TestCase
         $this->travelTo($startDate);
 
         $location = Location::factory()
-            ->state(['max_volunteers' => 3])
+            ->threeVolunteers()
             ->has(Shift::factory()->everyDay9am())
             ->create();
 
@@ -744,7 +757,7 @@ class ReservationsTest extends TestCase
         $startDate = CarbonImmutable::createFromTimeString('2023-02-08 00:00:00');
 
         $location = Location::factory()
-            ->state(['max_volunteers' => 3])
+            ->threeVolunteers()
             ->has(Shift::factory()->everyDay9am())
             ->create();
 
@@ -778,7 +791,7 @@ class ReservationsTest extends TestCase
         $startDate = CarbonImmutable::createFromTimeString('2023-02-16 00:00:00');
 
         $location = Location::factory()
-            ->state(['max_volunteers' => 3])
+            ->threeVolunteers()
             ->has(Shift::factory()->everyDay9am())
             ->create();
 
@@ -811,7 +824,7 @@ class ReservationsTest extends TestCase
         $startDate = CarbonImmutable::createFromTimeString('2023-02-16 00:00:00');
 
         $location = Location::factory()
-            ->state(['max_volunteers' => 3])
+            ->threeVolunteers()
             ->has(Shift::factory()->everyDay9am())
             ->create();
 
@@ -845,7 +858,7 @@ class ReservationsTest extends TestCase
         $startDate = CarbonImmutable::createFromTimeString('2023-02-08 00:00:00');
 
         $location = Location::factory()
-            ->state(['max_volunteers' => 3])
+            ->threeVolunteers()
             ->has(Shift::factory()->everyDay9am())
             ->create();
 
@@ -889,7 +902,7 @@ class ReservationsTest extends TestCase
         $startDate = CarbonImmutable::createFromTimeString('2023-02-08 00:00:00');
 
         $location = Location::factory()
-            ->state(['max_volunteers' => 3])
+            ->threeVolunteers()
             ->has(Shift::factory()->everyDay9am())
             ->create();
 
@@ -932,7 +945,7 @@ class ReservationsTest extends TestCase
         $startDate = CarbonImmutable::createFromTimeString('2023-02-13 12:29:00');
 
         $location = Location::factory()
-            ->state(['max_volunteers' => 3])
+            ->threeVolunteers()
             ->has(Shift::factory()->everyDay9am())
             ->create();
 
