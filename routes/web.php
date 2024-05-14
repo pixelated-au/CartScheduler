@@ -19,9 +19,8 @@ use App\Http\Controllers\ReportTagsController;
 use App\Http\Controllers\ReportTagsSortOrderController;
 use App\Http\Controllers\ResendWelcomeEmailController;
 use App\Http\Controllers\SaveShiftReportController;
-use App\Http\Controllers\SetUserAvailabilityController;
 use App\Http\Controllers\SetUserPasswordController;
-use App\Http\Controllers\ShiftsController;
+use App\Http\Controllers\DeleteShiftsController;
 use App\Http\Controllers\ShowUserAvailabilityController;
 use App\Http\Controllers\ToggleShiftReservationController;
 use App\Http\Controllers\ToggleUserOntoShiftReservationController;
@@ -131,9 +130,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified',
 
             Route::get('/assigned-shifts/{shiftDate}', AdminAvailableShiftsController::class)->where(['shiftDate' => '\d\d\d\d-\d\d-\d\d']);
 
-            Route::resource('shifts', ShiftsController::class)->only(['destroy'])->names([
-                'destroy' => 'admin.shifts.destroy',
-            ]);
+            Route::delete('/shifts/{shift}', DeleteShiftsController::class)->name('admin.shifts.destroy');
 
             Route::put('/move-volunteer-to-shift', MoveUserToNewShiftController::class);
 
