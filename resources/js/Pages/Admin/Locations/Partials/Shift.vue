@@ -75,7 +75,7 @@
                 await axios.delete('/admin/shifts/' + shift.value.id)
                 toast.success('Shift deleted successfully')
             } catch (e) {
-                toast.error(e.response.data)
+                toast.error(e.message || e.response?.data)
                 return
             }
         }
