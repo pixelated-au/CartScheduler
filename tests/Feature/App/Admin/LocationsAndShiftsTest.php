@@ -6,17 +6,112 @@ use App\Models\Location;
 use App\Models\Shift;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Inertia\Testing\AssertableInertia;
 use Tests\TestCase;
 
 class LocationsAndShiftsTest extends TestCase
 {
     use RefreshDatabase;
 
+    public function test_admin_show_list_locations_page(): void
+    {
+        $admin = User::factory()->enabled()->adminRoleUser()->create();
+
+        $locations = Location::factory()
+            ->count(3)
+            ->has(Shift::factory()->everyDay9am())
+            ->create();
+
+        $this->actingAs($admin)
+            ->getJson("/admin/locations")
+            ->assertOk()
+            ->assertInertia(fn(AssertableInertia $page) => $page
+                ->component('Admin/Locations/List')
+                ->has('locations.data', fn(AssertableInertia $data) => $data
+                    ->where('0.name', $locations[0]->name)
+                    ->has('0.shifts', $locations[0]->shifts->count())
+                    ->where('1.name', $locations[1]->name)
+                    ->has('1.shifts', $locations[1]->shifts->count())
+                    ->where('2.name', $locations[2]->name)
+                    ->has('2.shifts', $locations[2]->shifts->count())
+                )
+            );
+    }
+
+    public function test_user_cannot_see_list_locations_page(): void
+    {
+        $user = User::factory()->enabled()->create();
+        $this->actingAs($user)
+            ->getJson("/admin/locations")
+            ->assertForbidden();
+    }
+
+    public function test_admin_can_see_create_location_page(): void
+    {
+        $admin = User::factory()->enabled()->adminRoleUser()->create();
+        $this->actingAs($admin)
+            ->getJson("/admin/locations/create")
+            ->assertOk()
+            ->assertInertia(fn(AssertableInertia $page) => $page
+                ->component('Admin/Locations/Add')
+                ->where('maxVolunteers', config('cart-scheduler.max_volunteers_per_location'))
+            );
+    }
+
+    public function test_admin_can_see_edit_location_page(): void
+    {
+        $admin    = User::factory()->enabled()->adminRoleUser()->create();
+        $location = Location::factory()
+            ->has(Shift::factory()->everyDay9am())
+            ->create();
+
+        $this->actingAs($admin)
+            ->getJson("/admin/locations/{$location->id}/edit")
+            ->assertOk()
+            ->assertInertia(fn(AssertableInertia $page) => $page
+                ->component('Admin/Locations/Edit')
+                ->where('maxVolunteers', config('cart-scheduler.max_volunteers_per_location'))
+                ->has('location.data', fn(AssertableInertia $data) => $data
+                    ->where('id', $location->id)
+                    ->where('name', $location->name)
+                    ->where('description', $location->description)
+                    ->where('clean_description', fn(string $data) => $data !== '')
+                    ->where('min_volunteers', $location->min_volunteers)
+                    ->where('max_volunteers', $location->max_volunteers)
+                    ->where('requires_brother', $location->requires_brother)
+                    ->where('latitude', $location->latitude)
+                    ->where('longitude', $location->longitude)
+                    ->where('is_enabled', $location->is_enabled)
+                    ->has('shifts', $location->shifts->count())
+                )
+            );
+    }
+
+    public function test_admin_can_delete_location(): void
+    {
+        $admin = User::factory()->enabled()->adminRoleUser()->create();
+
+        $location = Location::factory()
+            ->has(Shift::factory()->everyDay9am())
+            ->create();
+
+        $this->assertDatabaseCount('locations', 1);
+        $this->assertDatabaseCount('shifts', 1);
+
+        $this->actingAs($admin)
+            ->deleteJson("/admin/locations/{$location->id}")
+            ->assertRedirect()
+            ->assertSessionHas('flash.banner', "Location $location->name successfully deleted.");
+
+        $this->assertDatabaseCount('locations', 0);
+        $this->assertDatabaseCount('shifts', 0);
+    }
+
     public function test_admin_can_add_location_with_no_shifts(): void
     {
         $admin = User::factory()->adminRoleUser()->create(['is_enabled' => true]);
 
-        $response = $this->actingAs($admin)
+        $response =$this->actingAs($admin)
             ->postJson('/admin/locations', [
                 'name'             => 'A test city',
                 'description'      => 'lorem ipsum dolor sit amet',
@@ -26,7 +121,9 @@ class LocationsAndShiftsTest extends TestCase
                 'is_enabled'       => true,
                 'shifts'           => [],
             ]);
-        $response->assertRedirect('http://localhost/admin/locations/1/edit');
+        $location = Location::first();
+
+        $response->assertRedirect("http://localhost/admin/locations/{$location->id}/edit");
         $this->assertDatabaseCount('locations', 1);
     }
 
