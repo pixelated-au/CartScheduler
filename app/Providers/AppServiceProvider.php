@@ -2,16 +2,17 @@
 
 namespace App\Providers;
 
-use App\Actions\UpdateUserPassword\UpdateUserPassword;
+use App\Actions\EncryptedErrorCodeAction;
+use App\Http\Controllers\SetUserPasswordController;
+use App\Interfaces\ObfuscatedErrorCode;
 use Codedge\Updater\UpdaterManager;
 use Composer\InstalledVersions;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Console\AboutCommand;
-use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
-use Laravel\Fortify\Fortify;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -22,6 +23,13 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
+        $this->app->when(SetUserPasswordController::class)
+            ->needs(ObfuscatedErrorCode::class)
+            ->give(
+                fn(Application $application) => $application
+                    ->make(EncryptedErrorCodeAction::class, ['message' => config('cart-scheduler.set_password_generic_error_message')])
+            );
+
         AboutCommand::add('CartScheduler', static fn(UpdaterManager $updater) => [
             'Self Updater'  => class_exists(InstalledVersions::class) ? InstalledVersions::getPrettyVersion('bugsnag/bugsnag-laravel') : '<fg=yellow;options=bold>-</>',
             'Inertia'       => class_exists(InstalledVersions::class) ? InstalledVersions::getPrettyVersion('inertiajs/inertia-laravel') : '<fg=yellow;options=bold>-</>',
