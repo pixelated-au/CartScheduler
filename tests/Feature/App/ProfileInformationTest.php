@@ -172,6 +172,24 @@ class ProfileInformationTest extends TestCase
         $this->assertSame($locations[1]->name, $user->rosterLocations[1]->name);
     }
 
+    public function test_user_can_get_user_location_choices(): void
+    {
+        $settings                            = app()->make(GeneralSettings::class);
+        $settings->enableUserLocationChoices = true;
+        $settings->save();
+
+        $user      = User::factory()->enabled()->create();
+        $locations = Location::factory()->count(3)->create();
+
+        $this->actingAs($user)
+            ->getJson("/user/available-locations")
+            ->assertOk()
+            ->assertJsonCount(3, 'data')
+            ->assertJsonFragment(['id' => $locations[0]->id, 'name' => $locations[0]->name])
+            ->assertJsonFragment(['id' => $locations[1]->id, 'name' => $locations[1]->name])
+            ->assertJsonFragment(['id' => $locations[2]->id, 'name' => $locations[2]->name]);
+    }
+
     public function test_user_cant_maintain_disabled_feature_of_user_location_choices(): void
     {
         $user      = User::factory()->enabled()->create();
