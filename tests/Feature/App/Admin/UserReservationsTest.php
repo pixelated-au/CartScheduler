@@ -293,11 +293,11 @@ class UserReservationsTest extends TestCase
             ->has(Shift::factory()
                 ->everyDay9am()
                 ->hasAttached(User::factory()
-                    ->userRoleUser()
                     ->count(3)
-                    ->state(['is_enabled' => true])
+                    ->enabled()
                     , ['shift_date' => $date]
-                ))
+                )
+            )
             ->create();
 
         $shifts = $locations->map->shifts->flatten();
@@ -324,6 +324,55 @@ class UserReservationsTest extends TestCase
 
         $this->assertCount(2, $shifts[0]->users);
         $this->assertCount(3, $shifts[1]->users);
+    }
+
+    public function test_move_volunteer_with_invalid_location(): void
+    {
+        $admin = User::factory()->adminRoleUser()->create();
+
+        $date = '2023-01-03'; // A Tuesday
+
+        $locations = Location::factory()
+            ->count(2)
+            ->allPublishers()
+            ->threeVolunteers()
+            ->sequence(['is_enabled' => true], ['is_enabled' => false])
+            ->has(Shift::factory()
+                ->everyDay9am()
+                ->hasAttached(User::factory()
+                    ->count(3)
+                    ->enabled()
+                    , ['shift_date' => $date]
+                )
+            )
+            ->create();
+
+        $shifts = $locations->map->shifts->flatten();
+
+        // Just to be sure we have the correct number of shifts
+        $this->assertCount(2, $shifts);
+        $this->assertCount(3, $shifts[0]->users);
+        $this->assertCount(3, $shifts[1]->users);
+
+        // Remove a user from second shift - to enable a user to move into the spot
+        $shifts[1]->users()->detach($shifts[1]->users->last());
+        $shifts[1]->refresh();
+        $this->assertCount(2, $shifts[1]->users);
+
+        $this->actingAs($admin)
+            ->putJson("/admin/move-volunteer-to-shift", [
+                'date'         => $date,
+                'location_id'  => $shifts[1]->location->id,
+                'old_shift_id' => $shifts[0]->getKey(),
+                'user_id'      => $shifts[0]->users->last()->getKey(),
+            ])
+            ->assertUnprocessable()
+            ->assertJsonPath('error_code', ErrorApiResource::CODE_LOCATION_NOT_FOUND)
+            ->assertContainsStringIgnoringCase('message', 'not found');
+        $shifts->each->refresh();
+
+        $this->assertCount(3, $shifts[0]->users);
+        $this->assertCount(2, $shifts[1]->users);
     }
 
     public function test_volunteer_cannot_be_moved_to_a_full_shift(): void
