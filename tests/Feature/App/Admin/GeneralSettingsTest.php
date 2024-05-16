@@ -123,7 +123,7 @@ class GeneralSettingsTest extends TestCase
             ->assertOk()
             ->assertContent('1');
 
-        $mock::$currentVersion   = '1.0.1';
+        $mock::$currentVersion = '1.0.1';
         $this->actingAs($admin)
             ->getJson("/admin/check-update")
             ->assertOk()
@@ -161,9 +161,8 @@ class GeneralSettingsTest extends TestCase
 
     public function test_run_system_update_with_available_update(): void
     {
-        $mock                    = $this->prepareArtisanMock();
+        $this->prepareArtisanMock(availableVersion: '2.0.0');
         $admin                   = User::factory()->adminRoleUser()->create();
-        $mock::$availableVersion = '2.0.0';
 
         $this->actingAs($admin)
             ->postJson("/admin/do-update")
@@ -173,9 +172,8 @@ class GeneralSettingsTest extends TestCase
 
     public function test_run_system_update_with_beta_available_update(): void
     {
-        $mock                    = $this->prepareArtisanMock();
-        $admin                   = User::factory()->adminRoleUser()->create();
-        $mock::$availableVersion = '2.0.0b';
+        $this->prepareArtisanMock(availableVersion: '2.0.0b');
+        $admin = User::factory()->adminRoleUser()->create();
 
         $this->actingAs($admin)
             ->postJson("/admin/do-update")
@@ -188,7 +186,7 @@ class GeneralSettingsTest extends TestCase
      * @param string $availableVersion
      * @return object{
      *     @method static call(): void,
-     *     @method static output(): string,
+     * @method static output(): string,
      * }
      * @throws \Spatie\LaravelSettings\Exceptions\MissingSettings
      */
