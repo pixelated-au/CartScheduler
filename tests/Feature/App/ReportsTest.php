@@ -12,11 +12,13 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Spatie\Tags\Tag;
 use Tests\TestCase;
 use Tests\Traits\ExtraFunctions;
+use Tests\Traits\MakesTags;
 
 class ReportsTest extends TestCase
 {
     use RefreshDatabase;
     use ExtraFunctions;
+    use MakesTags;
 
     public function test_user_receives_correct_reports(): void
     {
@@ -235,4 +237,21 @@ class ReportsTest extends TestCase
         $response->assertStatus(422);
         $this->assertDatabaseCount('reports', 0);
     }
+
+    public function test_user_can_retrieve_all_tags(): void
+    {
+        $user = User::factory()->enabled()->create();
+        $tags = $this->makeTags(5);
+
+        $this->assertDatabaseCount('tags', 5);
+
+        $this->actingAs($user)
+            ->getJson("/get-report-tags")
+            ->assertOk()
+            ->assertJsonCount(5, 'data')
+            ->assertJsonPath('data.0.id', $tags[0]->id)
+            ->assertJsonPath('data.0.name', $tags[0]->name)
+            ->assertJsonPath('data.0.sort', $tags[0]->order_column);
+    }
+
 }
