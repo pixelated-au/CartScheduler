@@ -6,6 +6,7 @@ use App\Enums\AvailabilityHours;
 use App\Models\Location;
 use App\Models\User;
 use App\Models\UserAvailability;
+use App\Models\UserVacation;
 use App\Settings\GeneralSettings;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
@@ -49,6 +50,7 @@ class ProfileInformationTest extends TestCase
         $this->assertCount(2, $user->vacations);
         $this->assertSame('Testing', $user->vacations[0]->description);
         $this->assertSame('Testing 2', $user->vacations[1]->description);
+
         $vacation              = $user->vacations[0];
         $vacation->start_date  = '2023-01-07';
         $vacation->description = 'Testing Updated';
@@ -75,7 +77,7 @@ class ProfileInformationTest extends TestCase
         $this->assertSame('Testing 2', $user->vacations[0]->description);
     }
 
-    public function test_user_cannot_maintain_vacations_for_other_users(): void
+    public function test_user_cannot_add_vacations_for_other_users(): void
     {
         $settings                         = app()->make(GeneralSettings::class);
         $settings->enableUserAvailability = true;
@@ -92,12 +94,77 @@ class ProfileInformationTest extends TestCase
             ],
         ];
 
+        $this->actingAs($user)
+            ->putJson("/user/vacations", $vacationData)
+            ->assertUnprocessable();
+
+        $this->assertDatabaseCount('user_vacations', 0);
+    }
+
+    public function test_user_cannot_update_vacations_using_another_users_vacation_id(): void
+    {
+        $settings                         = app()->make(GeneralSettings::class);
+        $settings->enableUserAvailability = true;
+        $settings->save();
+
+        $user  = User::factory()->enabled()->create();
+        $user2 = User::factory()->enabled()->create();
+
+        $state = [
+            'user_id'     => $user2->id,
+            'start_date'  => '2023-01-01',
+            'end_date'    => '2023-01-15',
+            'description' => 'Testing',
+        ];
+
+        $vacation = UserVacation::factory()->state($state)->create();
+
+        $vacationData = [
+            'vacations' => [
+                ['id' => $vacation->id, 'start_date' => '2024-01-01', 'end_date' => '2024-01-15', 'description' => 'Updated Testing'],
+            ],
+        ];
 
         $this->actingAs($user)
             ->putJson("/user/vacations", $vacationData)
-            ->assertUnauthorized();
+            ->assertUnprocessable();
 
-        $this->assertDatabaseCount('user_vacations', 0);
+        $found = UserVacation::find($vacation->id);
+        $this->assertSame($state['start_date'], $found->start_date);
+        $this->assertSame($state['end_date'], $found->end_date);
+        $this->assertSame($state['description'], $found->description);
+    }
+
+    public function test_user_cannot_delete_vacations_using_another_users_vacation_id(): void
+    {
+        $settings                         = app()->make(GeneralSettings::class);
+        $settings->enableUserAvailability = true;
+        $settings->save();
+
+        $user  = User::factory()->enabled()->create();
+        $user2 = User::factory()->enabled()->create();
+
+        $state = [
+            'user_id'     => $user2->id,
+            'start_date'  => '2023-01-01',
+            'end_date'    => '2023-01-15',
+            'description' => 'Testing',
+        ];
+
+        $vacation = UserVacation::factory()->state($state)->create();
+
+        $vacationData = [
+            'deletedVacations' => [
+                ['id' => $vacation->id],
+            ],
+        ];
+        $this->assertDatabaseCount('user_vacations', 1);
+
+        $this->actingAs($user)
+            ->putJson("/user/vacations", $vacationData)
+            ->assertUnprocessable();
+
+        $this->assertDatabaseCount('user_vacations', 1);
     }
 
     public function test_user_vacations_data_is_validated(): void
@@ -131,7 +198,6 @@ class ProfileInformationTest extends TestCase
                 'vacations.2.description',
                 'deletedVacations.0.id',
             ]);
-
     }
 
     public function test_user_can_maintain_location_choices(): void
@@ -230,18 +296,6 @@ class ProfileInformationTest extends TestCase
 
         $this->actingAs($user)
             ->putJson("/user/available-locations", $choiceData)
-            ->assertUnauthorized();
-
-        $vacationData = [
-            'user_id'   => $user2->getKey(),
-            'vacations' => [
-                ['start_date' => '2023-01-01', 'end_date' => '2023-01-15', 'description' => 'Testing'],
-                ['start_date' => '2023-02-01', 'end_date' => '2023-02-15', 'description' => 'Testing 2'],
-            ],
-        ];
-
-        $this->actingAs($user)
-            ->putJson("/user/vacations", $vacationData)
             ->assertUnauthorized();
     }
 
