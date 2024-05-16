@@ -35,12 +35,12 @@ class GeneralSettingsTest extends TestCase
             ])
             ->assertRedirect(route('admin.settings'));
 
-            $generalSettings->refresh();
-            $this->assertSame('New Site Name', $generalSettings->siteName);
-            $this->assertSame(12, $generalSettings->systemShiftStartHour);
-            $this->assertSame(15, $generalSettings->systemShiftEndHour);
-            $this->assertTrue($generalSettings->enableUserAvailability);
-            $this->assertTrue($generalSettings->enableUserLocationChoices);
+        $generalSettings->refresh();
+        $this->assertSame('New Site Name', $generalSettings->siteName);
+        $this->assertSame(12, $generalSettings->systemShiftStartHour);
+        $this->assertSame(15, $generalSettings->systemShiftEndHour);
+        $this->assertTrue($generalSettings->enableUserAvailability);
+        $this->assertTrue($generalSettings->enableUserLocationChoices);
     }
 
     public function test_admin_can_update_allowed_settings_users(): void
@@ -75,11 +75,11 @@ class GeneralSettingsTest extends TestCase
         $generalSettings->enableUserLocationChoices = false;
         $generalSettings->currentVersion            = '1.0.0';
         $generalSettings->availableVersion          = '1.0.1';
-        $generalSettings->allowedSettingsUsers      = [1];
+        $generalSettings->allowedSettingsUsers      = [$admin->getKey()];
         $generalSettings->save();
 
         $this->actingAs($admin)
-            ->getJson("/admin/settings")
+            ->get("/admin/settings")
             ->assertInertia(fn(AssertableInertia $page) => $page
                 ->component('Admin/Settings/Show')
                 ->has('settings', fn(AssertableInertia $data) => $data
@@ -90,8 +90,23 @@ class GeneralSettingsTest extends TestCase
                     ->where('enableUserLocationChoices', false)
                     ->where('currentVersion', '1.0.0')
                     ->where('availableVersion', '1.0.1')
-                    ->where('allowedSettingsUsers', [1])
+                    ->where('allowedSettingsUsers', [$admin->getKey()])
                 )
             );
+    }
+
+    public function test_non_allowed_admin_cannot_view_general_settings(): void
+    {
+        $admin  = User::factory()->adminRoleUser()->create();
+        $admin2 = User::factory()->adminRoleUser()->create();
+
+        $generalSettings = $this->app->make(GeneralSettings::class);
+
+        $generalSettings->allowedSettingsUsers      = [$admin2->getKey()];
+        $generalSettings->save();
+
+        $this->actingAs($admin)
+            ->get("/admin/settings")
+            ->assertNotFound();
     }
 }
