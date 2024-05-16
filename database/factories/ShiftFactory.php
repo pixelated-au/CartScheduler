@@ -70,4 +70,23 @@ class ShiftFactory extends Factory
             ];
         });
     }
+
+    public function everyDay1230pm(): Factory
+    {
+        return $this->state(function (array $attributes) {
+            return [
+                'day_monday'     => true,
+                'day_tuesday'    => true,
+                'day_wednesday'  => true,
+                'day_thursday'   => true,
+                'day_friday'     => true,
+                'day_saturday'   => true,
+                'day_sunday'     => true,
+                'start_time'     => '12:30:00',
+                'end_time'       => '15:30:00',
+                'available_from' => null,
+                'available_to'   => null,
+            ];
+        });
+    }
 }
