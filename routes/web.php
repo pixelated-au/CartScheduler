@@ -117,8 +117,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified',
 
             Route::resource('/reports', ReportsController::class)->names([
                 'index' => 'admin.reports.index',
-                'show'  => 'admin.reports.show',
-            ])->only(['index', 'show']);
+            ])->only(['index']);
 
             Route::resource('/report-tags', ReportTagsController::class)->parameter('report-tags', 'tag')->names([
                 'index'   => 'admin.report-tags.index',

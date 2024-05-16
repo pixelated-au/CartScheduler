@@ -22,8 +22,4 @@ class ReportsController extends Controller
             ),
         ]);
     }
-
-    public function show(Report $report)
-    {
-    }
 }
