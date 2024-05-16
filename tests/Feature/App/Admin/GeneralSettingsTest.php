@@ -5,6 +5,7 @@ namespace App\Admin;
 use App\Models\User;
 use App\Settings\GeneralSettings;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Artisan;
 use Inertia\Testing\AssertableInertia;
 use Tests\TestCase;
 
@@ -102,11 +103,112 @@ class GeneralSettingsTest extends TestCase
 
         $generalSettings = $this->app->make(GeneralSettings::class);
 
-        $generalSettings->allowedSettingsUsers      = [$admin2->getKey()];
+        $generalSettings->allowedSettingsUsers = [$admin2->getKey()];
         $generalSettings->save();
 
         $this->actingAs($admin)
             ->get("/admin/settings")
             ->assertNotFound();
+    }
+
+    public function test_admin_can_check_for_update(): void
+    {
+        $admin = User::factory()->adminRoleUser()->create();
+
+        $generalSettings = $this->app->make(GeneralSettings::class);
+
+        $generalSettings->currentVersion   = '1.0.0';
+        $generalSettings->availableVersion = '1.0.1';
+        $generalSettings->save();
+
+        $this->actingAs($admin)
+            ->getJson("/admin/check-update")
+            ->assertOk()
+            ->assertContent('1');
+
+        $generalSettings->currentVersion = '1.0.1';
+        $generalSettings->save();
+
+        $this->actingAs($admin)
+            ->getJson("/admin/check-update")
+            ->assertOk()
+            ->assertNoContent(200);
+    }
+
+    public function test_admin_can_check_for_beta_update(): void
+    {
+        $mock = $this->prepareArtisanMock();
+
+        $admin = User::factory()->adminRoleUser()->create();
+        $this->actingAs($admin)
+            ->getJson("/admin/check-update")
+            ->assertOk()
+            ->assertNoContent(200);
+
+        $mock::$versionInstalled = '2.0.0b';
+
+        $this->actingAs($admin)
+            ->getJson("/admin/check-update?beta=true")
+            ->assertOk()
+            ->assertContent('1');
+    }
+
+    public function test_run_system_update_with_no_available_update(): void
+    {
+        $this->prepareArtisanMock();
+        $admin = User::factory()->adminRoleUser()->create();
+
+        $this->actingAs($admin)
+            ->postJson("/admin/do-update")
+            ->assertOk()
+            ->assertContent('success!');
+    }
+
+    public function test_run_system_update_with_available_update(): void
+    {
+        $mock = $this->prepareArtisanMock();
+        $admin = User::factory()->adminRoleUser()->create();
+        $mock::$versionInstalled = '2.0.0';
+
+        $this->actingAs($admin)
+            ->postJson("/admin/do-update")
+            ->assertOk()
+            ->assertContent('success!');
+    }
+
+    public function test_run_system_update_with_beta_available_update(): void
+    {
+        $mock = $this->prepareArtisanMock();
+        $admin = User::factory()->adminRoleUser()->create();
+        $mock::$versionInstalled = '2.0.0b';
+
+        $this->actingAs($admin)
+            ->postJson("/admin/do-update")
+            ->assertOk()
+            ->assertContent('success!');
+    }
+
+    private function prepareArtisanMock(): object
+    {
+        GeneralSettings::fake(['currentVersion'   => '1.0.0', 'availableVersion' => '1.0.0']);
+
+        $mock = new class {
+            public static string $versionInstalled = '1.0.0';
+
+            public static function call(): void
+            {
+                app()->make(GeneralSettings::class)
+                    ->fill(['availableVersion' => self::$versionInstalled])
+                    ->save();
+            }
+
+            public static function output(): string
+            {
+                return 'success!';
+            }
+        };
+
+        Artisan::swap($mock);
+        return $mock;
     }
 }
