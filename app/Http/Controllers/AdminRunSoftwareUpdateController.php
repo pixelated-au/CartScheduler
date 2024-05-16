@@ -14,7 +14,7 @@ class AdminRunSoftwareUpdateController extends Controller
     }
 
 
-    public function __invoke(Request $request)
+    public function __invoke()
     {
         $available = $this->settings->availableVersion;
         $params = ['--force' => true];
