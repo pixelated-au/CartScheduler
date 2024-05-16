@@ -164,7 +164,7 @@ class AdminDashboardTest extends TestCase
             ->assertJsonPath('locations.0.name', $location->name);
     }
 
-    public function test_invalid_date_returns_today(): void
+    public function test_admin_sends_invalid_date_to_get_shifts(): void
     {
         $admin = User::factory()->adminRoleUser()->create(['is_enabled' => true]);
         $users = User::factory()->count(4)->create()->chunk(2);
