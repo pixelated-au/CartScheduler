@@ -478,4 +478,22 @@ class UsersTest extends TestCase
             ->putJson("/user/available-locations", $choiceData)
             ->assertInvalid(['featureDisabled']);
     }
+
+    public function test_get_admin_users_only_returns_users_with_admin_role(): void
+    {
+        $admins = User::factory()->count(3)->adminRoleUser()->create();
+        User::factory()->enabled()->count(3)->create();
+
+        $this->actingAs($admins[0])
+            ->getJson("/admin/admin-users")
+            ->assertOk()
+            ->assertJsonCount(3, 'data')
+            ->assertJson([
+                'data' => [
+                    ['id' => $admins[0]->id, 'name' => $admins[0]->name],
+                    ['id' => $admins[1]->id, 'name' => $admins[1]->name],
+                    ['id' => $admins[2]->id, 'name' => $admins[2]->name],
+                ],
+            ]);
+    }
 }
