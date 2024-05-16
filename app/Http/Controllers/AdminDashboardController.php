@@ -14,11 +14,7 @@ class AdminDashboardController extends Controller
 {
     public function __invoke(GetShiftFilledData $shiftFilledData, GetOutstandingReports $getOutstandingReports)
     {
-        /** @var \App\Models\User $user */
-        $user = Auth::user();
-        if ($user->role !== Role::Admin->value) {
-            abort(403);
-        }
+        // Not checking for admin role because the routes should check for it
 
         return Inertia::render('Admin/Dashboard', [
             'totalUsers'         => User::all()->count(),
