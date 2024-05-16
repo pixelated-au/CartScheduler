@@ -115,20 +115,15 @@ class GeneralSettingsTest extends TestCase
     {
         $admin = User::factory()->adminRoleUser()->create();
 
-        $generalSettings = $this->app->make(GeneralSettings::class);
+        $mock = $this->prepareArtisanMock();
 
-        $generalSettings->currentVersion   = '1.0.0';
-        $generalSettings->availableVersion = '1.0.1';
-        $generalSettings->save();
-
+        $mock::$availableVersion = '1.0.1';
         $this->actingAs($admin)
             ->getJson("/admin/check-update")
             ->assertOk()
             ->assertContent('1');
 
-        $generalSettings->currentVersion = '1.0.1';
-        $generalSettings->save();
-
+        $mock::$currentVersion   = '1.0.1';
         $this->actingAs($admin)
             ->getJson("/admin/check-update")
             ->assertOk()
@@ -145,7 +140,7 @@ class GeneralSettingsTest extends TestCase
             ->assertOk()
             ->assertNoContent(200);
 
-        $mock::$versionInstalled = '2.0.0b';
+        $mock::$availableVersion = '2.0.0b';
 
         $this->actingAs($admin)
             ->getJson("/admin/check-update?beta=true")
@@ -166,9 +161,9 @@ class GeneralSettingsTest extends TestCase
 
     public function test_run_system_update_with_available_update(): void
     {
-        $mock = $this->prepareArtisanMock();
-        $admin = User::factory()->adminRoleUser()->create();
-        $mock::$versionInstalled = '2.0.0';
+        $mock                    = $this->prepareArtisanMock();
+        $admin                   = User::factory()->adminRoleUser()->create();
+        $mock::$availableVersion = '2.0.0';
 
         $this->actingAs($admin)
             ->postJson("/admin/do-update")
@@ -178,9 +173,9 @@ class GeneralSettingsTest extends TestCase
 
     public function test_run_system_update_with_beta_available_update(): void
     {
-        $mock = $this->prepareArtisanMock();
-        $admin = User::factory()->adminRoleUser()->create();
-        $mock::$versionInstalled = '2.0.0b';
+        $mock                    = $this->prepareArtisanMock();
+        $admin                   = User::factory()->adminRoleUser()->create();
+        $mock::$availableVersion = '2.0.0b';
 
         $this->actingAs($admin)
             ->postJson("/admin/do-update")
@@ -188,17 +183,30 @@ class GeneralSettingsTest extends TestCase
             ->assertContent('success!');
     }
 
-    private function prepareArtisanMock(): object
+    /**
+     * @param string $currentVersion
+     * @param string $availableVersion
+     * @return object{
+     *     @method static call(): void,
+     *     @method static output(): string,
+     * }
+     * @throws \Spatie\LaravelSettings\Exceptions\MissingSettings
+     */
+    private function prepareArtisanMock(string $currentVersion = '1.0.0', string $availableVersion = '1.0.0'): object
     {
-        GeneralSettings::fake(['currentVersion'   => '1.0.0', 'availableVersion' => '1.0.0']);
+        GeneralSettings::fake(['currentVersion' => $currentVersion, 'availableVersion' => $availableVersion]);
 
         $mock = new class {
-            public static string $versionInstalled = '1.0.0';
+            public static string $availableVersion = '1.0.0';
+            public static string $currentVersion = '1.0.0';
 
             public static function call(): void
             {
                 app()->make(GeneralSettings::class)
-                    ->fill(['availableVersion' => self::$versionInstalled])
+                    ->fill([
+                        'currentVersion'   => self::$currentVersion,
+                        'availableVersion' => self::$availableVersion,
+                    ])
                     ->save();
             }
 
@@ -207,6 +215,9 @@ class GeneralSettingsTest extends TestCase
                 return 'success!';
             }
         };
+
+        $mock::$currentVersion   = $currentVersion;
+        $mock::$availableVersion = $availableVersion;
 
         Artisan::swap($mock);
         return $mock;
