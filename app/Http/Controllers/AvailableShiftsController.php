@@ -29,14 +29,14 @@ class AvailableShiftsController extends Controller
 
     public function __invoke(Request $request, string $shiftDate)
     {
-        /** @var User $user */
         $user = $request->user();
-        if (!$user) {
-            abort(403);
-        }
+        $endDate = $this->getMaxShiftReservationDateAllowed->execute()->format('Y-m-d');
 
         try {
             $selectedDate = Carbon::parse($shiftDate);
+            if ($selectedDate > $endDate) {
+                $selectedDate = Carbon::today();
+            }
         } catch (InvalidFormatException $e) {
             Bugsnag::notifyException($e);
             $selectedDate = Carbon::today();
@@ -86,7 +86,6 @@ class AvailableShiftsController extends Controller
                         ->contains(fn(User $shiftUser) => $shiftUser->id === $user->id)))
             );
 
-        $endDate         = $this->getMaxShiftReservationDateAllowed->execute()->format('Y-m-d');
         $startDate       = Carbon::today()->format('Y-m-d');
         $shifts          = $this->getUserShiftsData->execute($startDate, $endDate, $user);
         $freeShiftsCount = $user->is_unrestricted
