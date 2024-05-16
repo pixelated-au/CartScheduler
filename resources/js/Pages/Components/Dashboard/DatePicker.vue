@@ -148,7 +148,18 @@ watchEffect(() => {
 
     emit('locations-for-day', marks.map(marker => ({locations: marker.locations, date: marker.date})));
 });
+
+const updateMonthYear = ({month, year}) => {
+    const totalDays = new Date(year, month+1, 0).getDate();
+    const monthDay = selectedDate.value.getDate();
+    if (monthDay > totalDays) {
+        selectedDate.value = new Date(year, month, totalDays);
+        return
+    }
+    selectedDate.value = new Date(year, month, selectedDate.value.getDate());
+}
 </script>
+
 <template>
     <Datepicker inline
                 auto-apply
@@ -161,7 +172,8 @@ watchEffect(() => {
                 :allowed-dates="allowed"
                 :min-date="notBefore"
                 :max-date="notAfter"
-                :dark="isDarkMode">
+                :dark="isDarkMode"
+                @update-month-year="updateMonthYear">
         <template #day="{day, date}">
             {{ day }}
         </template>
