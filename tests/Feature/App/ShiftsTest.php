@@ -333,6 +333,75 @@ class ShiftsTest extends TestCase
             ->assertUnauthorized();
     }
 
+    public function test_user_sends_invalid_date_to_get_shifts(): void
+    {
+        $this->setConfig(2, DBPeriod::Week, true, 'MON', '00:00');
+        /** @var \Illuminate\Support\Collection<int, \Illuminate\Support\Collection<int, User>> $users */
+        $users = User::factory()->count(4)->enabled()->create()->chunk(2);
+
+        $location = Location::factory()
+            ->allPublishers()
+            ->has(
+                Shift::factory()
+                    ->everyDay9am()
+                    ->hasAttached($users->first(), ['shift_date' => '2023-01-03'])
+                    ->hasAttached($users->last(), ['shift_date' => '2023-01-04'])
+            )
+            ->has(Shift::factory()
+                ->everyDay1230pm()
+                ->hasAttached($users->first(), ['shift_date' => '2023-01-03'])
+                ->hasAttached($users->last(), ['shift_date' => '2023-01-04'])
+            )
+            ->create();
+
+        $this->travelTo('2023-01-03 09:00:00');
+
+        $this->actingAs($users->first()->first())
+            ->getJson("/shifts/2023-05-55") // This date doesn't exist
+            ->assertOk()
+            // Should fail silently and return values for today
+            ->assertJsonCount(14, 'freeShifts')
+            ->assertJsonPath('freeShifts.2023-01-03.max_volunteers', 10)
+            ->assertJsonPath('freeShifts.2023-01-16.max_volunteers', 10)
+            ->assertJsonCount(1, 'locations')
+            ->assertJsonPath('locations.0.id', $location->id)
+            ->assertJsonPath('locations.0.name', $location->name);
+    }
+
+    public function test_user_sends_date_beyond_max_reservation_date_to_get_shifts(): void
+    {
+        $this->setConfig(2, DBPeriod::Week, true, 'MON', '00:00');
+        /** @var \Illuminate\Support\Collection<int, \Illuminate\Support\Collection<int, User>> $users */
+        $users = User::factory()->count(4)->enabled()->create()->chunk(2);
+
+        $location = Location::factory()
+            ->allPublishers()
+            ->has(
+                Shift::factory()
+                    ->everyDay9am()
+                    ->hasAttached($users->first(), ['shift_date' => '2023-01-03'])
+                    ->hasAttached($users->last(), ['shift_date' => '2023-01-04'])
+            )
+            ->has(Shift::factory()
+                ->everyDay1230pm()
+                ->hasAttached($users->first(), ['shift_date' => '2023-01-03'])
+                ->hasAttached($users->last(), ['shift_date' => '2023-01-04'])
+            )
+            ->create();
+
+        $this->travelTo('2023-01-03 09:00:00');
+
+        $this->actingAs($users->first()->first())
+            ->getJson("/shifts/2023-02-01") // This date is beyond the max reservation date
+            ->assertOk()
+            // First day should be today, not the date sent
+            ->assertJsonCount(14, 'freeShifts')
+            ->assertJsonPath('freeShifts.2023-01-03.max_volunteers', 10)
+            ->assertJsonPath('freeShifts.2023-01-16.max_volunteers', 10)
+            ->assertJsonCount(1, 'locations')
+            ->assertJsonPath('locations.0.id', $location->id)
+            ->assertJsonPath('locations.0.name', $location->name);
+    }
 
     /**
      * @param string $timeString Eg '2023-01-25 00:00:00'
