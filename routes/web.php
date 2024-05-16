@@ -21,6 +21,7 @@ use App\Http\Controllers\ResendWelcomeEmailController;
 use App\Http\Controllers\SaveShiftReportController;
 use App\Http\Controllers\SetUserPasswordController;
 use App\Http\Controllers\DeleteShiftsController;
+use App\Http\Controllers\ShowGeneralSettingsController;
 use App\Http\Controllers\ShowUserAvailabilityController;
 use App\Http\Controllers\ToggleShiftReservationController;
 use App\Http\Controllers\ToggleUserOntoShiftReservationController;
@@ -137,9 +138,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified',
             Route::get('/available-users-for-shift/{shift}', GetAvailableUsersForShiftController::class);
             Route::match(['put', 'delete'], '/toggle-shift-for-user', ToggleUserOntoShiftReservationController::class);
 
-            Route::get('/settings', static fn(GeneralSettings $settings) => Inertia::render('Admin/Settings/Show', [
-                'settings' => $settings->toArray(),
-            ]))->name('admin.settings');
+            Route::get('/settings', ShowGeneralSettingsController::class)->name('admin.settings');
 
             Route::put('/general-settings', UpdateGeneralSettingsController::class)->name('admin.general-settings.update');
             Route::put('/allowed-settings-users', UpdateAllowedSettingsUsersController::class)->name('admin.allowed-settings-users.update');
