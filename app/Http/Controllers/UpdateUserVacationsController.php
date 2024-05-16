@@ -31,10 +31,8 @@ class UpdateUserVacationsController extends Controller
         foreach ($vacations as $vacation) {
             if (isset($vacation['id'])) {
                 $userVacation = $user->vacations()->find($vacation['id']);
-                if (!$userVacation) {
-                    continue;
-                }
             } else {
+                // If there is no id, create a new vacation
                 $userVacation          = new UserVacation();
                 $userVacation->user_id = $user->getKey();
             }
@@ -45,16 +43,9 @@ class UpdateUserVacationsController extends Controller
             $userVacation->save();
         }
 
-        $deleted = $request->validated('deletedVacations', []);
-        foreach ($deleted as $vacation) {
-            if (!isset($vacation['id'])) {
-                continue;
-            }
-            /** @var \App\Models\UserVacation $userVacation */
-            $userVacation = $user->vacations()->find($vacation['id']);
-            if (!$userVacation) {
-                continue;
-            }
+        $toBeDeleted = $request->validated('deletedVacations', []);
+        foreach ($toBeDeleted as $toDelete) {
+            $userVacation = $user->vacations()->find($toDelete['id']);
             $userVacation->delete();
         }
 
