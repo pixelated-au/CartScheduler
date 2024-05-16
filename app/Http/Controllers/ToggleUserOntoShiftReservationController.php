@@ -8,7 +8,6 @@ use App\Enums\ToggleReservationStatus;
 use App\Http\Controllers\ValidationRules\ToggleShiftReservationControllerRules;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Validation\ValidationException;
 
 class ToggleUserOntoShiftReservationController extends Controller
 {
@@ -19,17 +18,19 @@ class ToggleUserOntoShiftReservationController extends Controller
     {
     }
 
+    /**
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+     */
     public function __invoke(Request $request)
     {
-        $userId = $request->integer('user');
-        if (!$userId) {
-            throw new ValidationException('Missing User ID');
-        }
-        $user = User::findOrFail($userId);
+        $request->validate([
+            'user' => ['required', 'integer', 'exists:users,id'],
+        ]);
+        $user = User::findOrFail($request->integer('user'));
 
         $rules = $this->toggleShiftReservationControllerRules->execute($user, $request->all(), true);
 
-        $data = $this->validate($request, $rules);
+        $data   = $request->validate($rules);
         $status = $this->toggleUserOntoShift->execute($user, $data);
 
         return match ($status) {
