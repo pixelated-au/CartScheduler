@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Settings\GeneralSettings;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Str;
 
@@ -17,7 +16,7 @@ class AdminRunSoftwareUpdateController extends Controller
     public function __invoke()
     {
         $available = $this->settings->availableVersion;
-        $params = ['--force' => true];
+        $params    = ['--force' => true];
         if (Str::endsWith($available, 'b')) {
             $params['--beta'] = true;
         }
