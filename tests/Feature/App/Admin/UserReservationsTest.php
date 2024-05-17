@@ -7,7 +7,10 @@ use App\Models\Location;
 use App\Models\Shift;
 use App\Models\ShiftUser;
 use App\Models\User;
+use Carbon\CarbonImmutable;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Str;
 use Tests\TestCase;
 
 class UserReservationsTest extends TestCase
@@ -278,6 +281,57 @@ class UserReservationsTest extends TestCase
             )
             ->assertStatus(422)
             ->assertContainsStringIgnoringCase('message', "the last volunteer for this shift needs to be a brother");
+    }
+
+    public function test_volunteer_cannot_be_assigned_to_an_overlapping_shift(): void
+    {
+        $admin = User::factory()->enabled()->adminRoleUser()->create();
+        $user  = User::factory()->male()->create();
+
+        $startDate = CarbonImmutable::createFromTimeString('2023-01-15 12:00:00');
+        $nextDay   = $startDate->addDay()->toDateString();
+
+        $this->travelTo($startDate);
+        /** @var Location $location */
+        $location = Location::factory()
+            ->requiresBrother()
+            ->threeVolunteers()
+            ->has(
+                Shift::factory()
+                    ->everyDay9am()
+                    ->hasAttached($user, ['shift_date' => $nextDay])
+            )
+            ->has(
+                Shift::factory()
+                    ->everyDay1230pm()
+                    ->state(['start_time' => '10:30:00'])
+            )
+            ->create();
+
+        $this->assertDatabaseCount('shift_user', 1);
+
+        [$firstShift, $secondShift] = $location->shifts;
+
+        $this->actingAs($admin)->putJson('/admin/toggle-shift-for-user', [
+            'date'       => $nextDay,
+            'do_reserve' => true,
+            'location'   => $location->id,
+            'shift'      => $secondShift->id,
+            'user'       => $user->getKey(),
+        ])
+            ->assertUnprocessable()
+            ->assertInvalid('shift')
+            ->assertContainsStringIgnoringCase(
+                'message',
+                Str::of($user->name)
+                    ->append(' is already on a shift that overlaps this shift at ')
+                    ->append($location->name, ' between ')
+                    ->append(Carbon::parse($firstShift->start_time)->format('h:i a'), ' and ')
+                    ->append(Carbon::parse($firstShift->end_time)->format('h:i a'))
+                    ->value(),
+            );
+
+        $this->assertDatabaseCount('shift_user', 1);
     }
 
     public function test_volunteer_can_be_moved_to_a_different_shift(): void
