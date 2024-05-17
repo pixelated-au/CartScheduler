@@ -20,7 +20,7 @@ class CheckForUpdateCommand extends Command
 
     public function handle(): void
     {
-        $beta    = $this->option('beta');
+        $wantsBeta = $this->option('beta');
 
         $this->info('Checking for updates...');
         // Check if new version is available
@@ -29,10 +29,9 @@ class CheckForUpdateCommand extends Command
             $this->warn("No new updates available. Current version is $current");
             return;
         }
-
         $new = $this->updater->source()->getVersionAvailable();
         if (Str::endsWith($new, 'b')) {
-            if (!$beta) {
+            if (!$wantsBeta) {
                 $this->warn("New version is a beta release. Ignoring. Current version is $current");
 
                 return;
