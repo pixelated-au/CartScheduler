@@ -4,10 +4,14 @@ namespace Tests\Feature\App\Admin;
 
 use App\Mail\UserAccountCreated;
 use App\Models\User;
+use App\Settings\GeneralSettings;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 use Inertia\Testing\AssertableInertia;
+use Maatwebsite\Excel\Facades\Excel;
 use Tests\TestCase;
 
 class UsersBatchImportTest extends TestCase
@@ -114,5 +118,39 @@ class UsersBatchImportTest extends TestCase
 
         // Should only be one email sent because the duplicate user was updated
         Mail::assertSent(UserAccountCreated::class, 1);
+    }
+
+    public function test_admin_can_download_user_import_spreadsheet_template(): void
+    {
+        GeneralSettings::fake(['siteName' => 'Test Site']);
+        Excel::fake();
+
+        $admin = User::factory()->adminRoleUser()->create(['is_enabled' => true]);
+        $this->actingAs($admin)
+            ->get("/admin/users-import-template")
+            ->assertOk();
+
+        Excel::assertDownloaded(Str::of('Test Site')->snake()->append('-user_import_template.xlsx'));
+    }
+
+    public function test_admin_can_download_user_export_spreadsheet(): void
+    {
+        $carbon = Carbon::createFromTimeString('2023-01-01 12:00:00');
+        Carbon::setTestNow($carbon);
+        GeneralSettings::fake(['siteName' => 'Test Site']);
+        Excel::fake();
+
+        $admin = User::factory()->adminRoleUser()->create(['is_enabled' => true]);
+        $this->actingAs($admin)
+            ->get("/admin/users-as-spreadsheet")
+            ->assertOk();
+
+        Excel::assertDownloaded(
+            Str::of('Test Site')
+                ->snake()
+                ->append('-user_dump_')
+                ->append($carbon->format('Y-m-d_His'))
+                ->append('.xlsx'),
+        );
     }
 }
