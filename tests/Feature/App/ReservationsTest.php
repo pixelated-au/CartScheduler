@@ -582,6 +582,51 @@ class ReservationsTest extends TestCase
         $this->assertDatabaseCount('shift_user', 0);
     }
 
+    public function test_user_cannot_reserve_an_overlapping_shift(): void
+    {
+        $user = User::factory()->male()->create();
+
+        $startDate = CarbonImmutable::createFromTimeString('2023-01-15 12:00:00');
+        $nextDay   = $startDate->addDay()->toDateString();
+
+        $this->travelTo($startDate);
+        /** @var Location $location */
+        $location = Location::factory()
+            ->requiresBrother()
+            ->threeVolunteers()
+            ->has(
+                Shift::factory()
+                    ->everyDay9am()
+                    ->hasAttached($user, ['shift_date' => $nextDay])
+            )
+            ->has(
+                Shift::factory()
+                    ->everyDay1230pm()
+                    ->state(['start_time' => '10:30:00'])
+            )
+            ->create();
+
+        $this->assertDatabaseCount('shift_user', 1);
+
+        [$firstShift, $secondShift] = $location->shifts;
+
+        $this->actingAs($user)->postJson('/reserve-shift', [
+            'location'   => $location->id,
+            'shift'      => $secondShift->id,
+            'do_reserve' => true,
+            'date'       => $nextDay,
+        ])
+            ->assertUnprocessable()
+            ->assertInvalid('shift')
+            ->assertContainsStringIgnoringCase('message', "you're already assigned")
+            ->assertContainsStringIgnoringCase(
+                'message',
+                $location->name . ' - ' . $firstShift->start_time . ' and ' . $firstShift->end_time
+            );
+
+        $this->assertDatabaseCount('shift_user', 1);
+    }
+
     public function test_user_cannot_reserve_a_shift_on_day_where_shift_is_not_enabled(): void
     {
         $user = User::factory()->male()->create();
