@@ -1,13 +1,11 @@
 <?php
 
-namespace Tests\Console\Commands;
+namespace Tests\Feature\Console\Commands;
 
 use App\Console\Commands\UpdateCommand;
 use App\Settings\GeneralSettings;
-use Codedge\Updater\SourceRepositoryTypes\GithubRepositoryTypes\GithubTagType;
 use DG\BypassFinals;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Mockery\MockInterface;
 use Tests\TestCase;
 use Tests\Traits\LaravelUpdaterMocks;
 

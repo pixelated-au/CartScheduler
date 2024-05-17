@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Console\Commands;
+namespace Tests\Feature\Console\Commands;
 
 use App\Console\Commands\CheckForUpdateCommand;
 use App\Settings\GeneralSettings;
