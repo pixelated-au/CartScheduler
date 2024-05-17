@@ -18,7 +18,7 @@ class CreateUserCommand extends Command
 
     public function handle(): void
     {
-        if (User::count() > 1) {
+        if (User::count() > 0) {
             $this->error('Only one user can be created from this interface');
 
             return;
