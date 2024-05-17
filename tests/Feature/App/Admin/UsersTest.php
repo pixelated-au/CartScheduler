@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
 use Inertia\Testing\AssertableInertia;
 use Tests\TestCase;
@@ -208,7 +209,42 @@ class UsersTest extends TestCase
         Mail::assertNothingSent();
     }
 
+    public function test_password_reset_too_many_requests(): void
+    {
+        $admin = User::factory()->adminRoleUser()->state(['is_enabled' => true])->create();
+        $user  = User::factory()->enabled()->create();
+
+        Mail::fake();
+        Notification::fake();
+        Password::shouldReceive('sendResetLink')
+            ->andReturn(Password::RESET_LINK_SENT, Password::RESET_LINK_SENT, Password::RESET_THROTTLED);
+
+        for ($i = 0; $i < 3; $i++) {
+            // 3rd request should fail
+            $expected = $i < 2 ? 'has been sent' : 'too many password reset attempts';
+            $this->actingAs($admin)
+                ->postJson("/admin/resend-welcome-email?user_id={$user->getKey()}")
+                ->assertStatus($i < 2 ? 200 : 429)
+                ->assertContainsStringIgnoringCase('message', $expected);
+        }
+        Mail::assertNothingSent();
+    }
+
     public function test_admin_can_resend_welcome_email(): void
+    {
+        $admin = User::factory()->adminRoleUser()->state(['is_enabled' => true])->create();
+        $user  = User::factory()->enabled()->state(['password' => null])->create();
+
+        Mail::fake();
+        $this->actingAs($admin)
+            ->postJson("/admin/resend-welcome-email?user_id={$user->getKey()}")
+            ->assertOk()
+            ->assertJsonPath('message', 'Welcome email was sent');
+
+        Mail::assertSent(UserAccountCreated::class, 1);
+    }
+
+    public function test_resend_welcome_email_is_correct(): void
     {
         $admin = User::factory()->adminRoleUser()->state(['is_enabled' => true])->create();
         $user  = User::factory()->enabled()->state(['password' => null])->create();
@@ -237,21 +273,6 @@ class UsersTest extends TestCase
         $hashed = Str::of($render)->match('/set-password\/\d+\/([a-zA-Z0-9]+)/');
         $this->assertTrue(Hash::check($user->uuid . $user->email, base64_decode($hashed)));
     }
-
-    public function test_password_reset_email_is_correct(): void
-    {
-        $admin = User::factory()->adminRoleUser()->state(['is_enabled' => true])->create();
-        $user  = User::factory()->enabled()->state(['password' => null])->create();
-
-        Mail::fake();
-        $this->actingAs($admin)
-            ->postJson("/admin/resend-welcome-email?user_id={$user->getKey()}")
-            ->assertOk()
-            ->assertJsonPath('message', 'Welcome email was sent');
-
-        Mail::assertSent(UserAccountCreated::class, 1);
-    }
-
 
     public function test_validations_are_working(): void
     {
