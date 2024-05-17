@@ -173,22 +173,7 @@ class ToggleShiftReservationControllerRules
 
     private function isShiftInAllowedPeriod(Carbon $shiftDate, $fail): void
     {
-        $dbPeriod                       = DBPeriod::getConfigPeriod();
-        $doReleaseShiftsDaily           = config('cart-scheduler.do_release_shifts_daily');
         $maxShiftReservationDateAllowed = $this->getMaxShiftReservationDateAllowed->execute();
-
-        if (
-            $dbPeriod->value === DBPeriod::Week->value
-            && !$doReleaseShiftsDaily
-            && $shiftDate->isSameDay($maxShiftReservationDateAllowed)
-            && Carbon::now()->format('Gis.u') > $maxShiftReservationDateAllowed
-                ->addDay()
-                ->format('Gis.u')
-        ) {
-            $fail($this->getMaxShiftReservationDateAllowed->getFailMessage());
-
-            return;
-        }
 
         if ($shiftDate->isAfter($maxShiftReservationDateAllowed)) {
             $fail($this->getMaxShiftReservationDateAllowed->getFailMessage());
