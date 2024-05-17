@@ -6,11 +6,14 @@ use App\Console\Commands\CheckForUpdateCommand;
 use App\Settings\GeneralSettings;
 use Codedge\Updater\SourceRepositoryTypes\GithubRepositoryTypes\GithubTagType;
 use DG\BypassFinals;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Mockery\MockInterface;
 use Tests\TestCase;
 
 class CheckForUpdateCommandTest extends TestCase
 {
+    use RefreshDatabase;
+
     public function setUp(): void
     {
         parent::setUp();
