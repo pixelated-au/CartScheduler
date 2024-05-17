@@ -230,6 +230,24 @@ class UsersTest extends TestCase
         Mail::assertNothingSent();
     }
 
+    public function test_password_reset_unhandled_password_response(): void
+    {
+        $admin = User::factory()->adminRoleUser()->state(['is_enabled' => true])->create();
+        $user  = User::factory()->enabled()->create();
+
+        Mail::fake();
+        Notification::fake();
+        Password::shouldReceive('sendResetLink')
+            ->andReturn(Password::INVALID_USER);
+
+            // 3rd request should fail
+            $this->actingAs($admin)
+                ->postJson("/admin/resend-welcome-email?user_id={$user->getKey()}")
+                ->assertserverError()
+                ->assertContainsStringIgnoringCase('message', 'unknown error');
+        Mail::assertNothingSent();
+    }
+
     public function test_admin_can_resend_welcome_email(): void
     {
         $admin = User::factory()->adminRoleUser()->state(['is_enabled' => true])->create();

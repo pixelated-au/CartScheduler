@@ -55,5 +55,4 @@ class ResendWelcomeEmailController extends Controller
             'message' => 'Welcome email was sent',
         ]);
     }
-
 }
