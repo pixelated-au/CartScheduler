@@ -31,12 +31,13 @@
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.7",
         "brianium/paratest": "^6.11",
+        "dg/bypass-finals": "^1.7",
         "fakerphp/faker": "^1.9.1",
         "laravel/pint": "^1.0",
         "laravel/sail": "^v1.28.0",
         "mockery/mockery": "^1.4.4",
         "nunomaduro/collision": "^v6.4.0",
-        "phpunit/phpunit": "^9.6.16",
+        "phpunit/phpunit": "^9.6",
         "roave/security-advisories": "dev-latest",
         "spatie/laravel-ignition": "^1.0"
     },
