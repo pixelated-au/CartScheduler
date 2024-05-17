@@ -238,6 +238,48 @@ class ReportsTest extends TestCase
         $this->assertDatabaseCount('reports', 0);
     }
 
+    public function test_shift_on_date_should_be_fail_if_user_is_not_on_shift_date_or_start_time_is_wrong(): void
+    {
+        $user = User::factory()->enabled()->create();
+
+        $shift = Shift::factory()
+            ->everyDay9am()
+            ->for(Location::factory()->allPublishers())
+            ->create();
+
+        $this->assertDatabaseCount('reports', 0);
+
+        ShiftUser::factory()
+            ->state(['shift_date' => '2023-01-01'])
+            ->for($shift, 'shift')
+            ->for($user, 'user')
+            ->create();
+
+        $reportData = [
+            'shift_date'          => '2023-01-02',
+            'shift_id'            => $shift->getKey(),
+            'start_time'          => '09:00:00',
+            'shift_was_cancelled' => false,
+            'placements_count'    => 2,
+            'videos_count'        => 3,
+            'requests_count'      => 4,
+            'comments'            => 'A test comment',
+        ];
+
+        $this->actingAs($user)
+            ->postJson('/save-report', $reportData)
+            ->assertUnprocessable()
+            ->assertContainsStringIgnoringCase('message', 'does not match a shift');
+        $this->assertDatabaseCount('reports', 0);
+
+        $reportData['start_time'] = '08:00:00';
+        $this->actingAs($user)
+            ->postJson('/save-report', $reportData)
+            ->assertUnprocessable()
+            ->assertContainsStringIgnoringCase('message', 'does not match a shift');
+        $this->assertDatabaseCount('reports', 0);
+    }
+
     public function test_user_can_retrieve_all_tags(): void
     {
         $user = User::factory()->enabled()->create();
