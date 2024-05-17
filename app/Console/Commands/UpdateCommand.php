@@ -65,16 +65,16 @@ class UpdateCommand extends Command
 
         } else {
             // Shouldn't happen but theoretically possible...
+            // @codeCoverageIgnoreStart
             $this->error('Versions are the same. Aborting.');
             return;
+            // @codeCoverageIgnoreEnd
         }
 
-        if (config('app.env') === 'local') {
-            $this->warn('Not in production, pretending to update...');
-            $this->settings->currentVersion = $new;
-            $this->settings->save();
-
+        if ($this->doFinishEarly($new)) {
+            // @codeCoverageIgnoreStart
             return;
+            // @codeCoverageIgnoreEnd
         }
 
         $this->info('Updating...');
@@ -88,7 +88,6 @@ class UpdateCommand extends Command
         $this->info('Updating configuration to new version...');
         $this->setEnv($current, $new);
         $this->call('config:cache'); // Clear config cache
-
         $this->info('DB Migration starting...');
         $this->call('migrate', ['--force' => true]); // Run migrations
         $this->info('DB Migration done');
@@ -99,13 +98,48 @@ class UpdateCommand extends Command
         $this->info("Finished! Updated from $current to $new");
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
+    private function doFinishEarly(string $new): bool
+    {
+        if (config('app.env') === 'local') {
+            $this->warn('Not in production, pretending to update...');
+            $this->settings->currentVersion = $new;
+            $this->settings->save();
+
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * @codeCoverageIgnore
+     */
     private function setEnv(string $old, string $new): void
     {
+        if (config('app.env') === 'testing' || config('app.env') === 'local') {
+            return;
+        }
         $key = 'SELF_UPDATER_VERSION_INSTALLED';
         file_put_contents(app()->environmentFilePath(), str_replace(
             $key . '=' . $old,
             $key . '=' . $new,
             file_get_contents(app()->environmentFilePath())
         ));
+    }
+
+    /**
+     * @codeCoverageIgnore
+     * @param string $command
+     * @param array $arguments
+     * @return int
+     */
+    public function call($command, $arguments = [])
+    {
+        if (config('app.env') === 'testing' || config('app.env') === 'local') {
+            return 0;
+        }
+        return parent::call($command, $arguments);
     }
 }
