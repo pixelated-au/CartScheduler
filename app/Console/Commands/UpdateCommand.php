@@ -130,6 +130,7 @@ class UpdateCommand extends Command
     }
 
     /**
+     * @noinspection PhpMissingParamTypeInspection
      * @codeCoverageIgnore
      * @param string $command
      * @param array $arguments
