@@ -11,6 +11,9 @@ use Illuminate\Support\Facades\Password;
 
 class ResendWelcomeEmailController extends Controller
 {
+    /**
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+     */
     public function __invoke(Request $request): JsonResponse
     {
         $request->validate([
