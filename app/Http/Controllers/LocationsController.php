@@ -35,6 +35,9 @@ class LocationsController extends Controller
         ]);
     }
 
+    /**
+     * @throws \Illuminate\Database\Eloquent\MassAssignmentException
+     */
     public function store(CreateLocationRequest $request): RedirectResponse
     {
         $data = $request->validated();
@@ -68,6 +71,10 @@ class LocationsController extends Controller
         ]);
     }
 
+    /**
+     * @throws \Illuminate\Database\Eloquent\MassAssignmentException
+     * @throws \RuntimeException
+     */
     public function update(UpdateLocationRequest $request, Location $location): RedirectResponse
     {
         DB::beginTransaction();
@@ -80,7 +87,9 @@ class LocationsController extends Controller
             if (isset($shift['id'])) {
                 $shiftModel = Shift::find($shift['id']);
                 if (!$shiftModel) {
+                    // @codeCoverageIgnoreStart
                     throw new RuntimeException("Shift with an ID of {$shift['id']} belonging to $location->name not found");
+                    // @codeCoverageIgnoreEnd
                 }
                 unset($shift['id']);
             } else {

@@ -86,7 +86,9 @@ class ToggleUserOntoShift
     {
         $removeCount = $shift->users()->wherePivot('shift_date', '=', $shiftDate->format('Y-m-d'))->detach($userIdToToggle);
         if (!$removeCount) {
+            // @codeCoverageIgnoreStart
             throw new RuntimeException('Could not remove user from shift');
+            // @codeCoverageIgnoreEnd
         }
     }
 }
