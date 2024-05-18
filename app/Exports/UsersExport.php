@@ -19,16 +19,27 @@ use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Style\Style;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
-class UsersExport extends DefaultValueBinder implements FromQuery, ShouldAutoSize, WithHeadings, WithCustomValueBinder, WithDefaultStyles, WithMapping, WithStyles
+class UsersExport extends DefaultValueBinder implements
+    FromQuery,
+    ShouldAutoSize,
+    WithHeadings,
+    WithCustomValueBinder,
+    WithDefaultStyles,
+    WithMapping,
+    WithStyles
 {
     private bool $excludeData = false;
+
     public function excludeData(): static
     {
         $this->excludeData = true;
         return $this;
     }
 
-    /** @noinspection PhpUnused */
+    /**
+     * @noinspection PhpUnused
+     * @codeCoverageIgnore
+     */
     public function includeData(): static
     {
         $this->excludeData = false;
