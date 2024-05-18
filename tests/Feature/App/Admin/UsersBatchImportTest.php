@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\App\Admin;
 
+use App\Exports\UsersExport;
 use App\Mail\UserAccountCreated;
 use App\Models\User;
 use App\Settings\GeneralSettings;
@@ -11,6 +12,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Inertia\Testing\AssertableInertia;
+use League\Csv\Reader;
 use Maatwebsite\Excel\Facades\Excel;
 use Tests\TestCase;
 
@@ -126,11 +128,14 @@ class UsersBatchImportTest extends TestCase
         Excel::fake();
 
         $admin = User::factory()->adminRoleUser()->create(['is_enabled' => true]);
+        User::factory()->enabled()->count(5)->create();
+
         $this->actingAs($admin)
             ->get("/admin/users-import-template")
             ->assertOk();
 
-        Excel::assertDownloaded(Str::of('Test Site')->snake()->append('-user_import_template.xlsx'));
+        $filename = Str::of('Test Site')->snake()->append('-user_import_template.xlsx');
+        Excel::assertDownloaded($filename);
     }
 
     public function test_admin_can_download_user_export_spreadsheet(): void
@@ -145,12 +150,54 @@ class UsersBatchImportTest extends TestCase
             ->get("/admin/users-as-spreadsheet")
             ->assertOk();
 
-        Excel::assertDownloaded(
-            Str::of('Test Site')
-                ->snake()
-                ->append('-user_dump_')
-                ->append($carbon->format('Y-m-d_His'))
-                ->append('.xlsx'),
-        );
+        $filename = Str::of('Test Site')
+            ->snake()
+            ->append('-user_dump_')
+            ->append($carbon->format('Y-m-d_His'))
+            ->append('.xlsx');
+
+        Excel::assertDownloaded($filename);
+    }
+
+    public function test_users_export_returns_correct_data(): void
+    {
+        GeneralSettings::fake(['siteName' => 'Test Site']);
+        User::factory()->enabled()->count(5)->create();
+        $export = new UsersExport();
+        $result = Excel::raw($export, \Maatwebsite\Excel\Excel::CSV);
+
+        $csvReader = Reader::createFromString($result);
+
+        $csvReader->setHeaderOffset(1);
+        $csvReader->each(function (array $row, int $index) {
+            if ($index < 1) {
+                $this->checkCsvHeader($row);
+                return;
+            }
+
+            $this->assertDatabaseHas('users', ['name' => $row['NAME'], 'email' => $row['EMAIL']]);
+        });
+    }
+
+    private function checkCsvHeader(array $header): void
+    {
+        $values = [
+            'NAME',
+            'EMAIL',
+            'MOBILE PHONE',
+            'GENDER',
+            'YEAR OF BIRTH',
+            'APPOINTMENT',
+            'SERVING AS',
+            'MARITAL STATUS',
+            'SPOUSE EMAIL',
+            'SPOUSE ID',
+            'RESPONSIBLE BROTHER',
+            'IS UNRESTRICTED',
+        ];
+
+        foreach ($values as $value) {
+            $this->assertArrayHasKey($value, $header);
+        }
     }
 }
