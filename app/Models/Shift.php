@@ -9,7 +9,9 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use InvalidArgumentException;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
@@ -56,10 +58,7 @@ class Shift extends Model
         'available_to'   => 'datetime',
     ];
 
-    protected $dispatchesEvents = [
-//        'updated' => ShiftUpdated::class,
-    ];
-
+    /** @noinspection PhpUnused */
     protected function availableFrom(): Attribute
     {
         return Attribute::make(
@@ -68,6 +67,7 @@ class Shift extends Model
         );
     }
 
+    /** @noinspection PhpUnused */
     protected function availableTo(): Attribute
     {
         return Attribute::make(
@@ -76,6 +76,7 @@ class Shift extends Model
         );
     }
 
+    /** @noinspection PhpUnused */
     protected function startHour(): Attribute
     {
         return Attribute::make(
@@ -83,6 +84,7 @@ class Shift extends Model
         );
     }
 
+    /** @noinspection PhpUnused */
     protected function endHour(): Attribute
     {
         return Attribute::make(
@@ -98,6 +100,34 @@ class Shift extends Model
     public function users(): BelongsToMany
     {
         return $this->belongsToMany(User::class)->withPivot(['id', 'shift_date']);
+    }
+
+    public function getUsersOnDate(Carbon|string $date): BelongsToMany
+    {
+        return $this->users()->where('shift_date', $date);
+    }
+
+    /**
+     * @param \Illuminate\Support\Collection<int, \App\Models\User|int> $users
+     * @param \Illuminate\Support\Carbon|string $date
+     */
+    public function attachUsersOnDate(Collection $users, Carbon|string $date): Collection
+    {
+        $isValid = $users->where(fn($user) => is_numeric($user->id) || $user instanceof User)->count();
+        if ($isValid > 0 && $isValid !== $users->count()) {
+            throw new InvalidArgumentException('The collection must contain only numeric IDs or persisted User instances');
+        }
+        return $users->each(fn($user) => $this->users()->attach($user, ['shift_date' => $date]));
+    }
+
+    public function attachUserOnDate(User|int $user, Carbon|string $date): void
+    {
+        $this->users()->attach($user, ['shift_date' => $date]);
+    }
+
+    public function detatchUserOnDate(User|int $user, Carbon|string $date): int
+    {
+        return $this->getUsersOnDate($date)->detach($user);
     }
 
     public function getActivitylogOptions(): LogOptions
