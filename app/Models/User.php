@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Mail;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Jetstream\HasProfilePhoto;
@@ -175,6 +176,21 @@ class User extends Authenticatable
     public function shifts(): BelongsToMany
     {
         return $this->belongsToMany(Shift::class)->withPivot('shift_user');
+    }
+
+    public function getShiftsOnDate(Carbon|string $date): BelongsToMany
+    {
+        return $this->shifts()->where('shift_date', $date);
+    }
+
+    public function attachShiftOnDate(Shift|int $shift, Carbon|string $date): void
+    {
+        $this->shifts()->attach($shift, ['shift_date' => $date]);
+    }
+
+    public function detachShiftOnDate(Shift|int $shift, Carbon|string $date): int
+    {
+        return $this->getShiftsOnDate($date)->detach($shift);
     }
 
     public function spouse(): HasOne
