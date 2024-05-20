@@ -11,7 +11,6 @@ class UserVacationResource extends JsonResource
     {
         return [
             'id'          => $this->id,
-            'user_id'     => $this->user_id,
             'start_date'  => $this->start_date,
             'end_date'    => $this->end_date,
             'description' => $this->description,
