@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\App\Admin;
 
+use App\Enums\Role;
 use App\Mail\UserAccountCreated;
 use App\Models\Location;
 use App\Models\User;
@@ -149,6 +150,33 @@ class UsersTest extends TestCase
         Mail::assertNothingSent();
     }
 
+    public function test_restrict_admin_user_should_remove_admin_rights(): void
+    {
+        $admin     = User::factory()->enabled()->adminRoleUser()->create();
+        $adminUser = User::factory()->enabled()->adminRoleUser()->create();
+
+        GeneralSettings::fake(['allowedSettingsUsers' => [$admin->id, $adminUser->id]]);
+
+        $this->actingAs($admin)
+            ->putJson("/admin/users/$adminUser->id", [
+                'id'                  => $adminUser->id,
+                'name'                => $adminUser->name,
+                'email'               => $adminUser->email,
+                'mobile_phone'        => $adminUser->mobile_phone,
+                'role'                => Role::Admin->value,
+                'gender'              => $adminUser->gender,
+                'year_of_birth'       => $adminUser->year_of_birth,
+                'appointment'         => $adminUser->appointment,
+                'serving_as'          => $adminUser->serving_as,
+                'marital_status'      => $adminUser->marital_status,
+                'responsible_brother' => $adminUser->responsible_brother,
+                'is_unrestricted'     => false,
+            ])
+            ->assertRedirect("/admin/users/$adminUser->id/edit");
+
+        $this->assertDatabaseHas('users', ['id' => $adminUser->id, 'role' => Role::User->value, 'is_unrestricted' => false]);
+    }
+
     public function test_admin_can_edit_user_and_test_bad_email(): void
     {
         $admin    = User::factory()->adminRoleUser()->state(['is_enabled' => true])->create();
@@ -240,11 +268,11 @@ class UsersTest extends TestCase
         Password::shouldReceive('sendResetLink')
             ->andReturn(Password::INVALID_USER);
 
-            // 3rd request should fail
-            $this->actingAs($admin)
-                ->postJson("/admin/resend-welcome-email?user_id={$user->getKey()}")
-                ->assertserverError()
-                ->assertContainsStringIgnoringCase('message', 'unknown error');
+        // 3rd request should fail
+        $this->actingAs($admin)
+            ->postJson("/admin/resend-welcome-email?user_id={$user->getKey()}")
+            ->assertserverError()
+            ->assertContainsStringIgnoringCase('message', 'unknown error');
         Mail::assertNothingSent();
     }
 
