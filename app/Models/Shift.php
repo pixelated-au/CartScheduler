@@ -104,12 +104,13 @@ class Shift extends Model
 
     public function getUsersOnDate(Carbon|string $date): BelongsToMany
     {
-        return $this->users()->where('shift_date', $date);
+        return $this->users()->wherePivot('shift_date', is_string($date) ? $date : $date->toDateString());
     }
 
     /**
      * @param \Illuminate\Support\Collection<int, \App\Models\User|int> $users
      * @param \Illuminate\Support\Carbon|string $date
+     * @return \Illuminate\Support\Collection
      */
     public function attachUsersOnDate(Collection $users, Carbon|string $date): Collection
     {
@@ -125,7 +126,7 @@ class Shift extends Model
         $this->users()->attach($user, ['shift_date' => $date]);
     }
 
-    public function detatchUserOnDate(User|int $user, Carbon|string $date): int
+    public function detachUserOnDate(User|int $user, Carbon|string $date): int
     {
         return $this->getUsersOnDate($date)->detach($user);
     }
