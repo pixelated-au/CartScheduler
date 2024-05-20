@@ -134,3 +134,4 @@ will be available in this interface.
 - [ ] Notifications feature
 - [ ] If a location or a shift is "re-enabled", the system should first look for schedule conflicts and show those to the admin
 - [ ] Make a 'trainer' user type and allow them to un-restrict users who are with them on a shift. This feature needs to be configurable
+- [ ] In admin, if 'location choices' is enabled, add location filter to the find volunteers dialog
