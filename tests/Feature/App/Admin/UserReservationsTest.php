@@ -338,7 +338,7 @@ class UserReservationsTest extends TestCase
     {
         $admin = User::factory()->adminRoleUser()->create(['is_enabled' => true]);
 
-        $date = '2023-01-03'; // A Tuesday
+        $date = CarbonImmutable::parse('2023-01-03'); // A Tuesday
 
         $locations = Location::factory()
             ->threeVolunteers()
@@ -355,29 +355,61 @@ class UserReservationsTest extends TestCase
             ->create();
 
         $shifts = $locations->map->shifts->flatten();
+        /** @var Shift $firstShift */
+        $firstShift = $shifts->first();
+        /** @var Shift $secondShift */
+        $secondShift = $shifts->last();
+
+        $date2 = $date->addDay();
+        // Add user 1 on shift 1 to the next day
+        $firstShift->users->first()->attachShiftOnDate($firstShift, $date2);
+        $firstShift->refresh();
 
         // Just to be sure we have the correct number of shifts
         $this->assertCount(2, $shifts);
-        $this->assertCount(3, $shifts[0]->users);
-        $this->assertCount(3, $shifts[1]->users);
+        $this->assertCount(4, $firstShift->users);
+        $this->assertCount(3, $secondShift->users);
+
+        $this->assertDatabaseHas('shift_user', [
+            'shift_id'   => $firstShift->getKey(),
+            'user_id'    => $firstShift->users->first()->getKey(),
+            'shift_date' => $date2->toDateString(),
+        ]);
 
         // Remove a user from second shift - to enable a user to move into the spot
-        $shifts[1]->users()->detach($shifts[1]->users->last());
-        $shifts[1]->refresh();
-        $this->assertCount(2, $shifts[1]->users);
+        $secondShift->users->last()->detachShiftOnDate($secondShift, $date);
+        $secondShift->refresh();
+        $this->assertCount(2, $secondShift->users);
 
         $this->actingAs($admin)
             ->putJson("/admin/move-volunteer-to-shift", [
-                'date'         => $date,
-                'location_id'  => $shifts[1]->location->id,
-                'old_shift_id' => $shifts[0]->getKey(),
-                'user_id'      => $shifts[0]->users->last()->getKey(),
+                'date'           => $date->toDateString(),
+                'location_id'    => $secondShift->location->id,
+                'old_shift_id'   => $firstShift->id,
+                'old_shift_date' => $date->toDateString(),
+                'user_id'        => $firstShift->users->last()->id,
             ])
             ->assertSuccessful();
-        $shifts->each->refresh();
+        $firstShift->refresh();
+        $secondShift->refresh();
 
-        $this->assertCount(2, $shifts[0]->users);
-        $this->assertCount(3, $shifts[1]->users);
+        $this->assertSame(2, $firstShift->getUsersOnDate($date)->count());
+        $this->assertSame(1, $firstShift->getUsersOnDate($date2)->count());
+        $this->assertCount(3, $secondShift->users);
+    }
+
+    public function test_when_old_shift_date_is_missing_then_throw_exception(): void
+    {
+        $admin = User::factory()->adminRoleUser()->create(['is_enabled' => true]);
+        $this->actingAs($admin)
+            ->putJson("/admin/move-volunteer-to-shift", [
+                'date'         => '2023-01-03',
+                'location_id'  => 1,
+                'old_shift_id' => 2,
+                'user_id'      => 1,
+            ])
+            ->assertBadRequest()
+            ->assertContainsStringIgnoringCase('message', 'ENDPOINT UPDATED: The old shift date is required');
     }
 
     public function test_move_volunteer_with_invalid_location(): void
@@ -415,10 +447,11 @@ class UserReservationsTest extends TestCase
 
         $this->actingAs($admin)
             ->putJson("/admin/move-volunteer-to-shift", [
-                'date'         => $date,
-                'location_id'  => $shifts[1]->location->id,
-                'old_shift_id' => $shifts[0]->getKey(),
-                'user_id'      => $shifts[0]->users->last()->getKey(),
+                'date'           => $date,
+                'location_id'    => $shifts[1]->location->id,
+                'old_shift_id'   => $shifts[0]->getKey(),
+                'old_shift_date' => $date,
+                'user_id'        => $shifts[0]->users->last()->getKey(),
             ])
             ->assertUnprocessable()
             ->assertJsonPath('error_code', ErrorApiResource::CODE_LOCATION_NOT_FOUND)
@@ -459,10 +492,11 @@ class UserReservationsTest extends TestCase
 
         $this->actingAs($admin)
             ->putJson("/admin/move-volunteer-to-shift", [
-                'date'         => $date,
-                'location_id'  => $shifts[1]->location->id, // This is the location of shift volunteer will be moved to
-                'old_shift_id' => $shifts[0]->getKey(),
-                'user_id'      => $shifts[0]->users->last()->getKey(),
+                'date'           => $date,
+                'location_id'    => $shifts[1]->location->id, // This is the location of shift volunteer will be moved to
+                'old_shift_id'   => $shifts[0]->getKey(),
+                'old_shift_date' => $date,
+                'user_id'        => $shifts[0]->users->last()->getKey(),
             ])
             ->assertunprocessable()
             ->assertJsonPath('error_code', ErrorApiResource::CODE_SHIFT_AT_MAX_CAPACITY);
@@ -497,10 +531,11 @@ class UserReservationsTest extends TestCase
 
         $this->actingAs($admin)
             ->putJson("/admin/move-volunteer-to-shift", [
-                'date'         => $date,
-                'location_id'  => $location->shifts[0]->location->id,
-                'old_shift_id' => $location->shifts[0]->getKey(),
-                'user_id'      => $sister->getKey(),
+                'date'           => $date,
+                'location_id'    => $location->shifts[0]->location->id,
+                'old_shift_id'   => $location->shifts[0]->id,
+                'old_shift_date' => $date,
+                'user_id'        => $sister->id,
             ])
             ->assertUnprocessable()
             ->assertJsonPath('error_code', ErrorApiResource::CODE_BROTHER_REQUIRED);
@@ -508,28 +543,25 @@ class UserReservationsTest extends TestCase
         $this->assertDatabaseCount('shift_user', 2);
     }
 
-
-    /**
-     * @template TKey of array-key
-     */
     public function test_move_volunteer_when_duplicate_shifts_with_one_disabled(): void
     {
-        $admin = User::factory()->adminRoleUser()->create(['is_enabled' => true]);
+        $admin          = User::factory()->adminRoleUser()->create(['is_enabled' => true]);
+        $location1Users = User::factory()->enabled()->count(3)->create();
 
-        /** @var \Illuminate\Support\Collection<TKey, Location> $locations */
+        $date1 = '2023-01-03';
+        $date2 = '2023-01-04';
+
+        /** @var \Illuminate\Support\Collection<int, Location> $locations */
         $locations   = collect();
         $locations[] = Location::factory()
             ->allPublishers()
             ->threeVolunteers()
             ->has(Shift::factory()
                 ->everyDay9am()
-                ->state(['is_enabled' => true])
-                ->hasAttached(User::factory()
-                    ->userRoleUser()
-                    ->count(3)
-                    ->state(['is_enabled' => true])
-                    , ['shift_date' => '2023-01-03']
-                ))
+                ->hasAttached($location1Users, ['shift_date' => $date1])
+                // Additional check to ensure users aren't inadvertently removed from other shifts at the same time
+                ->hasAttached($location1Users, ['shift_date' => $date2])
+            )
             ->create();
 
         $locations[] = Location::factory()
@@ -540,109 +572,109 @@ class UserReservationsTest extends TestCase
                 ->everyDay9am()
                 ->sequence(['is_enabled' => true], ['is_enabled' => false])
                 ->hasAttached(User::factory()
-                    ->userRoleUser()
+                    ->enabled()
                     ->count(2)
-                    ->state(['is_enabled' => true])
-                    , ['shift_date' => '2023-01-03']
+                    , ['shift_date' => $date1]
                 ))
             ->create();
 
         $locations->each->load(['shifts', 'shifts.users', 'shifts.location']);
-        $shifts = $locations->map->shifts->flatten();
+        $shift1 = $locations[0]->shifts->first();
+        $shift2 = $locations[1]->shifts->first();
+        $shift3 = $locations[1]->shifts->last();
 
         // Just to be sure we have the correct number of shifts
-        $this->assertCount(3, $shifts);
-        $this->assertCount(3, $shifts[0]->users);
-        $this->assertCount(2, $shifts[1]->users);
-        $this->assertCount(2, $shifts[2]->users);
+        $this->assertSame(3, $shift1->getUsersOnDate($date1)->count());
+        $this->assertSame(3, $shift1->getUsersOnDate($date2)->count());
+        $this->assertCount(2, $shift2->users);
+        $this->assertCount(2, $shift3->users);
 
-        $this->assertTrue($shifts[0]->is_enabled);
-        $this->assertTrue($shifts[1]->is_enabled);
-        // Make sure the disabled shift is not enabled
-        $this->assertFalse($shifts[2]->is_enabled);
+        $this->assertTrue($shift1->is_enabled);
+        $this->asserttrue($shift2->is_enabled);
+        $this->assertFalse($shift3->is_enabled);
 
-        // Remove a user from second shift - to enable a user to move into the spot
-        $shifts[1]->users()->detach($shifts[0]->users->last());
-        $shifts[1]->refresh();
-        $this->assertCount(2, $shifts[1]->users);
-
-        $date = '2023-01-03'; // A Tuesday
-
-        $movingUserId = $shifts[0]->users->last()->getKey();
+        $movingUserId = $shift1->users->last()->id;
         $this->actingAs($admin)
             ->putJson("/admin/move-volunteer-to-shift", [
-                'date'         => $date,
-                'location_id'  => $shifts[1]->location->id,
-                'old_shift_id' => $shifts[0]->getKey(),
-                'user_id'      => $movingUserId,
+                'date'           => $date1,
+                'location_id'    => $shift2->location->id,
+                'old_shift_id'   => $shift1->first()->id,
+                'old_shift_date' => $date1,
+                'user_id'        => $movingUserId,
             ])
             ->assertSuccessful();
 
-        $shifts->each->refresh();
+        $shift1->refresh();
+        $shift2->refresh();
+        $shift3->refresh();
 
-        $this->assertCount(2, $shifts[0]->users);
-        $this->assertCount(3, $shifts[1]->users);
-        $this->assertCount(2, $shifts[2]->users);
+        $this->assertSame(2, $shift1->getUsersOnDate($date1)->count());
+        $this->assertSame(3, $shift1->getUsersOnDate($date2)->count());
+        $this->assertCount(3, $shift2->users);
+        $this->assertCount(2, $shift3->users);
 
-        // Now move the volunteer back to the first shift, disable shift 2 and enable shift 3. Then try again.
+        // Move the volunteer back to the first shift, disable location 2 shift 1 and enable location 2 shift 2
         $this->actingAs($admin)
             ->putJson("/admin/move-volunteer-to-shift", [
-                'date'         => $date,
-                'location_id'  => $shifts[0]->location->id,
-                'old_shift_id' => $shifts[1]->getKey(),
-                'user_id'      => $movingUserId,
+                'date'           => $date1,
+                'location_id'    => $shift1->location->id,
+                'old_shift_id'   => $shift2->id,
+                'old_shift_date' => $date1,
+                'user_id'        => $movingUserId,
             ])
             ->assertSuccessful();
-        $shifts->each->refresh();
 
-        $this->assertCount(3, $shifts[0]->users);
-        $this->assertCount(2, $shifts[1]->users);
-        $this->assertCount(2, $shifts[2]->users);
+        $shift1->refresh();
+        $shift2->refresh();
+        $shift3->refresh();
 
-        $shifts[1]->is_enabled = false;
-        $shifts[1]->save();
+        $this->assertSame(3, $shift1->getUsersOnDate($date1)->count());
+        $this->assertSame(3, $shift1->getUsersOnDate($date2)->count());
+        $this->assertCount(2, $shift2->users);
+        $this->assertCount(2, $shift3->users);
 
-        $shifts[2]->is_enabled = true;
-        $shifts[2]->save();
+        $shift2->is_enabled = false;
+        $shift2->save();
+
+        $shift3->is_enabled = true;
+        $shift3->save();
 
         // Now, check that the volunteer will move to the third shift.
         $this->actingAs($admin)
             ->putJson("/admin/move-volunteer-to-shift", [
-                'date'         => $date,
-                'location_id'  => $shifts[1]->location->id,
-                'old_shift_id' => $shifts[0]->getKey(),
-                'user_id'      => $movingUserId,
+                'date'           => $date1,
+                'location_id'    => $shift2->location->id,
+                'old_shift_id'   => $shift1->id,
+                'old_shift_date' => $date1,
+                'user_id'        => $movingUserId,
             ])
             ->assertSuccessful();
 
-        $shifts->each->refresh();
+        $shift1->refresh();
+        $shift2->refresh();
+        $shift3->refresh();
 
-        $this->assertCount(2, $shifts[0]->users);
-        $this->assertCount(2, $shifts[1]->users);
-        $this->assertCount(3, $shifts[2]->users);
+        $this->assertSame(2, $shift1->getUsersOnDate($date1)->count());
+        $this->assertSame(3, $shift1->getUsersOnDate($date2)->count());
+        $this->assertCount(2, $shift2->users);
+        $this->assertCount(3, $shift3->users);
     }
 
-    /**
-     * @template TKey of array-key
-     */
-    public function test_fail_move_volunteer_when_only_shift_is_disabled(): void
+    public function test_fail_move_volunteer_to_disabled_shift(): void
     {
         $admin = User::factory()->adminRoleUser()->create(['is_enabled' => true]);
 
-        /** @var \Illuminate\Support\Collection<TKey, Location> $locations */
+        $date = '2023-01-03';
+
+        /** @var \Illuminate\Support\Collection<int, Location> $locations */
         $locations   = collect();
         $locations[] = Location::factory()
             ->allPublishers()
             ->threeVolunteers()
             ->has(Shift::factory()
                 ->everyDay9am()
-                ->state(['is_enabled' => true])
-                ->hasAttached(User::factory()
-                    ->userRoleUser()
-                    ->count(3)
-                    ->state(['is_enabled' => true])
-                    , ['shift_date' => '2023-01-03']
-                ))
+                ->hasAttached(User::factory()->enabled()->count(3), ['shift_date' => $date])
+            )
             ->create();
 
         $locations[] = Location::factory()
@@ -651,12 +683,8 @@ class UserReservationsTest extends TestCase
             ->has(Shift::factory()
                 ->everyDay9am()
                 ->state(['is_enabled' => false])
-                ->hasAttached(User::factory()
-                    ->userRoleUser()
-                    ->count(2)
-                    ->state(['is_enabled' => true])
-                    , ['shift_date' => '2023-01-03']
-                ))
+                ->hasAttached(User::factory()->enabled()->count(2), ['shift_date' => $date])
+            )
             ->create();
 
         $locations->each->load(['shifts', 'shifts.users', 'shifts.location']);
@@ -671,14 +699,13 @@ class UserReservationsTest extends TestCase
         // Make sure the disabled shift is not enabled
         $this->assertFalse($shifts[1]->is_enabled);
 
-        $date = '2023-01-03'; // A Tuesday
-
         $this->actingAs($admin)
             ->putJson("/admin/move-volunteer-to-shift", [
-                'date'         => $date,
-                'location_id'  => $shifts[1]->location->id,
-                'old_shift_id' => $shifts[0]->getKey(),
-                'user_id'      => $shifts[0]->users->last()->getKey(),
+                'date'           => $date,
+                'location_id'    => $shifts[1]->location->id,
+                'old_shift_id'   => $shifts[0]->getKey(),
+                'old_shift_date' => $date,
+                'user_id'        => $shifts[0]->users->last()->getKey(),
             ])
             ->assertUnprocessable()
             ->assertJsonPath('error_code', ErrorApiResource::CODE_SHIFT_NOT_FOUND);
