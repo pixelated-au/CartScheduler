@@ -45,10 +45,8 @@ class ToggleUserOntoShift
 
             $location = Location::with([
                 'shifts'       => fn(HasMany $query) => $query->where('shifts.id', '=', $data['shift']),
-                'shifts.users' => fn(BelongsToMany $query) => $query->wherePivot(
-                    'shift_date',
-                    $shiftDate->toDateString(),
-                ),
+                'shifts.users' => fn(BelongsToMany $query) => $query
+                    ->wherePivot('shift_date', $shiftDate->toDateString()),
             ])->findOrFail($data['location']);
 
             /** @var Shift $shift */
@@ -84,7 +82,7 @@ class ToggleUserOntoShift
      */
     protected function detachUserFromShift(Shift $shift, bool|Carbon $shiftDate, mixed $userIdToToggle): void
     {
-        $removeCount = $shift->users()->wherePivot('shift_date', '=', $shiftDate->format('Y-m-d'))->detach($userIdToToggle);
+        $removeCount = $shift->detachUserOnDate($userIdToToggle, $shiftDate);
         if (!$removeCount) {
             // @codeCoverageIgnoreStart
             throw new RuntimeException('Could not remove user from shift');
