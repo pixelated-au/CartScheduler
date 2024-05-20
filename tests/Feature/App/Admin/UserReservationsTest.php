@@ -386,7 +386,6 @@ class UserReservationsTest extends TestCase
                 'date'           => $date->toDateString(),
                 'location_id'    => $secondShift->location->id,
                 'old_shift_id'   => $firstShift->id,
-                'old_shift_date' => $date->toDateString(),
                 'user_id'        => $firstShift->users->last()->id,
             ])
             ->assertSuccessful();
@@ -396,20 +395,6 @@ class UserReservationsTest extends TestCase
         $this->assertSame(2, $firstShift->getUsersOnDate($date)->count());
         $this->assertSame(1, $firstShift->getUsersOnDate($date2)->count());
         $this->assertCount(3, $secondShift->users);
-    }
-
-    public function test_when_old_shift_date_is_missing_then_throw_exception(): void
-    {
-        $admin = User::factory()->adminRoleUser()->create(['is_enabled' => true]);
-        $this->actingAs($admin)
-            ->putJson("/admin/move-volunteer-to-shift", [
-                'date'         => '2023-01-03',
-                'location_id'  => 1,
-                'old_shift_id' => 2,
-                'user_id'      => 1,
-            ])
-            ->assertBadRequest()
-            ->assertContainsStringIgnoringCase('message', 'ENDPOINT UPDATED: The old shift date is required');
     }
 
     public function test_move_volunteer_with_invalid_location(): void
@@ -450,7 +435,6 @@ class UserReservationsTest extends TestCase
                 'date'           => $date,
                 'location_id'    => $shifts[1]->location->id,
                 'old_shift_id'   => $shifts[0]->getKey(),
-                'old_shift_date' => $date,
                 'user_id'        => $shifts[0]->users->last()->getKey(),
             ])
             ->assertUnprocessable()
@@ -495,7 +479,6 @@ class UserReservationsTest extends TestCase
                 'date'           => $date,
                 'location_id'    => $shifts[1]->location->id, // This is the location of shift volunteer will be moved to
                 'old_shift_id'   => $shifts[0]->getKey(),
-                'old_shift_date' => $date,
                 'user_id'        => $shifts[0]->users->last()->getKey(),
             ])
             ->assertunprocessable()
@@ -534,7 +517,6 @@ class UserReservationsTest extends TestCase
                 'date'           => $date,
                 'location_id'    => $location->shifts[0]->location->id,
                 'old_shift_id'   => $location->shifts[0]->id,
-                'old_shift_date' => $date,
                 'user_id'        => $sister->id,
             ])
             ->assertUnprocessable()
@@ -599,7 +581,6 @@ class UserReservationsTest extends TestCase
                 'date'           => $date1,
                 'location_id'    => $shift2->location->id,
                 'old_shift_id'   => $shift1->first()->id,
-                'old_shift_date' => $date1,
                 'user_id'        => $movingUserId,
             ])
             ->assertSuccessful();
@@ -619,7 +600,6 @@ class UserReservationsTest extends TestCase
                 'date'           => $date1,
                 'location_id'    => $shift1->location->id,
                 'old_shift_id'   => $shift2->id,
-                'old_shift_date' => $date1,
                 'user_id'        => $movingUserId,
             ])
             ->assertSuccessful();
@@ -645,7 +625,6 @@ class UserReservationsTest extends TestCase
                 'date'           => $date1,
                 'location_id'    => $shift2->location->id,
                 'old_shift_id'   => $shift1->id,
-                'old_shift_date' => $date1,
                 'user_id'        => $movingUserId,
             ])
             ->assertSuccessful();
@@ -704,7 +683,6 @@ class UserReservationsTest extends TestCase
                 'date'           => $date,
                 'location_id'    => $shifts[1]->location->id,
                 'old_shift_id'   => $shifts[0]->getKey(),
-                'old_shift_date' => $date,
                 'user_id'        => $shifts[0]->users->last()->getKey(),
             ])
             ->assertUnprocessable()
