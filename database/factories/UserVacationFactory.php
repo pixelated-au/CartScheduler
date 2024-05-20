@@ -24,7 +24,6 @@ class UserVacationFactory extends Factory
     {
         $startDate = CarbonImmutable::instance($this->faker->dateTimeBetween('now', '+6 months'));
         return [
-            'user_id'     => $this->faker->randomNumber(),
             'start_date'  => $startDate,
             'end_date'    => $startDate->add($this->faker->numberBetween(1, 30), 'day'),
             'description' => $this->faker->sentence(),

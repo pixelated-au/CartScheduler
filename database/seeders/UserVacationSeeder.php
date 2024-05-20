@@ -12,8 +12,8 @@ class UserVacationSeeder extends Seeder
     {
         User::all()->each(
             fn(User $user) => UserVacation::factory()
-                ->when(fn() => $user->id === 1 || rand(0, 9) >= 8) // 20% chance
-                ->create(['user_id' => $user->id])
+                ->for($user)
+                ->create()
         );
     }
 }
