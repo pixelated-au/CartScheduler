@@ -15,7 +15,7 @@ class UserVacationRequest extends FormRequest
                 'nullable',
                 'integer',
                 Rule::when(
-                    fn() => $this->user()->role === 'admin',
+                    fn() => $this->integer('user_id') && $this->user()->role === 'admin',
                     fn() => Rule::exists('user_vacations', 'id')->where('user_id', $this->integer('user_id')),
                     fn() => Rule::exists('user_vacations', 'id')->where('user_id', $this->user()->id),
                 )
@@ -27,7 +27,7 @@ class UserVacationRequest extends FormRequest
                 'required',
                 'integer',
                 Rule::when(
-                    fn() => $this->user()->role === 'admin',
+                    fn() => $this->integer('user_id') && $this->user()->role === 'admin',
                     fn() => Rule::exists('user_vacations', 'id')->where('user_id', $this->integer('user_id')),
                     fn() => Rule::exists('user_vacations', 'id')->where('user_id', $this->user()->id),
                 )],
