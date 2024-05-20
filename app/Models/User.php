@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
+use App\Enums\Role;
 use App\Mail\UserAccountCreated;
+use App\Settings\GeneralSettings;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -55,6 +57,20 @@ class User extends Authenticatable
                 $spouse            = User::find($original['spouse_id']);
                 $spouse->spouse_id = null;
                 $spouse->saveQuietly();
+            }
+        });
+        static::updated(static function (self $user) {
+            if (!$user->is_unrestricted) {
+                $settings = app()->make(GeneralSettings::class);
+                if (in_array($user->id, $settings->allowedSettingsUsers, true)) {
+                    // remove the user->id from the allowedSettingsUsers array
+                    $settings->allowedSettingsUsers = array_diff($settings->allowedSettingsUsers, [$user->id]);
+                    $settings->save();
+                }
+                if ($user->role === Role::Admin->value) {
+                    $user->role = Role::User->value;
+                    $user->save();
+                }
             }
         });
     }
