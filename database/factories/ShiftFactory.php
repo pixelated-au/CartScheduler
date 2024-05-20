@@ -56,6 +56,7 @@ class ShiftFactory extends Factory
     {
         return $this->state(function (array $attributes) {
             return [
+                'is_enabled'     => true,
                 'day_monday'     => true,
                 'day_tuesday'    => true,
                 'day_wednesday'  => true,
@@ -75,6 +76,7 @@ class ShiftFactory extends Factory
     {
         return $this->state(function (array $attributes) {
             return [
+                'is_enabled'     => true,
                 'day_monday'     => true,
                 'day_tuesday'    => true,
                 'day_wednesday'  => true,
