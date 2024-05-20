@@ -54,13 +54,11 @@ const moveVolunteer = async (volunteerId, locationId, shiftId) => {
     const timeoutId = setTimeout(() => isLoading.value = true, 1000);
     selectedMoveUser.value = null;
     try {
-        const formattedDate = format(date.value, 'yyyy-MM-dd');
         await axios.put('/admin/move-volunteer-to-shift', {
             user_id: volunteerId,
             location_id: locationId,
             old_shift_id: shiftId,
-            old_shift_date: formattedDate,
-            date: formattedDate,
+            date: format(date.value, 'yyyy-MM-dd'),
         });
         toast.success('User was moved!');
     } catch (e) {
