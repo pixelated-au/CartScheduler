@@ -27,7 +27,6 @@ class UserAvailabilityFactory extends Factory
         $sunday    = $this->availability();
 
         return [
-            'user_id'        => $this->faker->randomNumber(),
             'day_monday'     => $monday,
             'day_tuesday'    => $tuesday,
             'day_wednesday'  => $wednesday,
