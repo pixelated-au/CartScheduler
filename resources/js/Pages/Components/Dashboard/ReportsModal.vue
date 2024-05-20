@@ -52,10 +52,10 @@
         <template #content>
             <div class="">
                 <div v-if="outstandingReports?.length" class="mt-5">
-                    <div v-for="(report, index) in outstandingReports"
+                    <div v-for="report in outstandingReports"
                          :key="`${report.shift_date}-${report.start_time}-${report.user_id}`"
                          class="pb-3 mb-20 border-b border-gray-200">
-                        <ReportForm :report="report" @saved="reportSaved(index)"/>
+                        <ReportForm :report="report" @saved="reportSaved()"/>
                     </div>
                 </div>
                 <div v-else>
