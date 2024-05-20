@@ -180,7 +180,7 @@ class User extends Authenticatable
 
     public function getShiftsOnDate(Carbon|string $date): BelongsToMany
     {
-        return $this->shifts()->where('shift_date', $date);
+        return $this->shifts()->wherePivot('shift_date', is_string($date) ? $date : $date->toDateString());
     }
 
     public function attachShiftOnDate(Shift|int $shift, Carbon|string $date): void
