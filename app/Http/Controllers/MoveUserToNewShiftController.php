@@ -7,7 +7,6 @@ use App\Actions\ErrorApiResource;
 use App\Actions\ValidateShiftIsAvailableAction;
 use App\Actions\ValidateShiftIsNotFullAction;
 use App\Actions\ValidateVolunteerIsAllowedToBeRosteredAction;
-use App\Exceptions\EndpointUpdatedException;
 use App\Exceptions\ShiftAvailabilityException;
 use App\Models\Location;
 use App\Models\Shift;
@@ -31,21 +30,16 @@ class MoveUserToNewShiftController extends Controller
 
     public function __invoke(Request $request)
     {
-        // Force the client to self-update to support this parameter:
-        $request->whenMissing('old_shift_date', EndpointUpdatedException::wrap('The old shift date is required'));
-
         $request->validate([
-            'user_id'        => ['required', 'exists:users,id'],
-            'location_id'    => ['required', 'exists:locations,id'],
-            'date'           => ['required', 'date'],
-            'old_shift_id'   => ['required', 'exists:shifts,id'],
-            'old_shift_date' => ['required', 'date'],
+            'user_id'      => ['required', 'exists:users,id'],
+            'location_id'  => ['required', 'exists:locations,id'],
+            'date'         => ['required', 'date'],
+            'old_shift_id' => ['required', 'exists:shifts,id'],
         ]);
 
         $oldShift  = Shift::find($request->get('old_shift_id'));
-        $newDate   = $request->date('date')?->midDay();
-        $startTime = $newDate->copy()->setTimeFromTimeString($oldShift->start_time);
-        $oldDate   = $request->date('old_shift_date')?->startOfDay();
+        $date      = $request->date('date')?->midDay();
+        $startTime = $date->copy()->setTimeFromTimeString($oldShift->start_time);
         $userId    = $request->integer('user_id');
 
         $range = [
@@ -58,13 +52,13 @@ class MoveUserToNewShiftController extends Controller
                 ->where('shifts.is_enabled', true)
                 ->where(fn(Builder $query) => $query
                     ->whereNull('shifts.available_from')
-                    ->orWhere('shifts.available_from', '<=', $newDate)
+                    ->orWhere('shifts.available_from', '<=', $date)
                 )
                 ->where(fn(Builder $query) => $query
                     ->whereNull('shifts.available_to')
-                    ->orWhere('shifts.available_to', '>=', $newDate)
+                    ->orWhere('shifts.available_to', '>=', $date)
                 ),
-            'shifts.users' => fn(BelongsToMany $query) => $query->wherePivot('shift_date', $newDate->toDateString()),
+            'shifts.users' => fn(BelongsToMany $query) => $query->wherePivot('shift_date', $date->toDateString()),
         ])
             ->where('id', $request->get('location_id'))
             ->where('is_enabled', true)
@@ -83,7 +77,7 @@ class MoveUserToNewShiftController extends Controller
                     ErrorApiResource::CODE_SHIFT_NOT_FOUND, 422);
             }
 
-            $this->validateShiftIsAvailableAction->execute($shift, $newDate);
+            $this->validateShiftIsAvailableAction->execute($shift, $date);
 
             $user      = User::find($userId);
             $isAllowed = $this->validateVolunteerIsAllowedToBeRosteredAction->execute($location, $user, $shift->users);
@@ -91,13 +85,13 @@ class MoveUserToNewShiftController extends Controller
                 return ErrorApiResource::create($isAllowed, ErrorApiResource::CODE_BROTHER_REQUIRED, 422);
             }
 
-            $this->validateShiftIsNotFullAction->execute($shift, $newDate);
+            $this->validateShiftIsNotFullAction->execute($shift, $date);
 
             DB::transaction(
-                function () use ($newDate, $location, $shift, $userId, $oldShift, $oldDate) {
-                    $oldShift->detachUserOnDate($userId, $oldDate);
+                function () use ($date, $location, $shift, $userId, $oldShift) {
+                    $oldShift->detachUserOnDate($userId, $date);
 
-                    $this->doShiftReservation->execute($shift, $location, $userId, $newDate);
+                    $this->doShiftReservation->execute($shift, $location, $userId, $date);
                 });
         } catch (ShiftAvailabilityException $e) {
             return ErrorApiResource::create($e->getMessage(), $e->getExceptionType(), 422);
