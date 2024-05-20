@@ -25,10 +25,6 @@ class GetAvailableUsersForShiftController extends Controller
             'showOnlyMinisterialServants' => ['nullable', 'boolean'],
         ]);
 
-        // TODO create tests for this controller. Include tests for the following:
-        // ...amongst other things, test that if a volunteer has been allocated to another shift that has been disabled, they are still returned as available for this shift
-
-
         return ExtendedUserResource::collection(
             $this->getUsersForShift->execute(
                 shift: $shift,
