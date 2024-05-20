@@ -1,6 +1,6 @@
 <?php
 
-namespace Actions;
+namespace Tests\Unit\Actions;
 
 use App\Actions\UserNeedsToUpdateAvailability;
 use App\Models\User;
