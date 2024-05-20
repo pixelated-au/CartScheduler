@@ -51,6 +51,7 @@ class User extends Authenticatable
             }
         });
         static::updating(static function (self $user) {
+            // Currently, this should only be called when doing a bulk update.
             $dirty    = $user->getDirty();
             $original = $user->getOriginal();
             if (array_key_exists('spouse_id', $dirty) && $dirty['spouse_id'] === null && $original['spouse_id'] !== null) {
