@@ -413,7 +413,7 @@ class GetAvailableUsersForShiftTest extends TestCase
         }
     }
 
-    public function test_enable_all_user_filters(): void
+    public function test_toggle_all_user_filters(): void
     {
         $locations = Location::factory()
             ->state(['max_volunteers' => 5])
@@ -472,10 +472,7 @@ class GetAvailableUsersForShiftTest extends TestCase
 
         $this->assertCount($availableUsers->count(),
             $availableUsers->filter(
-                fn(User $user) => (
-                        $user->appointment === 'elder'
-                        || $user->appointment === 'ministerial servant'
-                    )
+                fn(User $user) => in_array($user->appointment, ['elder', 'ministerial servant'], true)
                     && $user->serving_as !== 'publisher'
                     && $user->responsible_brother
             )
@@ -485,11 +482,31 @@ class GetAvailableUsersForShiftTest extends TestCase
         foreach ($availableUsers as $availableUser) {
             $this->assertTrue($remainingUsers->contains(fn(User $user) => $user->getKey() === $availableUser->getKey()));
         }
-    }
 
-    /**
-     * @param \App\Models\User $user
-     * @param array{int, int, int, int, int, int, int, int} $days
-     * @return \App\Models\UserAvailability
-     */
+        // Make sure the correct users are returned when filters are removed
+        $availableUsers = $this->getAvailableUsersForShift->execute(
+            shift: $locations[1]->shifts[0],
+            date: Carbon::parse('2023-05-15'),
+            showOnlyAvailable: true,
+            showOnlyResponsibleBros: false,
+            hidePublishers: false,
+            showOnlyElders: false,
+            showOnlyMinisterialServants: false,
+        );
+
+        $this->assertCount($availableUsers->count(),
+            $availableUsers->filter(
+                fn(User $user) => (
+                    in_array($user->appointment, ['elder', 'ministerial servant', null], true)
+                    && in_array($user->serving_as, ['field missionary', 'special pioneer', 'bethel family member', 'regular pioneer', 'publisher'], true)
+                    && ($user->responsible_brother || !$user->responsible_brother) // seems redundant but it can be both
+                )
+            )
+        );
+
+        /** @var User $availableUser */
+        foreach ($availableUsers as $availableUser) {
+            $this->assertTrue($remainingUsers->contains(fn(User $user) => $user->getKey() === $availableUser->getKey()));
+        }
+    }
 }
