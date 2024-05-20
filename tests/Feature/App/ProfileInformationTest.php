@@ -3,6 +3,7 @@
 namespace App;
 
 use App\Enums\AvailabilityHours;
+use App\Http\Resources\UserVacationResource;
 use App\Models\Location;
 use App\Models\User;
 use App\Models\UserAvailability;
@@ -75,6 +76,34 @@ class ProfileInformationTest extends TestCase
         $user->refresh()->load(['vacations']);
         $this->assertCount(1, $user->vacations);
         $this->assertSame('Testing 2', $user->vacations[0]->description);
+    }
+
+    public function test_admin_can_maintain_his_own_vacations(): void
+    {
+        $admin = User::factory()->enabled()->adminRoleUser()->create();
+
+        $vacation1 = ['start_date' => '2023-01-01', 'end_date' => '2023-01-15', 'description' => 'Testing'];
+        $vacation = UserVacation::factory()
+            ->state($vacation1)
+            ->for($admin)
+            ->create();
+        $resource = UserVacationResource::make($vacation);
+
+        $vacationData = [
+            'vacations' => [
+                $resource->resolve(),
+                ['start_date' => '2023-02-01', 'end_date' => '2023-02-15', 'description' => 'Testing 2'],
+            ],
+        ];
+
+        $this->actingAs($admin)
+            ->putJson("/user/vacations", $vacationData)
+            ->assertRedirect("/user/availability");
+
+        $admin->refresh()->load(['vacations']);
+        $this->assertCount(2, $admin->vacations);
+        $this->assertSame('Testing', $admin->vacations[0]->description);
+        $this->assertSame('Testing 2', $admin->vacations[1]->description);
     }
 
     public function test_user_cannot_add_vacations_for_other_users(): void
