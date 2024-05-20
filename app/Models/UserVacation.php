@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Prunable;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Carbon;
 
 class UserVacation extends Model
@@ -33,5 +34,10 @@ class UserVacation extends Model
             get: fn($value) => Carbon::parse($value)->format('Y-m-d'),
             set: fn($value) => $this->attributes['end_date'] = Carbon::parse($value)->endOfDay()
         );
+    }
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
     }
 }
