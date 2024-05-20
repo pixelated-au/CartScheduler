@@ -1,4 +1,7 @@
+import axios from 'axios';
 import _ from 'lodash';
+import {useToast} from "vue-toastification";
+
 window._ = _;
 
 /**
@@ -7,10 +10,34 @@ window._ = _;
  * CSRF token as a header based on the value of the "XSRF" token cookie.
  */
 
-import axios from 'axios';
 window.axios = axios;
 
 window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
+
+window.axios.interceptors.response.use(
+    response => response,
+    error => {
+        // todo, this can be improved
+        if (error.response.status === 400) {
+            if (error.response.data?.message?.startsWith('ENDPOINT UPDATED:')) {
+                const toast = useToast();
+                toast.error(
+                    'You are running an outdated version of the system. The browser will refresh to update.',
+                    {
+                        autoClose: false,
+                        position: 'top-center',
+                        icon: true,
+                        onClose: () => window.location.reload(),
+                    },
+                );
+            }
+            return new Promise(() => {
+            });
+        }
+        console.log('returning....');
+        return Promise.reject(error);
+    },
+);
 
 /**
  * Echo exposes an expressive API for subscribing to channels and listening
