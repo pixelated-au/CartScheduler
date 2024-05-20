@@ -552,7 +552,7 @@ class ReservationsTest extends TestCase
 
     public function test_user_cannot_reserve_a_disabled_shift(): void
     {
-        $user = User::factory()->male()->create();
+        $user = User::factory()->enabled()->male()->create();
 
         $startDate = CarbonImmutable::createFromTimeString('2023-01-15 12:00:00');
 
@@ -563,14 +563,15 @@ class ReservationsTest extends TestCase
             ->threeVolunteers()
             ->has(
                 Shift::factory()
-                    ->state(['is_enabled' => false])
                     ->everyDay9am()
+                    ->state(['is_enabled' => false])
             )
             ->create();
 
         $this->assertDatabaseCount('shift_user', 0);
 
-        $this->actingAs($user)->postJson('/reserve-shift', [
+        $this->actingAs($user)
+            ->postJson('/reserve-shift', [
             'location'   => $location->id,
             'shift'      => $location->shifts[0]->id,
             'do_reserve' => true,
