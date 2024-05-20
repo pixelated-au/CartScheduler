@@ -6,6 +6,10 @@ use Closure;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
+/**
+ * Used to indicate that the endpoint has been updated and the client should update their code.
+ * Client can detect a 400 (Bad Request) response code. The message should always be 'ENDPOINT UPDATED: <message>'
+ */
 class EndpointUpdatedException extends HttpException
 {
 
@@ -15,7 +19,7 @@ class EndpointUpdatedException extends HttpException
     }
 
     /**
-     * @throws \App\Exceptions\EndpointUpdatedException
+     * @throws self
      */
     public static function throw(string $message): void
     {
