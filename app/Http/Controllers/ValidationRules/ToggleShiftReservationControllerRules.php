@@ -4,7 +4,6 @@ namespace App\Http\Controllers\ValidationRules;
 
 use App\Actions\GetMaxShiftReservationDateAllowed;
 use App\Actions\ValidateVolunteerIsAllowedToBeRosteredAction;
-use App\Enums\DBPeriod;
 use App\Models\Location;
 use App\Models\Shift;
 use App\Models\ShiftUser;
@@ -44,7 +43,6 @@ class ToggleShiftReservationControllerRules
                 'bail',
                 'required',
                 'integer',
-                'exists:shifts,id',
                 Rule::exists('shifts', 'id')
                     ->where('is_enabled', true)
                     ->where($dayOfWeek, true),
@@ -58,7 +56,7 @@ class ToggleShiftReservationControllerRules
                         Rule::exists('shift_user', 'shift_id')
                             ->where('user_id', (int)$user->id)
                             ->where('shift_date', $shiftDate->toDateString())
-                    ]
+                    ],
                 ),
                 function ($attribute, $value, $fail) use ($user, $data, $shiftDate, $isAdmin) {
                     // only validate if adding a shift
@@ -154,7 +152,8 @@ class ToggleShiftReservationControllerRules
             return;
         }
 
-        $shiftUsers = ShiftUser::with(['user' => fn(BelongsTo $query) => $query->select(['id', 'gender'])])
+        $shiftUsers = ShiftUser::with(['user' => fn(BelongsTo $query) => $query
+            ->select(['id', 'gender'])])
             ->where('shift_id', $shiftId)
             ->where('shift_date', $shiftDate->toDateString())
             ->get();
