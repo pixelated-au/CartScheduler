@@ -20,7 +20,7 @@ class DoShiftReservation
     {
         $this->validateShiftIsNotFullAction->execute($shift, $shiftDate);
 
-        $shift->users()->attach($userId, ['shift_date' => $shiftDate]);
+        $shift->attachUserOnDate($userId, $shiftDate);
         activity()
             ->performedOn($shift)
             ->causedBy(Auth::user())
