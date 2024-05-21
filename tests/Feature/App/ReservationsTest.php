@@ -572,11 +572,11 @@ class ReservationsTest extends TestCase
 
         $this->actingAs($user)
             ->postJson('/reserve-shift', [
-            'location'   => $location->id,
-            'shift'      => $location->shifts[0]->id,
-            'do_reserve' => true,
-            'date'       => $startDate->addDay()->toDateString(),
-        ])
+                'location'   => $location->id,
+                'shift'      => $location->shifts[0]->id,
+                'do_reserve' => true,
+                'date'       => $startDate->addDay()->toDateString(),
+            ])
             ->assertUnprocessable()
             ->assertInvalid('shift');
 
@@ -703,6 +703,54 @@ class ReservationsTest extends TestCase
             ->assertJsonPath("freeShifts.{$startDate->toDateString()}.max_volunteers", fn(int $val) => $val === 3)
             ->assertJsonPath("freeShifts.{$startDate->addDay()->toDateString()}.volunteer_count", fn(int $val) => $val === 2)
             ->assertJsonPath("freeShifts.{$startDate->addDay()->toDateString()}.max_volunteers", fn(int $val) => $val === 3);
+    }
+
+    /**
+     * This test is a result of a unique bug where the following would happen:
+     * - A shift was available on limited days (e.g. Saturday and Sunday)
+     * - 'today' was not one of those days (e.g. Monday)
+     * - The user selected the last day of the period (e.g. June 30th - a Sunday)
+     * - The user would not see the location
+     * This would happen because the system wasn't comparing dates correctly
+     */
+    public function test_user_can_see_locations_that_are_only_displayed_on_limited_days_of_the_week_on_last_day_of_period(): void
+    {
+        $this->setConfig(1, DBPeriod::Month, false, 'MON', '12:00');
+
+        $user = User::factory()->enabled()->create();
+
+        $startDate = CarbonImmutable::createFromTimeString('2024-05-22 7:00:00');
+
+        $locations = Location::factory()
+            ->threeVolunteers()
+            ->count(3)
+            ->has(Shift::factory()->everyDay9am())
+            ->has(Shift::factory()->everyDay1230pm())
+            ->create();
+
+        $locations->last()->shifts->each(fn(Shift $shift) => $shift->setRawAttributes([
+            'day_monday'    => false,
+            'day_tuesday'   => false,
+            'day_wednesday' => false,
+            'day_thursday'  => false,
+            'day_friday'    => false,
+            'day_saturday'  => true,
+            'day_sunday'    => true,
+            'available_to'  => '2024-07-31',
+        ])->save());
+
+        $this->travelTo($startDate);
+
+        $this->actingAs($user)
+            ->getJson("/shifts/2024-06-30") // previously, this date would not return all locations
+            ->assertOk()
+            ->assertJsonCount(3, 'locations')
+            ->assertJsonPath("locations.0.name", $locations[0]->name)
+            ->assertJsonPath("locations.1.name", $locations[1]->name)
+            ->assertJsonPath("locations.2.name", $locations[2]->name)
+            ->assertJsonCount(2, "locations.0.shifts")
+            ->assertJsonCount(2, "locations.1.shifts")
+            ->assertJsonCount(2, "locations.2.shifts");
     }
 
     public function test_user_cannot_see_disabled_shifts(): void
@@ -1027,7 +1075,6 @@ class ReservationsTest extends TestCase
                     ->everyDay9am()
             )
             ->create();
-
 
         $this->travelTo('2023-01-02 09:00:00');
 
