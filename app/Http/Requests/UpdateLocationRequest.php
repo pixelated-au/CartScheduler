@@ -129,7 +129,7 @@ class UpdateLocationRequest extends FormRequest
                 $bothSetsOfDates = isset($shift1['available_from'], $shift1['available_to'], $shift2['available_from'], $shift2['available_to']);
                 if ($bothSetsOfDates) {
                     $datesOverlap = $shift1['available_from'] < $shift2['available_to'] && $shift1['available_to'] > $shift2['available_from'];
-                    if ($datesOverlap && $timesOverlap) {
+                    if ($datesOverlap && $timesOverlap && $this->doDaysOverlap($shift1, $shift2)) {
                         $errorShifts = 110;
                     }
                 }
@@ -137,30 +137,42 @@ class UpdateLocationRequest extends FormRequest
                 // For overlapping periods with only available_from or available_to
                 $eitherSetOfDatesShift1 = isset($shift1['available_from']) || isset($shift1['available_to']);
                 $noDatesShift2          = !isset($shift2['available_from']) && !isset($shift2['available_to']);
-                if ($eitherSetOfDatesShift1 && $noDatesShift2 && $timesOverlap) {
+                if ($eitherSetOfDatesShift1 && $noDatesShift2 && $timesOverlap && $this->doDaysOverlap($shift1, $shift2)) {
                     $errorShifts = 120;
                 }
 
                 $eitherSetOfDatesShift1 = !isset($shift1['available_from']) && !isset($shift1['available_to']);
                 $noDatesShift2          = isset($shift2['available_from']) || isset($shift2['available_to']);
-                if ($eitherSetOfDatesShift1 && $noDatesShift2 && $timesOverlap) {
+                if ($eitherSetOfDatesShift1 && $noDatesShift2 && $timesOverlap && $this->doDaysOverlap($shift1, $shift2)) {
                     $errorShifts = 121;
                 }
 
                 // For shifts with no available_from or available_to
                 $noDatesBoth = !isset($shift1['available_from']) && !isset($shift1['available_to']) && !isset($shift2['available_from']) && !isset($shift2['available_to']);
-                if ($noDatesBoth && $timesOverlap) {
+                if ($noDatesBoth && $timesOverlap && $this->doDaysOverlap($shift1, $shift2)) {
                     $errorShifts = 130;
                 }
 
-                $startTime = Carbon::now()->setTimeFromTimeString($shift1['start_time'])->format('H:i');
-                $endTime   = Carbon::now()->setTimeFromTimeString($shift1['end_time'])->format('H:i');
+                $startTime = Carbon::now()->setTimeFromTimeString($shift2['start_time'])->format('H:i');
+                $endTime   = Carbon::now()->setTimeFromTimeString($shift2['end_time'])->format('H:i');
 
                 if ($errorShifts) {
-                    $validator->errors()->add("shifts.$index1.start_time", "There is an active shift that conflicts with this shift between {$startTime} and {$endTime}. Only one shift per timeslot can be enabled. [Code: $errorShifts]");
+                    $validator->errors()->add("shifts.$index1.start_time", "There is an active shift that conflicts with this shift between $startTime and $endTime. Only one shift per timeslot can be enabled. [Code: $errorShifts]");
                 }
             }
-
         }
+    }
+
+    private array $days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+    protected function doDaysOverlap($shift1, $shift2): bool
+    {
+        $daysOverlap = false;
+        foreach ($this->days as $day) {
+            if ($shift1["day_$day"] && $shift2["day_$day"]) {
+                $daysOverlap = true;
+                break;
+            }
+        }
+        return $daysOverlap;
     }
 }
