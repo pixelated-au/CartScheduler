@@ -53,7 +53,7 @@
             <div class="">
                 <div v-if="outstandingReports?.length" class="mt-5">
                     <div v-for="report in outstandingReports"
-                         :key="`${report.shift_date}-${report.start_time}-${report.user_id}`"
+                         :key="`${report.shift_date}-${report.start_time}-${report.shift_id}-${report.user_id}`"
                          class="pb-3 mb-20 border-b border-gray-200">
                         <ReportForm :report="report" @saved="reportSaved()"/>
                     </div>
