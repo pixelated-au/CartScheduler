@@ -6,6 +6,7 @@ use App\Actions\UserNeedsToUpdateAvailability;
 use App\Models\User;
 use App\Models\UserAvailability;
 use App\Settings\GeneralSettings;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
 use Mockery\MockInterface;
 use Tests\TestCase;
@@ -13,6 +14,8 @@ use Tests\TestCase;
 
 class UserNeedsToUpdateAvailabilityTest extends TestCase
 {
+    use RefreshDatabase;
+
     public function test_execute_returns_false_for_null_user(): void
     {
         $settings = GeneralSettings::fake([]);
