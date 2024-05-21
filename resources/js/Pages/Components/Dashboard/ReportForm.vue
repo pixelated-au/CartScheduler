@@ -143,7 +143,7 @@
         </div>
 
         <div class="mb-3">
-            <JetButton type="button" style-type="primary" @click.prevent="saveReport" :disabled="formData.processing">
+            <JetButton type="button" style-type="primary" @click.prevent="saveReport" :disabled="isSaving">
                 Save Report
             </JetButton>
         </div>
