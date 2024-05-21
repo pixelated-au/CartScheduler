@@ -1,135 +1,144 @@
 <script setup>
-    import JetActionMessage from '@/Jetstream/ActionMessage.vue'
-    import JetButton from '@/Jetstream/Button.vue'
-    import JetConfirmationModal from '@/Jetstream/ConfirmationModal.vue'
-    import JetFormSection from '@/Jetstream/FormSection.vue'
-    import JetSectionBorder from '@/Jetstream/SectionBorder.vue'
-    import ShiftData from '@/Pages/Admin/Locations/Partials/ShiftData.vue'
-    import { Inertia } from '@inertiajs/inertia'
-    import { useForm } from '@inertiajs/inertia-vue3'
-    import { computed, nextTick, ref, watch, watchEffect } from 'vue'
-    import LocationData from './LocationData.vue'
+import JetActionMessage from '@/Jetstream/ActionMessage.vue';
+import JetButton from '@/Jetstream/Button.vue';
+import JetConfirmationModal from '@/Jetstream/ConfirmationModal.vue';
+import JetFormSection from '@/Jetstream/FormSection.vue';
+import JetSectionBorder from '@/Jetstream/SectionBorder.vue';
+import ShiftData from '@/Pages/Admin/Locations/Partials/ShiftData.vue';
+import {Inertia} from '@inertiajs/inertia';
+import {useForm} from '@inertiajs/inertia-vue3';
+import {computed, nextTick, ref, watch} from 'vue';
+import LocationData from './LocationData.vue';
 
-    const props = defineProps({
-        location: Object,
-        maxVolunteers: {
-            type: Number,
-            required: true,
-        },
-        action: {
-            type: String,
-            default: 'edit',
-        },
-    })
+const props = defineProps({
+    location: Object,
+    maxVolunteers: {
+        type: Number,
+        required: true,
+    },
+    action: {
+        type: String,
+        default: 'edit',
+    },
+});
 
-    const emit = defineEmits([
-        'cancel',
-    ])
+const emit = defineEmits([
+    'cancel',
+]);
 
-    const form = useForm({
-        id: '',
-        name: '',
-        description: '',
-        min_volunteers: '',
-        max_volunteers: '',
-        requires_brother: '',
-        latitude: '',
-        longitude: '',
-        is_enabled: '',
-        shifts: '',
-    })
+const form = useForm({
+    id: props.location?.data?.id,
+    name: props.location?.data?.name,
+    description: props.location?.data?.description,
+    min_volunteers: props.location?.data?.min_volunteers,
+    max_volunteers: props.location?.data?.max_volunteers,
+    requires_brother: props.location?.data?.requires_brother,
+    latitude: props.location?.data?.latitude,
+    longitude: props.location?.data?.longitude,
+    is_enabled: props.location?.data?.is_enabled,
+    shifts: props.location?.data?.shifts,
+    // id: '',
+    // name: '',
+    // description: '',
+    // min_volunteers: '',
+    // max_volunteers: '',
+    // requires_brother: '',
+    // latitude: '',
+    // longitude: '',
+    // is_enabled: '',
+    // shifts: '',
+});
 
-    watchEffect(() => {
-        form.id = props.location?.data?.id
-        form.name = props.location?.data?.name
-        form.description = props.location?.data?.description
-        form.min_volunteers = props.location?.data?.min_volunteers
-        form.max_volunteers = props.location?.data?.max_volunteers
-        form.requires_brother = props.location?.data?.requires_brother
-        form.latitude = props.location?.data?.latitude
-        form.longitude = props.location?.data?.longitude
-        form.is_enabled = props.location?.data?.is_enabled
-        form.shifts = props.location?.data?.shifts
-    })
+// watchEffect(() => {
+//     form.id = props.location?.data?.id
+//     form.name = props.location?.data?.name
+//     form.description = props.location?.data?.description
+//     form.min_volunteers = props.location?.data?.min_volunteers
+//     form.max_volunteers = props.location?.data?.max_volunteers
+//     form.requires_brother = props.location?.data?.requires_brother
+//     form.latitude = props.location?.data?.latitude
+//     form.longitude = props.location?.data?.longitude
+//     form.is_enabled = props.location?.data?.is_enabled
+//     form.shifts = props.location?.data?.shifts
+// })
 
-    watch(() => form.min_volunteers, (value, oldValue) => {
-        if (value < 0) {
-            nextTick(() => {
-                form.min_volunteers = oldValue
-            })
-        }
-        if (value > form.max_volunteers) {
-            form.max_volunteers = value
-        }
-    })
+watch(() => form.min_volunteers, (value, oldValue) => {
+    if (value < 0) {
+        nextTick(() => {
+            form.min_volunteers = oldValue;
+        });
+    }
+    if (value > form.max_volunteers) {
+        form.max_volunteers = value;
+    }
+});
 
-    watch(() => form.max_volunteers, (value, oldValue) => {
-        if (value > props.maxVolunteers) {
-            nextTick(() => {
-                form.max_volunteers = oldValue
-            })
-        }
-        if (value < form.min_volunteers) {
-            form.min_volunteers = value
-        }
-    })
+watch(() => form.max_volunteers, (value, oldValue) => {
+    if (value > props.maxVolunteers) {
+        nextTick(() => {
+            form.max_volunteers = oldValue;
+        });
+    }
+    if (value < form.min_volunteers) {
+        form.min_volunteers = value;
+    }
+});
 
-    const updateLocationData = () => {
-        form.put(route('admin.locations.update', props.location.data.id), {
-            errorBag: 'updateLocationData',
+const updateLocationData = () => {
+    form.put(route('admin.locations.update', props.location.data.id),
+        {
             preserveScroll: true,
-        })
-    }
+        });
+};
 
-    const createLocationData = () => {
-        form.post(route('admin.locations.store'), {
-            errorBag: 'updateLocationData',
-            preserveScroll: true,
-        })
-    }
+const createLocationData = () => {
+    form.post(route('admin.locations.store'), {
+        preserveScroll: true,
+    });
+};
 
-    const saveAction = () => {
-        if (props.action === 'edit') {
-            updateLocationData()
-        } else {
-            createLocationData()
-        }
+const saveAction = () => {
+    if (props.action === 'edit') {
+        updateLocationData();
+    } else {
+        createLocationData();
     }
+};
 
-    const listRouteAction = () => {
-        Inertia.visit(route('admin.locations.index'))
+const listRouteAction = () => {
+    Inertia.visit(route('admin.locations.index'));
+};
+
+const showConfirmationModal = ref(false);
+const modalDeleteAction = ref(false);
+const confirmCancel = () => {
+    modalDeleteAction.value = false;
+    if (form.isDirty) {
+        showConfirmationModal.value = true;
+    } else {
+        listRouteAction();
     }
+};
 
-    const showConfirmationModal = ref(false)
-    const modalDeleteAction = ref(false)
-    const confirmCancel = () => {
-        modalDeleteAction.value = false
-        if (form.isDirty) {
-            showConfirmationModal.value = true
-        } else {
-            listRouteAction()
-        }
+const onDelete = () => {
+    modalDeleteAction.value = true;
+    showConfirmationModal.value = true;
+};
+
+const doDeleteAction = () => {
+    Inertia.delete(route('admin.locations.destroy', props.location.data.id));
+};
+
+const performConfirmationAction = () => {
+    if (modalDeleteAction.value) {
+        doDeleteAction();
+    } else {
+        listRouteAction();
     }
+};
 
-    const onDelete = () => {
-        modalDeleteAction.value = true
-        showConfirmationModal.value = true
-    }
-
-    const doDeleteAction = () => {
-        Inertia.delete(route('admin.locations.destroy', props.location.data.id))
-    }
-
-    const performConfirmationAction = () => {
-        if (modalDeleteAction.value) {
-            doDeleteAction()
-        } else {
-            listRouteAction()
-        }
-    }
-
-    const cancelButtonText = computed(() => form.isDirty ? 'Cancel' : 'Back')
-    const hasErrors = computed(() => Object.keys(form.errors).length > 0)
+const cancelButtonText = computed(() => form.isDirty ? 'Cancel' : 'Back');
+const hasErrors = computed(() => Object.keys(form.errors).length > 0);
 
 </script>
 
