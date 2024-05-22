@@ -109,6 +109,7 @@ will be available in this interface.
 
 ## TODO:
 
+- [ ] Make locations and shifts sortable
 - [ ] Facility to detect if a volunteer's 'availability' conflicts with a shift
 - [ ] Facility to detect if a shift lost a volunteer after removing themselves - and causing the shift to be closed
 - [ ] Test that if a shifts can't be defined at the same day/time unless there is a start and end date that doesn't
