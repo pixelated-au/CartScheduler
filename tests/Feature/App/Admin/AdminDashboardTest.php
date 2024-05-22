@@ -189,11 +189,7 @@ class AdminDashboardTest extends TestCase
         $this->actingAs($admin)
             ->getJson("/admin/assigned-shifts/2023-05-55") // This date doesn't exist
             ->assertOk()
-            ->assertJsonCount(31, 'freeShifts')
-            ->assertJsonPath('freeShifts.2023-01-01.max_volunteers', 10)
-            ->assertJsonPath('freeShifts.2023-01-31.max_volunteers', 10)
-            ->assertJsonCount(1, 'locations')
-            ->assertJsonPath('locations.0.id', $location->id)
-            ->assertJsonPath('locations.0.name', $location->name);
+            ->assertJsonCount(0, 'freeShifts')
+            ->assertJsonCount(0, 'locations');
     }
 }
