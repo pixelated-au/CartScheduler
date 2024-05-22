@@ -21,11 +21,16 @@ class AdminAvailableShiftsController extends Controller
 
     public function __invoke(Request $request, string $shiftDate)
     {
+        $returnData = [
+            'freeShifts' => [],
+            'locations'  => [],
+        ];
+
         try {
             $selectedDate = Carbon::parse($shiftDate);
         } catch (InvalidFormatException $e) {
             Bugsnag::notifyException($e);
-            $selectedDate = Carbon::today();
+            return $returnData;
         }
         $formattedDate = $selectedDate->format('Y-m-d');
 
@@ -62,9 +67,9 @@ class AdminAvailableShiftsController extends Controller
 
         $freeShiftsCount = $this->getAvailableShiftsCount->execute($selectedDate->format('Y-m-d'), $endDate->format('Y-m-d'));
 
-        return [
-            'freeShifts' => $freeShiftsCount,
-            'locations'  => LocationResource::collection($locations),
-        ];
+        $returnData['freeShifts'] = $freeShiftsCount;
+        $returnData['locations']  = LocationResource::collection($locations);
+
+        return $returnData;
     }
 }
