@@ -1,4 +1,4 @@
-import {isAfter, isBefore, parse} from 'date-fns';
+import {endOfDay, endOfMonth, getMonth, isAfter, isBefore, parse, setDate, startOfDay} from 'date-fns';
 import {utcToZonedTime} from "date-fns-tz";
 import formatISO from 'date-fns/formatISO';
 import {cloneDeep} from 'lodash';
@@ -9,7 +9,7 @@ export default function useLocationFilter(timezone, canAdmin = false) {
     /**
      * @param {Date} date
      */
-    const date = ref(utcToZonedTime(new Date(), timezone.value));
+    const date = ref(endOfDay(utcToZonedTime(new Date(), timezone.value)));
     const maxReservationDate = ref(new Date());
     const serverLocations = shallowRef([]);
     const serverDates = shallowRef({});
@@ -22,14 +22,14 @@ export default function useLocationFilter(timezone, canAdmin = false) {
             timeoutId = setTimeout(() => isLoading.value = true, 1000);
         }
         try {
-            const path = canAdmin ? `/admin/assigned-shifts/${selectedDate.value}` : `/shifts/${selectedDate.value}`;
+            const path = canAdmin ? `/admin/assigned-shifts/${formattedDate.value}` : `/shifts/${formattedDate.value}`;
 
             const response = await axios.get(path);
             serverLocations.value = response.data.locations;
             serverDates.value = response.data.shifts;
             // next two props used in non-admin view
             freeShifts.value = response.data.freeShifts;
-            maxReservationDate.value = utcToZonedTime(response.data.maxDateReservation, timezone.value);
+            maxReservationDate.value = endOfDay(utcToZonedTime(response.data.maxDateReservation, timezone.value));
         } finally {
             if (showLoader) {
                 isLoading.value = false;
@@ -39,16 +39,32 @@ export default function useLocationFilter(timezone, canAdmin = false) {
     };
 
     onMounted(() => {
-        getShifts();
+        getShifts().then(() => {
+        });
     });
 
-    const selectedDate = computed(() =>
+    const formattedDate = computed(() =>
         date.value
             ? formatISO(date.value, {representation: 'date'})
             : '',
     );
 
-    watch(selectedDate, () => getShifts());
+    watch(date, (val, oldVal) => {
+        const newMonth = getMonth(val);
+        const oldMonth = getMonth(oldVal);
+
+        if (isAfter(val, maxReservationDate.value) || newMonth > oldMonth) {
+            date.value = setDate(val, 1);
+            return;
+        }
+
+        if (isBefore(val, startOfDay(new Date())) || newMonth < oldMonth) {
+            date.value = endOfMonth(val);
+            return;
+        }
+        getShifts().then(() => {
+        });
+    });
 
     const emptyShiftsForTime = ref([]);
 
@@ -160,7 +176,7 @@ export default function useLocationFilter(timezone, canAdmin = false) {
             let freeShifts = 0;
             for (const shift of location.shifts) {
                 const volunteers = shift.volunteers;
-                shift.filterVolunteers = volunteers.filter(volunteer => volunteer.shift_date === selectedDate.value);
+                shift.filterVolunteers = volunteers.filter(volunteer => volunteer.shift_date === formattedDate.value);
                 delete shift.volunteers;
                 if (location.requires_brother) {
                     let femaleCount = 0;
