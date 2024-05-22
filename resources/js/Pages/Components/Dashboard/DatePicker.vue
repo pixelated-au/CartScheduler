@@ -39,7 +39,7 @@ const emit = defineEmits([
 const selectedDate = computed({
     get: () => props.date,
     // set the date at midday to be safe...
-    set: (value) => emit('update:date', parse('12:00:00', 'HH:mm:ss', value)),
+    set: (value) => emit('update:date', parse('23:59:59.999', 'HH:mm:ss.SSS', value)),
 });
 
 const shiftAvailability = computed(() => {
