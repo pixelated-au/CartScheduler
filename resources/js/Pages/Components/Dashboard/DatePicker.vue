@@ -16,7 +16,7 @@ import {
     startOfMonth,
     subMonths,
 } from 'date-fns';
-import {utcToZonedTime, zonedTimeToUtc} from "date-fns-tz";
+import {utcToZonedTime} from "date-fns-tz";
 import {computed, defineEmits, defineProps, inject, onMounted, ref, watchEffect} from 'vue';
 
 const props = defineProps({
@@ -39,7 +39,7 @@ const emit = defineEmits([
 const selectedDate = computed({
     get: () => props.date,
     // set the date at midday to be safe...
-    set:(value) => emit('update:date', parse('12:00:00', 'HH:mm:ss', value)),
+    set: (value) => emit('update:date', parse('12:00:00', 'HH:mm:ss', value)),
 });
 
 const shiftAvailability = computed(() => {
@@ -119,7 +119,7 @@ watchEffect(() => {
             for (let shiftCount = 0; shiftCount < shifts.length; shiftCount++) {
                 const shift = shifts[shiftCount];
                 if (!isoDate) {
-                    isoDate = utcToZonedTime(shift.shift_date, shiftAvailability.value.timezone)
+                    isoDate = utcToZonedTime(shift.shift_date, shiftAvailability.value.timezone);
                 }
                 // TODO is this isBefore and isAfter still needed?
                 if (isBefore(isoDate, startOfDay(parseISO(shift.available_from)))) {
@@ -138,7 +138,6 @@ watchEffect(() => {
                 date: isoDate,
                 type: 'line',
                 color: '#0E9F6E',
-                tooltip: [{text: `You have a shift`, color: '#0E9F6E'}],
                 locations: foundAtLocation,
             });
         }
@@ -150,14 +149,14 @@ watchEffect(() => {
 });
 
 const updateMonthYear = ({month, year}) => {
-    const totalDays = new Date(year, month+1, 0).getDate();
+    const totalDays = new Date(year, month + 1, 0).getDate();
     const monthDay = selectedDate.value.getDate();
     if (monthDay > totalDays) {
         selectedDate.value = new Date(year, month, totalDays);
-        return
+        return;
     }
     selectedDate.value = new Date(year, month, selectedDate.value.getDate());
-}
+};
 </script>
 
 <template>
