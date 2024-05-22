@@ -1,3 +1,12 @@
+<script>
+import {VTooltip} from 'floating-vue';
+export default {
+    directives: {
+        tooltip: VTooltip,
+    },
+}
+</script>
+
 <script setup>
 import ComponentSpinner from '@/Components/ComponentSpinner.vue';
 import BookedSlot from '@/Components/Icons/BookedSlot.vue';
@@ -11,9 +20,6 @@ import useLocationFilter from '@/Pages/Admin/Locations/Composables/useLocationFi
 import DatePicker from '@/Pages/Components/Dashboard/DatePicker.vue';
 import {usePage} from "@inertiajs/inertia-vue3";
 import {format, isSameDay, parse} from 'date-fns';
-// noinspection ES6UnusedImports
-import {VTooltip} from 'floating-vue';
-import {debounce} from "lodash";
 import {computed, ref} from 'vue';
 
 defineProps({
