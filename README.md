@@ -109,6 +109,7 @@ will be available in this interface.
 
 ## TODO:
 
+- [ ] Add flag to highlight a shift hasn't opened yet
 - [ ] Make locations and shifts sortable
 - [ ] Facility to detect if a volunteer's 'availability' conflicts with a shift
 - [ ] Facility to detect if a shift lost a volunteer after removing themselves - and causing the shift to be closed
