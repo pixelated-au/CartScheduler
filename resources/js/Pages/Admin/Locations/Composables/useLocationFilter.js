@@ -4,12 +4,21 @@ import formatISO from 'date-fns/formatISO';
 import {cloneDeep} from 'lodash';
 import {computed, onMounted, ref, shallowRef, watch} from 'vue';
 
+/**
+ * @typedef { import("vue").Ref } Ref
+ */
 export default function useLocationFilter(timezone, canAdmin = false) {
 
     /**
-     * @param {Date} date
+     * @param {Ref<Date>} date
      */
     const date = ref(setHours(utcToZonedTime(new Date(), timezone.value), 12));
+    /**
+     * Represents the maximum reservation date.
+     * @constant
+     * @type {Ref<Date|null>}
+     * @default {Ref<Date|null>}
+     */
     const maxReservationDate = ref(endOfDay(utcToZonedTime(new Date(), timezone.value)));
     const serverLocations = shallowRef([]);
     const serverDates = shallowRef({});
@@ -29,7 +38,7 @@ export default function useLocationFilter(timezone, canAdmin = false) {
             serverDates.value = response.data.shifts;
             // next two props used in non-admin view
             freeShifts.value = response.data.freeShifts;
-            maxReservationDate.value = endOfDay(utcToZonedTime(response.data.maxDateReservation, timezone.value));
+            maxReservationDate.value = response.data.maxDateReservation ? endOfDay(utcToZonedTime(response.data.maxDateReservation, timezone.value)) : null;
         } finally {
             if (showLoader) {
                 isLoading.value = false;
@@ -58,7 +67,7 @@ export default function useLocationFilter(timezone, canAdmin = false) {
             return;
         }
 
-        if (isBefore(val, startOfDay(utcToZonedTime(new Date(), timezone.value))) || newMonth < oldMonth) {
+        if ((!canAdmin && isBefore(val, startOfDay(utcToZonedTime(new Date(), timezone.value)))) || newMonth < oldMonth) {
             date.value = endOfMonth(val);
             return;
         }
