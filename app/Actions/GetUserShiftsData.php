@@ -19,7 +19,7 @@ class GetUserShiftsData
      *
      * @param string $startDate YYYY-MM-DD
      * @param string $endDate YYYY-MM-DD
-     *
+     * @param \App\Models\User $user
      * @return \Illuminate\Support\Collection
      */
     public function execute(string $startDate, string $endDate, User $user): Collection
@@ -75,20 +75,19 @@ class GetUserShiftsData
                          shifts.start_time
                 ";
 
-        $params = ['startDate' => $startDate, 'endDate' => $endDate, 'userId' => $user->id];
-
+        $params  = ['startDate' => $startDate, 'endDate' => $endDate, 'userId' => $user->id];
         $results = DB::select(DB::raw($query), $params);
 
         return collect($results)
             ->map(fn(stdClass $shift) => [
                 'date_group'     => $shift->date,
-                'shift_date'     => Carbon::parse("{$shift->date}T{$shift->start_time}"),
+                'shift_date'     => Carbon::parse("{$shift->date}T$shift->start_time")->toDateString(),
                 'shift_id'       => $shift->shift_id,
                 'volunteer_id'   => $shift->volunteer_id,
                 'start_time'     => $shift->start_time,
                 'location_id'    => $shift->location_id,
-                'available_from' => $shift->available_from ? Carbon::parse($shift->available_from) : null,
-                'available_to'   => $shift->available_to ? Carbon::parse($shift->available_to) : null,
+                'available_from' => $shift->available_from ? Carbon::parse($shift->available_from)->toDateString() : null,
+                'available_to'   => $shift->available_to ? Carbon::parse($shift->available_to)->toDateString() : null,
                 'max_volunteers' => (int)$shift->max_volunteers,
             ])
             ->filter(fn(array $shift) => $shift['volunteer_id'] === $user->id)
