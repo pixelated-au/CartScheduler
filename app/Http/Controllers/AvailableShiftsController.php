@@ -29,14 +29,15 @@ class AvailableShiftsController extends Controller
 
     public function __invoke(Request $request, string $shiftDate)
     {
-        $user    = $request->user();
-        $endDate = $this->getMaxShiftReservationDateAllowed->execute()->endOfDay();
+        $user             = $request->user();
+        $endDate          = $this->getMaxShiftReservationDateAllowed->execute()->endOfDay();
+        $formattedEndDate = $endDate->toDateString();
 
         $returnData = [
             'shifts'             => [],
             'freeShifts'         => [],
             'locations'          => [],
-            'maxDateReservation' => $endDate->toDateString(),
+            'maxDateReservation' => $formattedEndDate,
         ];
 
         try {
@@ -48,7 +49,7 @@ class AvailableShiftsController extends Controller
             Bugsnag::notifyException($e);
             return $returnData;
         }
-        $formattedDate = $selectedDate->toDateString();
+        $formattedSelectedDate = $selectedDate->toDateString();
 
         // Locations are the list of locations in the 'accordion' menu
         $locations = Location::with([
@@ -56,28 +57,28 @@ class AvailableShiftsController extends Controller
                 ->where('shifts.is_enabled', true)
                 ->where(fn(Builder $query) => $query
                     ->whereNull('shifts.available_from')
-                    ->orWhere('shifts.available_from', '<=', $formattedDate)
+                    ->orWhere('shifts.available_from', '<=', $formattedSelectedDate)
                 )
                 ->where(fn(Builder $query) => $query
                     ->whereNull('shifts.available_to')
-                    ->orWhere('shifts.available_to', '>=', $formattedDate)
+                    ->orWhere('shifts.available_to', '>=', $formattedSelectedDate)
                 )
                 ->whereRaw("CASE
-                                    WHEN DAYOFWEEK('$formattedDate') = 1 THEN shifts.day_sunday
-                                    WHEN DAYOFWEEK('$formattedDate') = 2 THEN shifts.day_monday
-                                    WHEN DAYOFWEEK('$formattedDate') = 3 THEN shifts.day_tuesday
-                                    WHEN DAYOFWEEK('$formattedDate') = 4 THEN shifts.day_wednesday
-                                    WHEN DAYOFWEEK('$formattedDate') = 5 THEN shifts.day_thursday
-                                    WHEN DAYOFWEEK('$formattedDate') = 6 THEN shifts.day_friday
-                                    WHEN DAYOFWEEK('$formattedDate') = 7 THEN shifts.day_saturday
+                                    WHEN DAYOFWEEK('$formattedSelectedDate') = 1 THEN shifts.day_sunday
+                                    WHEN DAYOFWEEK('$formattedSelectedDate') = 2 THEN shifts.day_monday
+                                    WHEN DAYOFWEEK('$formattedSelectedDate') = 3 THEN shifts.day_tuesday
+                                    WHEN DAYOFWEEK('$formattedSelectedDate') = 4 THEN shifts.day_wednesday
+                                    WHEN DAYOFWEEK('$formattedSelectedDate') = 5 THEN shifts.day_thursday
+                                    WHEN DAYOFWEEK('$formattedSelectedDate') = 6 THEN shifts.day_friday
+                                    WHEN DAYOFWEEK('$formattedSelectedDate') = 7 THEN shifts.day_saturday
                                     END = 1")
                 ->orderBy('shifts.start_time'),
             'shifts.users' => fn(BelongsToMany $query) => $query
-                ->where('shift_user.shift_date', '=', $formattedDate)
+                ->where('shift_user.shift_date', '=', $formattedSelectedDate)
                 ->when($user->is_restricted, fn($query) => $query
                     ->where(fn(Builder $query) => $query
-                        ->whereRaw('shift_user.shift_id in (select shift_id from shift_user where user_id = ? AND shift_date = ?)', [$user->id, $formattedDate])
-                        ->whereRaw('shift_user.shift_date in (select shift_date from shift_user where user_id = ? AND shift_date = ?)', [$user->id, $formattedDate])
+                        ->whereRaw('shift_user.shift_id in (select shift_id from shift_user where user_id = ? AND shift_date = ?)', [$user->id, $formattedSelectedDate])
+                        ->whereRaw('shift_user.shift_date in (select shift_date from shift_user where user_id = ? AND shift_date = ?)', [$user->id, $formattedSelectedDate])
                     )
                 )
         ])
@@ -94,10 +95,10 @@ class AvailableShiftsController extends Controller
                         ->contains(fn(User $shiftUser) => $shiftUser->id === $user->id)))
             );
 
-        $startDate       = Carbon::today()->format('Y-m-d');
-        $shifts          = $this->getUserShiftsData->execute($startDate, $endDate, $user);
+        $formattedStartDate  = Carbon::today()->endOfDay()->format('Y-m-d');
+        $shifts          = $this->getUserShiftsData->execute($formattedStartDate, $formattedEndDate, $user);
         $freeShiftsCount = $user->is_unrestricted
-            ? $this->getAvailableShiftsCount->execute($startDate, $endDate)
+            ? $this->getAvailableShiftsCount->execute($formattedStartDate, $formattedEndDate)
             : [];
 
         $returnData['shifts']     = $shifts;
