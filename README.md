@@ -111,6 +111,7 @@ will be available in this interface.
 
 - [ ] Add flag to highlight a shift hasn't opened yet
 - [ ] Make locations and shifts sortable
+- [ ] Add selected dates to the shifts, so rather than entering a range, admin can enter individual dates
 - [ ] Facility to detect if a volunteer's 'availability' conflicts with a shift
 - [ ] Facility to detect if a shift lost a volunteer after removing themselves - and causing the shift to be closed
 - [ ] Test that if a shifts can't be defined at the same day/time unless there is a start and end date that doesn't
