@@ -1,4 +1,4 @@
-import {endOfDay, endOfMonth, getMonth, isAfter, isBefore, parse, setDate, startOfDay} from 'date-fns';
+import {endOfDay, endOfMonth, getMonth, isAfter, isBefore, parse, setDate, setHours, startOfDay} from 'date-fns';
 import {utcToZonedTime} from "date-fns-tz";
 import formatISO from 'date-fns/formatISO';
 import {cloneDeep} from 'lodash';
@@ -9,8 +9,8 @@ export default function useLocationFilter(timezone, canAdmin = false) {
     /**
      * @param {Date} date
      */
-    const date = ref(endOfDay(utcToZonedTime(new Date(), timezone.value)));
-    const maxReservationDate = ref(new Date());
+    const date = ref(setHours(utcToZonedTime(new Date(), timezone.value), 12));
+    const maxReservationDate = ref(endOfDay(utcToZonedTime(new Date(), timezone.value)));
     const serverLocations = shallowRef([]);
     const serverDates = shallowRef({});
     const freeShifts = shallowRef([]);
@@ -58,7 +58,7 @@ export default function useLocationFilter(timezone, canAdmin = false) {
             return;
         }
 
-        if (isBefore(val, startOfDay(new Date())) || newMonth < oldMonth) {
+        if (isBefore(val, startOfDay(utcToZonedTime(new Date(), timezone.value))) || newMonth < oldMonth) {
             date.value = endOfMonth(val);
             return;
         }
@@ -104,15 +104,12 @@ export default function useLocationFilter(timezone, canAdmin = false) {
     const addShift = (shifts, shift) => {
         if (shift.available_from) {
             const from = utcToZonedTime(shift.available_from, timezone.value);
-            // const from = parseISO(shift.available_from);
             if (isBefore(date.value, from)) {
                 return false;
             }
         }
         if (shift.available_to) {
-            // const to = parseISO(shift.available_to)
             const to = utcToZonedTime(`${shift.available_to}T23:59:59`, timezone.value);
-            // const to = parseISO(`${shift.available_to}T23:59:59`);
             if (isAfter(date.value, to)) {
                 return false;
             }

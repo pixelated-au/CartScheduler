@@ -10,8 +10,9 @@ import {
     endOfMonth,
     isAfter,
     isBefore,
-    parse,
     parseISO,
+    set,
+    setHours,
     startOfDay,
     startOfMonth,
     subMonths,
@@ -39,7 +40,7 @@ const emit = defineEmits([
 const selectedDate = computed({
     get: () => props.date,
     // set the date at midday to be safe...
-    set: (value) => emit('update:date', parse('23:59:59.999', 'HH:mm:ss.SSS', value)),
+    set: (value) => emit('update:date', set(value, {hours: 12, minutes: 0, seconds: 0, milliseconds: 0})),
 });
 
 const shiftAvailability = computed(() => {
@@ -50,7 +51,7 @@ const isRestricted = computed(() => {
     return !usePage().props.value.isUnrestricted;
 });
 
-const today = new Date();
+const today = setHours(new Date(), 12);
 const notBefore = props.canViewHistorical
     ? startOfDay(startOfMonth(subMonths(today, 6)))
     : startOfDay(today);
@@ -148,11 +149,19 @@ watchEffect(() => {
     emit('locations-for-day', marks.map(marker => ({locations: marker.locations, date: marker.date})));
 });
 
+/**
+ * @param month Number
+ * @param year Number
+ * @returns void
+ * @description Used to set the date when the user changes month (or year). This ensures that the next month's values
+ * are loaded.
+ */
 const updateMonthYear = ({month, year}) => {
-    const totalDays = new Date(year, month + 1, 0).getDate();
-    const monthDay = selectedDate.value.getDate();
-    if (monthDay > totalDays) {
-        selectedDate.value = new Date(year, month, totalDays);
+    // Setting the 'day of month' to 0, sets teh day to the previous month's last day
+    const totalDays = new Date(year, month + 1, 0, 0, 0, 0, 0);
+    const monthDay = selectedDate.value;
+    if (isAfter(monthDay, totalDays)) {
+        selectedDate.value = new Date(year, month, totalDays.getDate());
         return;
     }
     selectedDate.value = new Date(year, month, selectedDate.value.getDate());
