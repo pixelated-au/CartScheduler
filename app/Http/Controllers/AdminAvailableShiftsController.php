@@ -27,7 +27,7 @@ class AdminAvailableShiftsController extends Controller
         ];
 
         try {
-            $selectedDate = Carbon::parse($shiftDate);
+            $selectedDate = Carbon::parse($shiftDate)->endOfDay();
         } catch (InvalidFormatException $e) {
             Bugsnag::notifyException($e);
             return $returnData;
@@ -57,7 +57,7 @@ class AdminAvailableShiftsController extends Controller
                                     END = 1")
                 ->orderBy('shifts.start_time'),
             'shifts.users' => fn(BelongsToMany $query) => $query
-                ->where('shift_user.shift_date', '=', $selectedDate)
+                ->where('shift_user.shift_date', '=', $formattedDate)
         ])
             ->where('is_enabled', true)
             ->get();
