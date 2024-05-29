@@ -62,6 +62,10 @@ export default function useLocationFilter(timezone, canAdmin = false) {
         const newMonth = getMonth(val);
         const oldMonth = getMonth(oldVal);
 
+        if (newMonth === oldMonth) {
+            return;
+        }
+
         if (isAfter(val, maxReservationDate.value) || newMonth > oldMonth) {
             date.value = setDate(val, 1);
             return;
