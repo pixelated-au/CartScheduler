@@ -1,4 +1,4 @@
-import {endOfDay, endOfMonth, getMonth, isAfter, isBefore, parse, setDate, setHours, startOfDay} from 'date-fns';
+import {endOfDay, endOfMonth, getMonth, isAfter, isBefore, parse, setDate, setHours} from 'date-fns';
 import {utcToZonedTime} from "date-fns-tz";
 import formatISO from 'date-fns/formatISO';
 import {cloneDeep} from 'lodash';
@@ -36,6 +36,7 @@ export default function useLocationFilter(timezone, canAdmin = false) {
             const response = await axios.get(path);
             serverLocations.value = response.data.locations;
             serverDates.value = response.data.shifts;
+
             // next two props used in non-admin view
             freeShifts.value = response.data.freeShifts;
             maxReservationDate.value = response.data.maxDateReservation ? endOfDay(utcToZonedTime(response.data.maxDateReservation, timezone.value)) : null;
@@ -58,21 +59,27 @@ export default function useLocationFilter(timezone, canAdmin = false) {
             : '',
     );
 
-    watch(date, (val, oldVal) => {
-        const newMonth = getMonth(val);
-        const oldMonth = getMonth(oldVal);
-
-        if (newMonth === oldMonth) {
+    /**
+     * This will ensure if the month goes forward, the date is set to the first day of the month
+     * and if the month goes backward, the date is set to the last day of the previous month
+     */
+    watch(date, async (newDate, previousDate) => {
+        const newMonth = getMonth(newDate);
+        const oldMonth = getMonth(previousDate);
+        if (newMonth === undefined || newMonth === null) {
             return;
         }
 
-        if (isAfter(val, maxReservationDate.value) || newMonth > oldMonth) {
-            date.value = setDate(val, 1);
+        // going forward in time, set the date to the first day of the next month
+        // Both admin and non-admin users have a maxReservationDate
+        if (newMonth > oldMonth) {
+            date.value = setDate(newDate, 1);
             return;
         }
 
-        if ((!canAdmin && isBefore(val, startOfDay(utcToZonedTime(new Date(), timezone.value)))) || newMonth < oldMonth) {
-            date.value = endOfMonth(val);
+        // going back in time, set the date to the last day of the previous month
+        if (newMonth < oldMonth) {
+            date.value = endOfMonth(newDate);
             return;
         }
         getShifts().then(() => {
