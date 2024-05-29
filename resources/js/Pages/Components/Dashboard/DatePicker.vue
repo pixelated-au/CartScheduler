@@ -56,6 +56,7 @@ const notBefore = props.canViewHistorical
     ? startOfDay(startOfMonth(subMonths(today, 6)))
     : startOfDay(today);
 
+// Note, thi is computed because props.maxDate is a reactive value whereas notAfter has no reactivity dependency
 const notAfter = computed(() =>
     props.canViewHistorical
         ? endOfMonth(addMonths(notBefore, 12))
