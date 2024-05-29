@@ -10,6 +10,7 @@ import {
     endOfMonth,
     isAfter,
     isBefore,
+    lastDayOfMonth,
     parseISO,
     set,
     setHours,
@@ -158,14 +159,20 @@ watchEffect(() => {
  * are loaded.
  */
 const updateMonthYear = ({month, year}) => {
-    // Setting the 'day of month' to 0, sets teh day to the previous month's last day
-    const totalDays = new Date(year, month + 1, 0, 0, 0, 0, 0);
-    const monthDay = selectedDate.value;
-    if (isAfter(monthDay, totalDays)) {
+    // Setting the 'day of month' to 0, sets the day to the previous month's last day
+    const totalDays = lastDayOfMonth(new Date(year, month, 1, 0, 0, 0, 0));
+    const currentDate = selectedDate.value;
+    if (isAfter(currentDate, totalDays)) {
+        // Going back in time, set the date to the last day of the previous month
         selectedDate.value = new Date(year, month, totalDays.getDate());
         return;
     }
-    selectedDate.value = new Date(year, month, selectedDate.value.getDate());
+    // Going forward in time. Check next month has enough days, i.e. if the month is February, check if the date is
+    // less than the previous month's selected date
+    const dayOfMonth = currentDate.getDate() > totalDays.getDate()
+        ? totalDays.getDate()
+        : currentDate.getDate();
+    selectedDate.value = new Date(year, month, dayOfMonth);
 };
 </script>
 
