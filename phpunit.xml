@@ -6,23 +6,25 @@
 >
     <testsuites>
         <testsuite name="Unit">
-            <directory suffix="Test.php">./tests/Unit</directory>
+            <directory>./tests/Unit</directory>
         </testsuite>
         <testsuite name="Feature">
-            <directory suffix="Test.php">./tests/Feature</directory>
+            <directory>./tests/Feature</directory>
             <exclude>./tests/Feature/TwoFactorAuthenticationSettingsTest.php</exclude>
         </testsuite>
     </testsuites>
-    <coverage processUncoveredFiles="true">
+    <source>
+        <include>
+            <directory>./app</directory>
+        </include>
+        <exclude>
+            <directory>./app/Actions/Jetstream</directory>
+        </exclude>
+    </source>
+    <coverage>
         <report>
           <html outputDirectory="tests/code-coverage" highLowerBound="80"/>
         </report>
-        <include>
-            <directory suffix=".php">./app</directory>
-        </include>
-        <exclude>
-            <directory suffix=".php">./app/Actions/Jetstream</directory>
-        </exclude>
     </coverage>
     <logging>
         <testdoxText outputFile="php://stdout"/>
