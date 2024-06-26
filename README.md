@@ -109,6 +109,7 @@ will be available in this interface.
 
 ## TODO:
 
+- [ ] If admin enters a wrong email address and it generates a \Symfony\Component\Mailer\Exception\UnexpectedResponseException, send a notification to the admin
 - [ ] Add flag to highlight a shift hasn't opened yet
 - [ ] Make locations and shifts sortable
 - [ ] Add selected dates to the shifts, so rather than entering a range, admin can enter individual dates
