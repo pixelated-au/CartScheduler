@@ -1,41 +1,41 @@
 <script setup>
-    import JetAuthenticationCard from '@/Jetstream/AuthenticationCard.vue'
-    import JetAuthenticationCardLogo from '@/Jetstream/AuthenticationCardLogo.vue'
-    import JetButton from '@/Jetstream/Button.vue'
-    import JetInput from '@/Jetstream/Input.vue'
-    import JetLabel from '@/Jetstream/Label.vue'
-    import JetValidationErrors from '@/Jetstream/ValidationErrors.vue'
-    import { Head, useForm } from '@inertiajs/inertia-vue3'
+import JetAuthenticationCard from '@/Jetstream/AuthenticationCard.vue';
+import JetAuthenticationCardLogo from '@/Jetstream/AuthenticationCardLogo.vue';
+import JetButton from '@/Jetstream/Button.vue';
+import JetInput from '@/Jetstream/Input.vue';
+import JetLabel from '@/Jetstream/Label.vue';
+import JetValidationErrors from '@/Jetstream/ValidationErrors.vue';
+import {Head, useForm} from '@inertiajs/vue3';
 
 
-    const props = defineProps({
-        editUser: {
-            type: Object,
-            required: true,
-        },
-        hashedEmail: {
-            type: String,
-            required: true,
-        },
-        siteName: {
-            type: String,
-            required: true,
-        },
-    })
+const props = defineProps({
+    editUser: {
+        type: Object,
+        required: true,
+    },
+    hashedEmail: {
+        type: String,
+        required: true,
+    },
+    siteName: {
+        type: String,
+        required: true,
+    },
+});
 
 
-    const form = useForm({
-        password: '',
-        password_confirmation: '',
-        hashed_email: props.hashedEmail,
-        user_id: props.editUser.id,
-    })
+const form = useForm({
+    password: '',
+    password_confirmation: '',
+    hashed_email: props.hashedEmail,
+    user_id: props.editUser.id,
+});
 
-    const submit = () => {
-        form.post(route('set.password.update'), {
-            onFinish: () => form.reset('password', 'password_confirmation'),
-        })
-    }
+const submit = () => {
+    form.post(route('set.password.update'), {
+        onFinish: () => form.reset('password', 'password_confirmation'),
+    });
+};
 </script>
 
 <template>

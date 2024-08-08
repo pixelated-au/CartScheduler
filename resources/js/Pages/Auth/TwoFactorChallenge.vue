@@ -1,12 +1,12 @@
 <script setup>
-import { nextTick, ref } from 'vue';
-import { Head, useForm } from '@inertiajs/inertia-vue3';
 import JetAuthenticationCard from '@/Jetstream/AuthenticationCard.vue';
 import JetAuthenticationCardLogo from '@/Jetstream/AuthenticationCardLogo.vue';
 import JetButton from '@/Jetstream/Button.vue';
 import JetInput from '@/Jetstream/Input.vue';
 import JetLabel from '@/Jetstream/Label.vue';
 import JetValidationErrors from '@/Jetstream/ValidationErrors.vue';
+import {Head, useForm} from '@inertiajs/vue3';
+import {nextTick, ref} from 'vue';
 
 const recovery = ref(false);
 
@@ -38,16 +38,17 @@ const submit = () => {
 </script>
 
 <template>
-    <Head title="Two-factor Confirmation" />
+    <Head title="Two-factor Confirmation"/>
 
     <JetAuthenticationCard>
         <template #logo>
-            <JetAuthenticationCardLogo />
+            <JetAuthenticationCardLogo/>
         </template>
 
         <div class="mb-4 text-sm text-gray-600">
             <template v-if="! recovery">
-                Please confirm access to your account by entering the authentication code provided by your authenticator application.
+                Please confirm access to your account by entering the authentication code provided by your authenticator
+                application.
             </template>
 
             <template v-else>
@@ -55,11 +56,11 @@ const submit = () => {
             </template>
         </div>
 
-        <JetValidationErrors class="mb-4" />
+        <JetValidationErrors class="mb-4"/>
 
         <form @submit.prevent="submit">
             <div v-if="! recovery">
-                <JetLabel for="code" value="Code" />
+                <JetLabel for="code" value="Code"/>
                 <JetInput
                     id="code"
                     ref="codeInput"
@@ -73,7 +74,7 @@ const submit = () => {
             </div>
 
             <div v-else>
-                <JetLabel for="recovery_code" value="Recovery Code" />
+                <JetLabel for="recovery_code" value="Recovery Code"/>
                 <JetInput
                     id="recovery_code"
                     ref="recoveryCodeInput"
@@ -85,7 +86,8 @@ const submit = () => {
             </div>
 
             <div class="flex items-center justify-end mt-4">
-                <button type="button" class="text-sm text-gray-600 hover:text-gray-900 underline cursor-pointer" @click.prevent="toggleRecovery">
+                <button type="button" class="text-sm text-gray-600 hover:text-gray-900 underline cursor-pointer"
+                        @click.prevent="toggleRecovery">
                     <template v-if="! recovery">
                         Use a recovery code
                     </template>

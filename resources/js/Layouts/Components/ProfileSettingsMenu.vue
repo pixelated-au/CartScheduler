@@ -1,9 +1,9 @@
 <script setup>
-    import JetDropdown from '@/Jetstream/Dropdown.vue'
-    import JetDropdownLink from '@/Jetstream/DropdownLink.vue'
-    import { Inertia } from '@inertiajs/inertia'
+import JetDropdown from '@/Jetstream/Dropdown.vue';
+import JetDropdownLink from '@/Jetstream/DropdownLink.vue';
+import {router, usePage} from '@inertiajs/vue3';
 
-    const logout = () => Inertia.post(route('logout'))
+const logout = () => router.post(route('logout'));
 </script>
 
 <template>
@@ -12,14 +12,14 @@
             <button v-if="$page.props.jetstream.managesProfilePhotos"
                     class="flex text-sm border-2 border-transparent rounded-full focus:outline-none focus:border-gray-300 transition">
                 <img class="h-8 w-8 rounded-full object-cover"
-                     :src="$page.props.user.profile_photo_url"
-                     :alt="$page.props.user.name">
+                     :src="$page.props.auth.user.profile_photo_url"
+                     :alt="$page.props.auth.user.name">
             </button>
 
             <span v-else class="inline-flex rounded-md">
                 <button type="button"
                         class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 dark:text-gray-100 dark:bg-slate-700 dark:hover:text-gray-200 focus:outline-none transition">
-                    {{ $page.props.user.name }}
+                    {{ $page.props.auth.user.name }}
 
                     <svg class="ml-2 -mr-0.5 h-4 w-4"
                          xmlns="http://www.w3.org/2000/svg"

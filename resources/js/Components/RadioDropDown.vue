@@ -1,45 +1,45 @@
 <script setup>
-    import { computed, defineEmits, defineProps, onMounted } from 'vue'
+import {computed, defineEmits, defineProps, onMounted} from 'vue';
 
-    const props = defineProps({
-        modelValue: {},
-        options: {
-            type: Array,
-            required: true,
-        },
-    })
+const props = defineProps({
+    modelValue: {},
+    options: {
+        type: Array,
+        required: true,
+    },
+});
 
-    const emit = defineEmits([
-        'update:modelValue',
-    ])
+const emit = defineEmits([
+    'update:modelValue',
+]);
 
-    const myModel = computed({
-        get () {
-            return props.modelValue
-        },
-        set (value) {
-            emit('update:modelValue', value)
-        },
-    })
+const myModel = computed({
+    get() {
+        return props.modelValue;
+    },
+    set(value) {
+        emit('update:modelValue', value);
+    },
+});
 
-    const buttonLabel = computed(() => {
-        console.log(myModel.value)
-        return props.options.find(option => option.value === myModel.value)?.label || 'Please select'
-    })
-    const compId = Math.random().toString(36).substring(2, 9)
+const buttonLabel = computed(() => {
+    console.log(myModel.value);
+    return props.options.find(option => option.value === myModel.value)?.label || 'Please select';
+});
+const compId = Math.random().toString(36).substring(2, 9);
 
-    const initListeners = () => {
-        document.querySelectorAll('[data-dropdown-toggle]').forEach(triggerEl => {
-            const targetEl = document.getElementById(triggerEl.getAttribute('data-dropdown-toggle'))
-            const placement = triggerEl.getAttribute('data-dropdown-placement')
+const initListeners = () => {
+    document.querySelectorAll('[data-dropdown-toggle]').forEach(triggerEl => {
+        const targetEl = document.getElementById(triggerEl.getAttribute('data-dropdown-toggle'));
+        const placement = triggerEl.getAttribute('data-dropdown-placement');
 
-            new Dropdown(targetEl, triggerEl, {
-                placement: placement ? placement : 'bottom',
-            })
-        })
-    }
+        new Dropdown(targetEl, triggerEl, {
+            placement: placement ? placement : 'bottom',
+        });
+    });
+};
 
-    onMounted(() => initListeners())
+onMounted(() => initListeners());
 
 </script>
 

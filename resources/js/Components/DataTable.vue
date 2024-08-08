@@ -1,23 +1,23 @@
 <script setup>
-    import { computed } from 'vue'
-    import EasyDataTable from 'vue3-easy-data-table'
+import {computed} from 'vue';
+import EasyDataTable from 'vue3-easy-data-table';
 
-    const props = defineProps({
-        headers: Array,
-        items: Array,
-        filterOptions: Array,
-        searchField: String,
-        searchValue: String,
-        showHover: {
-            type: Boolean,
-            default: true,
-        },
-    })
+const props = defineProps({
+    headers: Array,
+    items: Array,
+    filterOptions: Array,
+    searchField: String,
+    searchValue: String,
+    showHover: {
+        type: Boolean,
+        default: true,
+    },
+});
 
-    defineEmits(['click-row'])
+defineEmits(['click-row']);
 
-    const cursor = computed(() => props.showHover ? 'pointer' : 'default')
-    const rowHoverColor = computed(() => props.showHover ? 'var(--tw-bg-200)' : 'transparent')
+const cursor = computed(() => props.showHover ? 'pointer' : 'default');
+const rowHoverColor = computed(() => props.showHover ? 'var(--tw-bg-200)' : 'transparent');
 </script>
 
 <template>

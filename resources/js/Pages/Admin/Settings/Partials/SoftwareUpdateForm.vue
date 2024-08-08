@@ -5,56 +5,55 @@ import JetButton from '@/Jetstream/Button.vue';
 import JetCheckbox from '@/Jetstream/Checkbox.vue';
 import JetFormSection from '@/Jetstream/FormSection.vue';
 import Label from "@/Jetstream/Label.vue";
-import {Inertia} from '@inertiajs/inertia';
-import {usePage} from '@inertiajs/inertia-vue3';
+import {router, usePage} from '@inertiajs/vue3';
 import axios from "axios";
 import {computed, onMounted, ref} from 'vue';
 
 const props = defineProps({
     settings: Object,
-})
+});
 
-const processing = ref(false)
-const betaCheck = ref(false)
-const toast = useToast()
+const processing = ref(false);
+const betaCheck = ref(false);
+const toast = useToast();
 const updateCheck = async () => {
-    processing.value = true
+    processing.value = true;
     try {
-        const response = await axios.get(route('admin.check-update'), {params: {beta: !!betaCheck.value}})
+        const response = await axios.get(route('admin.check-update'), {params: {beta: !!betaCheck.value}});
         if (!response.data) {
-            toast.warning('No update available')
-            return
+            toast.warning('No update available');
+            return;
         }
 
-        toast.success('Update available')
+        toast.success('Update available');
     } finally {
-        processing.value = false
+        processing.value = false;
     }
-    Inertia.visit(route('admin.settings'), {preserveState: false, preserveScroll: true})
-}
+    router.visit(route('admin.settings'), {preserveState: false, preserveScroll: true});
+};
 
-const updateLog = ref('')
+const updateLog = ref('');
 const doSoftwareUpdate = async () => {
-    processing.value = true
+    processing.value = true;
     try {
-        const response = await axios.post(route('admin.do-update'))
-        toast.success(`Update successful! You are now running version: ${props.settings.currentVersion}`)
-        updateLog.value = response.data || 'Update succeeded.'
+        const response = await axios.post(route('admin.do-update'));
+        toast.success(`Update successful! You are now running version: ${props.settings.currentVersion}`);
+        updateLog.value = response.data || 'Update succeeded.';
     } finally {
-        processing.value = false
+        processing.value = false;
     }
 
-}
+};
 
 const hasUpdate = computed(() => {
-    return !!usePage().props.value.hasUpdate && !updateLog.value
-})
+    return !!usePage().props.hasUpdate && !updateLog.value;
+});
 
-const adminUsers = ref()
+const adminUsers = ref();
 onMounted(async () => {
-    const response = await axios.get('/admin/admin-users')
-    adminUsers.value = response.data.data
-})
+    const response = await axios.get('/admin/admin-users');
+    adminUsers.value = response.data.data;
+});
 
 </script>
 

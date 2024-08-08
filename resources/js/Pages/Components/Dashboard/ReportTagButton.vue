@@ -1,27 +1,27 @@
 <script setup>
-    import { computed, ref } from 'vue'
+import {computed, ref} from 'vue';
 
-    defineProps({
-        name: String,
-    })
+defineProps({
+    name: String,
+});
 
-    const emit = defineEmits(['toggled'])
+const emit = defineEmits(['toggled']);
 
-    const isActive = ref(false)
+const isActive = ref(false);
 
-    const toggleActive = () => {
-        isActive.value = !isActive.value
-        emit('toggled', isActive.value)
-    }
+const toggleActive = () => {
+    isActive.value = !isActive.value;
+    emit('toggled', isActive.value);
+};
 
-    const classes = computed(() => {
-        return {
-            'bg-gray-200 dark:bg-gray-700': !isActive.value,
-            'text-gray-700 dark:text-gray-300': !isActive.value,
-            'bg-green-200 dark:bg-green-700': isActive.value,
-            'text-green-800 dark:text-green-200': isActive.value,
-        }
-    })
+const classes = computed(() => {
+    return {
+        'bg-gray-200 dark:bg-gray-700': !isActive.value,
+        'text-gray-700 dark:text-gray-300': !isActive.value,
+        'bg-green-200 dark:bg-green-700': isActive.value,
+        'text-green-800 dark:text-green-200': isActive.value,
+    };
+});
 </script>
 
 <template>

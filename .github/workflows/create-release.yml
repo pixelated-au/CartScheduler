@@ -33,7 +33,7 @@ jobs:
         with:
           type: 'zip'
           filename: 'release.zip'
-          exclusions: '*.git* /*node_modules/* .editorconfig vite.config.js phpunit.xml postcss.config.js\
+          exclusions: '*.git* /*node_modules/* .editorconfig vite.config.js phpunit.xml postcss.config.cjs\
                        docker-compose.yml jsconfig.json tailwind.config.json /*resources/css/* /*resources/js/*\
                        /*queries/* /*storage/debugbar/* /*database/factories/* /*database/seeders/* /*tests/*'
       - name: Upload Release

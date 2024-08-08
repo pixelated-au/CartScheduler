@@ -1,43 +1,43 @@
 <script setup>
-    import Alert from '@/Components/Alert.vue'
-    import JetAuthenticationCard from '@/Jetstream/AuthenticationCard.vue'
-    import JetAuthenticationCardLogo from '@/Jetstream/AuthenticationCardLogo.vue'
-    import JetButton from '@/Jetstream/Button.vue'
-    import JetCheckbox from '@/Jetstream/Checkbox.vue'
-    import JetInput from '@/Jetstream/Input.vue'
-    import JetLabel from '@/Jetstream/Label.vue'
-    import JetValidationErrors from '@/Jetstream/ValidationErrors.vue'
-    import { Head, Link, useForm, usePage } from '@inertiajs/inertia-vue3'
-    import { computed, onMounted } from 'vue'
+import Alert from '@/Components/Alert.vue';
+import JetAuthenticationCard from '@/Jetstream/AuthenticationCard.vue';
+import JetAuthenticationCardLogo from '@/Jetstream/AuthenticationCardLogo.vue';
+import JetButton from '@/Jetstream/Button.vue';
+import JetCheckbox from '@/Jetstream/Checkbox.vue';
+import JetInput from '@/Jetstream/Input.vue';
+import JetLabel from '@/Jetstream/Label.vue';
+import JetValidationErrors from '@/Jetstream/ValidationErrors.vue';
+import {Head, Link, useForm, usePage} from '@inertiajs/vue3';
+import {computed, onMounted} from 'vue';
 
-    defineProps({
-        canResetPassword: Boolean,
-        status: String,
-    })
+defineProps({
+    canResetPassword: Boolean,
+    status: String,
+});
 
-    const form = useForm({
-        email: '',
-        password: '',
-        remember: true,
-    })
+const form = useForm({
+    email: '',
+    password: '',
+    remember: true,
+});
 
-    const submit = () => {
-        form.transform(data => ({
-            ...data,
-            remember: form.remember ? 'on' : '',
-        })).post(route('login'), {
-            onFinish: () => form.reset('password'),
-        })
+const submit = () => {
+    form.transform(data => ({
+        ...data,
+        remember: form.remember ? 'on' : '',
+    })).post(route('login'), {
+        onFinish: () => form.reset('password'),
+    });
+};
+
+const setPasswordSuccess = computed(() => usePage().props.jetstream.flash?.setPassword || '');
+
+onMounted(() => {
+    if (import.meta.env.DEV) {
+        form.email = 'admin@example.com';
+        form.password = 'password';
     }
-
-    const setPasswordSuccess = computed(() => usePage().props.value.jetstream.flash?.setPassword || '')
-
-    onMounted(() => {
-        if (import.meta.env.DEV) {
-            form.email = 'admin@example.com'
-            form.password = 'password'
-        }
-    })
+});
 
 </script>
 

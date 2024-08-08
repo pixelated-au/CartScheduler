@@ -1,3 +1,4 @@
+
 <script setup>
 import JetActionMessage from '@/Jetstream/ActionMessage.vue';
 import JetButton from '@/Jetstream/Button.vue';
@@ -5,9 +6,7 @@ import JetCheckbox from "@/Jetstream/Checkbox.vue";
 import JetFormSection from '@/Jetstream/FormSection.vue';
 import JetInputError from '@/Jetstream/InputError.vue';
 import JetLabel from "@/Jetstream/Label.vue";
-import {useForm} from '@inertiajs/inertia-vue3';
-// noinspection ES6UnusedImports
-import {Dropdown as VDropdown, VTooltip} from 'floating-vue'
+import {useForm} from '@inertiajs/vue3';
 import {computed, onMounted, ref} from "vue";
 
 const props = defineProps({
@@ -19,10 +18,11 @@ const props = defineProps({
         type: Number,
         default: null,
     },
-})
+});
+
 const form = useForm({
     selectedLocations: props.selectedLocations || [],
-})
+});
 
 const update = () => {
     form.transform((data) => {
@@ -30,20 +30,20 @@ const update = () => {
                 return {
                     ...data,
                     user_id: props.userId,
-                }
+                };
             }
-            return data
+            return data;
         })
         .put(route('update.user.location-choices'), {
             preserveScroll: true,
             onSuccess: () => {
                 form.defaults({
                     selectedLocations: props.selectedLocations || [],
-                })
-                form.reset()
+                });
+                form.reset();
             },
             onError: (r) => {
-                console.log('error', r)
+                console.log('error', r);
             },
         });
 };
@@ -51,15 +51,15 @@ const update = () => {
 const resetForm = () => {
     form.reset();
     form.clearErrors();
-}
+};
 
 const onChecked = (locationId, isChecked) => {
     if (!isChecked) {
-        form.selectedLocations = form.selectedLocations.filter((id) => id !== locationId)
+        form.selectedLocations = form.selectedLocations.filter((id) => id !== locationId);
     } else {
-        form.selectedLocations.push(locationId)
+        form.selectedLocations.push(locationId);
     }
-}
+};
 
 const errors = computed(() => Object.keys(form.errors)
     .map((key) => {
@@ -74,22 +74,22 @@ const errors = computed(() => Object.keys(form.errors)
             message: form.errors[key],
         };
     })
-    .filter((error) => error !== null)
-)
+    .filter((error) => error !== null),
+);
 
 const getError = (locationId) => {
-    const error = errors.value.find((error) => error.locationId === locationId)
+    const error = errors.value.find((error) => error.locationId === locationId);
     if (!error) {
-        return null
+        return null;
     }
-    return error.message
-}
+    return error.message;
+};
 
-const locations = ref()
+const locations = ref();
 onMounted(async () => {
-    const response = await axios.get(route('user.location-choices'))
-    locations.value = response.data.data
-})
+    const response = await axios.get(route('user.location-choices'));
+    locations.value = response.data.data;
+});
 </script>
 
 <template>

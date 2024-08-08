@@ -1,33 +1,33 @@
 <script setup>
 //https://github.com/vueform/slider
-import SelectField from "@/Components/SelectField.vue"
-import Slider from "@vueform/slider"
+import SelectField from "@/Components/SelectField.vue";
+import Slider from "@vueform/slider";
 import {computed} from "vue";
 
 const props = defineProps({
-  hoursEachDay: Array,
-  numberOfDaysPerMonth: Number,
-  start: Number,
-  end: Number,
-  numberOfWeeks: Array,
-  label: String,
-  tooltipFormat: Function,
-})
+    hoursEachDay: Array,
+    numberOfDaysPerMonth: Number,
+    start: Number,
+    end: Number,
+    numberOfWeeks: Array,
+    label: String,
+    tooltipFormat: Function,
+});
 
 const emit = defineEmits([
-  'update:hoursEachDay',
-  'update:numberOfDaysPerMonth',
-])
+    'update:hoursEachDay',
+    'update:numberOfDaysPerMonth',
+]);
 
 const hoursEachDayModel = computed({
-  get: () => props.hoursEachDay,
-  set: value => emit('update:hoursEachDay', value),
-})
+    get: () => props.hoursEachDay,
+    set: value => emit('update:hoursEachDay', value),
+});
 
 const numberOfDaysPerMonthModel = computed({
-  get: () => props.numberOfDaysPerMonth,
-  set: value => emit('update:numberOfDaysPerMonth', value),
-})
+    get: () => props.numberOfDaysPerMonth,
+    set: value => emit('update:numberOfDaysPerMonth', value),
+});
 </script>
 
 <template>
@@ -53,11 +53,11 @@ const numberOfDaysPerMonthModel = computed({
 <style lang="scss" scoped>
 .v-enter-active,
 .v-leave-active {
-  transition: opacity 0.5s ease;
+    transition: opacity 0.5s ease;
 }
 
 .v-enter-from,
 .v-leave-to {
-  opacity: 0;
+    opacity: 0;
 }
 </style>

@@ -94,7 +94,7 @@ ORDER BY dates.date";
 
         $params = ['startDate' => $startDate, 'endDate' => $endDate];
 
-        $results = DB::select(DB::raw($query), $params);
+        $results = DB::select($query, $params);
         return collect($results)
             ->mapWithKeys(fn(stdClass $shift) => [
                 $shift->date => [

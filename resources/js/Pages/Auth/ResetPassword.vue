@@ -1,11 +1,11 @@
 <script setup>
-import { Head, useForm } from '@inertiajs/inertia-vue3';
 import JetAuthenticationCard from '@/Jetstream/AuthenticationCard.vue';
 import JetAuthenticationCardLogo from '@/Jetstream/AuthenticationCardLogo.vue';
 import JetButton from '@/Jetstream/Button.vue';
 import JetInput from '@/Jetstream/Input.vue';
 import JetLabel from '@/Jetstream/Label.vue';
 import JetValidationErrors from '@/Jetstream/ValidationErrors.vue';
+import {Head, useForm} from '@inertiajs/vue3';
 
 const props = defineProps({
     email: String,
@@ -27,18 +27,18 @@ const submit = () => {
 </script>
 
 <template>
-    <Head title="Reset Password" />
+    <Head title="Reset Password"/>
 
     <JetAuthenticationCard>
         <template #logo>
-            <JetAuthenticationCardLogo />
+            <JetAuthenticationCardLogo/>
         </template>
 
-        <JetValidationErrors class="mb-4" />
+        <JetValidationErrors class="mb-4"/>
 
         <form @submit.prevent="submit">
             <div>
-                <JetLabel for="email" value="Email" />
+                <JetLabel for="email" value="Email"/>
                 <JetInput
                     id="email"
                     v-model="form.email"
@@ -50,7 +50,7 @@ const submit = () => {
             </div>
 
             <div class="mt-4">
-                <JetLabel for="password" value="Password" />
+                <JetLabel for="password" value="Password"/>
                 <JetInput
                     id="password"
                     v-model="form.password"
@@ -62,7 +62,7 @@ const submit = () => {
             </div>
 
             <div class="mt-4">
-                <JetLabel for="password_confirmation" value="Confirm Password" />
+                <JetLabel for="password_confirmation" value="Confirm Password"/>
                 <JetInput
                     id="password_confirmation"
                     v-model="form.password_confirmation"

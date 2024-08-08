@@ -1,24 +1,23 @@
 <script setup>
-import JetButton from '@/Jetstream/Button.vue'
-import AppLayout from '@/Layouts/AppLayout.vue'
-import UserProfileForm from '@/Pages/Admin/Users/Partials/UserProfileForm.vue'
+import JetButton from '@/Jetstream/Button.vue';
+import AppLayout from '@/Layouts/AppLayout.vue';
+import UserProfileForm from '@/Pages/Admin/Users/Partials/UserProfileForm.vue';
 import ShowLocationAvailabilityForm from "@/Pages/Profile/Partials/ShowLocationAvailabilityForm.vue";
 import ShowRegularAvailabilityForm from "@/Pages/Profile/Partials/ShowRegularAvailabilityForm.vue";
 import ShowVacationsAvailabilityForm from "@/Pages/Profile/Partials/ShowVacationsAvailabilityForm.vue";
-import {Inertia} from '@inertiajs/inertia'
-import {usePage} from "@inertiajs/inertia-vue3";
+import {router, usePage} from "@inertiajs/vue3";
 
 defineProps({
     editUser: Object,
     availableRoles: Array,
     permissions: Object,
-})
+});
 
 const listRouteAction = () => {
-    Inertia.visit(route('admin.users.index'))
-}
+    router.visit(route('admin.users.index'));
+};
 
-const canChooseLocations = !!usePage().props.value.enableUserLocationChoices
+const canChooseLocations = !!usePage().props.enableUserLocationChoices;
 </script>
 
 <template>

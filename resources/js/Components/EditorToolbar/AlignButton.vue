@@ -1,13 +1,13 @@
 <script setup>
-    import BaseButton from '@/Components/EditorToolbar/BaseButton.vue'
-    import { defineProps } from 'vue'
+import BaseButton from '@/Components/EditorToolbar/BaseButton.vue';
+import {defineProps} from 'vue';
 
-    defineProps({
-        direction: {
-            type: String,
-            required: true,
-        },
-    })
+defineProps({
+    direction: {
+        type: String,
+        required: true,
+    },
+});
 </script>
 
 <template>

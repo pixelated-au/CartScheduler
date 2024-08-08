@@ -1,10 +1,11 @@
 <script>
 import {VTooltip} from 'floating-vue';
+
 export default {
     directives: {
         tooltip: VTooltip,
     },
-}
+};
 </script>
 
 <script setup>
@@ -18,7 +19,7 @@ import Accordion from '@/Components/LocationAccordion.vue';
 import useToast from '@/Composables/useToast';
 import useLocationFilter from '@/Pages/Admin/Locations/Composables/useLocationFilter';
 import DatePicker from '@/Pages/Components/Dashboard/DatePicker.vue';
-import {usePage} from "@inertiajs/inertia-vue3";
+import {usePage} from "@inertiajs/vue3";
 import {format, isSameDay, parse} from 'date-fns';
 import {computed, ref} from 'vue';
 
@@ -28,7 +29,7 @@ defineProps({
 
 const toast = useToast();
 
-const timezone = computed(() => usePage().props.value.shiftAvailability.timezone);
+const timezone = computed(() => usePage().props.shiftAvailability.timezone);
 
 const {
     date,
@@ -99,7 +100,7 @@ const isMyShift = location => {
 const today = new Date();
 const formatTime = time => format(parse(time, 'HH:mm:ss', today), 'h:mm a');
 
-const isRestricted = computed(() => !usePage().props.value.isUnrestricted);
+const isRestricted = computed(() => !usePage().props.isUnrestricted);
 
 const firstReservationForUser = ref(undefined);
 

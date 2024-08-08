@@ -1,7 +1,7 @@
 <script setup>
 import JetCheckbox from "@/Jetstream/Checkbox.vue";
-import {Dropdown} from 'flowbite'
-import {computed, inject, onMounted, ref, useSlots} from 'vue'
+import {Dropdown} from 'flowbite';
+import {computed, inject, onMounted, ref, useSlots} from 'vue';
 
 const props = defineProps({
     modelValue: Object,
@@ -10,79 +10,79 @@ const props = defineProps({
         type: Boolean,
         default: false,
     },
-})
+});
 
-const emit = defineEmits(['update:modelValue'])
+const emit = defineEmits(['update:modelValue']);
 
-const fieldUnique = computed(() => Math.random().toString(36).substring(2, 9))
+const fieldUnique = computed(() => Math.random().toString(36).substring(2, 9));
 
 const model = computed({
     get: () => props.modelValue,
     set: value => emit('update:modelValue', value),
-})
+});
 
-const slots = useSlots()
-const useLabelSlot = computed(() => !!slots.label)
+const slots = useSlots();
+const useLabelSlot = computed(() => !!slots.label);
 
 
 const label = computed(() => {
     if (!props.modelValue) {
-        return '0 selected'
+        return '0 selected';
     }
-    let count = 0
+    let count = 0;
     for (const key in model.value) {
         if (model.value[key].value) {
-            count++
+            count++;
         }
     }
-    return `${count} selected`
-})
+    return `${count} selected`;
+});
 
-const noOptions = computed(() => Object.entries(props.modelValue).length === 0)
+const noOptions = computed(() => Object.entries(props.modelValue).length === 0);
 
-const isDarkMode = inject('darkMode', false)
+const isDarkMode = inject('darkMode', false);
 
 const arrowFill = computed(() => {
     if (isDarkMode.value) {
-        return '#fff'
+        return '#fff';
     }
-    return noOptions.value ? '#000' : '#fff'
-})
+    return noOptions.value ? '#000' : '#fff';
+});
 
 const buttonClasses = computed(() => {
-    let classes = []
+    let classes = [];
     if (props.fullWidthButton) {
-        classes.push('w-full')
+        classes.push('w-full');
     }
     if (noOptions.value) {
-        classes.push('!bg-gray-300 dark:!bg-gray-700 !cursor-not-allowed')
+        classes.push('!bg-gray-300 dark:!bg-gray-700 !cursor-not-allowed');
     }
-    return classes.join(' ')
-})
+    return classes.join(' ');
+});
 
 const onSelect = (name) => {
     if (noOptions.value) {
-        return
+        return;
     }
-    model.value[name].value = !model.value[name].value
-}
+    model.value[name].value = !model.value[name].value;
+};
 
-const trigger = ref()
-const target = ref()
-const dropdown = ref()
+const trigger = ref();
+const target = ref();
+const dropdown = ref();
 
 onMounted(() => {
     dropdown.value = new Dropdown(target.value, trigger.value, {
         triggerType: 'click',
-    })
-})
+    });
+});
 
-const modelLength = computed(() => Object.keys(model.value).length)
+const modelLength = computed(() => Object.keys(model.value).length);
 
 const liClasses = index => ({
     "rounded-b": index === modelLength.value - 1,
     "rounded-t": index === 0,
-})
+});
 </script>
 
 <template>

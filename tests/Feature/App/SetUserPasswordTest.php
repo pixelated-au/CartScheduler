@@ -7,6 +7,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Inertia\Testing\AssertableInertia;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Tests\TestCase;
 
 class SetUserPasswordTest extends TestCase
@@ -50,7 +51,9 @@ class SetUserPasswordTest extends TestCase
     {
         $user = User::factory()->enabled()->state(['password' => null])->create();
 
-        $this->getJson("/set-password/$user->id/mock-text")
+        // So we don't see the exception in the logs...
+        $this->withoutExceptionHandling([NotFoundHttpException::class])
+            ->getJson("/set-password/$user->id/" . base64_encode('mock-text'))
             ->assertNotFound();
     }
 
@@ -109,12 +112,14 @@ class SetUserPasswordTest extends TestCase
     {
         $user = User::factory()->enabled()->state(['password' => null])->create();
 
-        $this->post("/set-password", [
-            'password_confirmation' => 'password',
-            'password'              => 'password',
-            'hashed_email'          => 'mock-text',
-            'user_id'               => $user->id,
-        ])
+        // So we don't see the exception in the logs...
+        $this->withoutExceptionHandling([NotFoundHttpException::class])
+            ->post("/set-password", [
+                'password_confirmation' => 'password',
+                'password'              => 'password',
+                'hashed_email'          => base64_encode('mock-text'),
+                'user_id'               => $user->id,
+            ])
             ->assertNotFound();
     }
 

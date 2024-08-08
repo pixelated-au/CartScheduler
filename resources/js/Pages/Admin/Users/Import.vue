@@ -1,45 +1,43 @@
 <script setup>
-import JetButton from '@/Jetstream/Button.vue'
-import AppLayout from '@/Layouts/AppLayout.vue'
-import {Inertia} from '@inertiajs/inertia'
-import {useForm} from '@inertiajs/inertia-vue3'
-import {computed} from 'vue'
+import JetButton from '@/Jetstream/Button.vue';
+import AppLayout from '@/Layouts/AppLayout.vue';
+import {router, useForm} from '@inertiajs/vue3';
+import {computed} from 'vue';
 
-defineProps({
-})
+defineProps({});
 
 const listRouteAction = () => {
-    Inertia.visit(route('admin.users.index'))
-}
+    router.visit(route('admin.users.index'));
+};
 
 const form = useForm({
     file: null,
-})
+});
 
 const uploadFile = () => {
     form.post(route('admin.users.import.import'), {
         preserveScroll: true,
-    })
-}
+    });
+};
 
 const hasErrors = computed(() =>
     !form.errors || Object.keys(form.errors).length > 0 || Object.getPrototypeOf(form.errors) !== Object.prototype,
-)
+);
 
 const validationErrors = computed(() => {
     if (form.errors && Object.keys(form.errors).length === 0 && Object.getPrototypeOf(form.errors) === Object.prototype) {
-        return []
+        return [];
     }
 
-    const errors = []
+    const errors = [];
     for (const errorsKey in form.errors) {
         if (Object.prototype.hasOwnProperty.call(form.errors, errorsKey)) {
-            const error = form.errors[errorsKey]
-            errors.push(error)
+            const error = form.errors[errorsKey];
+            errors.push(error);
         }
     }
-    return errors
-})
+    return errors;
+});
 
 const templateFile = route('admin.user-import-template');
 

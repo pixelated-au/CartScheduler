@@ -1,5 +1,5 @@
-import 'floating-vue/dist/style.css'
-import { POSITION, TYPE, useToast as ut } from 'vue-toastification'
+import 'floating-vue/dist/style.css';
+import {POSITION, TYPE, useToast as ut} from 'vue-toastification';
 //https://vue-toastification.maronato.dev/
 
 const options = {
@@ -15,22 +15,22 @@ const options = {
     closeButton: 'button',
     icon: true,
     rtl: false,
-}
+};
 
-export default function useToast () {
-    const toast = ut()
+export default function useToast() {
+    const toast = ut();
 
     const error = (message, itemOptions = null) => {
-        toast.error(message, { ...options, ...itemOptions })
-    }
+        toast.error(message, {...options, ...itemOptions});
+    };
 
     const success = (message, itemOptions = null) => {
-        toast.success(message, { ...options, ...itemOptions })
-    }
+        toast.success(message, {...options, ...itemOptions});
+    };
 
     const warning = (message, itemOptions = null) => {
-        toast.warning(message, { ...options, ...itemOptions })
-    }
+        toast.warning(message, {...options, ...itemOptions});
+    };
 
     /**
      * @param {TYPE} type
@@ -38,13 +38,13 @@ export default function useToast () {
      * @param {object} itemOptions
      */
     const message = (type, message, itemOptions = null) => {
-        toast(message, { ...options, ...itemOptions, ...{type:type}} )
-    }
+        toast(message, {...options, ...itemOptions, ...{type: type}});
+    };
 
     return {
         error,
         success,
         warning,
         message,
-    }
+    };
 }

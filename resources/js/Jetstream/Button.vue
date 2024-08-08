@@ -1,37 +1,37 @@
 <script setup>
-    import useTheme from '@/Composables/useTheme'
-    import { computed } from 'vue'
+import useTheme from '@/Composables/useTheme';
+import {computed} from 'vue';
 
-    const { getBackgroundColours, getBackgroundHoverColours, getOutlineColours, getOutlineHoverColours } = useTheme()
+const {getBackgroundColours, getBackgroundHoverColours, getOutlineColours, getOutlineHoverColours} = useTheme();
 
-    const props = defineProps({
-        type: {
-            type: String,
-            default: 'submit',
-        },
-        styleType: {
-            type: String,
-            default: 'primary',
-        },
-        outline: {
-            type: Boolean,
-            default: false,
-        },
-    })
+const props = defineProps({
+    type: {
+        type: String,
+        default: 'submit',
+    },
+    styleType: {
+        type: String,
+        default: 'primary',
+    },
+    outline: {
+        type: Boolean,
+        default: false,
+    },
+});
 
-    const cssClass = computed(() => {
-        const css = []
+const cssClass = computed(() => {
+    const css = [];
 
-        if (props.outline) {
-            css.push(getOutlineColours(props.styleType))
-            css.push(getOutlineHoverColours(props.styleType))
-        } else {
-            css.push(getBackgroundColours(props.styleType))
-            css.push(getBackgroundHoverColours(props.styleType))
-        }
+    if (props.outline) {
+        css.push(getOutlineColours(props.styleType));
+        css.push(getOutlineHoverColours(props.styleType));
+    } else {
+        css.push(getBackgroundColours(props.styleType));
+        css.push(getBackgroundHoverColours(props.styleType));
+    }
 
-        return css
-    })
+    return css;
+});
 
 </script>
 

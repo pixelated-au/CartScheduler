@@ -21,7 +21,7 @@
             <directory>./app/Actions/Jetstream</directory>
         </exclude>
     </source>
-    <coverage>
+    <coverage cacheDirectory="tests/.cache">
         <report>
           <html outputDirectory="tests/code-coverage" highLowerBound="80"/>
         </report>
@@ -31,7 +31,7 @@
     </logging>
     <php>
         <env name="APP_ENV" value="testing"/>
-        <env name="BCRYPT_ROUNDS" value="4"/>
+        <env name="BCRYPT_ROUNDS" value="10"/>
         <env name="CACHE_DRIVER" value="array"/>
         <env name="DB_DATABASE" value="testing"/>
         <env name="MAIL_MAILER" value="array"/>

@@ -1,10 +1,10 @@
 <script setup>
-import { useForm } from '@inertiajs/inertia-vue3';
 import JetButton from '@/Jetstream/Button.vue';
 import JetFormSection from '@/Jetstream/FormSection.vue';
 import JetInput from '@/Jetstream/Input.vue';
 import JetInputError from '@/Jetstream/InputError.vue';
 import JetLabel from '@/Jetstream/Label.vue';
+import {useForm, usePage} from '@inertiajs/vue3';
 
 const form = useForm({
     name: '',
@@ -30,22 +30,23 @@ const createTeam = () => {
 
         <template #form>
             <div class="col-span-6">
-                <JetLabel value="Team Owner" />
+                <JetLabel value="Team Owner"/>
 
                 <div class="flex items-center mt-2">
-                    <img class="object-cover w-12 h-12 rounded-full" :src="$page.props.user.profile_photo_url" :alt="$page.props.user.name">
+                    <img class="object-cover w-12 h-12 rounded-full" :src="$page.props.auth.user.profile_photo_url"
+                         :alt="$page.props.auth.user.name">
 
                     <div class="ml-4 leading-tight">
-                        <div>{{ $page.props.user.name }}</div>
+                        <div>{{ $page.props.auth.user.name }}</div>
                         <div class="text-sm text-gray-700">
-                            {{ $page.props.user.email }}
+                            {{ $page.props.auth.user.email }}
                         </div>
                     </div>
                 </div>
             </div>
 
             <div class="col-span-6 sm:col-span-4">
-                <JetLabel for="name" value="Team Name" />
+                <JetLabel for="name" value="Team Name"/>
                 <JetInput
                     id="name"
                     v-model="form.name"
@@ -53,7 +54,7 @@ const createTeam = () => {
                     class="block w-full mt-1"
                     autofocus
                 />
-                <JetInputError :message="form.errors.name" class="mt-2" />
+                <JetInputError :message="form.errors.name" class="mt-2"/>
             </div>
         </template>
 

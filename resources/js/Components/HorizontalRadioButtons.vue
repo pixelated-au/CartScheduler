@@ -1,28 +1,28 @@
 <script setup>
-    import { computed } from 'vue'
+import {computed} from 'vue';
 
-    const props = defineProps({
-        name: String,
-        modelValue: String | Number,
-        /**
-         * @typedef {label: string, value: string|number|boolean}[]
-         */
-        options: Array,
-    })
-
-    const emit = defineEmits([
-        'update:modelValue',
-    ])
-
+const props = defineProps({
+    name: String,
+    modelValue: String | Number,
     /**
      * @typedef {label: string, value: string|number|boolean}[]
      */
-    const vModel = computed({
-        get: () => props.modelValue,
-        set: (val) => {
-            emit('update:modelValue', val)
-        },
-    })
+    options: Array,
+});
+
+const emit = defineEmits([
+    'update:modelValue',
+]);
+
+/**
+ * @typedef {label: string, value: string|number|boolean}[]
+ */
+const vModel = computed({
+    get: () => props.modelValue,
+    set: (val) => {
+        emit('update:modelValue', val);
+    },
+});
 
 </script>
 

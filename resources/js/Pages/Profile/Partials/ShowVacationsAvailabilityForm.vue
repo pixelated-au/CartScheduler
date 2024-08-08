@@ -8,9 +8,8 @@ import JetFormSection from '@/Jetstream/FormSection.vue';
 import JetInput from '@/Jetstream/Input.vue';
 import JetInputError from '@/Jetstream/InputError.vue';
 import VacationDateRange from "@/Pages/Profile/Partials/VacationDateRange.vue";
-import {useForm} from '@inertiajs/inertia-vue3';
-// noinspection ES6UnusedImports
-import {Dropdown as VDropdown, VTooltip} from 'floating-vue'
+import {useForm} from '@inertiajs/vue3';
+import {Dropdown as VDropdown} from 'floating-vue';
 
 const props = defineProps({
     vacations: {
@@ -21,11 +20,11 @@ const props = defineProps({
         type: Number,
         default: null,
     },
-})
+});
 const form = useForm({
     vacations: props.vacations || [],
     deletedVacations: [],
-})
+});
 
 const update = () => {
     form.transform((data) => {
@@ -33,9 +32,9 @@ const update = () => {
                 return {
                     ...data,
                     user_id: props.userId,
-                }
+                };
             }
-            return data
+            return data;
         })
         .put(route('update.user.vacations'), {
             preserveScroll: true,
@@ -43,11 +42,11 @@ const update = () => {
                 form.defaults({
                     vacations: props.vacations || [],
                     deletedVacations: [],
-                })
-                form.reset()
+                });
+                form.reset();
             },
             onError: (r) => {
-                console.log('error', r)
+                console.log('error', r);
             },
         });
 };
@@ -55,7 +54,7 @@ const update = () => {
 const resetForm = () => {
     form.reset();
     form.clearErrors();
-}
+};
 
 const addVacation = () => form.vacations = [...form.vacations, {start_date: '', end_date: '', description: ''}];
 
@@ -79,7 +78,8 @@ const deleteVacation = (idx) => form.deletedVacations = [...form.deletedVacation
                     <div v-for="(vacation, idx) in form.vacations" :key="vacation.id"
                          class="bg-slate-200 dark:bg-slate-800 grid grid-cols-[auto_minmax(0,_1fr)] sm:grid-cols-[auto_minmax(0,_2fr)] gap-y-px gap-x-3 rounded p-3 items-center mb-3">
                         <JetButton style-type="" type="button"
-                                   class="bg-slate-300 dark:bg-transparent dark:border dark:border-slate-700 self-stretch row-span-2 sm:row-span-2 px-1 py-1 mr-2" @click="deleteVacation(idx)">
+                                   class="bg-slate-300 dark:bg-transparent dark:border dark:border-slate-700 self-stretch row-span-2 sm:row-span-2 px-1 py-1 mr-2"
+                                   @click="deleteVacation(idx)">
                             <CloseCircle/>
                         </JetButton>
                         <vacation-date-range v-model:start-date="vacation.start_date"

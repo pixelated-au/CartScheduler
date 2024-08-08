@@ -1,8 +1,5 @@
 import axios from 'axios';
-import _ from 'lodash';
 import {useToast} from "vue-toastification";
-
-window._ = _;
 
 /**
  * We'll load the axios HTTP library which allows us to easily issue requests

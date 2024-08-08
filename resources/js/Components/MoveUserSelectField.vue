@@ -1,10 +1,17 @@
+<script>
+import {VTooltip} from 'floating-vue';
+
+export default {
+    directives: {
+        tooltip: VTooltip,
+    },
+};
+</script>
 <script setup>
 import UserMove from "@/Components/Icons/UserMove.vue";
-import SelectField from '@/Components/SelectField.vue'
-import {addMinutes, areIntervalsOverlapping, format, getDay, parse, subMinutes} from 'date-fns'
-// noinspection ES6UnusedImports
-import {VTooltip} from 'floating-vue'
-import {computed, inject} from 'vue'
+import SelectField from '@/Components/SelectField.vue';
+import {addMinutes, areIntervalsOverlapping, format, getDay, parse, subMinutes} from 'date-fns';
+import {computed, inject} from 'vue';
 
 const props = defineProps({
     volunteer: Object,
@@ -12,14 +19,14 @@ const props = defineProps({
     shift: Object,
     locationId: Number,
     emptyShiftsForTime: Array,
-})
-const emit = defineEmits(['update:modelValue'])
+});
+const emit = defineEmits(['update:modelValue']);
 
-const shiftStart = computed(() => parse(props.shift.start_time, 'HH:mm:ss', props.date))
+const shiftStart = computed(() => parse(props.shift.start_time, 'HH:mm:ss', props.date));
 
-const dayOfWeek = computed(() => getDay(props.date))
+const dayOfWeek = computed(() => getDay(props.date));
 
-const formattedDate = computed(() => format(props.date, 'yyyy-MM-dd'))
+const formattedDate = computed(() => format(props.date, 'yyyy-MM-dd'));
 
 const hasMatch = (shiftData) => {
     return areIntervalsOverlapping(
@@ -32,32 +39,32 @@ const hasMatch = (shiftData) => {
             (!shiftData.available_from || shiftData.available_from <= formattedDate.value)
             &&
             (!shiftData.available_to || shiftData.available_to >= formattedDate.value)
-        )
-}
+        );
+};
 
 const shiftsForTime = computed(() => {
     return props.emptyShiftsForTime
         ?.filter(shiftData => hasMatch(shiftData))
         ?.map(({location, locationId, currentVolunteers, startTime, endTime}) => {
-            const label = `${location}: ${format(startTime, 'h:mm a')} - ${format(endTime, 'h:mm a')}`
+            const label = `${location}: ${format(startTime, 'h:mm a')} - ${format(endTime, 'h:mm a')}`;
 
             const volunteers = currentVolunteers.map(volunteer => {
-                const prefix = volunteer.gender === 'male' ? 'Bro' : 'Sis'
-                return `${prefix} ${volunteer.name}`
-            })
-            return {label, volunteers, id: locationId}
-        })
-})
-const isDarkMode = inject('darkMode', false)
+                const prefix = volunteer.gender === 'male' ? 'Bro' : 'Sis';
+                return `${prefix} ${volunteer.name}`;
+            });
+            return {label, volunteers, id: locationId};
+        });
+});
+const isDarkMode = inject('darkMode', false);
 const iconColor = computed(() => {
     if (shiftsForTime.value?.length === 0) {
-        return isDarkMode.value ? '#fff' : '#000'
+        return isDarkMode.value ? '#fff' : '#000';
     }
-    return '#fff'
-})
+    return '#fff';
+});
 const moveTooltip = computed(() => shiftsForTime.value?.length === 0
     ? `No other locations available`
-    : `Move ${props.volunteer.name} to another shift`)
+    : `Move ${props.volunteer.name} to another shift`);
 
 </script>
 <template>

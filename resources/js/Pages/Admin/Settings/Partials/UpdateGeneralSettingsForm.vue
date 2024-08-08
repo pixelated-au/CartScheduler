@@ -7,7 +7,7 @@ import JetFormSection from '@/Jetstream/FormSection.vue';
 import JetInput from '@/Jetstream/Input.vue';
 import JetInputError from '@/Jetstream/InputError.vue';
 import JetLabel from '@/Jetstream/Label.vue';
-import {useForm} from '@inertiajs/inertia-vue3';
+import {useForm} from '@inertiajs/vue3';
 import {computed} from "vue";
 
 const props = defineProps({
@@ -28,20 +28,20 @@ const updateGeneralSettings = () => {
         errorBag: 'updateGeneralSettings',
         preserveScroll: true,
         onSuccess: () => form.defaults(),
-    })
-}
+    });
+};
 
 const hours = computed(() => {
     return Array(24).fill('').map((_, i) => {
         if (i === 0) {
-            return {label: '12am', value: 0}
+            return {label: '12am', value: 0};
         }
 
         if (i === 12) {
-            return {label: '12pm', value: 0}
+            return {label: '12pm', value: 0};
         }
 
-        return {label: i < 12 ? i + 'am' : i - 12 + 'pm', value: i}
+        return {label: i < 12 ? i + 'am' : i - 12 + 'pm', value: i};
     });
 });
 

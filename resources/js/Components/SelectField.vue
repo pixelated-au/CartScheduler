@@ -1,6 +1,6 @@
 <script setup>
-import {Dropdown} from 'flowbite'
-import {computed, inject, onMounted, ref, useSlots} from 'vue'
+import {Dropdown} from 'flowbite';
+import {computed, inject, onMounted, ref, useSlots} from 'vue';
 
 const props = defineProps({
     modelValue: [Object, Number, String],
@@ -18,78 +18,78 @@ const props = defineProps({
         type: Boolean,
         default: false,
     },
-})
+});
 
-const emit = defineEmits(['update:modelValue'])
+const emit = defineEmits(['update:modelValue']);
 
-const fieldUnique = computed(() => Math.random().toString(36).substring(2, 9))
+const fieldUnique = computed(() => Math.random().toString(36).substring(2, 9));
 
 const model = computed({
     get: () => props.modelValue,
     set: value => emit('update:modelValue', value),
-})
+});
 
-const slots = useSlots()
-const useLabelSlot = computed(() => !!slots.label)
+const slots = useSlots();
+const useLabelSlot = computed(() => !!slots.label);
 
 
 const label = computed(() => isNaN(model.value) && model.value || model.value !== null
     ? props.options.find(option => option.value === model.value)?.label
-    : props.selectLabel || 'Select one'
-)
+    : props.selectLabel || 'Select one',
+);
 
-const noOptions = computed(() => props.options.length === 0)
+const noOptions = computed(() => props.options.length === 0);
 
-const isDarkMode = inject('darkMode', false)
+const isDarkMode = inject('darkMode', false);
 
 const arrowFill = computed(() => {
     if (isDarkMode.value) {
-        return '#fff'
+        return '#fff';
     }
-    return noOptions.value ? '#000' : '#fff'
-})
+    return noOptions.value ? '#000' : '#fff';
+});
 
 const buttonClasses = computed(() => {
-    let classes = []
+    let classes = [];
     if (props.fullWidthButton) {
-        classes.push('w-full')
+        classes.push('w-full');
     }
     if (noOptions.value) {
-        classes.push('!bg-gray-300 dark:!bg-gray-700 !cursor-not-allowed')
+        classes.push('!bg-gray-300 dark:!bg-gray-700 !cursor-not-allowed');
     }
-    return classes.join(' ')
-})
+    return classes.join(' ');
+});
 
 const onSelect = (selection) => {
-    dropdown.value.hide()
+    dropdown.value.hide();
     if (noOptions.value) {
-        return
+        return;
     }
 
     if (props.returnObjectValue) {
         // We're not returning the whole object, just the value
-        console.log('selection value', selection.value)
-        model.value = selection.value
-        return
+        console.log('selection value', selection.value);
+        model.value = selection.value;
+        return;
     }
 
-    model.value = selection
-}
+    model.value = selection;
+};
 
 const selectedClass = (option) => {
-    const val = props.returnObjectValue ? option.value : option
-    return model.value === val ? 'bg-purple-200 dark:bg-purple-800' : ''
-}
+    const val = props.returnObjectValue ? option.value : option;
+    return model.value === val ? 'bg-purple-200 dark:bg-purple-800' : '';
+};
 
-const trigger = ref()
-const target = ref()
-const dropdown = ref()
+const trigger = ref();
+const target = ref();
+const dropdown = ref();
 
 onMounted(() => {
     dropdown.value = new Dropdown(target.value, trigger.value, {
         triggerType: 'click',
-    })
-})
+    });
+});
 </script>
 
 <template>

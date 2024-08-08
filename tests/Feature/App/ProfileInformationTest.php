@@ -548,13 +548,13 @@ class ProfileInformationTest extends TestCase
             ])
             ->assertUnprocessable()
             ->assertInvalid([
-                'day_wednesday' => 'The day wednesday must have at least 2 items',
-                'day_friday.6'  => 'The day_friday.6 must not be greater than 23.',
-                'num_mondays'   => 'The num mondays must be an integer.',
+                'day_wednesday' => 'The day wednesday field must have at least 2 items',
+                'day_friday.6'  => 'The day_friday.6 field must not be greater than 23.',
+                'num_mondays'   => 'The num mondays field must be an integer.',
                 'num_tuesdays'  => 'The num tuesdays field is required.',
-                'num_thursdays' => 'The num thursdays must not be greater than 4.',
-                'num_sundays'   => 'The num sundays must be an integer.',
-                'comments'      => 'The comments must not be greater than 500 characters.',
+                'num_thursdays' => 'The num thursdays field must not be greater than 4.',
+                'num_sundays'   => 'The num sundays field must be an integer.',
+                'comments'      => 'The comments field must not be greater than 500 characters.',
             ]);
 
     }

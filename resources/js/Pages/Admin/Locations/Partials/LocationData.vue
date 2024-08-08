@@ -1,10 +1,10 @@
 <script setup>
-import HorizontalRadioButtons from '@/Components/HorizontalRadioButtons.vue'
-import TextEditor from '@/Components/TextEditor.vue'
-import JetInput from '@/Jetstream/Input.vue'
-import JetInputError from '@/Jetstream/InputError.vue'
-import JetLabel from '@/Jetstream/Label.vue'
-import {computed, defineProps} from 'vue'
+import HorizontalRadioButtons from '@/Components/HorizontalRadioButtons.vue';
+import TextEditor from '@/Components/TextEditor.vue';
+import JetInput from '@/Jetstream/Input.vue';
+import JetInputError from '@/Jetstream/InputError.vue';
+import JetLabel from '@/Jetstream/Label.vue';
+import {computed, defineProps} from 'vue';
 
 const props = defineProps({
     modelValue: Object,
@@ -12,20 +12,20 @@ const props = defineProps({
         type: Number,
         required: true,
     },
-})
+});
 
 const emit = defineEmits([
     'update:modelValue',
-])
+]);
 
 const form = computed({
     get() {
-        return props.modelValue
+        return props.modelValue;
     },
     set(value) {
-        emit('update:modelValue', value)
+        emit('update:modelValue', value);
     },
-})
+});
 </script>
 
 <template>
@@ -40,10 +40,12 @@ const form = computed({
     <div class="col-span-6 sm:col-span-full">
         <JetLabel for="description" value="Description"/>
         <p class="mb-1 text-sm italic text-gray-500 dark:text-gray-500">
-            NOTE: As part of standard HTML, empty paragraphs won't appear. A future update will have the ability to create arbitrary spacing
+            NOTE: As part of standard HTML, empty paragraphs won't appear. A future update will have the ability to
+            create arbitrary spacing
         </p>
         <p class="mb-1 text-sm text-gray-700 dark:text-gray-300">
-            Return/Enter creates a new paragraph. Holding the Shift key while pressing Return/Enter will insert a line break.
+            Return/Enter creates a new paragraph. Holding the Shift key while pressing Return/Enter will insert a line
+            break.
         </p>
         <TextEditor v-model="form.description"/>
         <JetInputError :message="form.errors.description" class="mt-2"/>
@@ -62,7 +64,7 @@ const form = computed({
     <!-- Maximum Volunteers -->
     <div class="col-span-6 sm:col-span-4 md:col-span-3">
         <JetLabel for="max-volunteers">
-            Maximum Volunteers at Location <span class="text-sm">(Max {{maxVolunteers}})</span>
+            Maximum Volunteers at Location <span class="text-sm">(Max {{ maxVolunteers }})</span>
         </JetLabel>
         <JetInput id="max-volunteers"
                   v-model="form.max_volunteers"
@@ -96,17 +98,17 @@ const form = computed({
         <JetInputError :message="form.errors.is_enabled" class="mt-2"/>
     </div>
 
-<!--    <div class="col-span-6 sm:col-span-4 md:col-span-3">-->
-<!--        <JetLabel for="latitude" value="Location Latitude"/>-->
-<!--        <JetInput id="latitude" v-model="form.latitude" type="number" inputmode="decimal" class="mt-1 block w-full"/>-->
-<!--        <div class="text-xs text-yellow-500">Not in use</div>-->
-<!--        <JetInputError :message="form.errors.latitude" class="mt-2"/>-->
-<!--    </div>-->
-<!--    <div class="col-span-6 sm:col-span-4 md:col-span-3">-->
-<!--        <JetLabel for="longitude" value="Location Longitude"/>-->
-<!--        <JetInput id="longitude" v-model="form.longitude" type="number" inputmode="decimal" class="mt-1 block w-full"/>-->
-<!--        <div class="text-xs text-yellow-500">Not in use</div>-->
-<!--        <JetInputError :message="form.errors.longitude" class="mt-2"/>-->
-<!--    </div>-->
+    <!--    <div class="col-span-6 sm:col-span-4 md:col-span-3">-->
+    <!--        <JetLabel for="latitude" value="Location Latitude"/>-->
+    <!--        <JetInput id="latitude" v-model="form.latitude" type="number" inputmode="decimal" class="mt-1 block w-full"/>-->
+    <!--        <div class="text-xs text-yellow-500">Not in use</div>-->
+    <!--        <JetInputError :message="form.errors.latitude" class="mt-2"/>-->
+    <!--    </div>-->
+    <!--    <div class="col-span-6 sm:col-span-4 md:col-span-3">-->
+    <!--        <JetLabel for="longitude" value="Location Longitude"/>-->
+    <!--        <JetInput id="longitude" v-model="form.longitude" type="number" inputmode="decimal" class="mt-1 block w-full"/>-->
+    <!--        <div class="text-xs text-yellow-500">Not in use</div>-->
+    <!--        <JetInputError :message="form.errors.longitude" class="mt-2"/>-->
+    <!--    </div>-->
 
 </template>

@@ -20,14 +20,14 @@ const props = defineProps({
         type: String,
         required: false,
     },
-})
+});
 
-const isDarkMode = inject('darkMode', false)
+const isDarkMode = inject('darkMode', false);
 
 const emit = defineEmits([
     'update:startDate',
     'update:endDate',
-])
+]);
 
 const formatForIso = (date) => formatISO(date, {representation: 'date'});
 
@@ -35,27 +35,27 @@ const formatForIso = (date) => formatISO(date, {representation: 'date'});
  * @param {Date} date
  * @returns {string}
  */
-const fieldFormat = date => intlFormat(date, {day: 'numeric', month: 'short', year: 'numeric'})
+const fieldFormat = date => intlFormat(date, {day: 'numeric', month: 'short', year: 'numeric'});
 
 const start = computed({
     get: () => props.startDate,
-    set: (value) => emit('update:startDate', formatForIso(value))
-})
+    set: (value) => emit('update:startDate', formatForIso(value)),
+});
 const end = computed({
     get: () => props.endDate,
-    set: (value) => emit('update:endDate', formatForIso(value))
-})
+    set: (value) => emit('update:endDate', formatForIso(value)),
+});
 
 watch(start, (value) => {
     if (value && end.value && isAfter(parseISO(value), parseISO(end.value))) {
-        end.value = parseISO(value)
+        end.value = parseISO(value);
     }
-})
+});
 watch(end, (value) => {
     if (value && start.value && isBefore(parseISO(value), parseISO(start.value))) {
-        start.value = parseISO(value)
+        start.value = parseISO(value);
     }
-})
+});
 </script>
 
 <template>

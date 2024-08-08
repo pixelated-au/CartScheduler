@@ -1,71 +1,71 @@
 <script setup>
-    import {Accordion} from "flowbite";
-    import {computed, nextTick, ref, useSlots, watch} from 'vue'
+import {Accordion} from "flowbite";
+import {computed, nextTick, ref, useSlots, watch} from 'vue';
 
-    const props = defineProps({
-        /** * @type {LocationData[]} */
-        items: Array,
-        label: String,
-        uid: String,
-        expandItem: {
-            type: Number,
-            default: undefined,
-        },
-        emptyCollectionText: {
-            type: String,
-            default: 'No items found.',
+const props = defineProps({
+    /** * @type {LocationData[]} */
+    items: Array,
+    label: String,
+    uid: String,
+    expandItem: {
+        type: Number,
+        default: undefined,
+    },
+    emptyCollectionText: {
+        type: String,
+        default: 'No items found.',
+    },
+});
+
+const slots = useSlots();
+
+const useLabelSlot = computed(() => !!slots.label);
+
+const compId = Math.random().toString(36).substring(2, 9);
+
+const compItems = ref();
+
+const computeItems = (tabs) => {
+    const i = [];
+    let index = 0;
+
+    for (const item of tabs) {
+        const key = item.dataset.key;
+        const id = `accordion-label-${key}-${compId}`;
+        i.push({
+            id: id,
+            triggerEl: item.querySelector(`#${id}`),
+            targetEl: item.querySelector(`#accordion-body-${key}-${compId}`),
+            active: props.expandItem === index,
+        });
+        index++;
+    }
+    // return i
+    compItems.value = i;
+};
+
+const options = {
+    alwaysOpen: false,
+    activeClasses: 'bg-gray-200 dark:bg-gray-800 text-gray-900 dark:text-white rounded',
+    inactiveClasses: 'text-gray-300 dark:text-gray-400',
+};
+
+const initAccordion = items => {
+    nextTick(() => {
+        new Accordion(items, options);
+    });
+};
+
+const skipUnwrap = {myTabs: ref([])}; // hack as per https://github.com/vuejs/core/issues/5525
+
+watch(skipUnwrap.myTabs, (val) => {
+    nextTick(() => {
+        if (val && val.length) {
+            computeItems(val);
+            initAccordion(compItems.value);
         }
-    })
-
-    const slots = useSlots()
-
-    const useLabelSlot = computed(() => !!slots.label)
-
-    const compId = Math.random().toString(36).substring(2, 9)
-
-    const compItems = ref()
-
-    const computeItems = (tabs) => {
-        const i = []
-        let index = 0
-
-        for (const item of tabs) {
-            const key = item.dataset.key
-            const id = `accordion-label-${key}-${compId}`
-            i.push({
-                id: id,
-                triggerEl: item.querySelector(`#${id}`),
-                targetEl: item.querySelector(`#accordion-body-${key}-${compId}`),
-                active: props.expandItem === index,
-            })
-            index++
-        }
-        // return i
-        compItems.value = i
-    }
-
-    const options = {
-        alwaysOpen: false,
-        activeClasses: 'bg-gray-200 dark:bg-gray-800 text-gray-900 dark:text-white rounded',
-        inactiveClasses: 'text-gray-300 dark:text-gray-400',
-    }
-
-    const initAccordion = items => {
-        nextTick(() => {
-            new Accordion(items, options)
-        })
-    }
-
-    const skipUnwrap = {myTabs: ref([])} // hack as per https://github.com/vuejs/core/issues/5525
-
-    watch(skipUnwrap.myTabs, (val) => {
-        nextTick(() => {
-            if (val && val.length) {
-                computeItems(val)
-                initAccordion(compItems.value)
-            }
-        })
-    }, {deep: true})
+    });
+}, {deep: true});
 </script>
 
 <template>
@@ -104,7 +104,7 @@
                 </div>
             </template>
             <div v-else class="text-gray-800 dark:text-gray-200 italic">
-                {{emptyCollectionText}}
+                {{ emptyCollectionText }}
             </div>
         </div>
     </div>

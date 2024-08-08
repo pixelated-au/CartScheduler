@@ -7,7 +7,7 @@ import JetInputError from "@/Jetstream/InputError.vue";
 import JetLabel from "@/Jetstream/Label.vue";
 import JetToggle from '@/Jetstream/Toggle.vue';
 import DayOfWeekConfiguration from "@/Pages/Profile/Partials/DayOfWeekConfiguration.vue";
-import {useForm, usePage} from '@inertiajs/inertia-vue3';
+import {useForm, usePage} from '@inertiajs/vue3';
 import '@vueform/slider/themes/tailwind.scss';
 import {computed, nextTick, reactive, watch} from 'vue';
 
@@ -20,12 +20,12 @@ const props = defineProps({
         type: Number,
         default: null,
     },
-})
+});
 
 const ranges = computed(() => ({
-    start: usePage().props.value.shiftAvailability.systemShiftStartHour,
-    end: usePage().props.value.shiftAvailability.systemShiftEndHour,
-}))
+    start: usePage().props.shiftAvailability.systemShiftStartHour,
+    end: usePage().props.shiftAvailability.systemShiftEndHour,
+}));
 
 const form = useForm({
     day_monday: props.availability.day_monday || [ranges.value.start, ranges.value.end],
@@ -43,37 +43,37 @@ const form = useForm({
     num_saturdays: props.availability.num_saturdays || 0,
     num_sundays: props.availability.num_sundays || 0,
     comments: props.availability.comments || '',
-})
+});
 
-const {computedRange, numberOfWeeks, toggleRosterDay, tooltipFormat} = useAvailabilityActions(form, ranges)
+const {computedRange, numberOfWeeks, toggleRosterDay, tooltipFormat} = useAvailabilityActions(form, ranges);
 
 const hasDayError = computed(() => {
     return form.errors['day_monday']?.length > 0
-    || form.errors['day_tuesday']?.length > 0
-    || form.errors['day_wednesday']?.length > 0
-    || form.errors['day_thursday']?.length > 0
-    || form.errors['day_friday']?.length > 0
-    || form.errors['day_saturday']?.length > 0
-    || form.errors['day_sunday']?.length > 0
-})
+        || form.errors['day_tuesday']?.length > 0
+        || form.errors['day_wednesday']?.length > 0
+        || form.errors['day_thursday']?.length > 0
+        || form.errors['day_friday']?.length > 0
+        || form.errors['day_saturday']?.length > 0
+        || form.errors['day_sunday']?.length > 0;
+});
 
 const hasNumError = computed(() => {
     return form.errors['num_mondays']?.length > 0
-    || form.errors['num_tuesdays']?.length > 0
-    || form.errors['num_wednesdays']?.length > 0
-    || form.errors['num_thursdays']?.length > 0
-    || form.errors['num_fridays']?.length > 0
-    || form.errors['num_saturdays']?.length > 0
-    || form.errors['num_sundays']?.length > 0
-})
+        || form.errors['num_tuesdays']?.length > 0
+        || form.errors['num_wednesdays']?.length > 0
+        || form.errors['num_thursdays']?.length > 0
+        || form.errors['num_fridays']?.length > 0
+        || form.errors['num_saturdays']?.length > 0
+        || form.errors['num_sundays']?.length > 0;
+});
 
-const rosterMonday = toggleRosterDay('monday')
-const rosterTuesday = toggleRosterDay('tuesday')
-const rosterWednesday = toggleRosterDay('wednesday')
-const rosterThursday = toggleRosterDay('thursday')
-const rosterFriday = toggleRosterDay('friday')
-const rosterSaturday = toggleRosterDay('saturday')
-const rosterSunday = toggleRosterDay('sunday')
+const rosterMonday = toggleRosterDay('monday');
+const rosterTuesday = toggleRosterDay('tuesday');
+const rosterWednesday = toggleRosterDay('wednesday');
+const rosterThursday = toggleRosterDay('thursday');
+const rosterFriday = toggleRosterDay('friday');
+const rosterSaturday = toggleRosterDay('saturday');
+const rosterSunday = toggleRosterDay('sunday');
 
 const hoursEachDay = reactive({
     monday: computedRange('monday'),
@@ -83,7 +83,7 @@ const hoursEachDay = reactive({
     friday: computedRange('friday'),
     saturday: computedRange('saturday'),
     sunday: computedRange('sunday'),
-})
+});
 
 const update = () => {
     form.transform((data) => {
@@ -91,37 +91,37 @@ const update = () => {
                 return {
                     ...data,
                     user_id: props.userId,
-                }
+                };
             }
-            return data
+            return data;
         })
         .put(route('update.user.availability'), {
             preserveScroll: true,
             onError: () => {
-                console.log('error')
+                console.log('error');
             },
-        })
-}
+        });
+};
 
 const showConfigurations = computed(() => {
-    return form.num_mondays > 0 || form.num_tuesdays > 0 || form.num_wednesdays > 0 || form.num_thursdays > 0 || form.num_fridays > 0 || form.num_saturdays > 0 || form.num_sundays > 0
-})
+    return form.num_mondays > 0 || form.num_tuesdays > 0 || form.num_wednesdays > 0 || form.num_thursdays > 0 || form.num_fridays > 0 || form.num_saturdays > 0 || form.num_sundays > 0;
+});
 
-const maxCommentChars = 500
+const maxCommentChars = 500;
 const commentsRemainingCharacters = computed(() => {
     if (form.comments) {
-        return maxCommentChars - form.comments.length
+        return maxCommentChars - form.comments.length;
     }
-    return maxCommentChars
-})
+    return maxCommentChars;
+});
 
 watch(() => form.comments, (value, oldValue) => {
     if (value.length > maxCommentChars) {
         nextTick(() => {
-            form.comments = oldValue
-        })
+            form.comments = oldValue;
+        });
     }
-})
+});
 </script>
 
 <template>
@@ -137,7 +137,9 @@ watch(() => form.comments, (value, oldValue) => {
         <template #form>
             <div
                 class="col-span-6 grid grid-cols-4 md:grid-cols-7 text-gray-700 dark:text-gray-100 items-stretch gap-y-px bg-slate-100 dark:bg-slate-800 border border-gray-200 dark:border-gray-900 rounded p-3">
-                <div class="col-span-4 md:col-span-7 font-bold">{{ props.userId ? 'Volunteer is' : 'I am' }} available to be rostered:</div>
+                <div class="col-span-4 md:col-span-7 font-bold">{{ props.userId ? 'Volunteer is' : 'I am' }} available
+                    to be rostered:
+                </div>
                 <div class="col text-center">
                     <JetToggle id="check-monday" v-model="rosterMonday" label="Monday"/>
                 </div>
@@ -218,7 +220,8 @@ watch(() => form.comments, (value, oldValue) => {
                                             :tooltip-format="tooltipFormat"/>
                 </div>
             </Transition>
-            <div v-if="hasNumError" class="col-span-6 text-gray-700 dark:text-gray-100 items-stretch gap-y-5 md:gap-y-px bg-slate-200 dark:bg-slate-800 border border-gray-200 dark:border-gray-900 rounded p-3">
+            <div v-if="hasNumError"
+                 class="col-span-6 text-gray-700 dark:text-gray-100 items-stretch gap-y-5 md:gap-y-px bg-slate-200 dark:bg-slate-800 border border-gray-200 dark:border-gray-900 rounded p-3">
                 <p class="text-sm text-red-600">
                     {{ form.errors.num_mondays }}
                     {{ form.errors.num_tuesdays }}

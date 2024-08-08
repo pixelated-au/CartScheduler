@@ -29,14 +29,15 @@ class CreateShiftReportRequest extends FormRequest
         ];
     }
 
-    // TODO after upgrading to laravel V10, THIS NEEDS TO BE CONVERTED TO THE FUNCTION after()
-    public function withValidator(Validator $validator): void
+    public function after(): array
     {
-        $validator->after(function (Validator $validator) {
-            if (Report::where('shift_id', $this->integer('shift_id'))->where('shift_date', $this->date('shift_date'))->exists()) {
-                $validator->errors()->add('shift_id', 'A report already exists for this shift');
-            }
-        });
+        return [
+            function (Validator $validator) {
+                if (Report::where('shift_id', $this->integer('shift_id'))->where('shift_date', $this->date('shift_date'))->exists()) {
+                    $validator->errors()->add('shift_id', 'A report already exists for this shift');
+                }
+            },
+        ];
     }
 
     public function messages(): array

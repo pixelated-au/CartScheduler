@@ -1,49 +1,49 @@
 <script setup>
-    import DataTable from '@/Components/DataTable.vue'
-    import Filter from '@/Components/Icons/Filter.vue'
-    import JetHelpText from '@/Jetstream/HelpText.vue'
-    import JetInput from '@/Jetstream/Input.vue'
-    import JetLabel from '@/Jetstream/Label.vue'
-    import AppLayout from '@/Layouts/AppLayout.vue'
-    import {computed, ref} from 'vue'
-    import headers from './Lib/ReportsDataTableHeaders.js'
+import DataTable from '@/Components/DataTable.vue';
+import Filter from '@/Components/Icons/Filter.vue';
+import JetHelpText from '@/Jetstream/HelpText.vue';
+import JetInput from '@/Jetstream/Input.vue';
+import JetLabel from '@/Jetstream/Label.vue';
+import AppLayout from '@/Layouts/AppLayout.vue';
+import {computed, ref} from 'vue';
+import headers from './Lib/ReportsDataTableHeaders.js';
 
-    const props = defineProps({
-        reports: Object,
-        locations: Object,
-    })
+const props = defineProps({
+    reports: Object,
+    locations: Object,
+});
 
-    const userSearch = ref('')
+const userSearch = ref('');
 
-    const reportData = computed(() => props.reports.data.map(report => ({
-            id: report.id,
-            location: report.metadata?.location_name || report.shift?.location?.name || '',
-            locationId: report.metadata?.locationId || report.shift?.location?.id || '',
-            userExists: !!report.submitted_by?.id,
-            submittedByName: report.metadata?.submitted_by_name || report.submitted_by?.name || '',
-            submittedByPhone: report.metadata?.submitted_by_phone || report.submitted_by?.mobile_phone || '',
-            submittedByEmail: report.metadata?.submitted_by_email || report.submitted_by?.email || '',
-            date: report.shift_date,
-            time: report.shift?.start_time,
-            placements: report.placements_count,
-            videos: report.videos_count,
-            requests: report.requests_count,
-            comments: report.comments,
-            tags: report.tags.map(tag => tag.name.en),
-            cancelled: report.shift_was_cancelled,
-            associates: report.metadata?.associates || [],
-    })))
+const reportData = computed(() => props.reports.data.map(report => ({
+    id: report.id,
+    location: report.metadata?.location_name || report.shift?.location?.name || '',
+    locationId: report.metadata?.locationId || report.shift?.location?.id || '',
+    userExists: !!report.submitted_by?.id,
+    submittedByName: report.metadata?.submitted_by_name || report.submitted_by?.name || '',
+    submittedByPhone: report.metadata?.submitted_by_phone || report.submitted_by?.mobile_phone || '',
+    submittedByEmail: report.metadata?.submitted_by_email || report.submitted_by?.email || '',
+    date: report.shift_date,
+    time: report.shift?.start_time,
+    placements: report.placements_count,
+    videos: report.videos_count,
+    requests: report.requests_count,
+    comments: report.comments,
+    tags: report.tags.map(tag => tag.name.en),
+    cancelled: report.shift_was_cancelled,
+    associates: report.metadata?.associates || [],
+})));
 
-    const showLocationFilter = ref(false)
-    const locationFilter = ref(0)
+const showLocationFilter = ref(false);
+const locationFilter = ref(0);
 
-    const filter = computed(() => {
-        const filters = []
-        if (locationFilter.value) {
-            filters.push({field: 'locationId', comparison: '=', criteria: locationFilter.value})
-        }
-        return filters
-    })
+const filter = computed(() => {
+    const filters = [];
+    if (locationFilter.value) {
+        filters.push({field: 'locationId', comparison: '=', criteria: locationFilter.value});
+    }
+    return filters;
+});
 </script>
 
 <template>

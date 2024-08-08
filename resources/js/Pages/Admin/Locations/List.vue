@@ -1,26 +1,26 @@
 <script setup>
-    import JetButton from '@/Jetstream/Button.vue'
-    import AppLayout from '@/Layouts/AppLayout.vue'
-    import { Inertia } from '@inertiajs/inertia'
-    import { truncate } from 'lodash'
+import JetButton from '@/Jetstream/Button.vue';
+import AppLayout from '@/Layouts/AppLayout.vue';
+import {router} from '@inertiajs/vue3';
+import {truncate} from 'lodash';
 
-    defineProps({
-        locations: Object.data,
-    })
+defineProps({
+    locations: Object.data,
+});
 
-    const onNewLocation = () => {
-        Inertia.visit(route('admin.locations.create'))
-    }
+const onNewLocation = () => {
+    router.visit(route('admin.locations.create'));
+};
 
-    const locationClicked = (location) => {
-        Inertia.visit(route('admin.locations.edit', { id: location.id }))
-    }
+const locationClicked = (location) => {
+    router.visit(route('admin.locations.edit', {id: location.id}));
+};
 
-    const truncateDescription = description => truncate(description, {
-        length: 100,
-        omission: '...',
-        separator: ' ',
-    })
+const truncateDescription = description => truncate(description, {
+    length: 100,
+    omission: '...',
+    separator: ' ',
+});
 </script>
 
 <template>
@@ -34,7 +34,8 @@
             </div>
         </template>
 
-        <div class="max-w-7xl mx-auto pt-10 sm:px-6 lg:px-8 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <div
+            class="max-w-7xl mx-auto pt-10 sm:px-6 lg:px-8 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             <div v-for="location in locations.data"
                  :key="location.id"
                  class="bg-white dark:bg-slate-700 shadow-xl sm:rounded-lg p-6 cursor-pointer hover:bg-violet-100 hover:transition-colors"

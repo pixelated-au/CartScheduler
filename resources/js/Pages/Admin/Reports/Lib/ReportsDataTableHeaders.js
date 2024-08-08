@@ -45,4 +45,4 @@ export default [
         value: 'cancelled',
         sortable: true,
     },
-]
+];

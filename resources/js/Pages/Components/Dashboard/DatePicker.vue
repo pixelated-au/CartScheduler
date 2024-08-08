@@ -1,5 +1,5 @@
 <script setup>
-import {usePage} from '@inertiajs/inertia-vue3';
+import {usePage} from '@inertiajs/vue3';
 
 //https://vue3datepicker.com/
 import Datepicker from '@vuepic/vue-datepicker';
@@ -45,11 +45,11 @@ const selectedDate = computed({
 });
 
 const shiftAvailability = computed(() => {
-    return usePage().props.value.shiftAvailability;
+    return usePage().props.shiftAvailability;
 });
 
 const isRestricted = computed(() => {
-    return !usePage().props.value.isUnrestricted;
+    return !usePage().props.isUnrestricted;
 });
 
 const today = setHours(new Date(), 12);

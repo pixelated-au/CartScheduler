@@ -1,18 +1,18 @@
 <script setup>
-import JetButton from '@/Jetstream/Button.vue'
-import AppLayout from '@/Layouts/AppLayout.vue'
-import LocationForm from '@/Pages/Admin/Locations/Partials/LocationForm.vue'
-import {Inertia} from '@inertiajs/inertia'
+import JetButton from '@/Jetstream/Button.vue';
+import AppLayout from '@/Layouts/AppLayout.vue';
+import LocationForm from '@/Pages/Admin/Locations/Partials/LocationForm.vue';
+import {router} from '@inertiajs/vue3';
 
 defineProps({
     maxVolunteers: {
         type: Number,
     },
-})
+});
 
 const listRouteAction = () => {
-    Inertia.visit(route('admin.locations.index'))
-}
+    router.visit(route('admin.locations.index'));
+};
 const newLocation = {
     data: {
         name: '',
@@ -23,7 +23,7 @@ const newLocation = {
         is_enabled: true,
         shifts: [],
     },
-}
+};
 </script>
 
 <template>

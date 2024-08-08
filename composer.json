@@ -11,36 +11,38 @@
         "php": "^8.2.0",
         "ext-pdo": "*",
         "ext-zip": "*",
-        "bugsnag/bugsnag-laravel": "^2.0",
+        "bugsnag/bugsnag-laravel": "^v2.28.0",
         "codedge/laravel-selfupdater": "dev-dev/github-release-files",
-        "guzzlehttp/guzzle": "^7.2",
-        "inertiajs/inertia-laravel": "^v0.6.11",
-        "laravel/framework": "^v9.52",
-        "laravel/jetstream": "^v2.16",
-        "laravel/sanctum": "^2.15",
-        "laravel/tinker": "^2.8",
+        "guzzlehttp/guzzle": "^7.8.1",
+        "inertiajs/inertia-laravel": "^v1.3.0",
+        "laravel/framework": "^v10.48.14",
+        "laravel/jetstream": "^v4.3.1",
+        "laravel/sanctum": "^v3.3.3",
+        "laravel/tinker": "^v2.9.0",
         "maatwebsite/excel": "^3.1",
         "maennchen/zipstream-php": "^3.1",
-        "psr/simple-cache": "^2.0",
+        "psr/simple-cache": "^3.0.0",
         "spatie/laravel-activitylog": "^4.7",
-        "spatie/laravel-ray": "^1.29",
-        "spatie/laravel-settings": "^3.1",
-        "spatie/laravel-tags": "^4.3",
-        "tightenco/ziggy": "^1.0"
+        "spatie/laravel-ray": "^1.36.2",
+        "spatie/laravel-settings": "^3.3.2",
+        "spatie/laravel-tags": "^4.6.1",
+        "tightenco/ziggy": "^v1.8.2"
     },
     "require-dev": {
-        "barryvdh/laravel-debugbar": "^3.7",
-        "brianium/paratest": "^6.11",
-        "dg/bypass-finals": "^1.7",
-        "fakerphp/faker": "^1.9.1",
-        "laravel/pint": "^1.0",
-        "laravel/sail": "^v1.28.0",
-        "league/csv": "^9.15",
-        "mockery/mockery": "^1.4.4",
-        "nunomaduro/collision": "^v6.4.0",
-        "phpunit/phpunit": "^9.6",
+        "barryvdh/laravel-debugbar": "^v3.13.5",
+        "brianium/paratest": "v7.4.5",
+        "dg/bypass-finals": "^v1.7.0",
+        "driftingly/rector-laravel": "^1.2",
+        "fakerphp/faker": "^v1.23.1",
+        "laravel/pint": "^v1.16.1",
+        "laravel/sail": "^v1.30.0",
+        "league/csv": "^9.16",
+        "mockery/mockery": "^1.6.12",
+        "nunomaduro/collision": "^v7.10.0",
+        "phpunit/phpunit": "^10.5.24",
+        "rector/rector": "^1.2",
         "roave/security-advisories": "dev-latest",
-        "spatie/laravel-ignition": "^1.0"
+        "spatie/laravel-ignition": "^2.8.0"
     },
     "repositories": [
         {
@@ -92,6 +94,5 @@
             "phpstan/extension-installer": true
         }
     },
-    "minimum-stability": "dev",
     "prefer-stable": true
 }

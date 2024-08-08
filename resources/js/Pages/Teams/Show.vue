@@ -1,7 +1,7 @@
 <script setup>
+import JetSectionBorder from '@/Jetstream/SectionBorder.vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import DeleteTeamForm from '@/Pages/Teams/Partials/DeleteTeamForm.vue';
-import JetSectionBorder from '@/Jetstream/SectionBorder.vue';
 import TeamMemberManager from '@/Pages/Teams/Partials/TeamMemberManager.vue';
 import UpdateTeamNameForm from '@/Pages/Teams/Partials/UpdateTeamNameForm.vue';
 
@@ -22,7 +22,7 @@ defineProps({
 
         <div>
             <div class="max-w-7xl mx-auto py-10 sm:px-6 lg:px-8">
-                <UpdateTeamNameForm :team="team" :permissions="permissions" />
+                <UpdateTeamNameForm :team="team" :permissions="permissions"/>
 
                 <TeamMemberManager
                     class="mt-10 sm:mt-0"
@@ -32,9 +32,9 @@ defineProps({
                 />
 
                 <template v-if="permissions.canDeleteTeam && ! team.personal_team">
-                    <JetSectionBorder />
+                    <JetSectionBorder/>
 
-                    <DeleteTeamForm class="mt-10 sm:mt-0" :team="team" />
+                    <DeleteTeamForm class="mt-10 sm:mt-0" :team="team"/>
                 </template>
             </div>
         </div>

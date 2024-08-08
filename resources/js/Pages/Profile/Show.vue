@@ -6,6 +6,7 @@ import LogoutOtherBrowserSessionsForm from '@/Pages/Profile/Partials/LogoutOther
 import TwoFactorAuthenticationForm from '@/Pages/Profile/Partials/TwoFactorAuthenticationForm.vue';
 import UpdatePasswordForm from '@/Pages/Profile/Partials/UpdatePasswordForm.vue';
 import UpdateProfileInformationForm from '@/Pages/Profile/Partials/UpdateProfileInformationForm.vue';
+import {usePage} from "@inertiajs/vue3";
 
 defineProps({
     confirmsTwoFactorAuthentication: Boolean,
@@ -23,7 +24,7 @@ defineProps({
 
         <div class="max-w-7xl mx-auto py-10 sm:px-6 lg:px-8">
             <div v-if="$page.props.jetstream.canUpdateProfileInformation">
-                <UpdateProfileInformationForm :user="$page.props.user"/>
+                <UpdateProfileInformationForm :user="$page.props.auth.user"/>
 
                 <JetSectionBorder/>
             </div>

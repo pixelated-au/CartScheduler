@@ -18,7 +18,7 @@ class GetShiftFilledData
 
         $params = ['startDate' => $startDate, 'endDate' => $endDate];
 
-        $rawQuery = DB::raw(/** @lang MySQL */ "WITH RECURSIVE dates (date) AS
+        $rawQuery = /** @lang MySQL */ "WITH RECURSIVE dates (date) AS
                  (SELECT :startDate
                   UNION ALL
                   SELECT date + INTERVAL 1 DAY
@@ -61,8 +61,8 @@ FROM dates
           ON dates.date = derived.shift_date
 
 GROUP BY dates.date, shifts_available
-ORDER BY dates.date"
-        );
+ORDER BY dates.date";
+
         return DB::select($rawQuery, $params);
     }
 }

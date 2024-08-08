@@ -1,23 +1,23 @@
 <script setup>
-    import JetAuthenticationCard from '@/Jetstream/AuthenticationCard.vue'
-    import JetAuthenticationCardLogo from '@/Jetstream/AuthenticationCardLogo.vue'
-    import JetButton from '@/Jetstream/Button.vue'
-    import JetInput from '@/Jetstream/Input.vue'
-    import JetLabel from '@/Jetstream/Label.vue'
-    import JetValidationErrors from '@/Jetstream/ValidationErrors.vue'
-    import { Head, useForm } from '@inertiajs/inertia-vue3'
+import JetAuthenticationCard from '@/Jetstream/AuthenticationCard.vue';
+import JetAuthenticationCardLogo from '@/Jetstream/AuthenticationCardLogo.vue';
+import JetButton from '@/Jetstream/Button.vue';
+import JetInput from '@/Jetstream/Input.vue';
+import JetLabel from '@/Jetstream/Label.vue';
+import JetValidationErrors from '@/Jetstream/ValidationErrors.vue';
+import {Head, useForm} from '@inertiajs/vue3';
 
-    defineProps({
-        status: String,
-    })
+defineProps({
+    status: String,
+});
 
-    const form = useForm({
-        email: '',
-    })
+const form = useForm({
+    email: '',
+});
 
-    const submit = () => {
-        form.post(route('password.email'))
-    }
+const submit = () => {
+    form.post(route('password.email'));
+};
 </script>
 
 <template>

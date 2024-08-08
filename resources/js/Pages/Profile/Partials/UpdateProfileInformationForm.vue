@@ -1,14 +1,13 @@
 <script setup>
-import { ref } from 'vue';
-import { Inertia } from '@inertiajs/inertia';
-import { Link, useForm } from '@inertiajs/inertia-vue3';
+import JetActionMessage from '@/Jetstream/ActionMessage.vue';
 import JetButton from '@/Jetstream/Button.vue';
 import JetFormSection from '@/Jetstream/FormSection.vue';
 import JetInput from '@/Jetstream/Input.vue';
 import JetInputError from '@/Jetstream/InputError.vue';
 import JetLabel from '@/Jetstream/Label.vue';
-import JetActionMessage from '@/Jetstream/ActionMessage.vue';
 import JetSecondaryButton from '@/Jetstream/SecondaryButton.vue';
+import {Link, router, useForm, usePage} from '@inertiajs/vue3';
+import {ref} from 'vue';
 
 const props = defineProps({
     user: Object,
@@ -48,7 +47,7 @@ const selectNewPhoto = () => {
 const updatePhotoPreview = () => {
     const photo = photoInput.value.files[0];
 
-    if (! photo) return;
+    if (!photo) return;
 
     const reader = new FileReader();
 
@@ -60,7 +59,7 @@ const updatePhotoPreview = () => {
 };
 
 const deletePhoto = () => {
-    Inertia.delete(route('current-user-photo.destroy'), {
+    router.delete(route('current-user-photo.destroy'), {
         preserveScroll: true,
         onSuccess: () => {
             photoPreview.value = null;
@@ -97,7 +96,7 @@ const clearPhotoFileInput = () => {
                     @change="updatePhotoPreview"
                 >
 
-                <JetLabel for="photo" value="Photo" />
+                <JetLabel for="photo" value="Photo"/>
 
                 <!-- Current Profile Photo -->
                 <div v-show="! photoPreview" class="mt-2">
@@ -125,12 +124,12 @@ const clearPhotoFileInput = () => {
                     Remove Photo
                 </JetSecondaryButton>
 
-                <JetInputError :message="form.errors.photo" class="mt-2" />
+                <JetInputError :message="form.errors.photo" class="mt-2"/>
             </div>
 
             <!-- Name -->
             <div class="col-span-6 sm:col-span-4">
-                <JetLabel for="name" value="Name" />
+                <JetLabel for="name" value="Name"/>
                 <JetInput
                     id="name"
                     v-model="form.name"
@@ -138,19 +137,19 @@ const clearPhotoFileInput = () => {
                     class="mt-1 block w-full"
                     autocomplete="name"
                 />
-                <JetInputError :message="form.errors.name" class="mt-2" />
+                <JetInputError :message="form.errors.name" class="mt-2"/>
             </div>
 
             <!-- Email -->
             <div class="col-span-6 sm:col-span-4">
-                <JetLabel for="email" value="Email" />
+                <JetLabel for="email" value="Email"/>
                 <JetInput
                     id="email"
                     v-model="form.email"
                     type="email"
                     class="mt-1 block w-full"
                 />
-                <JetInputError :message="form.errors.email" class="mt-2" />
+                <JetInputError :message="form.errors.email" class="mt-2"/>
 
                 <div v-if="$page.props.jetstream.hasEmailVerification && user.email_verified_at === null">
                     <p class="text-sm mt-2">

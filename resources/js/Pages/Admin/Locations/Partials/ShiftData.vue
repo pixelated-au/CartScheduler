@@ -1,57 +1,57 @@
 <script setup>
-    import JetButton from '@/Jetstream/Button.vue'
-    // import RadioDropDown from '@/Components/RadioDropDown.vue'
-    import Shift from '@/Pages/Admin/Locations/Partials/Shift.vue'
-    //https://vue3datepicker.com/
-    import { computed, defineProps } from 'vue'
+import JetButton from '@/Jetstream/Button.vue';
+// import RadioDropDown from '@/Components/RadioDropDown.vue'
+import Shift from '@/Pages/Admin/Locations/Partials/Shift.vue';
+//https://vue3datepicker.com/
+import {computed, defineProps} from 'vue';
 
-    const props = defineProps({
-        modelValue: Object,
-    })
+const props = defineProps({
+    modelValue: Object,
+});
 
-    const emit = defineEmits([
-        'update:modelValue',
-    ])
+const emit = defineEmits([
+    'update:modelValue',
+]);
 
-    const form = computed({
-        get () {
-            return props.modelValue
-        },
-        set (value) {
-            emit('update:modelValue', value)
-        },
-    })
+const form = computed({
+    get() {
+        return props.modelValue;
+    },
+    set(value) {
+        emit('update:modelValue', value);
+    },
+});
 
-    const days = [
-        { label: 'Mo', value: 'day_monday' },
-        { label: 'Tu', value: 'day_tuesday' },
-        { label: 'We', value: 'day_wednesday' },
-        { label: 'Th', value: 'day_thursday' },
-        { label: 'Fr', value: 'day_friday' },
-        { label: 'Sa', value: 'day_saturday' },
-        { label: 'Su', value: 'day_sunday' },
-    ]
+const days = [
+    {label: 'Mo', value: 'day_monday'},
+    {label: 'Tu', value: 'day_tuesday'},
+    {label: 'We', value: 'day_wednesday'},
+    {label: 'Th', value: 'day_thursday'},
+    {label: 'Fr', value: 'day_friday'},
+    {label: 'Sa', value: 'day_saturday'},
+    {label: 'Su', value: 'day_sunday'},
+];
 
-    const addShift = () => {
-        form.value.shifts.unshift({
-            location_id: form.value?.id,
-            day_monday: false,
-            day_tuesday: false,
-            day_wednesday: false,
-            day_thursday: false,
-            day_friday: false,
-            day_saturday: false,
-            day_sunday: false,
-            start_time: '00:00:00',
-            end_time: '20:00:00',
-            available_from: null,
-            available_to: null,
-        })
-    }
+const addShift = () => {
+    form.value.shifts.unshift({
+        location_id: form.value?.id,
+        day_monday: false,
+        day_tuesday: false,
+        day_wednesday: false,
+        day_thursday: false,
+        day_friday: false,
+        day_saturday: false,
+        day_sunday: false,
+        start_time: '00:00:00',
+        end_time: '20:00:00',
+        available_from: null,
+        available_to: null,
+    });
+};
 
-    const removeShift = index => {
-        form.value.shifts.splice(index, 1)
-    }
+const removeShift = index => {
+    form.value.shifts.splice(index, 1);
+};
 </script>
 
 <template>

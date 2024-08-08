@@ -66,28 +66,25 @@ class UpdateLocationRequest extends FormRequest
         ];
     }
 
-    /**
-     * TODO this will need to be changed after upgrading past Laravel 9 when migrating to laravel 10+
-     * @noinspection PhpUnused
-     */
-    public function withValidator(Validator $validator): void
+    public function after(): array
     {
-        $validator->after(function (Validator $validator) {
+        return [
+            function (Validator $validator) {
+                $this->compareAvailableDates($validator);
 
-            $this->compareAvailableDates($validator);
+                // Validate that available_from is before available_to only if the latter is present
+                $validator->sometimes(
+                    'shifts.*.available_from',
+                    'before_or_equal:shifts.*.available_to',
+                    fn(Fluent $input, Fluent $shiftData) => (bool)$shiftData->get('available_to'));
 
-            // Validate that available_from is before available_to only if the latter is present
-            $validator->sometimes(
-                'shifts.*.available_from',
-                'before_or_equal:shifts.*.available_to',
-                fn(Fluent $input, Fluent $shiftData) => (bool)$shiftData->get('available_to'));
-
-            // Validate that available_to is after available_from only if the latter is present
-            $validator->sometimes(
-                'shifts.*.available_to',
-                'after_or_equal:shifts.*.available_from',
-                fn(Fluent $input, Fluent $shiftData) => (bool)$shiftData->get('available_from'));
-        });
+                // Validate that available_to is after available_from only if the latter is present
+                $validator->sometimes(
+                    'shifts.*.available_to',
+                    'after_or_equal:shifts.*.available_from',
+                    fn(Fluent $input, Fluent $shiftData) => (bool)$shiftData->get('available_from'));
+            },
+        ];
     }
 
     public function messages(): array

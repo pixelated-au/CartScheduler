@@ -1,21 +1,21 @@
 <script setup>
-    import { Link } from '@inertiajs/inertia-vue3'
-    import {computed} from "vue";
+import {Link} from '@inertiajs/vue3';
+import {computed} from "vue";
 
-    const props = defineProps({
-        href: String,
-        as: String,
-        isMenu: Boolean,
-        innerClasses: String,
-    })
+const props = defineProps({
+    href: String,
+    as: String,
+    isMenu: Boolean,
+    innerClasses: String,
+});
 
-    const classes = computed(() => {
-        let classes = props.innerClasses
-        if (props.isMenu) {
-            classes += ' hover:no-underline'
-        }
-        return classes
-    })
+const classes = computed(() => {
+    let classes = props.innerClasses;
+    if (props.isMenu) {
+        classes += ' hover:no-underline';
+    }
+    return classes;
+});
 </script>
 
 <template>

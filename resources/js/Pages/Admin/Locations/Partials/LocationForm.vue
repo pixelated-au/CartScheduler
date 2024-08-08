@@ -5,8 +5,7 @@ import JetConfirmationModal from '@/Jetstream/ConfirmationModal.vue';
 import JetFormSection from '@/Jetstream/FormSection.vue';
 import JetSectionBorder from '@/Jetstream/SectionBorder.vue';
 import ShiftData from '@/Pages/Admin/Locations/Partials/ShiftData.vue';
-import {Inertia} from '@inertiajs/inertia';
-import {useForm} from '@inertiajs/inertia-vue3';
+import {router, useForm} from '@inertiajs/vue3';
 import {computed, nextTick, ref, watch} from 'vue';
 import LocationData from './LocationData.vue';
 
@@ -106,7 +105,7 @@ const saveAction = () => {
 };
 
 const listRouteAction = () => {
-    Inertia.visit(route('admin.locations.index'));
+    router.visit(route('admin.locations.index'));
 };
 
 const showConfirmationModal = ref(false);
@@ -126,7 +125,7 @@ const onDelete = () => {
 };
 
 const doDeleteAction = () => {
-    Inertia.delete(route('admin.locations.destroy', props.location.data.id));
+    router.delete(route('admin.locations.destroy', props.location.data.id));
 };
 
 const performConfirmationAction = () => {

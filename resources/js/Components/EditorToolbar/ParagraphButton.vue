@@ -1,4 +1,4 @@
-<script setup>import BaseButton from '@/Components/EditorToolbar/BaseButton.vue'</script>
+<script setup>import BaseButton from '@/Components/EditorToolbar/BaseButton.vue';</script>
 
 <template>
     <BaseButton action="setParagraph" tooltip="Paragraph or Body text">

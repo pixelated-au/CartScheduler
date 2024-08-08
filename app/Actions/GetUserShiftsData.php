@@ -76,7 +76,7 @@ class GetUserShiftsData
                 ";
 
         $params  = ['startDate' => $startDate, 'endDate' => $endDate, 'userId' => $user->id];
-        $results = DB::select(DB::raw($query), $params);
+        $results = DB::select($query, $params);
 
         return collect($results)
             ->map(fn(stdClass $shift) => [

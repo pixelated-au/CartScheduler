@@ -7,8 +7,7 @@ import useToast from "@/Composables/useToast";
 import JetButton from "@/Jetstream/Button.vue";
 import FilledShiftsIndicator from "@/Pages/Admin/Dashboard/FilledShiftsIndicator.vue";
 import {format, parse} from "date-fns";
-// noinspection ES6UnusedImports
-import {Menu as VMenu, VTooltip} from 'floating-vue'
+import {Menu as VMenu} from 'floating-vue';
 import {computed, inject, ref, watchEffect} from "vue";
 
 const props = defineProps({
@@ -42,12 +41,12 @@ const props = defineProps({
         type: Object,
         required: true,
     },
-})
+});
 
-const emit = defineEmits(['assignVolunteer'])
+const emit = defineEmits(['assignVolunteer']);
 
-const enableUserAvailability = inject('enableUserAvailability', false)
-const volunteers = ref([])
+const enableUserAvailability = inject('enableUserAvailability', false);
+const volunteers = ref([]);
 
 const tableHeaders = computed(() => {
     const headers = [
@@ -62,79 +61,79 @@ const tableHeaders = computed(() => {
             value: 'name',
             sortable: true,
         },
-    ]
+    ];
     if (props.columnFilters.responsibleBrother.value) {
         headers.push({
             text: 'Resp?',
             value: 'responsibleBrother',
             sortable: true,
-        })
+        });
     }
     if (props.columnFilters.gender.value) {
         headers.push({
             text: 'Gender',
             value: 'gender',
             sortable: true,
-        })
+        });
     }
     if (props.columnFilters.appointment.value) {
         headers.push({
             text: 'Appointment',
             value: 'appointment',
             sortable: true,
-        })
+        });
     }
     if (props.columnFilters.servingAs.value) {
         headers.push({
             text: 'Serving As',
             value: 'servingAs',
             sortable: true,
-        })
+        });
     }
     if (props.columnFilters.maritalStatus.value) {
         headers.push({
             text: 'Marital Status',
             value: 'maritalStatus',
             sortable: true,
-        })
+        });
     }
     if (props.columnFilters.birthYear.value) {
         headers.push({
             text: 'Birth Year',
             value: 'birthYear',
             sortable: true,
-        })
+        });
     }
     if (props.columnFilters.mobilePhone.value) {
         headers.push({
             text: 'Phone',
             value: 'mobilePhone',
             sortable: false,
-        })
+        });
     }
     headers.push({
         text: 'Last Shift',
         value: 'lastShift',
         sortable: true,
-    })
+    });
     if (enableUserAvailability) {
         headers.push({
             text: 'Availability',
             value: 'filledShifts',
             sortable: true,
-        })
+        });
     }
     headers.push({
         text: '',
         value: 'action',
         sortable: false,
-    })
-    return headers
-})
+    });
+    return headers;
+});
 
 const tableRows = computed(() => {
     return volunteers.value.map(volunteer => {
-        const prefix = volunteer.gender === 'male' ? 'Bro' : 'Sis'
+        const prefix = volunteer.gender === 'male' ? 'Bro' : 'Sis';
         const daysAvailable = {
             sunday: volunteer.num_sundays,
             monday: volunteer.num_mondays,
@@ -143,7 +142,7 @@ const tableRows = computed(() => {
             thursday: volunteer.num_thursdays,
             friday: volunteer.num_fridays,
             saturday: volunteer.num_saturdays,
-        }
+        };
         const daysAlreadyRostered = {
             sunday: (volunteer.filled_sundays < daysAvailable.sunday ? volunteer.filled_sundays : daysAvailable.sunday) || 0,
             monday: (volunteer.filled_mondays < daysAvailable.monday ? volunteer.filled_mondays : daysAvailable.monday) || 0,
@@ -152,7 +151,7 @@ const tableRows = computed(() => {
             thursday: (volunteer.filled_thursdays < daysAvailable.thursday ? volunteer.filled_thursdays : daysAvailable.thursday) || 0,
             friday: (volunteer.filled_fridays < daysAvailable.friday ? volunteer.filled_fridays : daysAvailable.friday) || 0,
             saturday: (volunteer.filled_saturdays < daysAvailable.saturday ? volunteer.filled_saturdays : daysAvailable.saturday) || 0,
-        }
+        };
 
         return {
             id: volunteer.id,
@@ -170,36 +169,36 @@ const tableRows = computed(() => {
             mobilePhone: volunteer.mobile_phone,
             daysAlreadyRostered,
             daysAvailable,
-        }
-    })
-})
+        };
+    });
+});
 
 const calcShiftPercentage = (daysRostered, daysAvailable) => {
     if (!daysAvailable) {
-        return 0
+        return 0;
     }
-    let sumOfDaysRostered = 0
-    let sumOfDaysAvailable = 0
+    let sumOfDaysRostered = 0;
+    let sumOfDaysAvailable = 0;
     for (const day in daysAvailable) {
         if (!daysAvailable.hasOwnProperty(day) || !daysAvailable[day]) {
-            continue
+            continue;
         }
         // Not using Array.reduce because we're only calculating based on the days a volunteer is available
-        sumOfDaysRostered += daysRostered[day]
-        sumOfDaysAvailable += daysAvailable[day]
+        sumOfDaysRostered += daysRostered[day];
+        sumOfDaysAvailable += daysAvailable[day];
         if (sumOfDaysRostered > sumOfDaysAvailable) {
-            sumOfDaysRostered = sumOfDaysAvailable
+            sumOfDaysRostered = sumOfDaysAvailable;
         }
     }
     if (sumOfDaysAvailable === 0) {
-        return 0
+        return 0;
     }
-    return Math.round((sumOfDaysRostered / sumOfDaysAvailable) * 100)
-}
+    return Math.round((sumOfDaysRostered / sumOfDaysAvailable) * 100);
+};
 
 const assignVolunteer = (volunteerId, volunteerName) => {
-    emit('assignVolunteer', {volunteerId, volunteerName, location: props.location, shift: props.shift})
-}
+    emit('assignVolunteer', {volunteerId, volunteerName, location: props.location, shift: props.shift});
+};
 
 const bodyRowClassNameFunction = item =>
     item.gender === 'male'
@@ -212,19 +211,19 @@ const bodyItemClassNameFunction = column => {
 
 const formatShiftDate = (shiftDate, shiftTime) => {
     if (!shiftDate) {
-        return 'Never'
+        return 'Never';
     }
     if (!shiftTime) {
-        return format(parse(shiftDate, 'yyyy-MM-dd', new Date()), 'MMM d, yyyy')
+        return format(parse(shiftDate, 'yyyy-MM-dd', new Date()), 'MMM d, yyyy');
     }
-    return format(parse(`${shiftDate} ${shiftTime}`, 'yyyy-MM-dd HH:mm:ss', new Date()), 'MMM d, yyyy, h:mma')
-}
+    return format(parse(`${shiftDate} ${shiftTime}`, 'yyyy-MM-dd HH:mm:ss', new Date()), 'MMM d, yyyy, h:mma');
+};
 
-const toast = useToast()
+const toast = useToast();
 
 watchEffect(async () => {
     if (!props.isVisible) {
-        return
+        return;
     }
     try {
         const response = await axios.get(`/admin/available-users-for-shift/${props.shift.id}`, {
@@ -235,16 +234,16 @@ watchEffect(async () => {
                 hidePublishers: props.mainFilters.doHidePublishers ? 1 : 0,
                 showOnlyElders: props.mainFilters.doShowOnlyElders ? 1 : 0,
                 showOnlyMinisterialServants: props.mainFilters.doShowOnlyMinisterialServants ? 1 : 0,
-            }
-        })
-        volunteers.value = response.data.data
+            },
+        });
+        volunteers.value = response.data.data;
     } catch (e) {
-        console.log(e)
-        toast.error('Unable to load volunteers, a critical error has occurred.')
+        console.log(e);
+        toast.error('Unable to load volunteers, a critical error has occurred.');
     }
-})
+});
 
-const hasDaysAvailable = daysAvailable => Object.values(daysAvailable).some(day => day > 0)
+const hasDaysAvailable = daysAvailable => Object.values(daysAvailable).some(day => day > 0);
 
 </script>
 <template>
@@ -332,8 +331,12 @@ const hasDaysAvailable = daysAvailable => Object.values(daysAvailable).some(day 
             <template #item-mobilePhone="{mobilePhone}">
                 <div class="flex flex-wrap justify-center">
                     <small class="text-xs w-full text-center">{{ mobilePhone }}</small>
-                    <a :href="`tel:${mobilePhone}`" class="block p-2"><img src="/images/phone.svg" class="min-w-16 min-h-16 dark:invert" alt="Phone"/></a>
-                    <a :href="`sms:${mobilePhone}`" class="block p-2"><img src="/images/sms.svg" class="min-w-16 min-h-16 dark:invert" alt="SMS"/></a>
+                    <a :href="`tel:${mobilePhone}`" class="block p-2"><img src="/images/phone.svg"
+                                                                           class="min-w-16 min-h-16 dark:invert"
+                                                                           alt="Phone"/></a>
+                    <a :href="`sms:${mobilePhone}`" class="block p-2"><img src="/images/sms.svg"
+                                                                           class="min-w-16 min-h-16 dark:invert"
+                                                                           alt="SMS"/></a>
                 </div>
             </template>
             <template #item-lastShift="{lastShift, lastShiftTime}">

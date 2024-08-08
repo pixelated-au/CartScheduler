@@ -1,45 +1,45 @@
 <script setup>
-    import JetActionMessage from '@/Jetstream/ActionMessage.vue'
-    import JetActionSection from '@/Jetstream/ActionSection.vue'
-    import JetButton from '@/Jetstream/Button.vue'
-    import JetDialogModal from '@/Jetstream/DialogModal.vue'
-    import JetInput from '@/Jetstream/Input.vue'
-    import JetInputError from '@/Jetstream/InputError.vue'
-    import JetSecondaryButton from '@/Jetstream/SecondaryButton.vue'
-    import { useForm } from '@inertiajs/inertia-vue3'
-    import { ref } from 'vue'
+import JetActionMessage from '@/Jetstream/ActionMessage.vue';
+import JetActionSection from '@/Jetstream/ActionSection.vue';
+import JetButton from '@/Jetstream/Button.vue';
+import JetDialogModal from '@/Jetstream/DialogModal.vue';
+import JetInput from '@/Jetstream/Input.vue';
+import JetInputError from '@/Jetstream/InputError.vue';
+import JetSecondaryButton from '@/Jetstream/SecondaryButton.vue';
+import {useForm} from '@inertiajs/vue3';
+import {ref} from 'vue';
 
-    defineProps({
-        sessions: Array,
-    })
+defineProps({
+    sessions: Array,
+});
 
-    const confirmingLogout = ref(false)
-    const passwordInput = ref(null)
+const confirmingLogout = ref(false);
+const passwordInput = ref(null);
 
-    const form = useForm({
-        password: '',
-    })
+const form = useForm({
+    password: '',
+});
 
-    const confirmLogout = () => {
-        confirmingLogout.value = true
+const confirmLogout = () => {
+    confirmingLogout.value = true;
 
-        setTimeout(() => passwordInput.value.focus(), 250)
-    }
+    setTimeout(() => passwordInput.value.focus(), 250);
+};
 
-    const logoutOtherBrowserSessions = () => {
-        form.delete(route('other-browser-sessions.destroy'), {
-            preserveScroll: true,
-            onSuccess: () => closeModal(),
-            onError: () => passwordInput.value.focus(),
-            onFinish: () => form.reset(),
-        })
-    }
+const logoutOtherBrowserSessions = () => {
+    form.delete(route('other-browser-sessions.destroy'), {
+        preserveScroll: true,
+        onSuccess: () => closeModal(),
+        onError: () => passwordInput.value.focus(),
+        onFinish: () => form.reset(),
+    });
+};
 
-    const closeModal = () => {
-        confirmingLogout.value = false
+const closeModal = () => {
+    confirmingLogout.value = false;
 
-        form.reset()
-    }
+    form.reset();
+};
 </script>
 
 <template>
@@ -71,7 +71,8 @@
                              viewBox="0 0 24 24"
                              stroke="currentColor"
                              class="w-8 h-8 text-gray-500 dark:text-gray-400">
-                            <path d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                            <path
+                                d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
                         </svg>
 
                         <svg v-else

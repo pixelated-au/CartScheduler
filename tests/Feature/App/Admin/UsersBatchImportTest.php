@@ -81,7 +81,7 @@ class UsersBatchImportTest extends TestCase
             )
             ->assertUnprocessable()
             ->assertJsonFragment(['errors' => [
-                ['There was an error on row 3. The year_of_birth must be at least 1924.'],
+                ['There was an error on row 3. The year_of_birth field must be at least 1924.'],
                 ['There was an error on row 3. The selected serving_as is invalid.'],
                 ['There was an error on row 3. The selected marital_status is invalid.'],
                 ['There was an error on row 3. The responsible_brother field must be true or false.'],

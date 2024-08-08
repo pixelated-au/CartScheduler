@@ -17,27 +17,16 @@ class UserLocationChoicesRequest extends FormRequest
         ];
     }
 
-    /**
-     * @throws \Illuminate\Contracts\Container\BindingResolutionException
-     * @noinspection PhpUnused
-     */
-    public function withValidator(Validator $validator): void
+    public function after(): array
     {
-        // TODO AFTER upgrade to laravel V10, THIS NEEDS TO BE CONVERTED TO THE FUNCTION after()
-        $settings = app()->make(GeneralSettings::class);
-        $validator->after(function (Validator $validator) use ($settings) {
-            if (!$settings->enableUserLocationChoices) {
-                $validator->errors()->add('featureDisabled', 'User location choices are not enabled.');
-            }
-        });
-        // Laravel V10 syntax
-//        return [
-//            function (Validator $validator) use ($settings) {
-//                if (!$settings->enableUserLocationChoices) {
-//                    $validator->errors()->add('featureDisabled', 'User location choices are not enabled.');
-//                }
-//            },
-//        ];
+        return [
+            function (Validator $validator) {
+                $settings = app()->make(GeneralSettings::class);
+                if (!$settings->enableUserLocationChoices) {
+                    $validator->errors()->add('featureDisabled', 'User location choices are not enabled.');
+                }
+            },
+        ];
     }
 
     public function messages(): array

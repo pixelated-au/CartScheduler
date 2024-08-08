@@ -1,9 +1,9 @@
 <script setup>
 import Bell from "@/Components/Icons/Bell.vue";
-import JetDropdown from '@/Jetstream/Dropdown.vue'
-import JetDropdownLink from '@/Jetstream/DropdownLink.vue'
-import {usePage} from "@inertiajs/inertia-vue3";
-import {computed} from 'vue'
+import JetDropdown from '@/Jetstream/Dropdown.vue';
+import JetDropdownLink from '@/Jetstream/DropdownLink.vue';
+import {usePage} from "@inertiajs/vue3";
+import {computed} from 'vue';
 
 const classes = computed(() => {
     // return route().current('admin.dashboard')
@@ -11,16 +11,16 @@ const classes = computed(() => {
     // || route().current('admin.locations.index')
     return route().current().startsWith('admin.')
         ? 'inline-flex items-center px-1 pt-1 border-b-2 border-indigo-400 text-sm font-medium leading-5 text-gray-900 focus:outline-none focus:border-indigo-700 transition'
-        : 'inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium leading-5 text-gray-500 hover:text-gray-700 hover:border-gray-300 focus:outline-none focus:text-gray-700 focus:border-gray-300 transition'
-})
+        : 'inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium leading-5 text-gray-500 hover:text-gray-700 hover:border-gray-300 focus:outline-none focus:text-gray-700 focus:border-gray-300 transition';
+});
 
 const permissions = computed(() => {
-    return usePage().props.value.pagePermissions
-})
+    return usePage().props.pagePermissions;
+});
 
 const hasUpdate = computed(() => {
-    return !!usePage().props.value.hasUpdate
-})
+    return !!usePage().props.hasUpdate;
+});
 
 </script>
 

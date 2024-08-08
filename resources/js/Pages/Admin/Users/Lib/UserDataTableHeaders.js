@@ -47,4 +47,4 @@ export default [
         sortable: true,
         width: '20%',
     },
-]
+];

@@ -1,3 +1,13 @@
+<script>
+import {VTooltip} from 'floating-vue';
+
+export default {
+    directives: {
+        tooltip: VTooltip,
+    },
+};
+</script>
+
 <script setup>
 import EmptySlot from '@/Components/Icons/EmptySlot.vue';
 import Female from '@/Components/Icons/Female.vue';
@@ -13,11 +23,9 @@ import JetConfirmModal from '@/Jetstream/ConfirmationModal.vue';
 import UserActionsModal from "@/Pages/Admin/Dashboard/UserActionsModal.vue";
 import useLocationFilter from '@/Pages/Admin/Locations/Composables/useLocationFilter';
 import DatePicker from '@/Pages/Components/Dashboard/DatePicker.vue';
-import {usePage} from "@inertiajs/inertia-vue3";
+import {usePage} from "@inertiajs/vue3";
 import axios from 'axios';
 import {format, parse} from 'date-fns';
-// noinspection ES6UnusedImports
-import {VTooltip} from 'floating-vue';
 import {computed, reactive, ref} from 'vue';
 
 defineProps({
@@ -25,8 +33,16 @@ defineProps({
 });
 
 const toast = useToast();
-const timezone = computed(() => usePage().props.value.shiftAvailability.timezone);
-const {date, emptyShiftsForTime, isLoading, locations, freeShifts, serverDates, getShifts} = useLocationFilter(timezone, true);
+const timezone = computed(() => usePage().props.shiftAvailability.timezone);
+const {
+    date,
+    emptyShiftsForTime,
+    isLoading,
+    locations,
+    freeShifts,
+    serverDates,
+    getShifts,
+} = useLocationFilter(timezone, true);
 
 const gridCols = {
     // See tailwind.config.js

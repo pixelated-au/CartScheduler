@@ -1,99 +1,98 @@
 <script setup>
 import ObtrusiveNotification from "@/Components/ObtrusiveNotification.vue";
 import useToast from "@/Composables/useToast";
-import JetApplicationMark from '@/Jetstream/ApplicationMark.vue'
-import JetBanner from '@/Jetstream/Banner.vue'
-import JetButton from '@/Jetstream/Button.vue'
-import JetNavLink from '@/Jetstream/NavLink.vue'
-import JetResponsiveNavLink from '@/Jetstream/ResponsiveNavLink.vue'
-import AdminMenu from '@/Layouts/Components/AdminMenu.vue'
-import DarkMode from '@/Layouts/Components/DarkMode.vue'
-import ProfileSettingsMenu from '@/Layouts/Components/ProfileSettingsMenu.vue'
-import TeamsMenu from '@/Layouts/Components/TeamsMenu.vue'
+import JetApplicationMark from '@/Jetstream/ApplicationMark.vue';
+import JetBanner from '@/Jetstream/Banner.vue';
+import JetButton from '@/Jetstream/Button.vue';
+import JetNavLink from '@/Jetstream/NavLink.vue';
+import JetResponsiveNavLink from '@/Jetstream/ResponsiveNavLink.vue';
+import AdminMenu from '@/Layouts/Components/AdminMenu.vue';
+import DarkMode from '@/Layouts/Components/DarkMode.vue';
+import ProfileSettingsMenu from '@/Layouts/Components/ProfileSettingsMenu.vue';
+import TeamsMenu from '@/Layouts/Components/TeamsMenu.vue';
 import {useGlobalState} from "@/store";
-import Bugsnag from '@bugsnag/js'
-import {Inertia} from "@inertiajs/inertia";
-import {Head, Link, usePage} from '@inertiajs/inertia-vue3'
-import '@vuepic/vue-datepicker/dist/main.css'
+import Bugsnag from '@bugsnag/js';
+import {Head, Link, router, usePage} from "@inertiajs/vue3";
+import '@vuepic/vue-datepicker/dist/main.css';
 import {differenceInDays} from "date-fns";
-import 'floating-vue/dist/style.css'
-import {computed, onMounted, onUpdated, provide, ref} from 'vue'
+import 'floating-vue/dist/style.css';
+import {computed, onMounted, onUpdated, provide, ref} from 'vue';
 
 
 defineProps({
     title: String,
     user: Object,
-})
+});
 
-const bugsnagKey = import.meta.env.VITE_BUGSNAG_FRONT_END_API_KEY
+const bugsnagKey = import.meta.env.VITE_BUGSNAG_FRONT_END_API_KEY;
 onMounted(() => {
     if (bugsnagKey) {
-        const user = usePage().props.value.user
+        const user = usePage().props.auth.user;
         if (user && user.id) {
-            Bugsnag.setUser(user.id, user.email, user.name)
+            Bugsnag.setUser(user.id, user.email, user.name);
         }
     }
-})
+});
 
-const showingNavigationDropdown = ref(false)
+const showingNavigationDropdown = ref(false);
 
 const permissions = computed(() => {
-    return usePage().props.value.pagePermissions
-})
+    return usePage().props.pagePermissions;
+});
 
-const logout = () => Inertia.post(route('logout'))
+const logout = () => router.post(route('logout'));
 
-const isDarkMode = ref(false)
-provide('darkMode', isDarkMode)
+const isDarkMode = ref(false);
+provide('darkMode', isDarkMode);
 
-provide('enableUserAvailability', !!usePage().props.value.enableUserAvailability || false)
+provide('enableUserAvailability', !!usePage().props.enableUserAvailability || false);
 
-// const style = computed(() => usePage().props.value.jetstream.flash?.bannerStyle || 'success')
-// const message = computed(() => usePage().props.value.jetstream.flash?.banner || '')
+// const style = computed(() => usePage().props.jetstream.flash?.bannerStyle || 'success')
+// const message = computed(() => usePage().props.jetstream.flash?.banner || '')
 
-const toast = useToast()
+const toast = useToast();
 onUpdated(() => {
-    // TODO this appears to be running twice. It may be fixed after updating to v1.x of Inertia (current is 0.11.0)
-    const flash = usePage().props.value.jetstream.flash
-    const type = flash?.bannerStyle || 'success'
-    const message = flash?.banner || ''
+    // TODO this appears to be running twice. It may be fixed after updating to v1.x of Inertia (current is 0.11.0).
+    const flash = usePage().props.jetstream.flash;
+    const type = flash?.bannerStyle || 'success';
+    const message = flash?.banner || '';
     if (!message) {
-        return
+        return;
     }
     // toast.success(message);
     toast.message(type, message);
-})
+});
 
-const state = useGlobalState()
-const showUpdateAvailabilityReminder = ref(false)
+const state = useGlobalState();
+const showUpdateAvailabilityReminder = ref(false);
 onMounted(() => {
-    const pageProps = usePage().props.value
+    const pageProps = usePage().props;
     if (pageProps.user && pageProps.needsToUpdateAvailability && didHideAvailabilityReminderOverOneDayAgo.value) {
-        showUpdateAvailabilityReminder.value = true
+        showUpdateAvailabilityReminder.value = true;
     }
-})
+});
 
 const didHideAvailabilityReminderOverOneDayAgo = computed(() => {
-    const dismissedOn = state.value.dismissedAvailabilityOn
+    const dismissedOn = state.value.dismissedAvailabilityOn;
     if (!dismissedOn) {
-        return true
+        return true;
     }
     if (differenceInDays(new Date(), new Date(dismissedOn)) > 1) {
-        return true
+        return true;
     }
 
-    return false
-})
+    return false;
+});
 
 const checkAvailability = () => {
-    checkLater()
-    Inertia.get(route('user.availability'))
-}
+    checkLater();
+    router.get(route('user.availability'));
+};
 
 const checkLater = () => {
-    state.value.dismissedAvailabilityOn = new Date()
-    showUpdateAvailabilityReminder.value = false
-}
+    state.value.dismissedAvailabilityOn = new Date();
+    showUpdateAvailabilityReminder.value = false;
+};
 </script>
 
 <template>
@@ -214,16 +213,16 @@ const checkLater = () => {
                         <div class="flex items-center px-4">
                             <div v-if="$page.props.jetstream.managesProfilePhotos" class="shrink-0 mr-3">
                                 <img class="h-10 w-10 rounded-full object-cover"
-                                     :src="$page.props.user.profile_photo_url"
-                                     :alt="$page.props.user.name">
+                                     :src="$page.props.auth.user.profile_photo_url"
+                                     :alt="$page.props.auth.user.name">
                             </div>
 
                             <div>
                                 <div class="font-medium text-base text-gray-800 dark:text-gray-100">
-                                    {{ $page.props.user.name }}
+                                    {{ $page.props.auth.user.name }}
                                 </div>
                                 <div class="font-medium text-sm text-gray-500 dark:text-gray-300">
-                                    {{ $page.props.user.email }}
+                                    {{ $page.props.auth.user.email }}
                                 </div>
                             </div>
                         </div>
@@ -282,7 +281,8 @@ const checkLater = () => {
                 <JetButton style-type="secondary" outline class="text-center justify-center" @click="checkLater">I'll
                     check later
                 </JetButton>
-                <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">You can always check your availability by going to the account menu item.</p>
+                <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">You can always check your availability by going
+                    to the account menu item.</p>
             </div>
         </div>
     </ObtrusiveNotification>

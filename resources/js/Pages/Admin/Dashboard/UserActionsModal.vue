@@ -1,15 +1,15 @@
 <script setup>
 import CheckboxSelectField from "@/Components/CheckboxSelectField.vue";
 import QuestionCircle from "@/Components/Icons/QuestionCircle.vue";
-import JetDialogModal from '@/Jetstream/DialogModal.vue'
+import JetDialogModal from '@/Jetstream/DialogModal.vue';
 import JetHelpText from "@/Jetstream/HelpText.vue";
 import JetInput from "@/Jetstream/Input.vue";
 import JetLabel from "@/Jetstream/Label.vue";
-import JetSecondaryButton from '@/Jetstream/SecondaryButton.vue'
-import JetToggle from '@/Jetstream/Toggle.vue'
+import JetSecondaryButton from '@/Jetstream/SecondaryButton.vue';
+import JetToggle from '@/Jetstream/Toggle.vue';
 import UserTable from "@/Pages/Admin/Dashboard/UserTable.vue";
 import {format} from "date-fns";
-import {Menu as VMenu} from 'floating-vue'
+import {Menu as VMenu} from 'floating-vue';
 import {computed, inject, onBeforeMount, reactive, ref, watch} from "vue";
 
 const props = defineProps({
@@ -17,18 +17,18 @@ const props = defineProps({
     date: Date,
     shift: Object,
     location: Object,
-})
+});
 
-const emit = defineEmits(['assignVolunteer', 'update:show'])
+const emit = defineEmits(['assignVolunteer', 'update:show']);
 
 const showModal = computed({
     get: () => props.show,
-    set: value => emit('update:show', value)
-})
+    set: value => emit('update:show', value),
+});
 
 const closeModal = () => {
-    showModal.value = false
-}
+    showModal.value = false;
+};
 
 const mainFilters = reactive({
     doShowFilteredVolunteers: true,
@@ -36,7 +36,7 @@ const mainFilters = reactive({
     doHidePublishers: false, // filter by publishers that have appointments
     doShowOnlyElders: false,
     doShowOnlyMinisterialServants: false,
-})
+});
 
 const columnFilters = reactive({
     gender: {label: 'Gender', value: false},
@@ -46,40 +46,40 @@ const columnFilters = reactive({
     birthYear: {label: 'Birth Year', value: false},
     responsibleBrother: {label: 'Is Responsible Bro?', value: false},
     mobilePhone: {label: 'Phone', value: false},
-})
+});
 
 watch(columnFilters, val => {
-    const c = {}
+    const c = {};
     for (const key in columnFilters) {
         if (columnFilters.hasOwnProperty(key)) {
-            c[key] = val[key].value
+            c[key] = val[key].value;
         }
     }
 
-    localStorage.setItem('admin-user-rostering-columns', JSON.stringify(c))
-}, {deep: true})
+    localStorage.setItem('admin-user-rostering-columns', JSON.stringify(c));
+}, {deep: true});
 
 onBeforeMount(() => {
-    const c = localStorage.getItem('admin-user-rostering-columns')
+    const c = localStorage.getItem('admin-user-rostering-columns');
     if (!c) {
-        return
+        return;
     }
-    const columns = JSON.parse(c)
+    const columns = JSON.parse(c);
     for (const key in columnFilters) {
         if (columns.hasOwnProperty(key)) {
-            columnFilters[key].value = columns[key]
+            columnFilters[key].value = columns[key];
         }
     }
-})
+});
 
-const volunteerSearch = ref('')
+const volunteerSearch = ref('');
 
-const enableUserAvailability = inject('enableUserAvailability', false)
+const enableUserAvailability = inject('enableUserAvailability', false);
 
 const volunteerAssigned = function (data) {
-    emit('assignVolunteer', data)
-    closeModal()
-}
+    emit('assignVolunteer', data);
+    closeModal();
+};
 </script>
 
 <template>
@@ -164,7 +164,8 @@ const volunteerAssigned = function (data) {
                 </div>
             </div>
 
-            <UserTable :shift="shift" :date="date" :location="location" :is-visible="showModal" :text-filter="volunteerSearch"
+            <UserTable :shift="shift" :date="date" :location="location" :is-visible="showModal"
+                       :text-filter="volunteerSearch"
                        :main-filters="mainFilters"
                        :column-filters="columnFilters" @assignVolunteer="volunteerAssigned"/>
 

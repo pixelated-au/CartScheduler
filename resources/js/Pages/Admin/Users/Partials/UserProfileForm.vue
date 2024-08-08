@@ -1,18 +1,17 @@
 <script setup>
 import SelectField from "@/Components/SelectField.vue";
-import VerticalRadioButtons from '@/Components/VerticalRadioButtons.vue'
-import useToast from '@/Composables/useToast.js'
-import JetActionMessage from '@/Jetstream/ActionMessage.vue'
-import JetButton from '@/Jetstream/Button.vue'
-import JetCheckbox from '@/Jetstream/Checkbox.vue'
-import JetConfirmationModal from '@/Jetstream/ConfirmationModal.vue'
-import JetFormSection from '@/Jetstream/FormSection.vue'
-import JetInput from '@/Jetstream/Input.vue'
-import JetInputError from '@/Jetstream/InputError.vue'
-import JetLabel from '@/Jetstream/Label.vue'
-import {Inertia} from '@inertiajs/inertia'
-import {useForm} from '@inertiajs/inertia-vue3'
-import {computed, ref, watch} from 'vue'
+import VerticalRadioButtons from '@/Components/VerticalRadioButtons.vue';
+import useToast from '@/Composables/useToast.js';
+import JetActionMessage from '@/Jetstream/ActionMessage.vue';
+import JetButton from '@/Jetstream/Button.vue';
+import JetCheckbox from '@/Jetstream/Checkbox.vue';
+import JetConfirmationModal from '@/Jetstream/ConfirmationModal.vue';
+import JetFormSection from '@/Jetstream/FormSection.vue';
+import JetInput from '@/Jetstream/Input.vue';
+import JetInputError from '@/Jetstream/InputError.vue';
+import JetLabel from '@/Jetstream/Label.vue';
+import {router, useForm} from '@inertiajs/vue3';
+import {computed, ref, watch} from 'vue';
 
 const props = defineProps({
     user: Object,
@@ -20,11 +19,11 @@ const props = defineProps({
         type: String,
         default: 'edit',
     },
-})
+});
 
 const emit = defineEmits([
     'cancel',
-])
+]);
 
 const form = useForm({
     id: props.user.id,
@@ -41,81 +40,81 @@ const form = useForm({
     responsible_brother: props.user.responsible_brother,
     is_enabled: props.user.is_enabled,
     is_unrestricted: props.user.is_unrestricted,
-})
+});
 
 const updateUserData = () => {
     form.put(route('admin.users.update', props.user.id), {
         errorBag: 'updateUserData',
         preserveScroll: true,
-    })
-}
+    });
+};
 
 const createUserData = () => {
     form.post(route('admin.users.store'), {
         errorBag: 'updateUserData',
         preserveScroll: true,
-    })
-}
+    });
+};
 
 const saveAction = () => {
     if (props.action === 'edit') {
-        updateUserData()
+        updateUserData();
     } else {
-        createUserData()
+        createUserData();
     }
-}
+};
 
 const listRouteAction = () => {
-    Inertia.visit(route('admin.users.index'))
-}
+    router.visit(route('admin.users.index'));
+};
 
-const showConfirmationModal = ref(false)
-const modalDeleteAction = ref(false)
+const showConfirmationModal = ref(false);
+const modalDeleteAction = ref(false);
 const confirmCancel = () => {
-    modalDeleteAction.value = false
+    modalDeleteAction.value = false;
     if (form.isDirty) {
-        showConfirmationModal.value = true
+        showConfirmationModal.value = true;
     } else {
-        listRouteAction()
+        listRouteAction();
     }
-}
+};
 
 const onDelete = () => {
-    modalDeleteAction.value = true
-    showConfirmationModal.value = true
-}
+    modalDeleteAction.value = true;
+    showConfirmationModal.value = true;
+};
 
 const doDeleteAction = () => {
-    Inertia.delete(route('admin.users.destroy', props.user.id))
-}
+    router.delete(route('admin.users.destroy', props.user.id));
+};
 
 const performConfirmationAction = () => {
     if (modalDeleteAction.value) {
-        doDeleteAction()
+        doDeleteAction();
     } else {
-        listRouteAction()
+        listRouteAction();
     }
-}
+};
 
-const toast = useToast()
+const toast = useToast();
 
 const performResendWelcomeAction = async () => {
     try {
-        const response = await axios.post(route('admin.resend-welcome-email', {user_id: props.user.id}))
-        toast.success(response.data.message)
+        const response = await axios.post(route('admin.resend-welcome-email', {user_id: props.user.id}));
+        toast.success(response.data.message);
     } catch (e) {
-        toast.error(e.response.data.message, {timeout: 3000})
+        toast.error(e.response.data.message, {timeout: 3000});
     }
-}
+};
 
 watch(() => form.is_unrestricted, (value) => {
     if (!value && form.role === 'admin') {
-        form.role = 'user'
-        toast.warning('Restricted users cannot be administrators. The role has been changed to a standard user.')
+        form.role = 'user';
+        toast.warning('Restricted users cannot be administrators. The role has been changed to a standard user.');
     }
-})
+});
 
-const cancelButtonText = computed(() => form.isDirty ? 'Cancel' : 'Back')
+const cancelButtonText = computed(() => form.isDirty ? 'Cancel' : 'Back');
 </script>
 
 <template>
@@ -126,7 +125,8 @@ const cancelButtonText = computed(() => form.isDirty ? 'Cancel' : 'Back')
 
         <template #description>
             <div>Update the user's personal information.</div>
-            <JetButton v-if="action === 'edit'" outline class="mt-5" style-type="info" @click="performResendWelcomeAction">
+            <JetButton v-if="action === 'edit'" outline class="mt-5" style-type="info"
+                       @click="performResendWelcomeAction">
                 <template v-if="user.has_logged_in">Send Password Reset Email</template>
                 <template v-else>Resend Welcome Email</template>
             </JetButton>

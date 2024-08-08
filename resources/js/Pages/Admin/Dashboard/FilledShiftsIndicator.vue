@@ -4,22 +4,22 @@ import {computed} from "vue";
 const props = defineProps({
     filled: Number,
     available: Number,
-})
+});
 
 const indicators = computed(() => {
-    const filled = props.filled > 4 ? 4 : props.filled || 0
-    const available = (props.available > 4 ? 4 : props.available || 0) - filled
+    const filled = props.filled > 4 ? 4 : props.filled || 0;
+    const available = (props.available > 4 ? 4 : props.available || 0) - filled;
 
-    const indicators = []
+    const indicators = [];
     for (let i = 0; i < filled; i++) {
-        indicators.push('fill')
+        indicators.push('fill');
     }
     for (let i = 0; i < available; i++) {
-        indicators.push('line')
+        indicators.push('line');
     }
 
-    return indicators
-})
+    return indicators;
+});
 
 </script>
 

@@ -1,90 +1,90 @@
 <script setup>
-    import useToast from '@/Composables/useToast.js'
-    import JetButton from '@/Jetstream/Button.vue'
-    import JetCheckbox from '@/Jetstream/Checkbox.vue'
-    import JetInput from '@/Jetstream/Input.vue'
-    import JetInputError from '@/Jetstream/InputError.vue'
-    import JetLabel from '@/Jetstream/Label.vue'
-    import ReportTags from '@/Pages/Components/Dashboard/ReportTags.vue'
-    import axios from 'axios'
-    import { format, parse } from 'date-fns'
-    import { computed, nextTick, reactive, ref, watch } from 'vue'
+import useToast from '@/Composables/useToast.js';
+import JetButton from '@/Jetstream/Button.vue';
+import JetCheckbox from '@/Jetstream/Checkbox.vue';
+import JetInput from '@/Jetstream/Input.vue';
+import JetInputError from '@/Jetstream/InputError.vue';
+import JetLabel from '@/Jetstream/Label.vue';
+import ReportTags from '@/Pages/Components/Dashboard/ReportTags.vue';
+import axios from 'axios';
+import {format, parse} from 'date-fns';
+import {computed, nextTick, reactive, ref, watch} from 'vue';
 
-    const props = defineProps({
-        report: Object,
-    })
+const props = defineProps({
+    report: Object,
+});
 
-    const emit = defineEmits(['saved'])
+const emit = defineEmits(['saved']);
 
-    const formData = reactive({
-        shift_id: props.report.shift_id,
-        shift_date: props.report.shift_date,
-        start_time: props.report.start_time,
-        shift_was_cancelled: props.report.shift_was_cancelled,
-        placements_count: props.location?.data?.placements_count,
-        videos_count: props.location?.data?.videos_count,
-        requests_count: props.location?.data?.requests_count,
-        comments: props.location?.data?.comments,
-        tags: [],
-    })
+const formData = reactive({
+    shift_id: props.report.shift_id,
+    shift_date: props.report.shift_date,
+    start_time: props.report.start_time,
+    shift_was_cancelled: props.report.shift_was_cancelled,
+    placements_count: props.location?.data?.placements_count,
+    videos_count: props.location?.data?.videos_count,
+    requests_count: props.location?.data?.requests_count,
+    comments: props.location?.data?.comments,
+    tags: [],
+});
 
-    const errors = ref({})
-    const errorMessages = computed(() => {
-        const messages = {}
-        for (const key in errors.value) {
-            if (errors.value.hasOwnProperty(key)) {
-                messages[key] = errors.value[key].join(', ')
-            }
-        }
-        return messages
-    })
-
-    const toast = useToast()
-
-    const isSaving = ref(false)
-    const saveReport = async () => {
-        if (isSaving.value) {
-            return
-        }
-        try {
-            isSaving.value = true
-            errors.value = {}
-            const response = await axios.post(route('save.report'), formData)
-            toast.success(response.data.message)
-            emit('saved')
-        } catch (e) {
-            errors.value = e.response.data.errors
-            toast.error(e.response.data.message)
-        } finally {
-            isSaving.value = false
+const errors = ref({});
+const errorMessages = computed(() => {
+    const messages = {};
+    for (const key in errors.value) {
+        if (errors.value.hasOwnProperty(key)) {
+            messages[key] = errors.value[key].join(', ');
         }
     }
+    return messages;
+});
 
-    const formatDate = (date) => {
-        return format(new Date(date), 'E, do MMMM yyyy')
+const toast = useToast();
+
+const isSaving = ref(false);
+const saveReport = async () => {
+    if (isSaving.value) {
+        return;
     }
+    try {
+        isSaving.value = true;
+        errors.value = {};
+        const response = await axios.post(route('save.report'), formData);
+        toast.success(response.data.message);
+        emit('saved');
+    } catch (e) {
+        errors.value = e.response.data.errors;
+        toast.error(e.response.data.message);
+    } finally {
+        isSaving.value = false;
+    }
+};
 
-    const fieldUnique = computed(() => Math.random().toString(36).substring(2, 9))
+const formatDate = (date) => {
+    return format(new Date(date), 'E, do MMMM yyyy');
+};
 
-    const maxCommentChars = 500
-    const commentsRemainingCharacters = computed(() => {
-        if (formData.comments) {
-            return maxCommentChars - formData.comments.length
-        }
-        return maxCommentChars
-    })
+const fieldUnique = computed(() => Math.random().toString(36).substring(2, 9));
 
-    watch(() => formData.comments, (value, oldValue) => {
-        if (value.length > maxCommentChars) {
-            nextTick(() => {
-                formData.comments = oldValue
-            })
-        }
-    })
+const maxCommentChars = 500;
+const commentsRemainingCharacters = computed(() => {
+    if (formData.comments) {
+        return maxCommentChars - formData.comments.length;
+    }
+    return maxCommentChars;
+});
 
-    const disableFields = computed(() => !!formData.shift_was_cancelled)
+watch(() => formData.comments, (value, oldValue) => {
+    if (value.length > maxCommentChars) {
+        nextTick(() => {
+            formData.comments = oldValue;
+        });
+    }
+});
 
-    const formatTime = time => format(parse(time, 'HH:mm:ss', new Date()), 'h:mm a')
+const disableFields = computed(() => !!formData.shift_was_cancelled);
+
+const formatTime = time => format(parse(time, 'HH:mm:ss', new Date()), 'h:mm a');
 </script>
 
 <template>

@@ -1,37 +1,45 @@
+<script>
+import {VTooltip} from 'floating-vue';
+
+export default {
+    directives: {
+        tooltip: VTooltip,
+    },
+};
+</script>
+
 <script setup>
-    // noinspection ES6UnusedImports
-    import { VTooltip } from 'floating-vue'
-    import { inject } from 'vue'
+import {inject} from 'vue';
 
-    const editor = inject('editor')
+const editor = inject('editor');
 
-    const props = defineProps({
-        action: {
-            type: String,
-            required: false,
-        },
-        actionProps: {
-            type: [Object, String],
-            required: false,
-            default: null,
-        },
-        tooltip: {
-            type: String,
-            required: true,
-        },
-    })
+const props = defineProps({
+    action: {
+        type: String,
+        required: false,
+    },
+    actionProps: {
+        type: [Object, String],
+        required: false,
+        default: null,
+    },
+    tooltip: {
+        type: String,
+        required: true,
+    },
+});
 
-    const emit = defineEmits(['click'])
+const emit = defineEmits(['click']);
 
-    const actionCall = (e) => {
-        if (!props.action) {
-            emit('click', e)
-        }
-
-        const call = editor?.value?.chain()?.focus()[props?.action](props?.actionProps || undefined)?.run()
-        return call || (() => {
-        })
+const actionCall = (e) => {
+    if (!props.action) {
+        emit('click', e);
     }
+
+    const call = editor?.value?.chain()?.focus()[props?.action](props?.actionProps || undefined)?.run();
+    return call || (() => {
+    });
+};
 </script>
 <template>
     <button type="button"

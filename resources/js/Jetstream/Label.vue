@@ -1,11 +1,11 @@
 <script setup>
-    defineProps({
-        value: String,
-        isDisabled: {
-            type: Boolean,
-            default: false,
-        },
-    })
+defineProps({
+    value: String,
+    isDisabled: {
+        type: Boolean,
+        default: false,
+    },
+});
 </script>
 
 <template>

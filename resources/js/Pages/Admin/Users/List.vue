@@ -1,37 +1,37 @@
 <script setup>
-import DataTable from '@/Components/DataTable.vue'
-import JetButton from '@/Jetstream/Button.vue'
-import JetHelpText from '@/Jetstream/HelpText.vue'
-import JetInput from '@/Jetstream/Input.vue'
-import JetLabel from '@/Jetstream/Label.vue'
-import AppLayout from '@/Layouts/AppLayout.vue'
-import {Inertia} from '@inertiajs/inertia'
-import {ref} from 'vue'
-import headers from './Lib/UserDataTableHeaders'
+import DataTable from '@/Components/DataTable.vue';
+import JetButton from '@/Jetstream/Button.vue';
+import JetHelpText from '@/Jetstream/HelpText.vue';
+import JetInput from '@/Jetstream/Input.vue';
+import JetLabel from '@/Jetstream/Label.vue';
+import AppLayout from '@/Layouts/AppLayout.vue';
+import {router} from '@inertiajs/vue3';
+import {ref} from 'vue';
+import headers from './Lib/UserDataTableHeaders';
 
 defineProps({
     users: Object,
     availableRoles: Array,
     permissions: Object,
-})
+});
 
-const userSearch = ref('')
+const userSearch = ref('');
 
 const onNewUser = () => {
-    Inertia.visit(route('admin.users.create'))
-}
+    router.visit(route('admin.users.create'));
+};
 
 const onImportUsers = () => {
-    Inertia.visit(route('admin.users.import.show'))
-}
+    router.visit(route('admin.users.import.show'));
+};
 
 const onDownloadUsers = async () => {
-    window.location.href = route('admin.users-as-spreadsheet')
-}
+    window.location.href = route('admin.users-as-spreadsheet');
+};
 
 const handleSelection = (selection) => {
-    Inertia.visit(route('admin.users.edit', selection.id))
-}
+    router.visit(route('admin.users.edit', selection.id));
+};
 </script>
 
 <template>

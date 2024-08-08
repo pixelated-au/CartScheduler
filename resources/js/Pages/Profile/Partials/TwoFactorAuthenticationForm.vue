@@ -1,107 +1,106 @@
 <script setup>
-    import JetActionSection from '@/Jetstream/ActionSection.vue'
-    import JetButton from '@/Jetstream/Button.vue'
-    import JetConfirmsPassword from '@/Jetstream/ConfirmsPassword.vue'
-    import JetDangerButton from '@/Jetstream/DangerButton.vue'
-    import JetInput from '@/Jetstream/Input.vue'
-    import JetInputError from '@/Jetstream/InputError.vue'
-    import JetLabel from '@/Jetstream/Label.vue'
-    import JetSecondaryButton from '@/Jetstream/SecondaryButton.vue'
-    import { Inertia } from '@inertiajs/inertia'
-    import { useForm, usePage } from '@inertiajs/inertia-vue3'
-    import { computed, ref, watch } from 'vue'
+import JetActionSection from '@/Jetstream/ActionSection.vue';
+import JetButton from '@/Jetstream/Button.vue';
+import JetConfirmsPassword from '@/Jetstream/ConfirmsPassword.vue';
+import JetDangerButton from '@/Jetstream/DangerButton.vue';
+import JetInput from '@/Jetstream/Input.vue';
+import JetInputError from '@/Jetstream/InputError.vue';
+import JetLabel from '@/Jetstream/Label.vue';
+import JetSecondaryButton from '@/Jetstream/SecondaryButton.vue';
+import {router, useForm, usePage} from '@inertiajs/vue3';
+import {computed, ref, watch} from 'vue';
 
-    const props = defineProps({
-        requiresConfirmation: Boolean,
-    })
+const props = defineProps({
+    requiresConfirmation: Boolean,
+});
 
-    const enabling = ref(false)
-    const confirming = ref(false)
-    const disabling = ref(false)
-    const qrCode = ref(null)
-    const setupKey = ref(null)
-    const recoveryCodes = ref([])
+const enabling = ref(false);
+const confirming = ref(false);
+const disabling = ref(false);
+const qrCode = ref(null);
+const setupKey = ref(null);
+const recoveryCodes = ref([]);
 
-    const confirmationForm = useForm({
-        code: '',
-    })
+const confirmationForm = useForm({
+    code: '',
+});
 
-    const twoFactorEnabled = computed(
-        () => !enabling.value && usePage().props.value.user?.two_factor_enabled,
-    )
+const twoFactorEnabled = computed(
+    () => !enabling.value && usePage().props.auth.user?.two_factor_enabled,
+);
 
-    watch(twoFactorEnabled, () => {
-        if (!twoFactorEnabled.value) {
-            confirmationForm.reset()
-            confirmationForm.clearErrors()
-        }
-    })
-
-    const enableTwoFactorAuthentication = () => {
-        enabling.value = true
-
-        Inertia.post('/user/two-factor-authentication', {}, {
-            preserveScroll: true,
-            onSuccess: () => Promise.all([
-                showQrCode(),
-                showSetupKey(),
-                showRecoveryCodes(),
-            ]),
-            onFinish: () => {
-                enabling.value = false
-                confirming.value = props.requiresConfirmation
-            },
-        })
+watch(twoFactorEnabled, () => {
+    if (!twoFactorEnabled.value) {
+        confirmationForm.reset();
+        confirmationForm.clearErrors();
     }
+});
 
-    const showQrCode = () => {
-        return axios.get('/user/two-factor-qr-code').then(response => {
-            qrCode.value = response.data.svg
-        })
-    }
+const enableTwoFactorAuthentication = () => {
+    enabling.value = true;
 
-    const showSetupKey = () => {
-        return axios.get('/user/two-factor-secret-key').then(response => {
-            setupKey.value = response.data.secretKey
-        })
-    }
+    router.post('/user/two-factor-authentication', {}, {
+        preserveScroll: true,
+        onSuccess: () => Promise.all([
+            showQrCode(),
+            showSetupKey(),
+            showRecoveryCodes(),
+        ]),
+        onFinish: () => {
+            enabling.value = false;
+            confirming.value = props.requiresConfirmation;
+        },
+    });
+};
 
-    const showRecoveryCodes = () => {
-        return axios.get('/user/two-factor-recovery-codes').then(response => {
-            recoveryCodes.value = response.data
-        })
-    }
+const showQrCode = () => {
+    return axios.get('/user/two-factor-qr-code').then(response => {
+        qrCode.value = response.data.svg;
+    });
+};
 
-    const confirmTwoFactorAuthentication = () => {
-        confirmationForm.post('/user/confirmed-two-factor-authentication', {
-            errorBag: 'confirmTwoFactorAuthentication',
-            preserveScroll: true,
-            preserveState: true,
-            onSuccess: () => {
-                confirming.value = false
-                qrCode.value = null
-                setupKey.value = null
-            },
-        })
-    }
+const showSetupKey = () => {
+    return axios.get('/user/two-factor-secret-key').then(response => {
+        setupKey.value = response.data.secretKey;
+    });
+};
 
-    const regenerateRecoveryCodes = () => {
-        axios
-            .post('/user/two-factor-recovery-codes')
-            .then(() => showRecoveryCodes())
-    }
+const showRecoveryCodes = () => {
+    return axios.get('/user/two-factor-recovery-codes').then(response => {
+        recoveryCodes.value = response.data;
+    });
+};
 
-    const disableTwoFactorAuthentication = () => {
-        disabling.value = true
+const confirmTwoFactorAuthentication = () => {
+    confirmationForm.post('/user/confirmed-two-factor-authentication', {
+        errorBag: 'confirmTwoFactorAuthentication',
+        preserveScroll: true,
+        preserveState: true,
+        onSuccess: () => {
+            confirming.value = false;
+            qrCode.value = null;
+            setupKey.value = null;
+        },
+    });
+};
 
-        Inertia.delete('/user/two-factor-authentication', {
-            preserveScroll: true,
-            onSuccess: () => {
-                disabling.value = false
-                confirming.value = false
-            },
-        })
-    }
+const regenerateRecoveryCodes = () => {
+    axios
+        .post('/user/two-factor-recovery-codes')
+        .then(() => showRecoveryCodes());
+};
+
+const disableTwoFactorAuthentication = () => {
+    disabling.value = true;
+
+    router.delete('/user/two-factor-authentication', {
+        preserveScroll: true,
+        onSuccess: () => {
+            disabling.value = false;
+            confirming.value = false;
+        },
+    });
+};
 </script>
 
 <template>

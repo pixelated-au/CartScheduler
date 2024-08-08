@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\CheckHashedEmailAddress;
 use App\Interfaces\ObfuscatedErrorCode;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
@@ -11,10 +12,11 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Redirect;
 use Inertia\Inertia;
 use Inertia\Response;
+use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 class SetUserPasswordController extends Controller
 {
-    public function __construct(private readonly ObfuscatedErrorCode $errorCodeAction)
+    public function __construct(private readonly ObfuscatedErrorCode $errorCodeAction, private readonly CheckHashedEmailAddress $checkHashedEmailAddress)
     {
     }
 
@@ -32,9 +34,7 @@ class SetUserPasswordController extends Controller
             return Redirect::route('login');
         }
 
-        if (!Hash::check($user->uuid . $user->email, base64_decode($hashedEmail))) {
-            abort(404);
-        }
+        abort_unless($this->checkHashedEmailAddress->execute($user, $hashedEmail), SymfonyResponse::HTTP_NOT_FOUND);
 
         return Inertia::render('Profile/SetPassword', [
             'editUser'    => ['id' => $user->id, 'name' => $user->name],
@@ -66,9 +66,12 @@ class SetUserPasswordController extends Controller
             ]);
         $user = User::findOrFail($data['user_id']);
 
-        if (!Hash::check($user->uuid . $user->email, base64_decode($data['hashed_email']))) {
-            abort(404);
-        }
+        abort_unless($this->checkHashedEmailAddress->execute($user, $data['hashed_email']), SymfonyResponse::HTTP_NOT_FOUND);
+
+
+//        if (!Hash::check($user->uuid . $user->email, base64_decode($data['hashed_email']))) {
+//            abort(404);
+//        }
         $user->update([
             'password' => Hash::make($data['password']),
         ]);

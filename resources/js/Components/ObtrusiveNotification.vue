@@ -14,8 +14,8 @@ const props = defineProps({
         type: Boolean,
         default: true,
     },
-})
-const emit = defineEmits(['close'])
+});
+const emit = defineEmits(['close']);
 </script>
 
 <template>

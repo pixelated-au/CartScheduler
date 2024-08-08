@@ -1,10 +1,10 @@
 <script setup>
-    defineProps({
-        showHideButton: {
-            type: Boolean,
-            default: false,
-        },
-    })
+defineProps({
+    showHideButton: {
+        type: Boolean,
+        default: false,
+    },
+});
 </script>
 
 <template>

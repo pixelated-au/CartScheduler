@@ -1,40 +1,40 @@
 <script setup>
-    import JetActionSection from '@/Jetstream/ActionSection.vue'
-    import JetDangerButton from '@/Jetstream/DangerButton.vue'
-    import JetDialogModal from '@/Jetstream/DialogModal.vue'
-    import JetInput from '@/Jetstream/Input.vue'
-    import JetInputError from '@/Jetstream/InputError.vue'
-    import JetSecondaryButton from '@/Jetstream/SecondaryButton.vue'
-    import { useForm } from '@inertiajs/inertia-vue3'
-    import { ref } from 'vue'
+import JetActionSection from '@/Jetstream/ActionSection.vue';
+import JetDangerButton from '@/Jetstream/DangerButton.vue';
+import JetDialogModal from '@/Jetstream/DialogModal.vue';
+import JetInput from '@/Jetstream/Input.vue';
+import JetInputError from '@/Jetstream/InputError.vue';
+import JetSecondaryButton from '@/Jetstream/SecondaryButton.vue';
+import {useForm} from '@inertiajs/vue3';
+import {ref} from 'vue';
 
-    const confirmingUserDeletion = ref(false)
-    const passwordInput = ref(null)
+const confirmingUserDeletion = ref(false);
+const passwordInput = ref(null);
 
-    const form = useForm({
-        password: '',
-    })
+const form = useForm({
+    password: '',
+});
 
-    const confirmUserDeletion = () => {
-        confirmingUserDeletion.value = true
+const confirmUserDeletion = () => {
+    confirmingUserDeletion.value = true;
 
-        setTimeout(() => passwordInput.value.focus(), 250)
-    }
+    setTimeout(() => passwordInput.value.focus(), 250);
+};
 
-    const deleteUser = () => {
-        form.delete(route('current-user.destroy'), {
-            preserveScroll: true,
-            onSuccess: () => closeModal(),
-            onError: () => passwordInput.value.focus(),
-            onFinish: () => form.reset(),
-        })
-    }
+const deleteUser = () => {
+    form.delete(route('current-user.destroy'), {
+        preserveScroll: true,
+        onSuccess: () => closeModal(),
+        onError: () => passwordInput.value.focus(),
+        onFinish: () => form.reset(),
+    });
+};
 
-    const closeModal = () => {
-        confirmingUserDeletion.value = false
+const closeModal = () => {
+    confirmingUserDeletion.value = false;
 
-        form.reset()
-    }
+    form.reset();
+};
 </script>
 
 <template>

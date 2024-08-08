@@ -1,5 +1,5 @@
 <script setup>
-import {computed, onMounted, onUnmounted, watch} from 'vue'
+import {computed, onMounted, onUnmounted, watch} from 'vue';
 
 const props = defineProps({
     show: {
@@ -17,37 +17,37 @@ const props = defineProps({
     fillScreen: {
         type: Boolean,
         default: false,
-    }
-})
+    },
+});
 
-const emit = defineEmits(['close'])
+const emit = defineEmits(['close']);
 
 watch(() => props.show, () => {
     if (props.show) {
-        document.body.style.overflow = 'hidden'
+        document.body.style.overflow = 'hidden';
     } else {
-        document.body.style.overflow = null
+        document.body.style.overflow = null;
     }
-})
+});
 
 const close = () => {
     if (props.closeable) {
-        emit('close')
+        emit('close');
     }
-}
+};
 
 const closeOnEscape = (e) => {
     if (e.key === 'Escape' && props.show) {
-        close()
+        close();
     }
-}
+};
 
-onMounted(() => document.addEventListener('keydown', closeOnEscape))
+onMounted(() => document.addEventListener('keydown', closeOnEscape));
 
 onUnmounted(() => {
-    document.removeEventListener('keydown', closeOnEscape)
-    document.body.style.overflow = null
-})
+    document.removeEventListener('keydown', closeOnEscape);
+    document.body.style.overflow = null;
+});
 
 const maxWidthClass = computed(() => {
     const options = {
@@ -62,23 +62,24 @@ const maxWidthClass = computed(() => {
         '6xl': 'sm:max-w-6xl',
         '7xl': 'sm:max-w-7xl',
         'full': 'sm:full',
-    }
-    return options[props.maxWidth]
-})
+    };
+    return options[props.maxWidth];
+});
 
 const extraClasses = computed(() => {
-    let classes = maxWidthClass.value
+    let classes = maxWidthClass.value;
     if (props.fillScreen) {
-        classes += 'inset-0 overflow-y-auto z-50 flex items-center justify-center px-4 py-6 sm:px-0 w-full sm:w-auto h-full sm:h-auto'
+        classes += 'inset-0 overflow-y-auto z-50 flex items-center justify-center px-4 py-6 sm:px-0 w-full sm:w-auto h-full sm:h-auto';
     }
-    return classes
-})
+    return classes;
+});
 </script>
 
 <template>
     <teleport to="body">
         <transition leave-active-class="duration-200">
-            <div v-show="show" class="fixed top-0 bottom-0 left-0 right-0 flex items-center justify-center inset-0 z-50 px-4 py-6">
+            <div v-show="show"
+                 class="fixed top-0 bottom-0 left-0 right-0 flex items-center justify-center inset-0 z-50 px-4 py-6">
                 <transition enter-active-class="ease-out duration-300"
                             enter-from-class="opacity-0"
                             enter-to-class="opacity-100"

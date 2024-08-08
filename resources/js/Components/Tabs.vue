@@ -1,28 +1,28 @@
 <script setup>
-    import { defineProps, getCurrentInstance, onMounted, ref } from 'vue'
+import {defineProps, getCurrentInstance, onMounted, ref} from 'vue';
 
-    defineProps({
-        tabList: {
-            type: Array,
-            required: true,
-        },
+defineProps({
+    tabList: {
+        type: Array,
+        required: true,
+    },
 
-        variant: {
-            type: String,
-            required: false,
-            default: () => 'horizontal',
-            validator: (value) => ['horizontal', 'vertical'].includes(value),
-        },
-    })
+    variant: {
+        type: String,
+        required: false,
+        default: () => 'horizontal',
+        validator: (value) => ['horizontal', 'vertical'].includes(value),
+    },
+});
 
-    let compId
-    onMounted(() => {
-        compId = getCurrentInstance().id || Math.random().toString(36).substring(2, 9)
-    })
+let compId;
+onMounted(() => {
+    compId = getCurrentInstance().id || Math.random().toString(36).substring(2, 9);
+});
 
-    const activeTab = ref(1)
-    // Individual tabs are defined like <template v-slot:tab-1>...</template>
-    // Tab names need to be defined also:     const tabNames = ['Location', 'Shifts']
+const activeTab = ref(1);
+// Individual tabs are defined like <template v-slot:tab-1>...</template>
+// Tab names need to be defined also:     const tabNames = ['Location', 'Shifts']
 </script>
 
 <template>

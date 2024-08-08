@@ -1,27 +1,27 @@
 <script setup>
-import AlignButton from '@/Components/EditorToolbar/AlignButton.vue'
-import BoldButton from '@/Components/EditorToolbar/BoldButton.vue'
-import HeadingButton from '@/Components/EditorToolbar/HeadingButton.vue'
-import ItalicButton from '@/Components/EditorToolbar/ItalicButton.vue'
-import LinkSetButton from '@/Components/EditorToolbar/LinkSetButton.vue'
-import LinkUnsetButton from '@/Components/EditorToolbar/LinkUnsetButton.vue'
-import ListButton from '@/Components/EditorToolbar/ListButton.vue'
-import ParagraphButton from '@/Components/EditorToolbar/ParagraphButton.vue'
-import StrikethroughButton from '@/Components/EditorToolbar/StrikethroughButton.vue'
-import Link from '@tiptap/extension-link'
-import TextAlign from '@tiptap/extension-text-align'
-import StarterKit from '@tiptap/starter-kit'
-import {EditorContent, useEditor} from '@tiptap/vue-3'
-import {provide, watch} from 'vue'
+import AlignButton from '@/Components/EditorToolbar/AlignButton.vue';
+import BoldButton from '@/Components/EditorToolbar/BoldButton.vue';
+import HeadingButton from '@/Components/EditorToolbar/HeadingButton.vue';
+import ItalicButton from '@/Components/EditorToolbar/ItalicButton.vue';
+import LinkSetButton from '@/Components/EditorToolbar/LinkSetButton.vue';
+import LinkUnsetButton from '@/Components/EditorToolbar/LinkUnsetButton.vue';
+import ListButton from '@/Components/EditorToolbar/ListButton.vue';
+import ParagraphButton from '@/Components/EditorToolbar/ParagraphButton.vue';
+import StrikethroughButton from '@/Components/EditorToolbar/StrikethroughButton.vue';
+import Link from '@tiptap/extension-link';
+import TextAlign from '@tiptap/extension-text-align';
+import StarterKit from '@tiptap/starter-kit';
+import {EditorContent, useEditor} from '@tiptap/vue-3';
+import {provide, watch} from 'vue';
 
 const props = defineProps({
     modelValue: {
         type: String,
         default: '',
     },
-})
+});
 
-const emit = defineEmits(['update:modelValue'])
+const emit = defineEmits(['update:modelValue']);
 
 const editor = useEditor({
     content: props.modelValue,
@@ -32,18 +32,18 @@ const editor = useEditor({
     ],
     editable: true,
     onUpdate: (event) => {
-        emit('update:modelValue', event.editor.getHTML())
+        emit('update:modelValue', event.editor.getHTML());
     },
-})
+});
 
 watch(() => props.modelValue, (value) => {
     if (!editor?.value || value === editor?.value?.getHTML()) {
-        return
+        return;
     }
-    editor.value.commands.setContent(value, false)
-})
+    editor.value.commands.setContent(value, false);
+});
 
-provide('editor', editor)
+provide('editor', editor);
 </script>
 
 <template>
@@ -93,6 +93,7 @@ provide('editor', editor)
             @apply mb-0.5;
         }
     }
+
     ul {
         @apply list-disc;
     }

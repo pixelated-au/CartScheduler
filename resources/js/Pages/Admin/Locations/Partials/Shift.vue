@@ -1,89 +1,89 @@
 <script setup>
-    import useToast from '@/Composables/useToast.js'
-    import JetButton from '@/Jetstream/Button.vue'
-    import JetCheckbox from '@/Jetstream/Checkbox.vue'
-    import JetConfirmationModal from '@/Jetstream/ConfirmationModal.vue'
-    import JetInputError from '@/Jetstream/InputError.vue'
-    import JetLabel from '@/Jetstream/Label.vue'
-    import JetSectionBorder from '@/Jetstream/SectionBorder.vue'
-    //https://vue3datepicker.com/
-    import Datepicker from '@vuepic/vue-datepicker'
-    import {format} from "date-fns";
-    import { computed, defineProps, inject, ref } from 'vue'
+import useToast from '@/Composables/useToast.js';
+import JetButton from '@/Jetstream/Button.vue';
+import JetCheckbox from '@/Jetstream/Checkbox.vue';
+import JetConfirmationModal from '@/Jetstream/ConfirmationModal.vue';
+import JetInputError from '@/Jetstream/InputError.vue';
+import JetLabel from '@/Jetstream/Label.vue';
+import JetSectionBorder from '@/Jetstream/SectionBorder.vue';
+//https://vue3datepicker.com/
+import Datepicker from '@vuepic/vue-datepicker';
+import {format} from "date-fns";
+import {computed, defineProps, inject, ref} from 'vue';
 
-    const props = defineProps({
-        modelValue: Object,
-        days: Array,
-        index: Number,
-        errors: Object,
-    })
+const props = defineProps({
+    modelValue: Object,
+    days: Array,
+    index: Number,
+    errors: Object,
+});
 
-    const emit = defineEmits([
-        'update:modelValue',
-        'delete',
-    ])
+const emit = defineEmits([
+    'update:modelValue',
+    'delete',
+]);
 
-    const shift = computed({
-        get: () => props.modelValue,
-        set: value => emit('update:modelValue', value),
-    })
+const shift = computed({
+    get: () => props.modelValue,
+    set: value => emit('update:modelValue', value),
+});
 
-    const availableFrom = computed({
-        get: () => props.modelValue.available_from,
-        set: value => shift.value.available_from = value ?format(value, 'yyyy-MM-dd') : null
-    })
+const availableFrom = computed({
+    get: () => props.modelValue.available_from,
+    set: value => shift.value.available_from = value ? format(value, 'yyyy-MM-dd') : null,
+});
 
-    const availableTo = computed({
-        get: () => props.modelValue.available_to,
-        set: value => shift.value.available_to = value ? format(value, 'yyyy-MM-dd') : null,
-    })
+const availableTo = computed({
+    get: () => props.modelValue.available_to,
+    set: value => shift.value.available_to = value ? format(value, 'yyyy-MM-dd') : null,
+});
 
-    const prefixTime = time => {
-        if (time < 10) {
-            return `0${time}`
+const prefixTime = time => {
+    if (time < 10) {
+        return `0${time}`;
+    }
+    return '' + time;
+};
+
+const shiftTimeRange = computed({
+    get: () =>
+        [
+            {
+                hours: parseInt(shift.value.start_time?.substring(0, 2)) || 0,
+                minutes: parseInt(shift.value.start_time?.substring(3, 5)) || 0,
+            },
+            {
+                hours: parseInt(shift.value.end_time?.substring(0, 2)) || 0,
+                minutes: parseInt(shift.value.end_time?.substring(3, 5)) || 0,
+            },
+        ],
+    set: value => {
+        shift.value.start_time = prefixTime(value[0].hours) + ':' + prefixTime(value[0].minutes) + ':00';
+        shift.value.end_time = prefixTime(value[1].hours) + ':' + prefixTime(value[1].minutes) + ':00';
+    },
+});
+
+const fieldUnique = computed(() => shift.value.id || Math.random().toString(36).substring(2, 9));
+
+const showModal = ref(false);
+
+const toast = useToast();
+
+const deleteShift = async () => {
+    if (shift.value.id) {
+        try {
+            await axios.delete('/admin/shifts/' + shift.value.id);
+            toast.success('Shift deleted successfully');
+        } catch (e) {
+            toast.error(e.message || e.response?.data);
+            return;
         }
-        return '' + time
     }
 
-    const shiftTimeRange = computed({
-        get: () =>
-            [
-                {
-                    hours: parseInt(shift.value.start_time?.substring(0, 2)) || 0,
-                    minutes: parseInt(shift.value.start_time?.substring(3, 5)) || 0,
-                },
-                {
-                    hours: parseInt(shift.value.end_time?.substring(0, 2)) || 0,
-                    minutes: parseInt(shift.value.end_time?.substring(3, 5)) || 0,
-                },
-            ],
-        set: value => {
-            shift.value.start_time = prefixTime(value[0].hours) + ':' + prefixTime(value[0].minutes) + ':00'
-            shift.value.end_time = prefixTime(value[1].hours) + ':' + prefixTime(value[1].minutes) + ':00'
-        },
-    })
+    emit('delete', props.index);
+};
 
-    const fieldUnique = computed(() => shift.value.id || Math.random().toString(36).substring(2, 9))
-
-    const showModal = ref(false)
-
-    const toast = useToast()
-
-    const deleteShift = async () => {
-        if (shift.value.id) {
-            try {
-                await axios.delete('/admin/shifts/' + shift.value.id)
-                toast.success('Shift deleted successfully')
-            } catch (e) {
-                toast.error(e.message || e.response?.data)
-                return
-            }
-        }
-
-        emit('delete', props.index)
-    }
-
-    const darkMode = inject('darkMode', false)
+const darkMode = inject('darkMode', false);
 
 </script>
 

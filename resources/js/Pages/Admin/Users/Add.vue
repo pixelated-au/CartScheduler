@@ -1,17 +1,17 @@
 <script setup>
-    import JetButton from '@/Jetstream/Button.vue'
-    import AppLayout from '@/Layouts/AppLayout.vue'
-    import UserProfileForm from '@/Pages/Admin/Users/Partials/UserProfileForm.vue'
-    import { Inertia } from '@inertiajs/inertia'
+import JetButton from '@/Jetstream/Button.vue';
+import AppLayout from '@/Layouts/AppLayout.vue';
+import UserProfileForm from '@/Pages/Admin/Users/Partials/UserProfileForm.vue';
+import {router} from '@inertiajs/vue3';
 
-    defineProps({
-        availableRoles: Array,
-        permissions: Object,
-    })
+defineProps({
+    availableRoles: Array,
+    permissions: Object,
+});
 
-    const listRouteAction = () => {
-        Inertia.visit(route('admin.users.index'))
-    }
+const listRouteAction = () => {
+    router.visit(route('admin.users.index'));
+};
 </script>
 
 <template>

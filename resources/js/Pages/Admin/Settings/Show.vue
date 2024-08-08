@@ -6,7 +6,7 @@ import UpdateGeneralSettingsForm from "@/Pages/Admin/Settings/Partials/UpdateGen
 
 defineProps({
     settings: Object,
-})
+});
 
 </script>
 

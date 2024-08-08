@@ -1,22 +1,22 @@
 <script setup>
-    import Bell from '@/Components/Icons/Bell.vue'
-    import JetButton from '@/Jetstream/Button.vue'
-    import AppLayout from '@/Layouts/AppLayout.vue'
-    import CartReservation from '@/Pages/Components/Dashboard/CartReservation.vue'
-    import ReportsModal from '@/Pages/Components/Dashboard/ReportsModal.vue'
-    import { computed, ref } from 'vue'
+import Bell from '@/Components/Icons/Bell.vue';
+import JetButton from '@/Jetstream/Button.vue';
+import AppLayout from '@/Layouts/AppLayout.vue';
+import CartReservation from '@/Pages/Components/Dashboard/CartReservation.vue';
+import ReportsModal from '@/Pages/Components/Dashboard/ReportsModal.vue';
+import {computed, ref} from 'vue';
 
-    defineProps({
-        user: Object,
-    })
+defineProps({
+    user: Object,
+});
 
-    const outstandingReportCount = ref(0)
+const outstandingReportCount = ref(0);
 
-    const updateReportCount = count => outstandingReportCount.value = count
+const updateReportCount = count => outstandingReportCount.value = count;
 
-    const reportsLabel = computed(() => outstandingReportCount.value === 1 ? 'Report' : 'Reports')
+const reportsLabel = computed(() => outstandingReportCount.value === 1 ? 'Report' : 'Reports');
 
-    const showReportsModal = ref(false)
+const showReportsModal = ref(false);
 </script>
 
 <template>

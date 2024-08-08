@@ -1,15 +1,15 @@
 <script setup>
-    import JetDropdown from '@/Jetstream/Dropdown.vue'
-    import JetDropdownLink from '@/Jetstream/DropdownLink.vue'
-    import { Inertia } from '@inertiajs/inertia'
+import JetDropdown from '@/Jetstream/Dropdown.vue';
+import JetDropdownLink from '@/Jetstream/DropdownLink.vue';
+import {router, usePage} from '@inertiajs/vue3';
 
-    const switchToTeam = (team) => {
-        Inertia.put(route('current-team.update'), {
-            team_id: team.id,
-        }, {
-            preserveState: false,
-        })
-    }
+const switchToTeam = (team) => {
+    router.put(route('current-team.update'), {
+        team_id: team.id,
+    }, {
+        preserveState: false,
+    });
+};
 </script>
 <template>
     <JetDropdown v-if="$page.props.jetstream.hasTeamFeatures" align="right" width="60">
@@ -17,7 +17,7 @@
             <span class="inline-flex rounded-md">
                 <button type="button"
                         class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:bg-gray-50 hover:text-gray-700 focus:outline-none focus:bg-gray-50 active:bg-gray-50 transition">
-                    {{ $page.props.user.current_team.name }}
+                    {{ $page.props.auth.user.current_team.name }}
 
                     <svg class="ml-2 -mr-0.5 h-4 w-4"
                          xmlns="http://www.w3.org/2000/svg"
@@ -40,11 +40,11 @@
                     </div>
 
                     <!-- Team Settings -->
-                    <JetDropdownLink :href="route('teams.show', $page.props.user.current_team)">
+                    <JetDropdownLink :href="route('teams.show', $page.props.auth.user.current_team)">
                         Team Settings
                     </JetDropdownLink>
 
-                    <JetDropdownLink v-if="$page.props.jetstream.canCreateTeams" :href="route('teams.create')">
+                    <JetDropdownLink v-if="usePage().props.jetstream.canCreateTeams" :href="route('teams.create')">
                         Create New Team
                     </JetDropdownLink>
 
@@ -55,11 +55,11 @@
                         Switch Teams
                     </div>
 
-                    <template v-for="team in $page.props.user.all_teams" :key="team.id">
+                    <template v-for="team in $page.props.auth.user.all_teams" :key="team.id">
                         <form @submit.prevent="switchToTeam(team)">
                             <JetDropdownLink as="button">
                                 <div class="flex items-center">
-                                    <svg v-if="team.id == $page.props.user.current_team_id"
+                                    <svg v-if="team.id == $page.props.auth.user.current_team_id"
                                          class="mr-2 h-5 w-5 text-green-400"
                                          fill="none"
                                          stroke-linecap="round"

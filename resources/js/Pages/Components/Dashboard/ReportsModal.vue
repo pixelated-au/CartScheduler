@@ -1,47 +1,47 @@
 <script setup>
-    import useToast from '@/Composables/useToast.js'
-    import JetButton from '@/Jetstream/Button.vue'
-    import ConfirmationModal from '@/Jetstream/ConfirmationModal.vue'
-    import ReportForm from '@/Pages/Components/Dashboard/ReportForm.vue'
-    import { onMounted, provide, ref } from 'vue'
+import useToast from '@/Composables/useToast.js';
+import JetButton from '@/Jetstream/Button.vue';
+import ConfirmationModal from '@/Jetstream/ConfirmationModal.vue';
+import ReportForm from '@/Pages/Components/Dashboard/ReportForm.vue';
+import {onMounted, provide, ref} from 'vue';
 
-    defineProps({
-        show: {
-            type: Boolean,
-            default: false,
-        },
-    })
+defineProps({
+    show: {
+        type: Boolean,
+        default: false,
+    },
+});
 
-    const emit = defineEmits(['has-outstanding-reports', 'close'])
+const emit = defineEmits(['has-outstanding-reports', 'close']);
 
-    const close = () => emit('close')
+const close = () => emit('close');
 
-    const toast = useToast()
+const toast = useToast();
 
-    const outstandingReports = ref([])
-    const tags = ref([])
-    provide('report-tags', tags)
+const outstandingReports = ref([]);
+const tags = ref([]);
+provide('report-tags', tags);
 
-    const getData = async () => {
-        try {
-            const [reportsResponse, tagsResponse] = await Promise.all([
-                axios.get('/outstanding-reports'),
-                axios.get('/get-report-tags'),
-            ])
-            outstandingReports.value = reportsResponse.data
-            emit('has-outstanding-reports', outstandingReports.value.length)
+const getData = async () => {
+    try {
+        const [reportsResponse, tagsResponse] = await Promise.all([
+            axios.get('/outstanding-reports'),
+            axios.get('/get-report-tags'),
+        ]);
+        outstandingReports.value = reportsResponse.data;
+        emit('has-outstanding-reports', outstandingReports.value.length);
 
-            tags.value = tagsResponse.data.data
-        } catch (e) {
-            toast.error(e.response.data.message)
-        }
+        tags.value = tagsResponse.data.data;
+    } catch (e) {
+        toast.error(e.response.data.message);
     }
+};
 
-    onMounted(() => {
-        getData()
-    })
+onMounted(() => {
+    getData();
+});
 
-    const reportSaved = () => getData()</script>
+const reportSaved = () => getData();</script>
 
 <template>
     <ConfirmationModal :show="show" @close="close">

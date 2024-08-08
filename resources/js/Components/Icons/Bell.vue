@@ -1,14 +1,14 @@
 <script setup>
-    defineProps({
-        color: {
-            type: String,
-            default: '#000000',
-        },
-        box: {
-            type: String,
-            default: '16',
-        }
-    })
+defineProps({
+    color: {
+        type: String,
+        default: '#000000',
+    },
+    box: {
+        type: String,
+        default: '16',
+    },
+});
 </script>
 
 <template>
