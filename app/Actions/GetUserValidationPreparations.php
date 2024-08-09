@@ -11,7 +11,7 @@ class GetUserValidationPreparations
     {
         $data['mobile_phone'] = isset($data['mobile_phone'])
             ? Str::of($data['mobile_phone'])
-                ->tap(fn(string $value) => Str::startsWith($value, '+') ? "0$value" : "$value")
+                ->tap(fn(string $value) => Str::startsWith($value, '+') ? "0$value" : $value)
                 ->replaceMatches('/[^A-Za-z0-9]++/', '')
                 ->trim()
                 ->toString()
@@ -60,12 +60,12 @@ class GetUserValidationPreparations
     protected function tidyBoolean(array &$data, string $fieldName): void
     {
         if (!isset($data[$fieldName])
-            || trim($data[$fieldName]) === '0'
-            || trim(strtolower($data[$fieldName])) === 'false') {
+            || trim((string) $data[$fieldName]) === '0'
+            || strtolower(trim((string)$data[$fieldName])) === 'false') {
             $data[$fieldName] = false;
 
-        } else if (trim($data[$fieldName]) === '1'
-            || trim(strtolower($data[$fieldName])) === 'true') {
+        } else if (trim((string) $data[$fieldName]) === '1'
+            || strtolower(trim((string)$data[$fieldName])) === 'true') {
             $data[$fieldName] = true;
         }
     }

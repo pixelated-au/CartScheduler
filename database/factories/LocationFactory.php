@@ -22,28 +22,22 @@ class LocationFactory extends Factory
 
     public function threeVolunteers(): self
     {
-        return $this->state(function (array $attributes) {
-            return [
-                'max_volunteers' => 3,
-            ];
-        });
+        return $this->state(fn(array $attributes) => [
+            'max_volunteers' => 3,
+        ]);
     }
 
     public function requiresBrother(): self
     {
-        return $this->state(function (array $attributes) {
-            return [
-                'requires_brother' => true,
-            ];
-        });
+        return $this->state(fn(array $attributes) => [
+            'requires_brother' => true,
+        ]);
     }
 
     public function allPublishers(): self
     {
-        return $this->state(function (array $attributes) {
-            return [
-                'requires_brother' => false,
-            ];
-        });
+        return $this->state(fn(array $attributes) => [
+            'requires_brother' => false,
+        ]);
     }
 }

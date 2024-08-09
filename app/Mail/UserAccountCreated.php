@@ -12,16 +12,13 @@ class UserAccountCreated extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public User $user;
-
     /**
      * Create a new message instance.
      *
      * @return void
      */
-    public function __construct(User $user)
+    public function __construct(public User $user)
     {
-        $this->user = $user;
         $this->subject = config('app.name') . ' Account Activation';
     }
 

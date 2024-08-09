@@ -49,24 +49,22 @@ class UserAvailabilityFactory extends Factory
 
     public function wedThuTenToOne(): Factory
     {
-        return $this->state(function (array $attributes) {
-            return [
-                'day_monday'     => null,
-                'day_tuesday'    => null,
-                'day_wednesday'  => $this->getHourRange(10, 13),
-                'day_thursday'   => $this->getHourRange(10, 13),
-                'day_friday'     => null,
-                'day_saturday'   => null,
-                'day_sunday'     => null,
-                'num_mondays'    => 0,
-                'num_tuesdays'   => 0,
-                'num_wednesdays' => 2,
-                'num_thursdays'  => 1,
-                'num_fridays'    => 0,
-                'num_saturdays'  => 0,
-                'num_sundays'    => 0,
-            ];
-        });
+        return $this->state(fn(array $attributes) => [
+            'day_monday'     => null,
+            'day_tuesday'    => null,
+            'day_wednesday'  => $this->getHourRange(10, 13),
+            'day_thursday'   => $this->getHourRange(10, 13),
+            'day_friday'     => null,
+            'day_saturday'   => null,
+            'day_sunday'     => null,
+            'num_mondays'    => 0,
+            'num_tuesdays'   => 0,
+            'num_wednesdays' => 2,
+            'num_thursdays'  => 1,
+            'num_fridays'    => 0,
+            'num_saturdays'  => 0,
+            'num_sundays'    => 0,
+        ]);
     }
 
     private function availability(): ?array

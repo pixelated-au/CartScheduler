@@ -11,7 +11,7 @@ class CheckHashedEmailAddress
     public function execute(User $user, $hashedEmail) : bool
     {
         try {
-            if (!Hash::check($user->uuid . $user->email, base64_decode($hashedEmail))) {
+            if (!Hash::check($user->uuid . $user->email, base64_decode((string) $hashedEmail))) {
                 return false;
             }
         } catch (Exception $e) {

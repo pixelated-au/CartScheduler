@@ -14,7 +14,7 @@ class UserFactory extends Factory
     /**
      * The current password being used by the factory.
      */
-    protected static ?string $password;
+    protected static ?string $password = null;
 
     /**
      * Define the model's default state.
@@ -47,134 +47,110 @@ class UserFactory extends Factory
 
     public function devUser(): self
     {
-        return $this->state(function (array $attributes) {
-            return [
-                'name'        => 'Admin',
-                'email'       => 'admin@example.com',
-                'role'        => 'admin',
-                'gender'      => 'male',
-                'appointment' => 'elder'
-            ];
-        });
+        return $this->state(fn(array $attributes) => [
+            'name'        => 'Admin',
+            'email'       => 'admin@example.com',
+            'role'        => 'admin',
+            'gender'      => 'male',
+            'appointment' => 'elder'
+        ]);
     }
 
     public function testUser(): self
     {
-        return $this->state(function (array $attributes) {
-            return [
-                'name'        => 'User',
-                'email'       => 'test@example.com',
-                'role'        => 'user',
-                'gender'      => 'male',
-                'appointment' => 'elder'
-            ];
-        });
+        return $this->state(fn(array $attributes) => [
+            'name'        => 'User',
+            'email'       => 'test@example.com',
+            'role'        => 'user',
+            'gender'      => 'male',
+            'appointment' => 'elder'
+        ]);
     }
 
     public function adminRoleUser(): self
     {
-        return $this->state(function (array $attributes) {
-            return [
-                'role'        => 'admin',
-                'gender'      => 'male',
-                'appointment' => 'elder'
-            ];
-        });
+        return $this->state(fn(array $attributes) => [
+            'role'        => 'admin',
+            'gender'      => 'male',
+            'appointment' => 'elder'
+        ]);
     }
 
     public function userRoleUser(): self
     {
-        return $this->state(function (array $attributes) {
-            return [
-                'role'       => 'user',
-                'is_enabled' => random_int(0, 9) !== 9,
-            ];
-        });
+        return $this->state(fn(array $attributes) => [
+            'role'       => 'user',
+            'is_enabled' => random_int(0, 9) !== 9,
+        ]);
     }
 
     public function enabled(): self
     {
-        return $this->state(function (array $attributes) {
-            return [
-                'role'       => 'user',
-                'is_enabled' => true,
-            ];
-        });
+        return $this->state(fn(array $attributes) => [
+            'role'       => 'user',
+            'is_enabled' => true,
+        ]);
     }
 
     public function responsibleBrother(): self
     {
-        return $this->state(function (array $attributes) {
-            return [
-                'role'                => 'user',
-                'responsible_brother' => true,
-                'is_enabled'          => true,
-            ];
-        });
+        return $this->state(fn(array $attributes) => [
+            'role'                => 'user',
+            'responsible_brother' => true,
+            'is_enabled'          => true,
+        ]);
     }
 
     public function female(): self
     {
-        return $this->state(function (array $attributes) {
-            return [
-                'gender' => 'female',
-            ];
-        });
+        return $this->state(fn(array $attributes) => [
+            'gender' => 'female',
+        ]);
     }
 
     public function male(): self
     {
-        return $this->state(function (array $attributes) {
-            return [
-                'gender' => 'male',
-            ];
-        });
+        return $this->state(fn(array $attributes) => [
+            'gender' => 'male',
+        ]);
     }
 
     public function publisher(): self
     {
-        return $this->state(function (array $attributes) {
-            return [
-                'role'       => 'user',
-                'serving_as' => 'publisher',
-                'is_enabled' => true,
-            ];
-        });
+        return $this->state(fn(array $attributes) => [
+            'role'       => 'user',
+            'serving_as' => 'publisher',
+            'is_enabled' => true,
+        ]);
     }
 
     public function pioneer(): self
     {
-        return $this->state(function (array $attributes) {
-            return [
-                'role'       => 'user',
-                'serving_as' => $this->faker->randomElement(['field missionary', 'special pioneer', 'bethel family member', 'regular pioneer']),
-                'is_enabled' => true,
-            ];
-        });
+        return $this->state(fn(array $attributes) => [
+            'role'       => 'user',
+            'serving_as' => $this->faker->randomElement(['field missionary', 'special pioneer', 'bethel family member', 'regular pioneer']),
+            'is_enabled' => true,
+        ]);
     }
 
     public function ministerialServant(): self
     {
-        return $this->state(function (array $attributes) {
-            return [
-                'role'        => 'user',
-                'appointment' => 'ministerial servant',
-                'gender'      => 'male',
-                'is_enabled'  => true,
-            ];
-        });
+        return $this->state(fn(array $attributes) => [
+            'role'        => 'user',
+            'appointment' => 'ministerial servant',
+            'gender'      => 'male',
+            'is_enabled'  => true,
+        ]);
     }
 
     public function elder(): self
     {
-        return $this->state(function (array $attributes) {
-            return [
-                'role'        => 'user',
-                'appointment' => 'elder',
-                'gender'      => 'male',
-                'is_enabled'  => true,
-            ];
-        });
+        return $this->state(fn(array $attributes) => [
+            'role'        => 'user',
+            'appointment' => 'elder',
+            'gender'      => 'male',
+            'is_enabled'  => true,
+        ]);
     }
 
     /**
@@ -184,11 +160,9 @@ class UserFactory extends Factory
      */
     public function unverified(): self
     {
-        return $this->state(function (array $attributes) {
-            return [
-                'email_verified_at' => null,
-            ];
-        });
+        return $this->state(fn(array $attributes) => [
+            'email_verified_at' => null,
+        ]);
     }
 
     protected function getAppointment($gender = 'male'): ?string

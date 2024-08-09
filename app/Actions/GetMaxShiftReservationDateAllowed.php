@@ -6,7 +6,7 @@ use App\Enums\DBPeriod;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 
-class GetMaxShiftReservationDateAllowed
+readonly class GetMaxShiftReservationDateAllowed
 {
     private DBPeriod $period;
     private mixed    $duration;
@@ -14,7 +14,7 @@ class GetMaxShiftReservationDateAllowed
     private mixed    $releaseShiftsAtTime;
     private mixed    $doReleaseShiftsDaily;
 
-    public function __construct(private readonly MapDayOfWeek $mapDayOfWeek)
+    public function __construct(private MapDayOfWeek $mapDayOfWeek)
     {
         $this->period               = DBPeriod::getConfigPeriod();
         $this->duration             = config('cart-scheduler.shift_reservation_duration');

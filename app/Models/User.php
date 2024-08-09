@@ -176,18 +176,14 @@ class User extends Authenticatable
     protected function hasLoggedIn(): Attribute
     {
         return Attribute::make(
-            get: static function ($value, $attributes) {
-                return isset($attributes['password']) && $attributes['password'];
-            },
+            get: static fn($value, $attributes) => isset($attributes['password']) && $attributes['password'],
         );
     }
 
     protected function isRestricted(): Attribute
     {
         return Attribute::make(
-            get: static function ($value, $attributes) {
-                return isset($attributes['is_unrestricted']) && !$attributes['is_unrestricted'];
-            },
+            get: static fn($value, $attributes) => isset($attributes['is_unrestricted']) && !$attributes['is_unrestricted'],
         );
     }
 

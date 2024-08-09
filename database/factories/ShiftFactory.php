@@ -37,58 +37,52 @@ class ShiftFactory extends Factory
 
     public function everyDay(): Factory
     {
-        return $this->state(function (array $attributes) {
-            return [
-                'day_monday'     => true,
-                'day_tuesday'    => true,
-                'day_wednesday'  => true,
-                'day_thursday'   => true,
-                'day_friday'     => true,
-                'day_saturday'   => true,
-                'day_sunday'     => true,
-                'available_from' => null,
-                'available_to'   => null,
-            ];
-        });
+        return $this->state(fn(array $attributes) => [
+            'day_monday'     => true,
+            'day_tuesday'    => true,
+            'day_wednesday'  => true,
+            'day_thursday'   => true,
+            'day_friday'     => true,
+            'day_saturday'   => true,
+            'day_sunday'     => true,
+            'available_from' => null,
+            'available_to'   => null,
+        ]);
     }
 
     public function everyDay9am(): Factory
     {
-        return $this->state(function (array $attributes) {
-            return [
-                'is_enabled'     => true,
-                'day_monday'     => true,
-                'day_tuesday'    => true,
-                'day_wednesday'  => true,
-                'day_thursday'   => true,
-                'day_friday'     => true,
-                'day_saturday'   => true,
-                'day_sunday'     => true,
-                'start_time'     => '09:00:00',
-                'end_time'       => '12:00:00',
-                'available_from' => null,
-                'available_to'   => null,
-            ];
-        });
+        return $this->state(fn(array $attributes) => [
+            'is_enabled'     => true,
+            'day_monday'     => true,
+            'day_tuesday'    => true,
+            'day_wednesday'  => true,
+            'day_thursday'   => true,
+            'day_friday'     => true,
+            'day_saturday'   => true,
+            'day_sunday'     => true,
+            'start_time'     => '09:00:00',
+            'end_time'       => '12:00:00',
+            'available_from' => null,
+            'available_to'   => null,
+        ]);
     }
 
     public function everyDay1230pm(): Factory
     {
-        return $this->state(function (array $attributes) {
-            return [
-                'is_enabled'     => true,
-                'day_monday'     => true,
-                'day_tuesday'    => true,
-                'day_wednesday'  => true,
-                'day_thursday'   => true,
-                'day_friday'     => true,
-                'day_saturday'   => true,
-                'day_sunday'     => true,
-                'start_time'     => '12:30:00',
-                'end_time'       => '15:30:00',
-                'available_from' => null,
-                'available_to'   => null,
-            ];
-        });
+        return $this->state(fn(array $attributes) => [
+            'is_enabled'     => true,
+            'day_monday'     => true,
+            'day_tuesday'    => true,
+            'day_wednesday'  => true,
+            'day_thursday'   => true,
+            'day_friday'     => true,
+            'day_saturday'   => true,
+            'day_sunday'     => true,
+            'start_time'     => '12:30:00',
+            'end_time'       => '15:30:00',
+            'available_from' => null,
+            'available_to'   => null,
+        ]);
     }
 }

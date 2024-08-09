@@ -46,7 +46,7 @@ class UsersImport implements WithHeadingRow, WithValidation, WithBatchInserts, O
             'marital_status'      => $this->tidyNullableData($rowData['marital_status']),
             'spouse_id'           => $this->tidyNullableData($rowData['spouse_id']),
             'responsible_brother' => $rowData['responsible_brother'] ?: false,
-            'is_unrestricted'     => isset($rowData['is_unrestricted']) ? $rowData['is_unrestricted'] : true,
+            'is_unrestricted'     => $rowData['is_unrestricted'] ?? true,
         ];
 
         $user = User::where('email', '=', $rowData['email'])->first();

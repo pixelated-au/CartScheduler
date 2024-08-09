@@ -30,7 +30,7 @@ class SetAsEnumCollectionCast implements Castable
                     return null;
                 }
 
-                $data = explode(',', $attributes[$key]);
+                $data = explode(',', (string) $attributes[$key]);
 
                 if (!is_array($data)) {
                     return null;

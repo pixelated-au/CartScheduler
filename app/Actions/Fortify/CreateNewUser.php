@@ -23,14 +23,12 @@ class CreateNewUser implements CreatesNewUsers
             'terms'        => Jetstream::hasTermsAndPrivacyPolicyFeature() ? ['accepted', 'required'] : '',
         ])->validate();
 
-        return DB::transaction(function () use ($input) {
-            return tap(User::create([
-                'name'         => $input['name'],
-                'email'        => $input['email'],
-                'mobile_phone' => $input['mobile_phone'],
-                'password'     => Hash::make($input['password']),
-            ]), function (User $user) {
-            });
-        });
+        return DB::transaction(fn() => tap(User::create([
+            'name'         => $input['name'],
+            'email'        => $input['email'],
+            'mobile_phone' => $input['mobile_phone'],
+            'password'     => Hash::make($input['password']),
+        ]), function (User $user) {
+        }));
     }
 }

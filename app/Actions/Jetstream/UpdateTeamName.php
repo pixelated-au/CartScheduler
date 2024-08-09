@@ -9,14 +9,10 @@ use Laravel\Jetstream\Contracts\UpdatesTeamNames;
 class UpdateTeamName implements UpdatesTeamNames
 {
     /**
-     * Validate and update the given team's name.
-     *
-     * @param  mixed  $user
-     * @param  mixed  $team
-     * @param  array  $input
-     * @return void
+     * @throws \Illuminate\Auth\Access\AuthorizationException
+     * @throws \Illuminate\Validation\ValidationException
      */
-    public function update($user, $team, array $input)
+    public function update(mixed $user, mixed $team, array $input): void
     {
         Gate::forUser($user)->authorize('update', $team);
 
