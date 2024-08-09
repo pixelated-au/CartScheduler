@@ -33,25 +33,26 @@ class Location extends Model
         'is_enabled',
     ];
 
-    protected $casts = [
-        'min_volunteers'   => 'integer',
-        'max_volunteers'   => 'integer',
-        'requires_brother' => 'boolean',
-        'latitude'         => 'decimal:8',
-        'longitude'        => 'decimal:8',
-        'is_enabled'       => 'boolean',
-    ];
-
     public function shifts(): HasMany
     {
         return $this->hasMany(Shift::class);
     }
 
-    /** @noinspection SpellCheckingInspection */
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
             ->logAll()
             ->logOnlyDirty();
+    }
+    protected function casts(): array
+    {
+        return [
+            'min_volunteers'   => 'integer',
+            'max_volunteers'   => 'integer',
+            'requires_brother' => 'boolean',
+            'latitude'         => 'decimal:8',
+            'longitude'        => 'decimal:8',
+            'is_enabled'       => 'boolean',
+        ];
     }
 }

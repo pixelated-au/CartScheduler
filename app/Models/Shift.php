@@ -45,19 +45,6 @@ class Shift extends Model
         'is_enabled',
     ];
 
-    protected $casts = [
-        'day_monday'     => 'boolean',
-        'day_tuesday'    => 'boolean',
-        'day_wednesday'  => 'boolean',
-        'day_thursday'   => 'boolean',
-        'day_friday'     => 'boolean',
-        'day_saturday'   => 'boolean',
-        'day_sunday'     => 'boolean',
-        'is_enabled'     => 'boolean',
-        'available_from' => 'datetime',
-        'available_to'   => 'datetime',
-    ];
-
     /** @noinspection PhpUnused */
     protected function availableFrom(): Attribute
     {
@@ -136,5 +123,20 @@ class Shift extends Model
         return LogOptions::defaults()
             ->logAll()
             ->logOnlyDirty();
+    }
+    protected function casts(): array
+    {
+        return [
+            'day_monday'     => 'boolean',
+            'day_tuesday'    => 'boolean',
+            'day_wednesday'  => 'boolean',
+            'day_thursday'   => 'boolean',
+            'day_friday'     => 'boolean',
+            'day_saturday'   => 'boolean',
+            'day_sunday'     => 'boolean',
+            'is_enabled'     => 'boolean',
+            'available_from' => 'datetime',
+            'available_to'   => 'datetime',
+        ];
     }
 }

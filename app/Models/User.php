@@ -114,21 +114,6 @@ class User extends Authenticatable
     ];
 
     /**
-     * The attributes that should be cast.
-     *
-     * @var array
-     */
-    protected $casts = [
-        'is_enabled'          => 'boolean',
-        'is_unrestricted'     => 'boolean',
-        'responsible_brother' => 'boolean',
-        'email_verified_at'   => 'datetime',
-        'year_of_birth'       => 'integer',
-        'password'            => 'hashed',
-        //TODO add in a Role enum class
-    ];
-
-    /**
      * The accessors to append to the model's array form.
      *
      * @var array
@@ -209,7 +194,7 @@ class User extends Authenticatable
 
     public function spouse(): HasOne
     {
-        return $this->hasOne(User::class, 'id', 'spouse_id');
+        return $this->hasOne(__CLASS__, 'id', 'spouse_id');
     }
 
     public function bookings(): HasMany
@@ -238,5 +223,22 @@ class User extends Authenticatable
             ->logAll()
             ->logExcept(['password', 'remember_token', 'two_factor_recovery_codes', 'two_factor_secret'])
             ->logOnlyDirty();
+    }
+    /**
+     * The attributes that should be cast.
+     *
+     * @return array
+     */
+    protected function casts(): array
+    {
+        return [
+            'is_enabled'          => 'boolean',
+            'is_unrestricted'     => 'boolean',
+            'responsible_brother' => 'boolean',
+            'email_verified_at'   => 'datetime',
+            'year_of_birth'       => 'integer',
+            'password'            => 'hashed',
+            //TODO add in a Role enum class
+        ];
     }
 }

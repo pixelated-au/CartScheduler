@@ -21,11 +21,11 @@ class ReportFactory extends Factory
             'shift_date'               => $shift->available_from
                 ? $shift->available_from->addDay()
                 : date('Y-m-d', strtotime('tomorrow')),
-            'placements_count'         => $this->faker->numberBetween(0, 10),
-            'videos_count'             => $this->faker->numberBetween(0, 10),
-            'requests_count'           => $this->faker->numberBetween(0, 10),
-            'shift_was_cancelled'      => $this->faker->boolean,
-            'comments'                 => $this->faker->sentence,
+            'placements_count'         => fake()->numberBetween(0, 10),
+            'videos_count'             => fake()->numberBetween(0, 10),
+            'requests_count'           => fake()->numberBetween(0, 10),
+            'shift_was_cancelled'      => fake()->boolean,
+            'comments'                 => fake()->sentence,
         ];
     }
 }

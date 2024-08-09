@@ -34,14 +34,14 @@ class UserAvailabilityFactory extends Factory
             'day_friday'     => $friday,
             'day_saturday'   => $saturday,
             'day_sunday'     => $sunday,
-            'num_mondays'    => $monday ? $this->faker->numberBetween(0, 4) : 0,
-            'num_tuesdays'   => $tuesday ? $this->faker->numberBetween(0, 4) : 0,
-            'num_wednesdays' => $wednesday ? $this->faker->numberBetween(0, 4) : 0,
-            'num_thursdays'  => $thursday ? $this->faker->numberBetween(0, 4) : 0,
-            'num_fridays'    => $friday ? $this->faker->numberBetween(0, 4) : 0,
-            'num_saturdays'  => $saturday ? $this->faker->numberBetween(0, 4) : 0,
-            'num_sundays'    => $sunday ? $this->faker->numberBetween(0, 4) : 0,
-            'comments'       => $this->faker->sentence(),
+            'num_mondays'    => $monday ? fake()->numberBetween(0, 4) : 0,
+            'num_tuesdays'   => $tuesday ? fake()->numberBetween(0, 4) : 0,
+            'num_wednesdays' => $wednesday ? fake()->numberBetween(0, 4) : 0,
+            'num_thursdays'  => $thursday ? fake()->numberBetween(0, 4) : 0,
+            'num_fridays'    => $friday ? fake()->numberBetween(0, 4) : 0,
+            'num_saturdays'  => $saturday ? fake()->numberBetween(0, 4) : 0,
+            'num_sundays'    => $sunday ? fake()->numberBetween(0, 4) : 0,
+            'comments'       => fake()->sentence(),
             'created_at'     => Carbon::now(),
             'updated_at'     => Carbon::now(),
         ];
@@ -70,24 +70,24 @@ class UserAvailabilityFactory extends Factory
     private function availability(): ?array
     {
         // 20% chance of full-day
-        if ($this->faker->boolean(20)) {
+        if (fake()->boolean(20)) {
             return $this->getHourRange(7, 18);
         }
 
         // 20% chance of morning
-        if ($this->faker->boolean(20)) {
+        if (fake()->boolean(20)) {
             return $this->getHourRange(7, 12);
         }
 
         // 20% chance of afternoon
-        if ($this->faker->boolean(20)) {
+        if (fake()->boolean(20)) {
             return $this->getHourRange(12, 18);
         }
         return null;
     }
 
     /**
-     * @return mixed[]
+     * @return AvailabilityHours[]
      */
     public function getHourRange(int $start, int $end): array
     {

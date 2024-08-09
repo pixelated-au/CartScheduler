@@ -46,7 +46,7 @@ class UserAvailabilityRequest extends FormRequest
     public function after(): array
     {
         return [
-            function (\Illuminate\Validation\Validator $validator) {
+            function (Validator $validator) {
                 $settings = app()->make(GeneralSettings::class);
                 if (!$settings->enableUserAvailability) {
                     $validator->errors()->add('featureDisabled', 'User location choices are not enabled.');

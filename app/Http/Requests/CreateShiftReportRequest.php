@@ -3,8 +3,8 @@
 namespace App\Http\Requests;
 
 use App\Models\Report;
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Validator;
 
 class CreateShiftReportRequest extends FormRequest
 {

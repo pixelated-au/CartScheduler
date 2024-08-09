@@ -3,6 +3,7 @@
          xsi:noNamespaceSchemaLocation="./vendor/phpunit/phpunit/phpunit.xsd"
          bootstrap="vendor/autoload.php"
          colors="true"
+         cacheDirectory="tests/.cache"
 >
     <testsuites>
         <testsuite name="Unit">
@@ -21,7 +22,7 @@
             <directory>./app/Actions/Jetstream</directory>
         </exclude>
     </source>
-    <coverage cacheDirectory="tests/.cache">
+    <coverage>
         <report>
           <html outputDirectory="tests/code-coverage" highLowerBound="80"/>
         </report>

@@ -2,10 +2,10 @@
 
 namespace App\Http\Requests;
 
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Fluent;
-use Illuminate\Validation\Validator;
 
 class UpdateLocationRequest extends FormRequest
 {

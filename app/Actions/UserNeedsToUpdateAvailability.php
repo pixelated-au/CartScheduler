@@ -6,9 +6,9 @@ use App\Models\User;
 use App\Settings\GeneralSettings;
 use Illuminate\Support\Carbon;
 
-class UserNeedsToUpdateAvailability
+readonly class UserNeedsToUpdateAvailability
 {
-    public function __construct(private readonly GeneralSettings $settings)
+    public function __construct(private GeneralSettings $settings)
     {
     }
 

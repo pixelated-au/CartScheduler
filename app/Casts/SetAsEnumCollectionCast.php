@@ -17,7 +17,7 @@ class SetAsEnumCollectionCast implements Castable
      * @param array{class-string<TEnum>} $arguments
      * @return CastsAttributes<Collection<array-key, TEnum>, iterable<TEnum>>
      */
-    public static function castUsing(array $arguments): CastsAttributes
+    public static function castUsing(array $arguments = []): CastsAttributes
     {
         return new class($arguments) implements CastsAttributes {
             public function __construct(protected array $arguments)

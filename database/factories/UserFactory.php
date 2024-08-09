@@ -6,9 +6,6 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
-/**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\User>
- */
 class UserFactory extends Factory
 {
     /**
@@ -24,20 +21,20 @@ class UserFactory extends Factory
      */
     public function definition(): array
     {
-        $gender = $this->faker->randomElement(['male', 'female']);
+        $gender = fake()->randomElement(['male', 'female']);
         return [
-            'uuid'                => $this->faker->uuid(),
-            'name'                => $this->faker->name(),
-            'email'               => $this->faker->unique()->safeEmail(),
-            'role'                => $this->faker->randomElement(['admin', 'user']),
+            'uuid'                => fake()->uuid(),
+            'name'                => fake()->name(),
+            'email'               => fake()->unique()->safeEmail(),
+            'role'                => fake()->randomElement(['admin', 'user']),
             //'email_verified_at'  => now(),
             'gender'              => $gender,
-            'mobile_phone'        => $this->faker->phoneNumber(),
-            'year_of_birth'       => $this->faker->numberBetween(1950, date('Y') - 18),
-            'marital_status'      => $this->faker->randomElement(['married', 'single', 'divorced', 'separated', 'widowed']),
+            'mobile_phone'        => fake()->phoneNumber(),
+            'year_of_birth'       => fake()->numberBetween(1950, date('Y') - 18),
+            'marital_status'      => fake()->randomElement(['married', 'single', 'divorced', 'separated', 'widowed']),
             'appointment'         => $this->getAppointment($gender),
-            'serving_as'          => $this->faker->randomElement(['field missionary', 'special pioneer', 'bethel family member', 'regular pioneer', 'publisher']),
-            'responsible_brother' => $gender === 'male' && $this->faker->boolean(5),
+            'serving_as'          => fake()->randomElement(['field missionary', 'special pioneer', 'bethel family member', 'regular pioneer', 'publisher']),
+            'responsible_brother' => $gender === 'male' && fake()->boolean(5),
             'is_enabled'          => true,
             'is_unrestricted'     => true,
             'password'            => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', // password
@@ -128,7 +125,7 @@ class UserFactory extends Factory
     {
         return $this->state(fn(array $attributes) => [
             'role'       => 'user',
-            'serving_as' => $this->faker->randomElement(['field missionary', 'special pioneer', 'bethel family member', 'regular pioneer']),
+            'serving_as' => fake()->randomElement(['field missionary', 'special pioneer', 'bethel family member', 'regular pioneer']),
             'is_enabled' => true,
         ]);
     }
@@ -170,7 +167,7 @@ class UserFactory extends Factory
         if ($gender !== 'male') {
             return null;
         }
-        $appointment = $this->faker->randomElement(['elder', 'ministerial servant', '']);
+        $appointment = fake()->randomElement(['elder', 'ministerial servant', '']);
         if ($appointment === '') {
             return null;
         }

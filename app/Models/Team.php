@@ -8,21 +8,9 @@ use Laravel\Jetstream\Events\TeamDeleted;
 use Laravel\Jetstream\Events\TeamUpdated;
 use Laravel\Jetstream\Team as JetstreamTeam;
 
-/**
- * @method \Database\Factories\TeamFactory factory()
- */
 class Team extends JetstreamTeam
 {
     use HasFactory;
-
-    /**
-     * The attributes that should be cast.
-     *
-     * @var array
-     */
-    protected $casts = [
-        'personal_team' => 'boolean',
-    ];
 
     /**
      * The attributes that are mass assignable.
@@ -44,4 +32,15 @@ class Team extends JetstreamTeam
         'updated' => TeamUpdated::class,
         'deleted' => TeamDeleted::class,
     ];
+    /**
+     * The attributes that should be cast.
+     *
+     * @return array
+     */
+    protected function casts(): array
+    {
+        return [
+            'personal_team' => 'boolean',
+        ];
+    }
 }

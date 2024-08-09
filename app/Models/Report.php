@@ -21,11 +21,6 @@ class Report extends Model
         'shift_date',
     ];
 
-    protected $casts = [
-        'shift_date' => 'custom_datetime:Y-m-d',
-        'metadata'   => 'array',
-    ];
-
     public function shift(): BelongsTo
     {
         return $this->belongsTo(Shift::class);
@@ -41,6 +36,13 @@ class Report extends Model
         return LogOptions::defaults()
                          ->logAll()
                          ->logOnlyDirty();
+    }
+    protected function casts(): array
+    {
+        return [
+            'shift_date' => 'custom_datetime:Y-m-d',
+            'metadata'   => 'array',
+        ];
     }
 
 }

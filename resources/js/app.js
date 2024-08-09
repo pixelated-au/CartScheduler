@@ -9,7 +9,7 @@ import {createApp, h} from 'vue';
 
 import Toast from 'vue-toastification';
 import 'vue-toastification/dist/index.css';
-import {ZiggyVue} from '../../vendor/tightenco/ziggy/dist/vue.m';
+import {ZiggyVue} from 'ziggy-js';
 import '../css/app.css';
 import './bootstrap';
 
@@ -28,7 +28,7 @@ if (bugsnagKey) {
  *     head: string[];
  *     body: string;
  * }>
-*/
+ */
 createInertiaApp({
     title: (title) => `${title} - ${appName}`,
     resolve: (name) => resolvePageComponent(`./Pages/${name}.vue`, import.meta.glob('./Pages/**/*.vue')),

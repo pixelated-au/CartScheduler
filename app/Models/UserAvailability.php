@@ -26,18 +26,20 @@ class UserAvailability extends Model
         'day_sunday',
     ];
 
-    protected $casts = [
-        'day_monday'    => SetAsEnumCollectionCast::class . ':' . AvailabilityHours::class,
-        'day_tuesday'   => SetAsEnumCollectionCast::class . ':' . AvailabilityHours::class,
-        'day_wednesday' => SetAsEnumCollectionCast::class . ':' . AvailabilityHours::class,
-        'day_thursday'  => SetAsEnumCollectionCast::class . ':' . AvailabilityHours::class,
-        'day_friday'    => SetAsEnumCollectionCast::class . ':' . AvailabilityHours::class,
-        'day_saturday'  => SetAsEnumCollectionCast::class . ':' . AvailabilityHours::class,
-        'day_sunday'    => SetAsEnumCollectionCast::class . ':' . AvailabilityHours::class,
-    ];
-
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+    protected function casts(): array
+    {
+        return [
+            'day_monday'    => SetAsEnumCollectionCast::class . ':' . AvailabilityHours::class,
+            'day_tuesday'   => SetAsEnumCollectionCast::class . ':' . AvailabilityHours::class,
+            'day_wednesday' => SetAsEnumCollectionCast::class . ':' . AvailabilityHours::class,
+            'day_thursday'  => SetAsEnumCollectionCast::class . ':' . AvailabilityHours::class,
+            'day_friday'    => SetAsEnumCollectionCast::class . ':' . AvailabilityHours::class,
+            'day_saturday'  => SetAsEnumCollectionCast::class . ':' . AvailabilityHours::class,
+            'day_sunday'    => SetAsEnumCollectionCast::class . ':' . AvailabilityHours::class,
+        ];
     }
 }
