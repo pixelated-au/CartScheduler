@@ -70,7 +70,9 @@
         "post-autoload-dump": [
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
             "@php artisan package:discover --ansi",
-            "@php composer audit"
+            "@php composer audit",
+            "npm audit",
+            "# *** DON'T FORGET TO RUN: snyk test ***"
         ],
         "post-update-cmd": [
             "@php artisan vendor:publish --tag=laravel-assets --ansi --force"
