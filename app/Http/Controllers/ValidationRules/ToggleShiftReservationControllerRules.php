@@ -8,7 +8,9 @@ use App\Models\Location;
 use App\Models\Shift;
 use App\Models\ShiftUser;
 use App\Models\User;
+use Carbon\CarbonImmutable;
 use Carbon\CarbonPeriod;
+use Closure;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Query\JoinClause;
@@ -17,11 +19,11 @@ use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use RuntimeException;
 
-class ToggleShiftReservationControllerRules
+readonly class ToggleShiftReservationControllerRules
 {
     public function __construct(
-        private readonly GetMaxShiftReservationDateAllowed            $getMaxShiftReservationDateAllowed,
-        private readonly ValidateVolunteerIsAllowedToBeRosteredAction $validateVolunteerIsAllowedToBeRosteredAction,
+        private GetMaxShiftReservationDateAllowed            $getMaxShiftReservationDateAllowed,
+        private ValidateVolunteerIsAllowedToBeRosteredAction $validateVolunteerIsAllowedToBeRosteredAction,
     )
     {
     }
@@ -29,7 +31,7 @@ class ToggleShiftReservationControllerRules
     //TODO Can this be migrated to a FormRequest class?
     public function execute(User $user, array $data, bool $isAdmin = false): array
     {
-        $shiftDate = Carbon::parse($data['date']);
+        $shiftDate = CarbonImmutable::parse($data['date']);
         $dayOfWeek = Str::of('day_')->append($shiftDate->dayName)->lower();
         return [
             'location'   => [
@@ -58,11 +60,12 @@ class ToggleShiftReservationControllerRules
                             ->where('shift_date', $shiftDate->toDateString())
                     ],
                 ),
-                function ($attribute, $value, $fail) use ($user, $data, $shiftDate, $isAdmin) {
+                function (string $attribute, mixed $value, Closure $fail) use ($user, $data, $shiftDate, $isAdmin) {
                     // only validate if adding a shift
                     if (!$data['do_reserve']) {
                         return;
                     }
+
                     $this->isOverlappingShift($user, $shiftDate, $data['shift'], $isAdmin, $fail);
                     $this->isUserAllowedToReserveShifts($user, $shiftDate, $data['shift'], $fail);
                     $this->isUserActive($user, $data, $fail);
@@ -74,7 +77,7 @@ class ToggleShiftReservationControllerRules
                 'date',
                 'after_or_equal:today',
                 //'before_or_equal:last day of next month zulu',
-                function ($attribute, $value, $fail) use ($data, $isAdmin) {
+                function (string $attribute, mixed $value, Closure $fail) use ($data, $isAdmin) {
                     // only validate if adding a shift
                     if ($isAdmin || !$data['do_reserve']) {
                         return;
@@ -86,7 +89,7 @@ class ToggleShiftReservationControllerRules
         ];
     }
 
-    private function isOverlappingShift(User $user, Carbon $shiftDate, int $shiftId, bool $isAdmin, $fail): void
+    private function isOverlappingShift(User $user, CarbonImmutable $shiftDate, int $shiftId, bool $isAdmin, Closure $fail): void
     {
         $userShiftsOnDate = Shift::select('shifts.*')
             ->with([
@@ -114,23 +117,25 @@ class ToggleShiftReservationControllerRules
             )
             ->get();
 
-
         $requestedShift       = Shift::find($shiftId);
         $requestedShiftPeriod = CarbonPeriod::create(
-            $requestedShift->start_time,
-            $requestedShift->end_time,
+            $shiftDate->setTimeFrom($requestedShift->start_time),
+            $shiftDate->setTimeFrom($requestedShift->end_time),
         );
 
         /** @var Shift $overlappingShift */
         $overlappingShift = $userShiftsOnDate->first(
             fn(Shift $currentShift) => $requestedShiftPeriod->overlaps(
-                CarbonPeriod::create($currentShift->start_time, $currentShift->end_time),
+                CarbonPeriod::create(
+                    $shiftDate->setTimeFrom($currentShift->start_time),
+                    $shiftDate->setTimeFrom($currentShift->end_time),
+                ),
             ),
         );
 
         if ($overlappingShift) {
-            $start   = Carbon::parse($overlappingShift->start_time)->format('h:i a');
-            $end     = Carbon::parse($overlappingShift->end_time)->format('h:i a');
+            $start   = $shiftDate->setTimeFrom($overlappingShift->start_time)->format('h:i a');
+            $end     = $shiftDate->setTimeFrom($overlappingShift->end_time)->format('h:i a');
             $message = $isAdmin
                 ? "Sorry, $user->name is already on a shift that overlaps this shift at {$overlappingShift->location->name} between $start and $end."
                 : "Sorry, you're already assigned to shift at this time\n{$overlappingShift->location->name} - {$overlappingShift->start_time} and {$overlappingShift->end_time}.";
@@ -142,7 +147,7 @@ class ToggleShiftReservationControllerRules
     /**
      * @throws \RuntimeException
      */
-    private function isUserAllowedToReserveShifts(User $user, Carbon $shiftDate, int $shiftId, $fail): void
+    private function isUserAllowedToReserveShifts(User $user, CarbonImmutable $shiftDate, int $shiftId, Closure $fail): void
     {
         $location = Location::whereRelation('shifts', 'id', $shiftId)->first();
         if (!$location) {
@@ -170,16 +175,15 @@ class ToggleShiftReservationControllerRules
         }
     }
 
-    private function isShiftInAllowedPeriod(Carbon $shiftDate, $fail): void
+    private function isShiftInAllowedPeriod(Carbon $shiftDate, Closure $fail): void
     {
         $maxShiftReservationDateAllowed = $this->getMaxShiftReservationDateAllowed->execute();
-
         if ($shiftDate->isAfter($maxShiftReservationDateAllowed)) {
             $fail($this->getMaxShiftReservationDateAllowed->getFailMessage());
         }
     }
 
-    private function isUserActive(User $user, array $data, $fail): void
+    private function isUserActive(User $user, array $data, Closure $fail): void
     {
         if (!$data['do_reserve'] || !isset($data['user'])) {
             // test only if there is a 'user' key (admin-only feature) and adding to a shift
