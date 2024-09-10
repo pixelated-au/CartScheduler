@@ -45,8 +45,8 @@ mv public_html public_html.bak && ln -s /home/[MY ACCOUNT]/smpw_app/public /home
 
 > [!IMPORTANT]
 > :warning: If you are using cPanel, in the instructions below, you may need to replace the default PHP version with PHP 8.x by
-> replacing `php` with `ea-php81` in the commands below. You can check the PHP version by running `php -v`. If the 
-> version is below 8.1, you will need to use the `ea-php81` command. An example is provided below
+> replacing `php` with `ea-php82` in the commands below. You can check the PHP version by running `php -v`. If the 
+> version is below 8.1, you will need to use the `ea-php82` command. An example is provided below
 
 ### Standard Deployment
 
@@ -64,7 +64,11 @@ To deploy a release requires the following steps:
       MAIL_HOST=localhost
       ``` 
 1. SSH into the server if you haven't yet already.
-1. Make sure the permissions on the `storage` folder are set to 775. Navigate to the installed directory and use this: `find . -type d -exec chmod 775 {} \;`
+1. Make sure the permissions on the installation direcotry are set to 775 and files are set to 644. Navigate to the installed directory and use this:
+    ```bash
+    find . -type d -exec chmod 775 {} \; && find . -type f -exec chmod 644 {} \;
+   
+    ```
 1. Run the following command to enable the Laravel cache:
     ```bash
     php artisan key:generate \
@@ -76,19 +80,19 @@ To deploy a release requires the following steps:
     ```
 1. Or for cPanel, if the default system PHP version is not PHP 8.1, you may be able to use the following:
     ```bash
-    ea-php81 artisan key:generate \
-    && ea-php81 artisan config:cache \
-    && ea-php81 artisan route:cache \
-    && ea-php81 artisan view:cache \
-    && ea-php81 artisan event:cache \
-    && ea-php81 artisan storage:link
+    ea-php82 artisan key:generate \
+    && ea-php82 artisan config:cache \
+    && ea-php82 artisan route:cache \
+    && ea-php82 artisan view:cache \
+    && ea-php82 artisan event:cache \
+    && ea-php82 artisan storage:link
     ```
 1. Run the following command to migrate/install the database:
     - `php artisan migrate`
 1. Setup the cron job to run the following command every minute:
     - `php artisan schedule:run >> /dev/null 2>&1`
-        - eg: `* * * * * cd /home/[MY_ACCOUNT]/[MY_APP] && php artisan schedule:run >> /dev/null 2>&1`
-          <- Note, you may need to replace `php` with `ea-php81` if you're using cPanel
+        - eg: `* * * * * cd (/home/[MY_ACCOUNT]/[MY_APP] && php artisan schedule:run >> /dev/null 2>&1)`
+          <- Note, you may need to replace `php` with `ea-php82` if you're using cPanel
 1. Create the admin user. Note, this can only be run once.:
     - `php artisan carts:create-user <name> <email> <phone> <gender> [<password>]`
 1. Navigate to the site and login with the admin user you just created.
