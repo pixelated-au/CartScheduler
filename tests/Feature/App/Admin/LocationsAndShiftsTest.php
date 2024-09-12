@@ -123,7 +123,7 @@ class LocationsAndShiftsTest extends TestCase
             ]);
         $location = Location::first();
 
-        $response->assertRedirect("http://localhost/admin/locations/{$location->id}/edit");
+        $response->assertRedirect("/admin/locations/$location->id/edit");
         $this->assertDatabaseCount('locations', 1);
     }
 
@@ -312,7 +312,7 @@ class LocationsAndShiftsTest extends TestCase
                 ]
             ]);
 
-        $response->assertRedirect("http://localhost/admin/locations/$location->id/edit");
+        $response->assertRedirect("/admin/locations/$location->id/edit");
         $this->assertDatabaseCount('locations', 1);
         $this->assertDatabaseHas('locations', [
             'name'             => 'A test city!',
@@ -426,7 +426,7 @@ class LocationsAndShiftsTest extends TestCase
                 ]
             ]);
 
-        $response->assertRedirect("http://localhost/admin/locations/$location->id/edit");
+        $response->assertRedirect("/admin/locations/$location->id/edit");
         $this->assertDatabaseCount('locations', 1);
 
         $this->assertDatabaseCount('shifts', 2);
@@ -713,7 +713,7 @@ class LocationsAndShiftsTest extends TestCase
                     ]
                 ]
             ]);
-        $response->assertRedirect("http://localhost/admin/locations/{$location->id}/edit");
+        $response->assertRedirect("/admin/locations/{$location->id}/edit");
 
         $this->assertDatabaseCount('locations', 1);
         $this->assertDatabaseCount('shifts', 2);
