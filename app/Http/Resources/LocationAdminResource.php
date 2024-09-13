@@ -14,6 +14,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
  * @property mixed $latitude
  * @property mixed $longitude
  * @property mixed $is_enabled
+ * @property mixed $sort_order
  * @property mixed $shifts
  */
 class LocationAdminResource extends JsonResource
@@ -31,6 +32,7 @@ class LocationAdminResource extends JsonResource
             'latitude'          => $this->latitude,
             'longitude'         => $this->longitude,
             'is_enabled'        => $this->is_enabled,
+            'sort_order'        => $this->sort_order,
             'shifts'            => ShiftAdminResource::collection($this->whenLoaded('shifts')),
         ];
     }
