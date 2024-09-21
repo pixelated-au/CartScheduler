@@ -32,13 +32,12 @@ const submit = () => {
 
 const setPasswordSuccess = computed(() => usePage().props.jetstream.flash?.setPassword || '');
 
-onMounted(() => {
-    if (import.meta.env.DEV) {
+if (import.meta.env.DEV) {
+    onMounted(() => {
         form.email = 'admin@example.com';
         form.password = 'password';
-    }
-});
-
+    });
+}
 </script>
 
 <template>
