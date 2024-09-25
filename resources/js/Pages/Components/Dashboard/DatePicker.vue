@@ -122,7 +122,8 @@ watchEffect(() => {
             for (let shiftCount = 0; shiftCount < shifts.length; shiftCount++) {
                 const shift = shifts[shiftCount];
                 if (!isoDate) {
-                    isoDate = utcToZonedTime(shift.shift_date, shiftAvailability.value.timezone);
+                    // isoDate = utcToZonedTime(shift.shift_date + ' 12:00:00', shiftAvailability.value.timezone);
+                    isoDate = parseISO(shift.shift_date);
                 }
                 // TODO is this isBefore and isAfter still needed?
                 if (isBefore(isoDate, startOfDay(parseISO(shift.available_from)))) {
