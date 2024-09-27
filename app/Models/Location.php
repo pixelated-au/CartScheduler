@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Database\Factories\LocationFactory;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -31,7 +32,15 @@ class Location extends Model
         'latitude',
         'longitude',
         'is_enabled',
+        'sort_order',
     ];
+
+    protected static function boot(): void
+    {
+        parent::boot();
+        static::addGlobalScope('sort_order', static fn(Builder $builder) => $builder
+            ->orderBy('sort_order'));
+    }
 
     public function shifts(): HasMany
     {
@@ -44,6 +53,7 @@ class Location extends Model
             ->logAll()
             ->logOnlyDirty();
     }
+
     protected function casts(): array
     {
         return [
