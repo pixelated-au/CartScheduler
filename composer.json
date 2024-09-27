@@ -12,7 +12,7 @@
         "ext-pdo": "*",
         "ext-zip": "*",
         "bugsnag/bugsnag-laravel": "^v2.28.0",
-        "codedge/laravel-selfupdater": "dev-dev/github-release-files",
+        "codedge/laravel-selfupdater": "^3.9",
         "guzzlehttp/guzzle": "^7.8.1",
         "inertiajs/inertia-laravel": "^v1.3.0",
         "laravel/framework": "^v11.20.0",
@@ -44,12 +44,6 @@
         "roave/security-advisories": "dev-latest",
         "spatie/laravel-ignition": "^2.8.0"
     },
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/pixelated-au/laravel-selfupdater.git"
-        }
-    ],
     "autoload": {
         "psr-4": {
             "App\\": "app/",
