@@ -30,7 +30,7 @@
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^v3.13.5",
-        "brianium/paratest": "v7.5.4",
+        "brianium/paratest": "v7.5.5",
         "dg/bypass-finals": "^v1.8.0",
         "driftingly/rector-laravel": "^1.2.1",
         "fakerphp/faker": "^v1.23.1",
@@ -39,7 +39,7 @@
         "league/csv": "^9.16",
         "mockery/mockery": "^1.6.12",
         "nunomaduro/collision": "^v8.4.0",
-        "phpunit/phpunit": "^11.3.0",
+        "phpunit/phpunit": "^11.3.6",
         "rector/rector": "^1.2.2",
         "roave/security-advisories": "dev-latest",
         "spatie/laravel-ignition": "^2.8.0"
