@@ -1,22 +1,23 @@
 <script setup>
 import DragDrop from "@/Components/Icons/DragDrop.vue";
+import useToast from "@/Composables/useToast.js";
 import JetButton from '@/Jetstream/Button.vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import {router} from '@inertiajs/vue3';
 import {useSortable} from "@vueuse/integrations/useSortable";
-import {VTooltip} from 'floating-vue';
-import {truncate} from 'lodash';
-import {onMounted, onUnmounted, ref, watch} from "vue";
+import {nextTick, onMounted, onUnmounted, ref, watch} from "vue";
 
 const props = defineProps({
     locations: Object.data,
 });
 
-defineOptions({
-    directives: [VTooltip],
-});
+const toast = useToast();
 
 const onNewLocation = () => {
+    if (isSortingMode.value) {
+        toast.warning('You cannot create a new location while sorting is enabled');
+        return;
+    }
     router.visit(route('admin.locations.create'));
 };
 
@@ -27,58 +28,66 @@ const locationClicked = (location) => {
     router.visit(route('admin.locations.edit', {id: location.id}));
 };
 
-const truncateDescription = description => truncate(description, {
-    // todo can this be one with css?
-    length: 100,
-    omission: '...',
-    separator: ' ',
-});
-
 const locationsRef = ref(null);
 if (!locationsRef) {
     throw new Error('An unexpected error occurred. The locationsRef is not defined. Please report this to the developers.');
 }
 
-let watcher;
+const storeSortOrder = async (locations) => {
+    try {
+        await axios.put(route('admin.locations.sort-order'), {
+            locations: locations.map(location => location.id),
+        });
+    } catch (e) {
+        return false;
+    }
 
-const {start, stop, option} = useSortable(locationsRef, props.locations.data, {animation: 250, disabled: true});
+    return true;
+};
 
-const unsetWatcher = () => {
-    if (watcher) {
-        watcher();
-        watcher = undefined;
+const moveArrayElement = async (evt) => {
+    const from = evt.oldIndex;
+    const to = evt.newIndex;
+
+    const locationsArray = props.locations.data;
+
+    if (to >= 0 && to < locationsArray.length) {
+        const element = locationsArray.splice(from, 1)[0];
+        await nextTick(async () => {
+            locationsArray.splice(to, 0, element);
+            const success = await storeSortOrder(locationsArray);
+            if (!success) {
+                const element = locationsArray.splice(to, 1)[0];
+                locationsArray.splice(from, 0, element);
+                toast.error('There was an error while saving the sort order. The order has been reverted. Please try again.');
+            }
+        });
     }
 };
 
+const {start, stop, option} = useSortable(locationsRef, props.locations.data, {
+    animation: 250,
+    disabled: true,
+    onUpdate: moveArrayElement,
+});
+
 const pause = () => {
     option('disabled', true);
-}
+};
 const resume = () => {
     console.log('resume', option('disabled'), option('animation'));
     option('disabled', false);
-}
-
-onMounted(() => start());
-
-onUnmounted(() => {
-    unsetWatcher();
-    stop();
-});
-
-const isSortingMode = ref(false);
-
-const updateSortOrder = (locations) => {
-    console.log('updateSortOrder', locations);
-    // TODO now save the sort order to the database and then show the sort ordrer in the front-end
 };
 
+onMounted(() => start());
+onUnmounted(() => stop());
+
+const isSortingMode = ref(false);
 watch(isSortingMode, (value) => {
     if (value) {
         resume();
-        watcher = watch(props.locations.data, updateSortOrder, {deep: true});
     } else {
         pause();
-        unsetWatcher();
     }
 });
 
@@ -92,9 +101,10 @@ const transitionDelayStyle = (index) => `animation-delay: -${index * 0.37}s`;
             <div class="flex justify-between">
                 <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">Locations</h2>
                 <div class="flex">
-                    <JetButton outline style-type="secondary" class="mx-3" @click="isSortingMode = !isSortingMode"
-                               v-tooltip="'Sort Locations'">
-                        <drag-drop color="#000" box="16"/>
+                    <JetButton outline :style-type="isSortingMode ? 'danger' : 'secondary'" class="mx-3"
+                               @click="isSortingMode = !isSortingMode">
+                        <drag-drop color="currentColor" box="16"/>
+                        <span class="ml-3">{{ isSortingMode ? 'Stop sorting' : 'Sort locations' }}</span>
                     </JetButton>
                     <JetButton class="mx-3" style-type="primary" @click="onNewLocation">
                         New Location
@@ -116,7 +126,7 @@ const transitionDelayStyle = (index) => `animation-delay: -${index * 0.37}s`;
                 <div class="flex flex-col justify-between h-full dark:text-gray-100">
                     <div>
                         <h4 class="font-semibold">{{ location.name }}</h4>
-                        <div>{{ truncateDescription(location.clean_description) }}</div>
+                        <div class="line-clamp-3">{{ location.clean_description }}</div>
                     </div>
                     <div>
                         <div class="border-t border-gray-100 dark:border-gray-700 mt-3 pt-3"></div>
