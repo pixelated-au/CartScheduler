@@ -39,7 +39,9 @@ class Location extends Model
     {
         parent::boot();
         static::addGlobalScope('sort_order', static fn(Builder $builder) => $builder
-            ->orderBy('sort_order'));
+            ->orderBy('sort_order')
+            ->orderBy('name')
+        );
     }
 
     public function shifts(): HasMany
