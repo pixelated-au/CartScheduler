@@ -78,6 +78,7 @@ class RestrictedVolunteerTest extends TestCase
         $date  = '2023-01-03'; // A Tuesday
         $date2 = '2023-01-04';
         Location::factory()
+            ->state(['name' => 'Location 1'])
             ->has(
                 Shift::factory()
                     ->hasAttached($users, ['shift_date' => $date])
@@ -86,6 +87,7 @@ class RestrictedVolunteerTest extends TestCase
             ->create();
 
         Location::factory()
+            ->state(['name' => 'Location 2'])
             ->has(
                 Shift::factory()
                     ->hasAttached(

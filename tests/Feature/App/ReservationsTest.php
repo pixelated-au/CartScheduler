@@ -739,15 +739,17 @@ class ReservationsTest extends TestCase
             'available_to'  => '2024-07-31',
         ])->save());
 
+        $sortedLocations = $locations->sortBy('name')->values();
+
         $this->travelTo($startDate);
 
         $this->actingAs($user)
             ->getJson("/shifts/2024-06-30") // previously, this date would not return all locations
             ->assertOk()
             ->assertJsonCount(3, 'locations')
-            ->assertJsonPath("locations.0.name", $locations[0]->name)
-            ->assertJsonPath("locations.1.name", $locations[1]->name)
-            ->assertJsonPath("locations.2.name", $locations[2]->name)
+            ->assertJsonPath("locations.0.name", $sortedLocations[0]->name)
+            ->assertJsonPath("locations.1.name", $sortedLocations[1]->name)
+            ->assertJsonPath("locations.2.name", $sortedLocations[2]->name)
             ->assertJsonCount(2, "locations.0.shifts")
             ->assertJsonCount(2, "locations.1.shifts")
             ->assertJsonCount(2, "locations.2.shifts");
@@ -765,6 +767,7 @@ class ReservationsTest extends TestCase
         $locations = Location::factory()
             ->threeVolunteers()
             ->count(2)
+            ->sequence(['name' => 'Location 1'], ['name' => 'Location 2'])
             ->has(
                 Shift::factory()
                     ->count(1)

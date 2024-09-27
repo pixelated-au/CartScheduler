@@ -495,7 +495,7 @@ class UsersTest extends TestCase
 
         $admin     = User::factory()->adminRoleUser()->state(['is_enabled' => true])->create();
         $user      = User::factory()->enabled()->create();
-        $locations = Location::factory()->count(3)->create();
+        $locations = Location::factory()->count(6)->create();
 
         $choiceData = [
             'user_id'           => $user->getKey(),
@@ -512,9 +512,11 @@ class UsersTest extends TestCase
 
         $user->refresh()->load(['rosterLocations']);
         $this->assertCount(2, $user->rosterLocations);
-        $this->assertSame($locations[0]->name, $user->rosterLocations[0]->name);
-        $this->assertSame($locations[2]->name, $user->rosterLocations[1]->name);
-        $this->assertNotSame($locations[1]->name, $user->rosterLocations[0]->name, 'Verify data is not duplicated');
+
+        $rosterLocations = $user->rosterLocations->pluck('name');
+        $this->assertContains($locations[0]->name, $rosterLocations);
+        $this->assertContains($locations[2]->name, $rosterLocations);
+        $this->assertNotContains($locations[1]->name, $rosterLocations, 'Verify data is not duplicated');
 
         $choiceData['selectedLocations'][1] = $locations[1]->getKey();
 
@@ -523,8 +525,9 @@ class UsersTest extends TestCase
             ->assertRedirect("/admin/users/{$user->getKey()}/edit");
 
         $user->refresh()->load(['rosterLocations']);
-        $this->assertSame($locations[0]->name, $user->rosterLocations[0]->name);
-        $this->assertSame($locations[1]->name, $user->rosterLocations[1]->name);
+        $rosterLocations = $user->rosterLocations->pluck('name');
+        $this->assertContains($locations[0]->name, $rosterLocations);
+        $this->assertContains($locations[1]->name, $rosterLocations);
     }
 
     public function test_admin_cant_maintain_disabled_feature_of_user_location_choices(): void

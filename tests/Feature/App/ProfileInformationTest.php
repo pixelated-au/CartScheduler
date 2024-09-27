@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Models\UserAvailability;
 use App\Models\UserVacation;
 use App\Settings\GeneralSettings;
+use Illuminate\Database\Eloquent\Factories\Sequence;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
@@ -236,7 +237,10 @@ class ProfileInformationTest extends TestCase
         $settings->save();
 
         $user      = User::factory()->enabled()->create();
-        $locations = Location::factory()->count(3)->create();
+        $locations = Location::factory()
+            ->count(3)
+            ->sequence(fn(Sequence $sequence) => ['name' => 'Location ' . $sequence->index])
+            ->create();
 
         $choiceData = [
             'selectedLocations' => [
@@ -263,8 +267,9 @@ class ProfileInformationTest extends TestCase
             ->assertRedirect("/user/availability");
 
         $user->refresh()->load(['rosterLocations']);
-        $this->assertSame($locations[0]->name, $user->rosterLocations[0]->name);
-        $this->assertSame($locations[1]->name, $user->rosterLocations[1]->name);
+        $rosterLocations = $user->rosterLocations->pluck('name');
+        $this->assertContains($locations[0]->name, $rosterLocations);
+        $this->assertContains($locations[1]->name, $rosterLocations);
     }
 
     public function test_user_can_get_user_location_choices(): void

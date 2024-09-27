@@ -18,9 +18,11 @@ class LocationsAndShiftsTest extends TestCase
         $admin = User::factory()->enabled()->adminRoleUser()->create();
 
         $locations = Location::factory()
-            ->count(3)
+            ->count(6)
             ->has(Shift::factory()->everyDay9am())
             ->create();
+
+        $sortedLocations = $locations->sortBy('name')->values();
 
         $this->actingAs($admin)
             ->getJson("/admin/locations")
@@ -28,12 +30,18 @@ class LocationsAndShiftsTest extends TestCase
             ->assertInertia(fn(AssertableInertia $page) => $page
                 ->component('Admin/Locations/List')
                 ->has('locations.data', fn(AssertableInertia $data) => $data
-                    ->where('0.name', $locations[0]->name)
-                    ->has('0.shifts', $locations[0]->shifts->count())
-                    ->where('1.name', $locations[1]->name)
-                    ->has('1.shifts', $locations[1]->shifts->count())
-                    ->where('2.name', $locations[2]->name)
-                    ->has('2.shifts', $locations[2]->shifts->count())
+                    ->where('0.name', $sortedLocations[0]->name)
+                    ->has('0.shifts', $sortedLocations[0]->shifts->count())
+                    ->where('1.name', $sortedLocations[1]->name)
+                    ->has('1.shifts', $sortedLocations[1]->shifts->count())
+                    ->where('2.name', $sortedLocations[2]->name)
+                    ->has('2.shifts', $sortedLocations[2]->shifts->count())
+                    ->where('3.name', $sortedLocations[3]->name)
+                    ->has('3.shifts', $sortedLocations[3]->shifts->count())
+                    ->where('4.name', $sortedLocations[4]->name)
+                    ->has('4.shifts', $sortedLocations[4]->shifts->count())
+                    ->where('5.name', $sortedLocations[5]->name)
+                    ->has('5.shifts', $sortedLocations[5]->shifts->count())
                 )
             );
     }
@@ -83,6 +91,7 @@ class LocationsAndShiftsTest extends TestCase
                     ->where('longitude', $location->longitude)
                     ->where('is_enabled', $location->is_enabled)
                     ->has('shifts', $location->shifts->count())
+                    ->etc()
                 )
             );
     }
