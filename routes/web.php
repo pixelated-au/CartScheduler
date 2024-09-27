@@ -4,6 +4,7 @@ use App\Http\Controllers\AdminAvailableShiftsController;
 use App\Http\Controllers\AdminCheckForUpdateController;
 use App\Http\Controllers\AdminDashboardController;
 use App\Http\Controllers\AdminRunSoftwareUpdateController;
+use App\Http\Controllers\AdminUpdateLocationSortOrderController;
 use App\Http\Controllers\AvailableShiftsController;
 use App\Http\Controllers\DownloadUserImportSpreadsheetController;
 use App\Http\Controllers\DownloadUsersAsSpreadsheetController;
@@ -104,6 +105,9 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified',
                 'update'  => 'admin.users.update',
                 'destroy' => 'admin.users.destroy',
             ]);
+
+            Route::put('/locations/sort-order', AdminUpdateLocationSortOrderController::class)
+                ->name('admin.locations.sort-order');
 
             Route::resource('/locations', LocationsController::class)->names([
                 'index'   => 'admin.locations.index',
