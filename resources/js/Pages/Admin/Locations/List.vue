@@ -60,7 +60,9 @@ const moveArrayElement = async (evt) => {
                 const element = locationsArray.splice(to, 1)[0];
                 locationsArray.splice(from, 0, element);
                 toast.error('There was an error while saving the sort order. The order has been reverted. Please try again.');
+                return;
             }
+            toast.success('The sort order has been saved successfully');
         });
     }
 };
