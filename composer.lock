@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "0312ab5bffdac732fbf0fb531e0a3bdd",
+    "content-hash": "75596be9713a79a4e7d2aecbc7edb1dc",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -374,16 +374,16 @@
         },
         {
             "name": "codedge/laravel-selfupdater",
-            "version": "dev-dev/github-release-files",
+            "version": "3.9.0",
             "source": {
                 "type": "git",
-                "url": "https://github.com/pixelated-au/laravel-selfupdater.git",
-                "reference": "138796868e3ed518d80bb9d3d106169240377f03"
+                "url": "https://github.com/codedge/laravel-selfupdater.git",
+                "reference": "3b1c6ad6582c5cb5bfb24d29a2990c34a2435fd1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pixelated-au/laravel-selfupdater/zipball/138796868e3ed518d80bb9d3d106169240377f03",
-                "reference": "138796868e3ed518d80bb9d3d106169240377f03",
+                "url": "https://api.github.com/repos/codedge/laravel-selfupdater/zipball/3b1c6ad6582c5cb5bfb24d29a2990c34a2435fd1",
+                "reference": "3b1c6ad6582c5cb5bfb24d29a2990c34a2435fd1",
                 "shasum": ""
             },
             "require": {
@@ -415,29 +415,14 @@
                 }
             },
             "autoload": {
-                "psr-4": {
-                    "Codedge\\Updater\\": "src/"
-                },
                 "files": [
                     "src/helpers.php"
-                ]
-            },
-            "autoload-dev": {
+                ],
                 "psr-4": {
-                    "Codedge\\Updater\\Tests\\": "tests/"
+                    "Codedge\\Updater\\": "src/"
                 }
             },
-            "scripts": {
-                "phpstan": [
-                    "./vendor/bin/phpstan --memory-limit=1G"
-                ],
-                "test": [
-                    "./vendor/bin/phpunit"
-                ],
-                "test-coverage": [
-                    "XDEBUG_MODE=coverage ./vendor/bin/phpunit --coverage-html=build/coverage-html"
-                ]
-            },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
@@ -466,11 +451,11 @@
             },
             "funding": [
                 {
-                    "type": "github",
-                    "url": "https://github.com/codedge"
+                    "url": "https://github.com/codedge",
+                    "type": "github"
                 }
             ],
-            "time": "2024-06-26T22:14:24+00:00"
+            "time": "2024-06-28T13:29:29+00:00"
         },
         {
             "name": "composer/ca-bundle",
@@ -12824,7 +12809,6 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
-        "codedge/laravel-selfupdater": 20,
         "roave/security-advisories": 20
     },
     "prefer-stable": true,
