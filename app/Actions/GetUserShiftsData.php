@@ -22,7 +22,7 @@ class GetUserShiftsData
      * @param \App\Models\User $user
      * @return \Illuminate\Support\Collection
      */
-    public function execute(string $startDate, string $endDate, user $user): collection
+    public function execute(string $startDate, string $endDate, User $user): Collection
     {
         $query = /** @lang MySQL */
             "
