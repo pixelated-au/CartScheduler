@@ -2,6 +2,10 @@
 
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Schedule;
+use App\Actions\SendShiftReminders;
+use Illuminate\Support\Facades\App;
+use Illuminate\Console\Scheduling\CallbackEvent;
 
 /*
 |--------------------------------------------------------------------------
@@ -17,3 +21,12 @@ use Illuminate\Support\Facades\Artisan;
 Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote');
+
+
+Schedule::call(SendShiftReminders::class)
+    ->tap(fn (CallbackEvent $event) =>
+        App::isLocal()
+            ? $event->everyThirtySeconds()
+            : $event->daily())
+    ->everyMinute();
+
