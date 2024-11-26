@@ -3,7 +3,13 @@
 
 # {{ config('app.name') }} Upcoming Shift
 
-Dear @if($gender == "male") Brother @else Sister @endif {{ $name }}, this is a reminder that you have an upcoming shift scheduled with the {{ config('app.name') }} Public Witnessing web application on this date: **{{ $date }}**.
+Dear {{ $name }}, this is a reminder that you have
+@if(count($shifts) > 1) upcoming shifts @else an upcoming shift @endif
+scheduled with the {{ config('app.name') }} Public Witnessing web application on the **{{ $date }}**:
+
+@foreach($shifts as $shift)
+&nbsp;&nbsp; {{ $shift[1] }} at {{ $shift[2] }} <br>
+@endforeach
 
 Thank you,<br>
 The {{ config('app.name') }} Team

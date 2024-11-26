@@ -17,11 +17,12 @@ class ShiftReminder extends Mailable
      *
      * @return void
      */
-    public function __construct(public string $date, public string $name, public string $gender) //public User $user,
+    public function __construct(public string $date, public string $name, public string $gender, public array $shifts)
     {
         $this->date = $date;
         $this->name = $name;
         $this->gender = $gender;
+        $this->shifts = $shifts;
 
         $this->subject = config('app.name') . ' Upcoming Shift';
     }
