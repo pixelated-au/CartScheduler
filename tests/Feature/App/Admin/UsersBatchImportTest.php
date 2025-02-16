@@ -70,6 +70,7 @@ class UsersBatchImportTest extends TestCase
         $admin = User::factory()->adminRoleUser()->state(['is_enabled' => true])->create();
 
         Mail::fake();
+        $this->travelTo('2024-06-01');
         $this->actingAs($admin)
             ->postJson("/admin/users/import",
                 ['file' => new UploadedFile(
