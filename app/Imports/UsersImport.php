@@ -7,6 +7,7 @@ use App\Enums\Appontment;
 use App\Enums\MaritalStatus;
 use App\Enums\ServingAs;
 use App\Models\User;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Enum;
 use Maatwebsite\Excel\Concerns\OnEachRow;
@@ -70,7 +71,7 @@ class UsersImport implements WithHeadingRow, WithValidation, WithBatchInserts, O
             'email'               => ['required', 'email'],
             'mobile_phone'        => ['required', 'string', 'regex:/^([0-9\+\-\s]+)$/', 'min:8', 'max:15'],
             'gender'              => ['required', 'in:male,female,m,f'],
-            'year_of_birth'       => ['nullable', 'integer', 'min:' . date('Y') - 100, 'max:' . date('Y')],
+            'year_of_birth'       => ['nullable', 'integer', 'min:' . Carbon::now()->year - 100, 'max:' . Carbon::now()->year],
             'appointment'         => ['nullable', 'string', new Enum(Appontment::class)],
             'serving_as'          => ['nullable', 'string', new Enum(ServingAs::class)],
             'marital_status'      => ['nullable', 'string', new Enum(MaritalStatus::class)],
