@@ -113,7 +113,6 @@ export default function useLocationFilter(timezone, canAdmin = false) {
                 endTime: parse(shift.end_time, 'HH:mm:ss', date.value),
                 location: location.name,
                 locationId: location.id,
-                shiftId: shift.id,
                 currentVolunteers: volunteers,
                 days: shift.js_days,
                 available_from: shift.available_from,
