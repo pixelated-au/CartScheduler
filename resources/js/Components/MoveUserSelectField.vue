@@ -45,14 +45,14 @@ const hasMatch = (shiftData) => {
 const shiftsForTime = computed(() => {
     return props.emptyShiftsForTime
         ?.filter(shiftData => hasMatch(shiftData))
-        ?.map(({location, locationId, currentVolunteers, startTime, endTime}) => {
+        ?.map(({location, locationId, shiftId, currentVolunteers, startTime, endTime}) => {
             const label = `${location}: ${format(startTime, 'h:mm a')} - ${format(endTime, 'h:mm a')}`;
 
             const volunteers = currentVolunteers.map(volunteer => {
                 const prefix = volunteer.gender === 'male' ? 'Bro' : 'Sis';
                 return `${prefix} ${volunteer.name}`;
             });
-            return {label, volunteers, id: locationId};
+            return {label, volunteers, newLocationId: locationId, newShiftId: shiftId};
         });
 });
 const isDarkMode = inject('darkMode', false);
