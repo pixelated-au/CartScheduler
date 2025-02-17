@@ -85,4 +85,40 @@ class ShiftFactory extends Factory
             'available_to'   => null,
         ]);
     }
+
+    public function weekdays9am(): Factory
+    {
+        return $this->state(fn(array $attributes) => [
+            'is_enabled'     => true,
+            'day_monday'     => true,
+            'day_tuesday'    => true,
+            'day_wednesday'  => true,
+            'day_thursday'   => true,
+            'day_friday'     => true,
+            'day_saturday'   => false,
+            'day_sunday'     => false,
+            'start_time'     => '09:00:00',
+            'end_time'       => '12:00:00',
+            'available_from' => null,
+            'available_to'   => null,
+        ]);
+    }
+
+    public function weekends9am(): Factory
+    {
+        return $this->state(fn(array $attributes) => [
+            'is_enabled'     => true,
+            'day_monday'     => false,
+            'day_tuesday'    => false,
+            'day_wednesday'  => false,
+            'day_thursday'   => false,
+            'day_friday'     => false,
+            'day_saturday'   => true,
+            'day_sunday'     => true,
+            'start_time'     => '09:00:00',
+            'end_time'       => '12:00:00',
+            'available_from' => null,
+            'available_to'   => null,
+        ]);
+    }
 }

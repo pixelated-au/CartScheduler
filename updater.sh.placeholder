@@ -1,0 +1,147 @@
+#!/bin/bash
+set -x  # Enable debugging
+
+# Global variables
+UPDATER_FILE=".updater"
+ENV_FILE=".env"
+VERSION_KEY="APP_VERSION"
+ASSET_DIR="resources/js/build"
+TEMP_DIR="./release_update"
+RETENTION_PERIOD=60  # in days
+
+# Function to retrieve GitHub repository from .laravel-updater file
+get_github_repo() {
+    local repo_url
+    if ! repo_url=$(grep "^github_repo=" "$UPDATER_FILE" | cut -d '=' -f2); then
+        printf "Error: GitHub repository not found in %s\n" "$UPDATER_FILE" >&2
+        return 1
+    fi
+    printf "%s" "$repo_url"
+}
+
+# Function to retrieve current version from .env file
+get_current_version() {
+    local version_line
+    if ! version_line=$(grep "^$VERSION_KEY=" "$ENV_FILE"); then
+        printf "Error: Could not find %s in %s\n" "$VERSION_KEY" "$ENV_FILE" >&2
+        return 1
+    fi
+    local current_version
+    current_version=$(printf "%s" "$version_line" | cut -d '=' -f2)
+    printf "%s" "$current_version"
+}
+
+# Function to get the latest version from GitHub
+get_latest_version() {
+    local github_repo latest_version
+    github_repo=$(get_github_repo) || return 1
+    if ! latest_version=$(curl -s "$github_repo/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/'); then
+        printf "Error: Failed to retrieve the latest version from GitHub\n" >&2
+        return 1
+    fi
+    printf "%s" "$latest_version"
+}
+
+# Function to compare current version with the latest version
+check_for_update() {
+    local current_version latest_version
+    current_version=$(get_current_version) || return 1
+    latest_version=$(get_latest_version) || return 1
+
+    if [[ "$current_version" != "$latest_version" ]]; then
+        printf "Update available: %s -> %s\n" "$current_version" "$latest_version"
+        return 0
+    else
+        printf "No updates available. Current version: %s\n" "$current_version"
+        return 1
+    fi
+}
+
+# Function to download and install a specific release (default: latest)
+install_release() {
+    local release_version="$1"
+    local github_repo
+    github_repo=$(get_github_repo) || return 1
+
+    # If no version specified, use the latest
+    if [[ -z "$release_version" ]]; then
+        release_version=$(get_latest_version) || return 1
+    fi
+
+    # Download the zip file from the release
+    local zip_url="$github_repo/releases/download/$release_version/release.zip"
+    local zip_file="$TEMP_DIR/release.zip"
+    mkdir -p "$TEMP_DIR"
+
+    printf "Downloading release %s...\n" "$release_version"
+    if ! curl -L "$zip_url" -o "$zip_file"; then
+        printf "Error: Failed to download release from %s\n" "$zip_url" >&2
+        return 1
+    fi
+
+    # Extract the zip file
+    printf "Unpacking release...\n"
+    if ! unzip -qo "$zip_file" -d "$TEMP_DIR"; then
+        printf "Error: Failed to unpack %s\n" "$zip_file" >&2
+        return 1
+    fi
+
+    # Remove old assets, except those younger than 2 months
+    find "$ASSET_DIR" -type f -mtime +"$RETENTION_PERIOD" -exec rm -f {} \;
+
+    # Move the new assets to their respective places
+    printf "Installing new assets...\n"
+    rsync -a --delete "$TEMP_DIR/$ASSET_DIR/" "$ASSET_DIR/"
+
+    # Cleanup
+    rm -rf "$TEMP_DIR"
+
+    # Update .env with the new version
+    sed -i "s/^$VERSION_KEY=.*/$VERSION_KEY=$release_version/" "$ENV_FILE"
+
+    # Record the installed version in .laravel-updater
+    printf "version=%s\n" "$release_version" > "$UPDATER_FILE"
+
+    printf "Release %s installed successfully.\n" "$release_version"
+}
+
+# Function to export all releases from GitHub as JSON array and store in .laravel-updater
+export_releases() {
+    local github_repo releases
+    github_repo=$(get_github_repo) || return 1
+
+    if ! releases=$(curl -s "$github_repo/releases" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/' | jq -R . | jq -s .); then
+        printf "Error: Failed to retrieve releases from GitHub\n" >&2
+        return 1
+    fi
+
+    if [[ -n "$releases" ]]; then
+        printf "releases=%s\n" "$releases" > "$UPDATER_FILE"
+        printf "Releases exported: %s\n" "$releases"
+    else
+        printf "Error: No releases found\n" >&2
+        return 1
+    fi
+}
+
+# Main function to handle arguments and execution flow
+main() {
+    case "$1" in
+        check)
+            check_for_update
+            ;;
+        install)
+            install_release "$2"
+            ;;
+        export-releases)
+            export_releases
+            ;;
+        *)
+            # Correctly escape curly braces and ensure proper format
+            echo "Usage: $0 {check|install [version]|export-releases}" >&2
+            return 1
+            ;;
+    esac
+}
+
+main "$@"
