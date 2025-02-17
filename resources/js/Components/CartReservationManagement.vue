@@ -66,14 +66,15 @@ const showMoveUserModal = computed({
 
 const promptMoveVolunteer = (selection, volunteer, shift) => selectedMoveUser.value = {selection, volunteer, shift};
 
-const moveVolunteer = async (volunteerId, locationId, shiftId) => {
+const moveVolunteer = async (volunteerId, locationId, shiftId, oldShiftId) => {
     const timeoutId = setTimeout(() => isLoading.value = true, 1000);
     selectedMoveUser.value = null;
     try {
-        await axios.put('/admin/move-volunteer-to-shift', {
+        await axios.put(`/admin/move-volunteer-to-shift`, {
             user_id: volunteerId,
             location_id: locationId,
-            old_shift_id: shiftId,
+            shift_id: shiftId,
+            old_shift_id: oldShiftId,
             date: format(date.value, 'yyyy-MM-dd'),
         });
         toast.success('User was moved!');
@@ -294,7 +295,7 @@ const locationClasses = location => location.freeShifts
             <div class="flex justify-end">
                 <JetButton style-type="secondary" @click="selectedMoveUser = null">Cancel</JetButton>
                 <JetButton
-                    @click="moveVolunteer(selectedMoveUser?.volunteer.id, selectedMoveUser?.selection.id, selectedMoveUser?.shift.id)"
+                    @click="moveVolunteer(selectedMoveUser?.volunteer.id, selectedMoveUser?.selection.newLocationId, selectedMoveUser?.selection.newShiftId, selectedMoveUser?.shift.id)"
                     class="ml-2">
                     Move
                 </JetButton>
