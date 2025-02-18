@@ -7,7 +7,7 @@ services:
             args:
                 WWWGROUP: '${WWWGROUP}'
                 DEPLOYMENT_DIR: '/var/www/html'
-        image: sail-8.2/app
+        image: sail-8.3/app
         extra_hosts:
             - 'host.docker.internal:host-gateway'
         ports:
@@ -18,8 +18,12 @@ services:
             LARAVEL_SAIL: 1
             XDEBUG_MODE: '${SAIL_XDEBUG_MODE:-off}'
             XDEBUG_CONFIG: '${SAIL_XDEBUG_CONFIG:-client_host=host.docker.internal}'
+            IGNITION_LOCAL_SITES_PATH: '${PWD}'
         volumes:
-            - '.:/var/www/html'
+            - type: bind
+              source: ./
+              target: /var/www/html
+              consistency: cached
         networks:
             - sail
         depends_on:
