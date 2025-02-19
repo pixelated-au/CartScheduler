@@ -35,17 +35,17 @@ jobs:
       - name: Set directory permissions
         run: chmod -R 777 storage bootstrap/cache
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          check-latest: true
-
-      - name: Install NPM dependencies
-        run: npm install
-
-      - name: Compile front-end assets
-        run: npm run build
+#      - name: Setup Node.js
+#        uses: actions/setup-node@v4
+#        with:
+#          node-version: 20
+#          check-latest: true
+#
+#      - name: Install NPM dependencies
+#        run: npm install
+#
+#      - name: Compile front-end assets
+#        run: npm run build
 
       - name: Run PHPUnit tests
         env:
