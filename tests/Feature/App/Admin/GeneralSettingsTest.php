@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Admin;
+namespace Tests\Feature\App\Admin;
 
 use App\Models\User;
 use App\Settings\GeneralSettings;

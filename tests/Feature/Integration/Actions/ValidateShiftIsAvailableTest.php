@@ -1,6 +1,6 @@
 <?php
 
-namespace Integration\Actions;
+namespace Tests\Feature\Integration\Actions;
 
 use App\Actions\ValidateShiftIsAvailableAction;
 use App\Exceptions\ShiftAvailabilityException;

@@ -1,6 +1,6 @@
 <?php
 
-namespace Integration\Actions;
+namespace Tests\Feature\Integration\Actions;
 
 use App\Actions\HasNewVersionAvailable;
 use App\Settings\GeneralSettings;

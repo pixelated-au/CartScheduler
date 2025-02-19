@@ -1,6 +1,6 @@
 <?php
 
-namespace App;
+namespace Tests\Feature\App;
 
 use App\Enums\AvailabilityHours;
 use App\Http\Resources\UserVacationResource;

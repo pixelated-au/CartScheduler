@@ -1,6 +1,6 @@
 <?php
 
-namespace Integration\Actions;
+namespace Tests\Feature\Integration\Actions;
 
 use App\Actions\GetShiftFilledData;
 use App\Models\Location;

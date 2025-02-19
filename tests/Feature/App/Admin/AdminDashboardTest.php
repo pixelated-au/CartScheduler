@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Admin;
+namespace Tests\Feature\App\Admin;
 
 use App\Models\Location;
 use App\Models\Shift;
@@ -169,7 +169,7 @@ class AdminDashboardTest extends TestCase
         $admin = User::factory()->adminRoleUser()->create(['is_enabled' => true]);
         $users = User::factory()->count(4)->create()->chunk(2);
 
-        $location = Location::factory()
+        Location::factory()
             ->allPublishers()
             ->has(
                 Shift::factory()
