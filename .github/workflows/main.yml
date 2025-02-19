@@ -1,0 +1,16 @@
+name: Main Runner
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+
+jobs:
+  run-tests:
+    uses: ./.github/workflows/test.yml
+
+  create-release:
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' && startsWith(github.ref, 'refs/tags/v') }}
+    needs: run-tests
+    uses: ./.github/workflows/create-release.yml
