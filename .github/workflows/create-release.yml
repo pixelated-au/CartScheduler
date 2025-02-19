@@ -1,22 +1,19 @@
 name: Laravel Release
 
-on:
-  push:
-    tags:
-      - "v*"
+on: [ workflow_call ]
 
 jobs:
-  zip-deploy:
+  test-and-release:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup PHP 8.2
+      - name: Setup PHP 8.3
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.2'
+          php-version: '8.3'
           coverage: none
 
       - name: Install Composer dependencies
@@ -64,4 +61,6 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           artifacts: "release.zip"
+          prerelease: ${{ endsWith(github.ref, 'a') || endsWith(github.ref, 'b') || endsWith(github.ref, 'alpha') || endsWith(github.ref, 'beta') }}
+          generateReleaseNotes: true
           token: ${{ secrets.GITHUB_TOKEN }}
