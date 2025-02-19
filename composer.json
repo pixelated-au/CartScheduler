@@ -21,6 +21,7 @@
         "laravel/tinker": "^v2.9.0",
         "maatwebsite/excel": "^3.1.57",
         "maennchen/zipstream-php": "^3.1",
+        "pixelated-au/streamline": "dev-main",
         "psr/simple-cache": "^3.0.0",
         "spatie/laravel-activitylog": "^4.7",
         "spatie/laravel-ray": "^1.36.2",
