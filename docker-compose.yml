@@ -28,6 +28,9 @@ services:
             - sail
         depends_on:
             - mysql
+        dns_opt:
+            - use-vc # use tCP-IP DNS Resolution to fix timeouts
+
     #            - redis
     #            - meilisearch
     #            - selenium
@@ -53,6 +56,8 @@ services:
             test: [ "CMD", "mysqladmin", "ping", "-p${DB_PASSWORD}" ]
             retries: 3
             timeout: 5s
+        dns_opt:
+            - use-vc
     phpmyadmin:
         # If Errors: https://stackoverflow.com/a/50437307/2041446
         image: phpmyadmin:latest
@@ -66,6 +71,8 @@ services:
             - mysql
         networks:
             - sail
+        dns_opt:
+            - use-vc
     #    redis:
     #        image: 'redis:alpine'
     #        ports:
@@ -112,6 +119,7 @@ services:
             - '/dev/shm:/dev/shm'
         networks:
             - sail
+
 networks:
     sail:
         driver: bridge
