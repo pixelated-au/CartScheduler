@@ -63,7 +63,7 @@
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
             "@php artisan package:discover --ansi",
             "@php composer audit",
-            "npm audit",
+            "which npm > /dev/null && npm audit || echo 'npm not found, skipping npm audit'",
             "# *** DON'T FORGET TO RUN: snyk test ***"
         ],
         "post-update-cmd": [
