@@ -35,14 +35,34 @@ const updateCheck = async () => {
 const updateLog = ref('');
 const doSoftwareUpdate = async () => {
     processing.value = true;
+    updateLog.value = '';
     try {
-        const response = await axios.post(route('admin.do-update'));
-        toast.success(`Update successful! You are now running version: ${props.settings.currentVersion}`);
-        updateLog.value = response.data || 'Update succeeded.';
+        const response = await axios.post(route('admin.do-update'), {}, {
+            responseType: 'stream',
+            adapter: 'fetch',
+        });
+        const reader = response.data.getReader();
+        const decoder = new TextDecoder();
+
+        while (true) {
+            const {done, value} = await reader.read();
+            if (done) {
+                break;
+            }
+            updateLog.value += decoder.decode(value);
+        }
+
+        if (response.status === 200) {
+            toast.success(`Update process completed. Please check the log for details.`);
+        } else {
+            toast.error(`Update process failed. Please check the log for details.`);
+        }
+    } catch (error) {
+        console.error('Error during update:', error);
+        toast.error('An error occurred during the update. Please try again.');
     } finally {
         processing.value = false;
     }
-
 };
 
 const hasUpdate = computed(() => {
@@ -91,7 +111,7 @@ onMounted(async () => {
             </template>
             <div v-else-if="updateLog" class="col-span-12 text-gray-600 dark:text-gray-300">
                 <div class="font-bold">Update Log:</div>
-                <pre class="font-mono">{{ updateLog }}</pre>
+                <pre class="font-mono text-sm max-w-full overflow-x-scroll">{{ updateLog }}</pre>
             </div>
             <template v-else>
                 <p class="col-span-12 text-gray-600 dark:text-gray-300">You are running the latest version of the
@@ -103,7 +123,7 @@ onMounted(async () => {
                     instructed by your IT support.</p>
             </template>
         </template>
-
+        
         <template #actions>
             <JetButton v-if="hasUpdate" :class="{ 'opacity-25': processing }" :disabled="processing">
                 Update Now
