@@ -7,6 +7,9 @@ use Codedge\Updater\UpdaterManager;
 use Illuminate\Console\Command;
 use Illuminate\Support\Str;
 
+/**
+ * @deprecated - replace with Streamline
+ */
 class CheckForUpdateCommand extends Command
 {
     protected $signature = 'cart-scheduler:has-update {--beta : Check for beta version}';

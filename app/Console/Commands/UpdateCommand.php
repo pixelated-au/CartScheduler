@@ -7,6 +7,9 @@ use Codedge\Updater\UpdaterManager;
 use Illuminate\Console\Command;
 use Illuminate\Support\Str;
 
+/**
+ * @deprecated - replace with Streamline
+ */
 class UpdateCommand extends Command
 {
     protected $signature = 'cart-scheduler:do-update {--force : Force update} {--beta : Update to beta version}';
