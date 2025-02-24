@@ -5,14 +5,16 @@ namespace App\Providers;
 use App\Actions\EncryptedErrorCodeAction;
 use App\Http\Controllers\SetUserPasswordController;
 use App\Interfaces\ObfuscatedErrorCode;
-use Codedge\Updater\UpdaterManager;
-use Composer\InstalledVersions;
+use App\Listeners\StreamlineInstalledVersionSetListener;
+use App\Listeners\StreamlineNextAvailableVersionUpdatedListener;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Application;
-use Illuminate\Foundation\Console\AboutCommand;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
+use Pixelated\Streamline\Events\InstalledVersionSet;
+use Pixelated\Streamline\Events\NextAvailableVersionUpdated;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -31,15 +33,10 @@ class AppServiceProvider extends ServiceProvider
             URL::forceScheme('https');
         }
 
-        $this->configureSetPasswordController();
+        Event::listen(InstalledVersionSet::class, StreamlineInstalledVersionSetListener::class);
+        Event::listen(NextAvailableVersionUpdated::class, StreamlineNextAvailableVersionUpdatedListener::class);
 
-        AboutCommand::add('CartScheduler', static fn(UpdaterManager $updater) => [
-//            'Self Updater'  => fn () => class_exists(InstalledVersions::class) ? InstalledVersions::getPrettyVersion('bugsnag/bugsnag-laravel') : '<fg=yellow;options=bold>-</>',
-            'Inertia'       => fn () => class_exists(InstalledVersions::class) ? InstalledVersions::getPrettyVersion('inertiajs/inertia-laravel') : '<fg=yellow;options=bold>-</>',
-            'Excel Support' => fn () => class_exists(InstalledVersions::class) ? InstalledVersions::getPrettyVersion('maatwebsite/excel') : '<fg=yellow;options=bold>-</>',
-            '<fg=bright-magenta>CartScheduler Version</>'
-                            => fn () => '<fg=bright-magenta>' . $updater->source()->getVersionInstalled() . '</>',
-        ]);
+        $this->configureSetPasswordController();
     }
 
     public function configureSetPasswordController(): void
@@ -48,7 +45,8 @@ class AppServiceProvider extends ServiceProvider
             ->needs(ObfuscatedErrorCode::class)
             ->give(
                 fn(Application $application) => $application
-                    ->make(EncryptedErrorCodeAction::class, ['message' => config('cart-scheduler.set_password_generic_error_message')])
+                    ->make(EncryptedErrorCodeAction::class,
+                        ['message' => config('cart-scheduler.set_password_generic_error_message')])
             );
     }
 }
