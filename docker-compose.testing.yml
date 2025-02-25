@@ -1,37 +1,4 @@
 services:
-  laravel-testing:
-    build:
-      context: ./docker/8.3
-      dockerfile: Dockerfile
-      args:
-        WWWGROUP: '${WWWGROUP}'
-        DEPLOYMENT_DIR: '/var/www/html'
-    image: sail-8.3/app
-    extra_hosts:
-      - 'host.docker.internal:host-gateway'
-    ports:
-      - '${APP_PORT:-81}:81'
-      - '${VITE_PORT:-5174}:${VITE_PORT:-5174}'
-    environment:
-      WWWUSER: '${WWWUSER}'
-      LARAVEL_SAIL: 1
-      XDEBUG_MODE: off
-      XDEBUG_CONFIG: client_host=host.docker.internal
-      IGNITION_LOCAL_SITES_PATH: '${PWD}'
-    volumes:
-      - ./:/var/www/html
-    tmpfs:
-      - /var/www/html/storage/framework/views
-      - /var/www/html/storage/framework/cache
-      - /var/www/html/storage/framework/sessions
-      - /var/www/html/storage/framework/logs
-    networks:
-      - sail
-    depends_on:
-      - mysql-testing
-    dns_opt:
-      - use-vc # use tCP-IP DNS Resolution to fix timeouts
-
   mysql-testing:
     image: 'mysql/mysql-server:8.0'
     ports:
@@ -54,6 +21,8 @@ services:
       test: [ "CMD", "mysqladmin", "ping", "-p${DB_PASSWORD}" ]
       retries: 3
       timeout: 5s
+    depends_on:
+      - laravel.test
 
 networks:
   sail:
