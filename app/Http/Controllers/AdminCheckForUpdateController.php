@@ -16,6 +16,6 @@ class AdminCheckForUpdateController extends Controller
     {
         $old = config('streamline.installed_version');
         $new = $this->availableVersions->execute(ignorePreReleases: !$request->boolean('beta'));
-        return version_compare($old, $new, '!=');
+        return version_compare($old, $new, '<');
     }
 }
