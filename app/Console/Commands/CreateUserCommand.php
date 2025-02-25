@@ -8,7 +8,7 @@ use Str;
 
 class CreateUserCommand extends Command
 {
-    protected $signature   = 'carts:create-user
+    protected $signature   = 'cart-scheduler:create-user
                                 {name : Full name wrapped in quotes}
                                 {email : Valid email address}
                                 {phone : Mobile phone number}
