@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Lib\FilterAnsiEscapeSequencesStreamedOutput;
 use App\Settings\GeneralSettings;
 use Exception;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Str;
@@ -14,15 +15,16 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class AdminRunSoftwareUpdateController extends Controller
 {
-    public function __construct(private readonly GeneralSettings $settings)
-    {
+    public function __construct(
+        private readonly GeneralSettings $settings,
+    ) {
     }
 
     public function __invoke()
     {
         // Ensure any existing output buffers are cleared
         if (ob_get_level()) {
-            ob_end_clean();
+            ob_clean();
         }
         $available = $this->settings->availableVersion;
         $params    = ['--force' => true];
@@ -36,17 +38,14 @@ class AdminRunSoftwareUpdateController extends Controller
                     // Create stream
                     $stream = fopen('php://output', 'wb');
 
-                    if ($stream === false) {
-                        throw new RuntimeException('Could not open output stream');
-                    }
-
-                    // Create StreamOutput with verbose output
-                    $output = new FilterAnsiEscapeSequencesStreamedOutput(
-                        $stream,
-                        OutputInterface::VERBOSITY_VERBOSE,
-                        true // Enable decoration (colors and formatting)
+                    $output = App::make(
+                        abstract: FilterAnsiEscapeSequencesStreamedOutput::class,
+                        parameters: [
+                            'stream'    => $stream,
+                            'verbosity' => OutputInterface::VERBOSITY_VERBOSE,
+                            'decorated' => true,
+                        ]
                     );
-
                     // Call your command
                     $exitCode = Artisan::call('streamline:run-update', $params, $output);
 
