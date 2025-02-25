@@ -2,11 +2,18 @@
 
 namespace Tests\Feature\App\Admin;
 
+use App\Lib\FilterAnsiEscapeSequencesStreamedOutput;
 use App\Models\User;
 use App\Settings\GeneralSettings;
+use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Log;
 use Inertia\Testing\AssertableInertia;
+use Mockery\MockInterface;
+use Pixelated\Streamline\Actions\CheckAvailableVersions;
+use Symfony\Component\Console\Output\OutputInterface;
 use Tests\TestCase;
 
 class GeneralSettingsTest extends TestCase
@@ -115,15 +122,19 @@ class GeneralSettingsTest extends TestCase
     {
         $admin = User::factory()->adminRoleUser()->create();
 
-        $mock = $this->prepareArtisanMock();
+        $this->mock(
+            CheckAvailableVersions::class,
+            fn(MockInterface $mock) => $mock
+                ->expects('execute')->with(false, true)->andReturn('v2.0.0')->twice()
+        );
 
-        $mock::$availableVersion = '1.0.1';
+        Config::set('streamline.installed_version', 'v1.0.0');
         $this->actingAs($admin)
             ->getJson("/admin/check-update")
             ->assertOk()
             ->assertContent('1');
 
-        $mock::$currentVersion = '1.0.1';
+        Config::set('streamline.installed_version', 'v3.0.0');
         $this->actingAs($admin)
             ->getJson("/admin/check-update")
             ->assertOk()
@@ -132,15 +143,13 @@ class GeneralSettingsTest extends TestCase
 
     public function test_admin_can_check_for_beta_update(): void
     {
-        $mock = $this->prepareArtisanMock();
-
         $admin = User::factory()->adminRoleUser()->create();
-        $this->actingAs($admin)
-            ->getJson("/admin/check-update")
-            ->assertOk()
-            ->assertNoContent(200);
 
-        $mock::$availableVersion = '2.0.0b';
+        $this->mock(
+            CheckAvailableVersions::class,
+            fn(MockInterface $mock) => $mock
+                ->expects('execute')->with(false, false)->andReturn('v2.0.0b')
+        );
 
         $this->actingAs($admin)
             ->getJson("/admin/check-update?beta=true")
@@ -148,76 +157,76 @@ class GeneralSettingsTest extends TestCase
             ->assertContent('1');
     }
 
-    public function test_run_system_update_with_no_available_update(): void
+    public function test_run_system_update(): void
     {
-        $this->prepareArtisanMock();
+        $admin = User::factory()->adminRoleUser()->create();
+
+        $stream = fopen('php://memory', 'wb');
+        fwrite($stream, "Some test data\n");
+        rewind($stream);
+
+        Artisan::expects('call')
+            ->withSomeOfArgs('streamline:run-update')
+            ->andReturnUsing(function () use ($stream) {
+                // This should simulate some output that happens during the command execution
+                echo stream_get_contents($stream);
+                return 0;
+            });
+
+
+        $this->app->bind(FilterAnsiEscapeSequencesStreamedOutput::class,
+            fn(Application $app) => new FilterAnsiEscapeSequencesStreamedOutput(
+                $stream,
+                OutputInterface::VERBOSITY_VERBOSE,
+                true,
+            ));
+
+        $this->actingAs($admin)
+            ->postJson("/admin/do-update")
+            ->assertStreamed()
+            ->assertHeader('Content-Type', 'text/plain; charset=UTF-8')
+            ->assertHeader('X-Accel-Buffering', 'no')
+            ->assertHeader('Cache-Control', 'no-cache, private')
+            ->assertStreamedContent("Some test data\n")
+            ->assertOk();
+
+        fclose($stream);
+    }
+
+    public function test_run_system_update_with_beta_flag(): void
+    {
+        GeneralSettings::fake([
+            'availableVersion' => 'v2.0.0b',
+        ]);
+
+        Artisan::expects('call')
+            ->withSomeOfArgs('streamline:run-update', ['--force' => true, '--beta' => true])
+            ->andReturn(0)
+            ->once();
+
         $admin = User::factory()->adminRoleUser()->create();
 
         $this->actingAs($admin)
             ->postJson("/admin/do-update")
+            ->assertStreamed()
             ->assertOk()
-            ->assertContent('success!');
+            ->assertStreamedContent('');
     }
 
-    public function test_run_system_update_with_available_update(): void
+    public function test_run_system_update_but_failed(): void
     {
-        $this->prepareArtisanMock(availableVersion: '2.0.0');
-        $admin                   = User::factory()->adminRoleUser()->create();
+        Artisan::expects('call')
+            ->withSomeOfArgs('streamline:run-update')
+            ->andReturn(1);
 
-        $this->actingAs($admin)
-            ->postJson("/admin/do-update")
-            ->assertOk()
-            ->assertContent('success!');
-    }
+        Log::expects('error')->with('Command streaming failed: Command failed');
 
-    public function test_run_system_update_with_beta_available_update(): void
-    {
-        $this->prepareArtisanMock(availableVersion: '2.0.0b');
         $admin = User::factory()->adminRoleUser()->create();
 
         $this->actingAs($admin)
             ->postJson("/admin/do-update")
+            ->assertStreamed()
             ->assertOk()
-            ->assertContent('success!');
-    }
-
-    /**
-     * @param string $currentVersion
-     * @param string $availableVersion
-     * @return object{
-     *     @method static call(): void,
-     * @method static output(): string,
-     * }
-     * @throws \Spatie\LaravelSettings\Exceptions\MissingSettings
-     */
-    private function prepareArtisanMock(string $currentVersion = '1.0.0', string $availableVersion = '1.0.0'): object
-    {
-        GeneralSettings::fake(['currentVersion' => $currentVersion, 'availableVersion' => $availableVersion]);
-
-        $mock = new class {
-            public static string $availableVersion = '1.0.0';
-            public static string $currentVersion = '1.0.0';
-
-            public static function call(): void
-            {
-                app()->make(GeneralSettings::class)
-                    ->fill([
-                        'currentVersion'   => self::$currentVersion,
-                        'availableVersion' => self::$availableVersion,
-                    ])
-                    ->save();
-            }
-
-            public static function output(): string
-            {
-                return 'success!';
-            }
-        };
-
-        $mock::$currentVersion   = $currentVersion;
-        $mock::$availableVersion = $availableVersion;
-
-        Artisan::swap($mock);
-        return $mock;
+            ->assertStreamedContent('Error: Command failed');
     }
 }
