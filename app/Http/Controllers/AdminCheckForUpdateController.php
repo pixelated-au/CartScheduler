@@ -14,8 +14,9 @@ class AdminCheckForUpdateController extends Controller
 
     public function __invoke(Request $request)
     {
-        $old = config('streamline.installed_version');
+        $old = ltrim(config('streamline.installed_version'), 'v');
         $new = $this->availableVersions->execute(ignorePreReleases: !$request->boolean('beta'));
+        $new = ltrim($new, 'v');
         return version_compare($old, $new, '<');
     }
 }
