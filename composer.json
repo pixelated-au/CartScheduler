@@ -34,6 +34,7 @@
         "brianium/paratest": "^v7.8.1",
         "dg/bypass-finals": "^v1.8.0",
         "driftingly/rector-laravel": "^1.2.1",
+        "ergebnis/phpunit-slow-test-detector": "^2.19",
         "fakerphp/faker": "^v1.23.1",
         "laravel/pint": "^v1.17.2",
         "laravel/sail": "^v1.31.1",

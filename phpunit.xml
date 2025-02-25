@@ -27,6 +27,9 @@
           <html outputDirectory="tests/code-coverage" highLowerBound="80"/>
         </report>
     </coverage>
+    <extensions>
+        <bootstrap class="Ergebnis\PHPUnit\SlowTestDetector\Extension"></bootstrap>
+    </extensions>
     <logging>
         <testdoxText outputFile="php://stdout"/>
     </logging>
