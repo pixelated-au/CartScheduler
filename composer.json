@@ -12,7 +12,6 @@
         "ext-pdo": "*",
         "ext-zip": "*",
         "bugsnag/bugsnag-laravel": "^v2.28.1",
-        "codedge/laravel-selfupdater": "^3.9",
         "guzzlehttp/guzzle": "^7.8.1",
         "inertiajs/inertia-laravel": "^v1.3.0",
         "laravel/framework": "^v11.42.1",
