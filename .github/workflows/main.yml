@@ -1,6 +1,7 @@
 name: Main Runner
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - master
