@@ -1,6 +1,6 @@
 name: Laravel Release
 
-on: [ workflow_call ]
+on: [ workflow_call, workflow_dispatch ]
 
 jobs:
   test-and-release:
