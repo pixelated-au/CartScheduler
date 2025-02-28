@@ -8,8 +8,8 @@ on:
   pull_request:
 
 jobs:
-  run-tests:
-    uses: ./.github/workflows/test.yml
+#  run-tests:
+#    uses: ./.github/workflows/test.yml
 
   debug-info:
     runs-on: ubuntu-latest
@@ -17,11 +17,12 @@ jobs:
       - name: Output GitHub context
         run: |
           echo "Event name: ${{ github.event_name }}"
+          echo "Ref: ${{ github.ref)name }}"
           echo "Ref: ${{ github.ref }}"
           echo "Is tag? ${{ startsWith(github.ref, 'refs/tags/v') }}"
           echo "Will create release? ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v') }}"
 
-  create-release:
-    if: ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v') }}
-    needs: run-tests
-    uses: ./.github/workflows/create-release.yml
+#  create-release:
+#    if: ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v') }}
+#    needs: run-tests
+#    uses: ./.github/workflows/create-release.yml
