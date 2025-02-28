@@ -1,4 +1,4 @@
-name: Main Runner
+name: Test Runner
 
 on:
   workflow_dispatch:

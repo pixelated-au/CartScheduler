@@ -1,4 +1,4 @@
-name: Main Runner
+name: Release Runner
 
 on:
   workflow_dispatch:
