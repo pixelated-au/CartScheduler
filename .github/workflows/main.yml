@@ -19,7 +19,7 @@ jobs:
         run: |
           echo "Event name: ${{ github.event_name }}"
           echo "Ref: ${{ github.ref_name }}"
-          echo "JSON: ${{ toJSON(github.ref) }}"
+          echo "JSON: ${{ toJSON(github) }}"
           echo "Is tag? ${{ startsWith(github.ref, 'refs/tags/v') }}"
           echo "Will create release? ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v') }}"
 
