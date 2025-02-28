@@ -48,7 +48,9 @@ jobs:
             postcss.config.cjs
             docker-compose.yml
             jsconfig.json
-            tailwind.config.json
+            tailwind.config.js
+            web-types.json
+            rector.php
             /*resources/css/*
             /*resources/js/*
             /*queries/*
@@ -56,6 +58,7 @@ jobs:
             /*database/factories/*
             /*database/seeders/*
             /*tests/*
+            /*docker/*
 
       - name: Upload Release
         uses: ncipollo/release-action@v1
