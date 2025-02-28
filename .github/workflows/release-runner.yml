@@ -1,0 +1,16 @@
+name: Main Runner
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "v*"
+  pull_request:
+
+jobs:
+  run-tests:
+    uses: ./.github/workflows/test.yml
+
+  create-release:
+    needs: run-tests
+    uses: ./.github/workflows/create-release.yml
