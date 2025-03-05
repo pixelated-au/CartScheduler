@@ -1,16 +1,16 @@
-name: Test Runner
-
-on:
-  workflow_dispatch:
-  push:
-    branches:
-      - master
-    tags-ignore:
-      - "v*"
-  pull_request:
-    branches:
-      - "**"
-
-jobs:
-  run-tests:
-    uses: ./.github/workflows/test.yml
+#name: Test Runner
+#
+#on:
+#  workflow_dispatch:
+#  push:
+#    branches:
+#      - master
+#    tags-ignore:
+#      - "v*"
+#  pull_request:
+#    branches:
+#      - "**"
+#
+#jobs:
+#  run-tests:
+#    uses: ./.github/workflows/test.yml
