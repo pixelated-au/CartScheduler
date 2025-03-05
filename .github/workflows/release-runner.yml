@@ -1,8 +1,10 @@
-name: Release Runner
+name: Main Runner
 
 on:
   workflow_dispatch:
   push:
+    branches:
+      - master
     tags:
       - "v*"
   pull_request:
