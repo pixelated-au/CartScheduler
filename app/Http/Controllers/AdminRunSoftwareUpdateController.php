@@ -8,7 +8,6 @@ use Exception;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Response;
-use Illuminate\Support\Str;
 use Log;
 use RuntimeException;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -27,10 +26,7 @@ class AdminRunSoftwareUpdateController extends Controller
             ob_clean();
         }
         $available = $this->settings->availableVersion;
-        $params    = ['--force' => true];
-        if (Str::endsWith($available, 'b')) {
-            $params['--beta'] = true;
-        }
+        $params    = ['--force' => true, '--install-version' => $available];
 
         return Response::stream(
             callback: static function () use ($params) {
@@ -57,10 +53,10 @@ class AdminRunSoftwareUpdateController extends Controller
                 } catch (Exception $e) {
 
                     // Log the error
-                    Log::error('Command streaming failed: '.$e->getMessage());
+                    Log::error('Command streaming failed: ' . $e->getMessage());
 
                     // Output error message to stream
-                    echo "Error: ".$e->getMessage();
+                    echo "Error: " . $e->getMessage();
 
                     // Ensure stream is closed
                     if (isset($stream) && is_resource($stream)) {
