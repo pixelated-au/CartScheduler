@@ -163,13 +163,12 @@ class GeneralSettingsTest extends TestCase
 
         $stream = fopen('php://memory', 'wb');
         fwrite($stream, "Some test data\n");
-        rewind($stream);
 
         Artisan::expects('call')
             ->withSomeOfArgs('streamline:run-update')
             ->andReturnUsing(function () use ($stream) {
                 // This should simulate some output that happens during the command execution
-                echo stream_get_contents($stream);
+                echo stream_get_contents($stream,null, 0);
                 return 0;
             });
 
@@ -187,7 +186,7 @@ class GeneralSettingsTest extends TestCase
             ->assertHeader('Content-Type', 'text/plain; charset=UTF-8')
             ->assertHeader('X-Accel-Buffering', 'no')
             ->assertHeader('Cache-Control', 'no-cache, private')
-            ->assertStreamedContent("Some test data\n")
+            ->assertStreamedContent("Some test data\nRunning Software Update... (Version: v0.0.5).\nNOTE: THIS MAY TAKE A WHILE...\n")
             ->assertOk();
 
         fclose($stream);
@@ -210,7 +209,7 @@ class GeneralSettingsTest extends TestCase
             ->postJson("/admin/do-update")
             ->assertStreamed()
             ->assertOk()
-            ->assertStreamedContent('');
+            ->assertStreamedContent("Running Software Update... (Version: v2.0.0b).\n+NOTE: THIS MAY TAKE A WHILE...\n");
     }
 
     public function test_run_system_update_but_failed(): void
@@ -227,6 +226,6 @@ class GeneralSettingsTest extends TestCase
             ->postJson("/admin/do-update")
             ->assertStreamed()
             ->assertOk()
-            ->assertStreamedContent('Error: Command failed');
+            ->assertStreamedContent("Running Software Update... (Version: v2.0.0b).\n+NOTE: THIS MAY TAKE A WHILE...\nError: Command failed");
     }
 }
