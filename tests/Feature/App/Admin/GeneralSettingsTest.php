@@ -125,7 +125,7 @@ class GeneralSettingsTest extends TestCase
         $this->mock(
             CheckAvailableVersions::class,
             fn(MockInterface $mock) => $mock
-                ->expects('execute')->with(false, true)->andReturn('v2.0.0')->twice()
+                ->expects('execute')->with(true, true)->andReturn('v2.0.0')->twice()
         );
 
         Config::set('streamline.installed_version', 'v1.0.0');
@@ -148,7 +148,7 @@ class GeneralSettingsTest extends TestCase
         $this->mock(
             CheckAvailableVersions::class,
             fn(MockInterface $mock) => $mock
-                ->expects('execute')->with(false, false)->andReturn('v2.0.0b')
+                ->expects('execute')->with(true, false)->andReturn('v2.0.0b')
         );
 
         $this->actingAs($admin)
@@ -193,14 +193,14 @@ class GeneralSettingsTest extends TestCase
         fclose($stream);
     }
 
-    public function test_run_system_update_with_beta_flag(): void
+    public function test_run_system_update_when_beta_has_been_selected_for_update(): void
     {
         GeneralSettings::fake([
             'availableVersion' => 'v2.0.0b',
         ]);
 
         Artisan::expects('call')
-            ->withSomeOfArgs('streamline:run-update', ['--force' => true, '--beta' => true])
+            ->withSomeOfArgs('streamline:run-update', ['--force' => true, '--install-version' => 'v2.0.0b'])
             ->andReturn(0)
             ->once();
 
