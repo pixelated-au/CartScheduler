@@ -25,12 +25,11 @@ class AdminRunSoftwareUpdateController extends Controller
         if (ob_get_level()) {
             ob_clean();
         }
-        $available = $this->settings->availableVersion;
-        $params    = ['--force' => true, '--install-version' => $available];
 
         return Response::stream(
-            callback: static function () use ($params) {
+            callback: function () {
                 try {
+                    $available = $this->settings->availableVersion;
                     // Create stream
                     $stream = fopen('php://output', 'wb');
 
@@ -42,7 +41,11 @@ class AdminRunSoftwareUpdateController extends Controller
                             'decorated' => true,
                         ]
                     );
-                    // Call your command
+
+                    $output->writeln("Running Software Update... (Version: $available).");
+                    $output->writeln("NOTE: THIS MAY TAKE A WHILE...");
+
+                    $params    = ['--force' => true, '--install-version' => $available];
                     $exitCode = Artisan::call('streamline:run-update', $params, $output);
 
                     if ($exitCode !== 0) {
