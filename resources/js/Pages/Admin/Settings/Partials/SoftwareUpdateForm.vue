@@ -4,10 +4,10 @@ import useToast from "@/Composables/useToast";
 import JetButton from '@/Jetstream/Button.vue';
 import JetCheckbox from '@/Jetstream/Checkbox.vue';
 import JetFormSection from '@/Jetstream/FormSection.vue';
-import Label from "@/Jetstream/Label.vue";
 import {router, usePage} from '@inertiajs/vue3';
 import axios from "axios";
 import {computed, onMounted, ref} from 'vue';
+import vAutoScroll from '@/Directives/v-autoscroll.js';
 
 const props = defineProps({
     settings: Object,
@@ -74,7 +74,6 @@ onMounted(async () => {
     const response = await axios.get('/admin/admin-users');
     adminUsers.value = response.data.data;
 });
-
 </script>
 
 <template>
@@ -111,7 +110,7 @@ onMounted(async () => {
             </template>
             <div v-else-if="updateLog" class="col-span-12 text-gray-600 dark:text-gray-300">
                 <div class="font-bold">Update Log:</div>
-                <pre class="font-mono text-sm max-w-full overflow-x-scroll">{{ updateLog }}</pre>
+                <pre v-auto-scroll class="mt-2 rounded-md p-2 font-mono text-sm scroll-smooth max-w-full h-96 max-h-96 overflow-x-scroll bg-gray-200 dark:bg-gray-800">{{ updateLog }}</pre>
             </div>
             <template v-else>
                 <p class="col-span-12 text-gray-600 dark:text-gray-300">You are running the latest version of the
@@ -123,13 +122,13 @@ onMounted(async () => {
                     instructed by your IT support.</p>
             </template>
         </template>
-        
+
         <template #actions>
             <JetButton v-if="hasUpdate" :class="{ 'opacity-25': processing }" :disabled="processing">
                 Update Now
             </JetButton>
             <template v-else-if="!updateLog">
-                <label class="block mr-3 flex items-center text-gray-400 dark:text-gray-600">
+                <label class="mr-3 flex items-center text-gray-400 dark:text-gray-600">
                     <JetCheckbox v-model:checked="betaCheck" value="true"/>
                     <span class="ml-1.5">Check for Beta updates</span>
                 </label>
