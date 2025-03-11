@@ -1,5 +1,6 @@
 <script setup>
 import Bell from "@/Components/Icons/Bell.vue";
+import OozeLoader from "@/Components/Loaders/OozeLoader.vue";
 import useToast from "@/Composables/useToast";
 import JetButton from '@/Jetstream/Button.vue';
 import JetCheckbox from '@/Jetstream/Checkbox.vue';
@@ -74,6 +75,7 @@ onMounted(async () => {
     const response = await axios.get('/admin/admin-users');
     adminUsers.value = response.data.data;
 });
+
 </script>
 
 <template>
@@ -109,7 +111,8 @@ onMounted(async () => {
                 </p>
             </template>
             <div v-else-if="updateLog" class="col-span-12 text-gray-600 dark:text-gray-300">
-                <div class="font-bold">Update Log:</div>
+
+                <div class="font-bold flex items-center justify-between w-full">Update Log: <OozeLoader v-if="processing"/></div>
                 <pre v-auto-scroll class="mt-2 rounded-md p-2 font-mono text-sm scroll-smooth max-w-full h-96 max-h-96 overflow-x-scroll bg-gray-200 dark:bg-gray-800">{{ updateLog }}</pre>
             </div>
             <template v-else>
