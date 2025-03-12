@@ -1,4 +1,5 @@
 <?php
+/** @noinspection LaravelFunctionsInspection */
 
 return [
     /*
@@ -25,6 +26,11 @@ return [
     'send_jobs_to_ray' => env('SEND_JOBS_TO_RAY', false),
 
     /*
+    * When enabled all mails will automatically be sent to Ray.
+    */
+    'send_mails_to_ray' => env('SEND_MAILS_TO_RAY', true),
+
+    /*
     * When enabled, all things logged to the application log
     * will be sent to Ray as well.
     */
@@ -44,7 +50,32 @@ return [
      * When enabled, slow queries will automatically be sent to Ray.
      */
     'send_slow_queries_to_ray' => env('SEND_SLOW_QUERIES_TO_RAY', false),
-    
+
+    /**
+     * Queries that are longer than this number of milliseconds will be regarded as slow.
+     */
+    'slow_query_threshold_in_ms' => env('RAY_SLOW_QUERY_THRESHOLD_IN_MS', 500),
+
+    /*
+     * When enabled, all update queries will automatically be sent to Ray.
+     */
+    'send_update_queries_to_ray' => env('SEND_UPDATE_QUERIES_TO_RAY', false),
+
+    /*
+     * When enabled, all insert queries will automatically be sent to Ray.
+     */
+    'send_insert_queries_to_ray' => env('SEND_INSERT_QUERIES_TO_RAY', false),
+
+    /*
+     * When enabled, all delete queries will automatically be sent to Ray.
+     */
+    'send_delete_queries_to_ray' => env('SEND_DELETE_QUERIES_TO_RAY', false),
+
+    /*
+     * When enabled, all select queries will automatically be sent to Ray.
+     */
+    'send_select_queries_to_ray' => env('SEND_SELECT_QUERIES_TO_RAY', false),
+
     /*
     * When enabled, all requests made to this app will automatically be sent to Ray.
     */
@@ -66,8 +97,14 @@ return [
     'send_exceptions_to_ray' => env('SEND_EXCEPTIONS_TO_RAY', true),
 
     /*
+     * When enabled, all deprecation notices will be automatically sent to Ray.
+     */
+    'send_deprecated_notices_to_ray' => env('SEND_DEPRECATED_NOTICES_TO_RAY', false),
+
+    /*
     * The host used to communicate with the Ray app.
     * When using Docker on Mac or Windows, you can replace localhost with 'host.docker.internal'
+    * When using Docker on Linux, you can replace localhost with '172.17.0.1'
     * When using Homestead with the VirtualBox provider, you can replace localhost with '10.0.2.2'
     * When using Homestead with the Parallels provider, you can replace localhost with '10.211.55.2'
     */
@@ -82,13 +119,13 @@ return [
      * Absolute base path for your sites or projects in Homestead,
      * Vagrant, Docker, or another remote development server.
      */
-    'remote_path' => env('RAY_REMOTE_PATH', null),
+    'remote_path' => env('RAY_REMOTE_PATH'),
 
     /*
      * Absolute base path for your sites or projects on your local
      * computer where your IDE or code editor is running on.
      */
-    'local_path' => env('RAY_LOCAL_PATH', null),
+    'local_path' => env('RAY_LOCAL_PATH'),
 
     /*
      * When this setting is enabled, the package will not try to format values sent to Ray.
