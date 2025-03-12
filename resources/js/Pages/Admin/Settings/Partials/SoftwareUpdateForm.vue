@@ -2,13 +2,13 @@
 import Bell from "@/Components/Icons/Bell.vue";
 import OozeLoader from "@/Components/Loaders/OozeLoader.vue";
 import useToast from "@/Composables/useToast";
+import vAutoScroll from '@/Directives/v-autoscroll.js';
 import JetButton from '@/Jetstream/Button.vue';
 import JetCheckbox from '@/Jetstream/Checkbox.vue';
 import JetFormSection from '@/Jetstream/FormSection.vue';
 import {router, usePage} from '@inertiajs/vue3';
 import axios from "axios";
 import {computed, onMounted, ref} from 'vue';
-import vAutoScroll from '@/Directives/v-autoscroll.js';
 
 const props = defineProps({
     settings: Object,
@@ -34,6 +34,8 @@ const updateCheck = async () => {
 };
 
 const updateLog = ref('');
+const updateCompleted = ref(false);
+const hadUpdateError = ref(false);
 const doSoftwareUpdate = async () => {
     processing.value = true;
     updateLog.value = '';
@@ -58,17 +60,46 @@ const doSoftwareUpdate = async () => {
         } else {
             toast.error(`Update process failed. Please check the log for details.`);
         }
+        updateCompleted.value = true;
     } catch (error) {
         console.error('Error during update:', error);
         toast.error('An error occurred during the update. Please try again.');
+        hadUpdateError.value = true;
     } finally {
         processing.value = false;
     }
 };
 
+
 const hasUpdate = computed(() => {
     return !!usePage().props.hasUpdate && !updateLog.value;
 });
+
+const downloadLog = () => {
+    if (!updateLog.value) return;
+
+    // Create a blob with the log content
+    const blob = new Blob([updateLog.value], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const siteName = props.settings.siteName ? props.settings.siteName.toLowerCase().replace(/[^a-z\s]/g, '').replace(/\s+/g, '_') : 'cart_scheduler';
+
+    // Create a temporary link element to trigger the download
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${siteName}_update_${new Date().toISOString().slice(0, 19).replace(/[T:]/g, '-')}.txt`;
+    document.body.appendChild(link);
+
+    // Trigger the download
+    link.click();
+
+    // Clean up
+    setTimeout(() => {
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+    }, 100);
+}
+
+const reloadSite = () => window.location.reload();
 
 const adminUsers = ref();
 onMounted(async () => {
@@ -110,11 +141,17 @@ onMounted(async () => {
                     with minimum impact.
                 </p>
             </template>
-            <div v-else-if="updateLog" class="col-span-12 text-gray-600 dark:text-gray-300">
 
-                <div class="font-bold flex items-center justify-between w-full">Update Log: <OozeLoader v-if="processing"/></div>
-                <pre v-auto-scroll class="mt-2 rounded-md p-2 font-mono text-sm scroll-smooth max-w-full h-96 max-h-96 overflow-x-scroll bg-gray-200 dark:bg-gray-800">{{ updateLog }}</pre>
+            <div v-else-if="updateLog" class="col-span-12 text-gray-600 dark:text-gray-300">
+                <div class="font-bold flex items-center justify-between w-full">Update Log:
+                    <OozeLoader v-if="processing"/>
+                </div>
+                <pre v-auto-scroll
+                     class="mt-2 rounded-md p-2 font-mono text-sm scroll-smooth max-w-full h-96 max-h-96 overflow-x-scroll bg-gray-200 dark:bg-gray-800"
+                     :class="{'bg-red-200': hadUpdateError, 'dark:bg-red-900/80': hadUpdateError}"
+                >{{ updateLog }}</pre>
             </div>
+
             <template v-else>
                 <p class="col-span-12 text-gray-600 dark:text-gray-300">You are running the latest version of the
                     scheduling software (version {{ settings.currentVersion }}).</p>
@@ -130,6 +167,7 @@ onMounted(async () => {
             <JetButton v-if="hasUpdate" :class="{ 'opacity-25': processing }" :disabled="processing">
                 Update Now
             </JetButton>
+
             <template v-else-if="!updateLog">
                 <label class="mr-3 flex items-center text-gray-400 dark:text-gray-600">
                     <JetCheckbox v-model:checked="betaCheck" value="true"/>
@@ -141,6 +179,17 @@ onMounted(async () => {
                 </JetButton>
                 <JetButton style-type="warning" :class="{ 'opacity-25': processing }" :disabled="processing">
                     Reinstall Current Version
+                </JetButton>
+            </template>
+
+            <template v-else-if="updateCompleted">
+                <JetButton style-type="secondary" class="mr-3"
+                           :disabled="processing" @click.prevent.stop="downloadLog">
+                    Download update log
+                </JetButton>
+                <JetButton style-type="primary" class="mr-3"
+                           :disabled="processing" @click.prevent.stop="reloadSite">
+                    Reload the page to see changes
                 </JetButton>
             </template>
         </template>
