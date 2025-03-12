@@ -4280,12 +4280,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/pixelated-au/streamline.git",
-                "reference": "698186e77be450b5f703a3981e512c3e88da6bb2"
+                "reference": "b166e53e6adc5eb91d19dfbcc3637cc12f3a5ca4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pixelated-au/streamline/zipball/698186e77be450b5f703a3981e512c3e88da6bb2",
-                "reference": "698186e77be450b5f703a3981e512c3e88da6bb2",
+                "url": "https://api.github.com/repos/pixelated-au/streamline/zipball/b166e53e6adc5eb91d19dfbcc3637cc12f3a5ca4",
+                "reference": "b166e53e6adc5eb91d19dfbcc3637cc12f3a5ca4",
                 "shasum": ""
             },
             "require": {
@@ -4349,7 +4349,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2025-03-08T21:03:15+00:00"
+            "time": "2025-03-12T00:06:35+00:00"
         },
         {
             "name": "pragmarx/google2fa",
