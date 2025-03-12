@@ -28,7 +28,7 @@
         </report>
     </coverage>
     <extensions>
-        <bootstrap class="Ergebnis\PHPUnit\SlowTestDetector\Extension"></bootstrap>
+        <bootstrap class="Ergebnis\PHPUnit\SlowTestDetector\Extension"/>
     </extensions>
     <logging>
         <testdoxText outputFile="php://stdout"/>
