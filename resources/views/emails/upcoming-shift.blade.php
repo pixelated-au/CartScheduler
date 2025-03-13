@@ -5,10 +5,10 @@
 
 Dear {{ $name }}, this is a reminder that you have
 @if(count($shifts) > 1) upcoming shifts @else an upcoming shift @endif
-scheduled with the {{ config('app.name') }} Public Witnessing web application on the **{{ $date }}**:
+scheduled **{{ $relativeDate }}** ({{ $date->format('l, F jS') }}):
 
 @foreach($shifts as $shift)
-> {{ $shift[1] }} at {{ $shift[2] }} <br>
+- {{ $shift->location->name }} from {{ $shift->start_time12_hr }} to {{ $shift->end_time12_hr }} <br>
 @endforeach
 
 Thank you,<br>

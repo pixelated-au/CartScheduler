@@ -1,13 +1,11 @@
 <?php
 
+use App\Console\Commands\SendUserShiftReminderCommand;
+use Illuminate\Console\Scheduling\Event;
 use Illuminate\Foundation\Inspiring;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Schedule;
-use Illuminate\Support\Facades\App;
-use Illuminate\Console\Scheduling\CallbackEvent;
-use App\Actions\SendShiftReminders;
-use App\Actions\GetUserShiftReminderData;
-use App\Settings\GeneralSettings;
 
 /*
 |--------------------------------------------------------------------------
@@ -24,22 +22,8 @@ Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote');
 
-
-/*
-== OLD METHOD ==
-Schedule::call(SendShiftReminders::class)
-    ->tap(fn (CallbackEvent $event) =>
-        App::isLocal()
-            ? $event->everyThirtySeconds()
-            : $event->daily())
-    ->everyMinute();
-*/
-Schedule::call(function () {
-        $settings = app()->make(GeneralSettings::class);
-        dispatch(new SendShiftReminders($settings, new GetUserShiftReminderData()));
-    })
-    ->tap(fn (CallbackEvent $event) =>
-        App::isLocal()
-            ? $event->everyThirtySeconds()
-            : $event->daily())
+Schedule::command(SendUserShiftReminderCommand::class)
+    ->tap(fn(Event $event) => App::isLocal()
+        ? $event->everyThirtySeconds()
+        : $event->daily())
     ->everyMinute();

@@ -54,7 +54,11 @@ class User extends Authenticatable
             // Currently, this should only be called when doing a bulk update.
             $dirty    = $user->getDirty();
             $original = $user->getOriginal();
-            if (array_key_exists('spouse_id', $dirty) && $dirty['spouse_id'] === null && $original['spouse_id'] !== null) {
+            if (
+                array_key_exists('spouse_id', $dirty)
+                && $dirty['spouse_id'] === null
+                && $original['spouse_id'] !== null
+            ) {
                 $spouse            = User::find($original['spouse_id']);
                 $spouse->spouse_id = null;
                 $spouse->saveQuietly();
@@ -99,7 +103,6 @@ class User extends Authenticatable
         'password',
         'role',
     ];
-
     /**
      * The attributes that should be hidden for serialization.
      *
@@ -112,7 +115,6 @@ class User extends Authenticatable
         'two_factor_recovery_codes',
         'two_factor_secret',
     ];
-
     /**
      * The accessors to append to the model's array form.
      *
@@ -127,6 +129,17 @@ class User extends Authenticatable
     public function scopeEnabled(Builder $query): Builder
     {
         return $query->where('is_enabled', true);
+    }
+
+    /** @noinspection PhpUnused */
+    public function scopeShiftsOnDate(Builder $query, Carbon $date, ?string ...$columns): Builder
+    {
+        return $query->with([
+            'shifts' => fn(BelongsToMany $query) => $query
+                ->wherePivot('shift_date', '=', $date)
+                ->select(['location_id', ...$columns])
+                ->orderBy('start_time')
+        ]);
     }
 
     /**
@@ -168,13 +181,16 @@ class User extends Authenticatable
     protected function isRestricted(): Attribute
     {
         return Attribute::make(
-            get: static fn($value, $attributes) => isset($attributes['is_unrestricted']) && !$attributes['is_unrestricted'],
+            get: static fn(
+                $value,
+                $attributes
+            ) => isset($attributes['is_unrestricted']) && !$attributes['is_unrestricted'],
         );
     }
 
     public function shifts(): BelongsToMany
     {
-        return $this->belongsToMany(Shift::class)->withPivot('shift_user');
+        return $this->belongsToMany(Shift::class)->using(ShiftUser::class)->withPivot('id', 'shift_date');
     }
 
     public function getShiftsOnDate(Carbon|string $date): BelongsToMany
@@ -224,6 +240,7 @@ class User extends Authenticatable
             ->logExcept(['password', 'remember_token', 'two_factor_recovery_codes', 'two_factor_secret'])
             ->logOnlyDirty();
     }
+
     /**
      * The attributes that should be cast.
      *

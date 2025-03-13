@@ -2,42 +2,48 @@
 
 namespace App\Mail;
 
-//use App\Models\User;
-use Illuminate\Bus\Queueable;
+use Carbon\CarbonInterface;
 use Illuminate\Mail\Mailable;
+use Illuminate\Mail\Mailables\Content;
 use Illuminate\Queue\SerializesModels;
-//use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 
 class ShiftReminder extends Mailable
 {
-    use Queueable, SerializesModels;
+    use SerializesModels;
 
     /**
      * Create a new message instance.
      *
      * @return void
      */
-    public function __construct(public string $date, public string $name, public string $gender, public array $shifts)
-    {
-        $this->date = $date;
-        $this->name = $name;
-        $this->gender = $gender;
-        $this->shifts = $shifts;
-
-        $this->subject = config('app.name') . ' Upcoming Shift';
+    public function __construct(
+        public Carbon $date,
+        public string $name,
+        public string $gender,
+        public Collection $shifts
+    ) {
+        $this->subject = config('app.name') . ' Upcoming ' . Str::plural('Shift', $shifts->count());
     }
 
-    /**
-     * Build the message.
-     *
-     * @return $this
-     */
-    public function build(): static
+    public function content(): Content
     {
-        //$hashedEmail = base64_encode(Hash::make($this->user->uuid . $this->user->email));
-        //$data['date'] = $this->date;
-        //$data['name'] = $this->name;
-
-        return $this->markdown('emails.upcoming-shift');
+        return new Content(
+            markdown: 'emails.upcoming-shift',
+            with: [
+                'relativeDate' => match ((int) Carbon::now()->startOfDay()->diffInDays($this->date)) {
+                    0 => 'today',
+                    1 => 'tomorrow',
+                    2, 3, 4, 5, 6 => ($this->date->isNextWeek() ? 'next ' : 'this ') . $this->date->getTranslatedDayName(),
+                    default => $this->date->startOfDay()->from(
+                        other: Carbon::now()->startOfDay(),
+                        syntax: CarbonInterface::DIFF_RELATIVE_TO_NOW,
+                        options: Carbon::JUST_NOW | Carbon::ONE_DAY_WORDS | Carbon::TWO_DAY_WORDS | Carbon::SEQUENTIAL_PARTS_ONLY
+                    ),
+                },
+            ],
+        );
     }
 }
