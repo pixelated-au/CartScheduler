@@ -20,7 +20,9 @@ class GetUserShifts
             ->shiftsOnDate($targetDate, 'start_time', 'end_time')
             ->when(
                 is_int($userId),
-                fn(Builder $query) => $query->where('users.id', '=', $userId)
+                fn(Builder $query) => $query
+                    ->where('users.id', '=', $userId)
+                    ->whereHas('shifts', fn(Builder $query) => $query->where('shift_date', '=', $targetDate))
             )
             ->get();
     }
