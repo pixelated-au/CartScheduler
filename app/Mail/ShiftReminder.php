@@ -3,41 +3,43 @@
 namespace App\Mail;
 
 //use App\Models\User;
-use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
+use Illuminate\Mail\Mailables\Content;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
+
 //use Illuminate\Support\Facades\Hash;
 
 class ShiftReminder extends Mailable
 {
-    use Queueable, SerializesModels;
+    use SerializesModels;
 
     /**
      * Create a new message instance.
      *
      * @return void
      */
-    public function __construct(public string $date, public string $name, public string $gender, public array $shifts)
-    {
-        $this->date = $date;
-        $this->name = $name;
-        $this->gender = $gender;
-        $this->shifts = $shifts;
-
-        $this->subject = config('app.name') . ' Upcoming Shift';
+    public function __construct(
+        public Carbon $date,
+        public string $name,
+        public string $gender,
+        public Collection $shifts
+    ) {
+        $this->subject = config('app.name') . ' Upcoming ' . Str::plural('Shift', $shifts->count());
     }
 
-    /**
-     * Build the message.
-     *
-     * @return $this
-     */
-    public function build(): static
+    public function content(): Content
     {
-        //$hashedEmail = base64_encode(Hash::make($this->user->uuid . $this->user->email));
-        //$data['date'] = $this->date;
-        //$data['name'] = $this->name;
-
-        return $this->markdown('emails.upcoming-shift');
+        return new Content(
+            markdown: 'emails.upcoming-shift',
+            with: [
+                'date'    => $this->date,
+                'name'    => $this->name,
+                'gender'  => $this->gender,
+                'shiftss' => $this->shifts,
+            ],
+        );
     }
 }
