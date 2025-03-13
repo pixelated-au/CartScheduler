@@ -2,11 +2,11 @@
 
 namespace App\Actions;
 
+use App\Models\User;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\DB;
-use stdClass;
-
-use function Laravel\Prompts\error;
 
 class GetUserShiftReminderData
 {
@@ -14,34 +14,15 @@ class GetUserShiftReminderData
      * Query all users with shifts on the requested date.
      */
 
-    public function execute(string $targetDate): Collection
+    public function execute(Carbon $targetDate, ?int $userId = null): Collection
     {
-        $query = DB::table('users as u')
-            ->join('shift_user as su', 'u.id', '=', 'su.user_id')
-            ->join('shifts as s', 'su.shift_id', '=', 's.id')
-            ->join('locations as l', 's.location_id', '=', 'l.id')
-            ->select(
-                'u.id as user_id',
-                'u.name',
-                'u.email',
-                'u.gender',
-                DB::raw("GROUP_CONCAT(CONCAT(su.shift_id, '|', s.start_time, '|', l.name) SEPARATOR ';') as all_shifts")
+        return User::with(['shifts.location' => fn(BelongsTo $query) => $query->select('id', 'name')])
+            ->shiftsOnDate($targetDate, 'start_time', 'end_time')
+            ->select(['id', 'name', 'email', 'gender'])
+            ->when(
+                is_int($userId),
+                fn(Builder $query) => $query->where('users.id', '=', $userId)
             )
-            ->where('su.shift_date', '=', $targetDate)
-            ->groupBy('u.id', 'u.name', 'u.email', 'u.gender')
             ->get();
-        var_dump($query);
-
-
-
-        // filter results into an array of dicts/maps with id, name, gender and email per user.
-        return collect($query)
-            ->map(fn(stdClass $shift) => [
-                'user_id'     => $shift->user_id,
-                'user_email' => $shift->email,
-                'user_name' => $shift->name,
-                'user_gender' => $shift->gender,
-                'shifts' => explode(";", $shift->all_shifts)
-            ]);
     }
 }
