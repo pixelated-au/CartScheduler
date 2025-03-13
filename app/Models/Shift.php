@@ -79,6 +79,22 @@ class Shift extends Model
         );
     }
 
+    /** @noinspection PhpUnused */
+    protected function startTime12Hr(): Attribute
+    {
+        return Attribute::make(
+            get: static fn(?string $value, array $attributes) => Carbon::parse($attributes['start_time'])->format('h:i A'),
+        );
+    }
+
+    /** @noinspection PhpUnused */
+    protected function endTime12Hr(): Attribute
+    {
+        return Attribute::make(
+            get: static fn(?string $value, array $attributes) => Carbon::parse($attributes['end_time'])->format('h:i A'),
+        );
+    }
+
     public function location(): BelongsTo
     {
         return $this->belongsTo(Location::class);
@@ -86,7 +102,7 @@ class Shift extends Model
 
     public function users(): BelongsToMany
     {
-        return $this->belongsToMany(User::class)->withPivot(['id', 'shift_date']);
+        return $this->belongsToMany(User::class)->using(ShiftUser::class)->withPivot('id', 'shift_date');
     }
 
     public function getUsersOnDate(Carbon|string $date): BelongsToMany
