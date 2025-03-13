@@ -12,9 +12,12 @@ class GetUserShifts
 {
     public function execute(Carbon $targetDate, ?int $userId = null): Collection
     {
-        return User::with(['shifts.location' => fn(BelongsTo $query) => $query->select('id', 'name')])
+        return User::select(['id', 'name', 'email', 'gender'])
+            ->with([
+                'shifts.location' => fn(BelongsTo $query) => $query
+                    ->select('id', 'name')
+            ])
             ->shiftsOnDate($targetDate, 'start_time', 'end_time')
-            ->select(['id', 'name', 'email', 'gender'])
             ->when(
                 is_int($userId),
                 fn(Builder $query) => $query->where('users.id', '=', $userId)
