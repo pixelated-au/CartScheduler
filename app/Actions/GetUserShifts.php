@@ -8,12 +8,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 
-class GetUserShiftReminderData
+class GetUserShifts
 {
-    /**
-     * Query all users with shifts on the requested date.
-     */
-
     public function execute(Carbon $targetDate, ?int $userId = null): Collection
     {
         return User::with(['shifts.location' => fn(BelongsTo $query) => $query->select('id', 'name')])
