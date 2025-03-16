@@ -21,6 +21,7 @@ const form = useForm({
     systemShiftEndHour: props.settings.systemShiftEndHour,
     enableUserAvailability: props.settings.enableUserAvailability,
     enableUserLocationChoices: props.settings.enableUserLocationChoices,
+    emailReminderTime: props.settings.emailReminderTime,
 });
 
 const updateGeneralSettings = () => {
@@ -44,6 +45,7 @@ const hours = computed(() => {
         return {label: i < 12 ? i + 'am' : i - 12 + 'pm', value: i};
     });
 });
+
 
 </script>
 
@@ -118,6 +120,19 @@ const hours = computed(() => {
                     niche setting, you probably will <strong>not</strong> need to enable this feature.</em>
                 </div>
             </div>
+
+            <div class="col-span-6 flex items-center flex-wrap">
+                <div class = "flex flex-col pb-2">
+                    <JetLabel for="change_shift_reminders_time" value="Shift Reminder Notifications"/>
+                    <JetInput id="change_shift_reminders_time" v-model="form.emailReminderTime" type="number" step="0.5" class="mt-1 block w-1/2"/>
+                </div>
+                <JetInputError :message="form.errors.emailReminderTime" class="mt-2"/>
+                <div class="col-span-2 ml-1 text-sm text-gray-600 dark:text-gray-300 w-full">
+                    How many hours before the shift do you want publishers to receive the reminder?
+                </div>
+            </div>
+
+
         </template>
 
         <template #actions>

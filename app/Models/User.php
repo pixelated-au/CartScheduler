@@ -136,7 +136,7 @@ class User extends Authenticatable
     {
         return $query->with([
             'shifts' => fn(BelongsToMany $query) => $query
-                ->wherePivot('shift_date', '=', $date)
+                ->wherePivot('shift_date', '=', $date->toDateString())
                 ->select(['location_id', ...$columns])
                 ->orderBy('start_time')
         ]);

@@ -18,7 +18,10 @@ class SendUserShiftReminderCommand extends Command
 
     public function handle(): void
     {
-        SendShiftReminders::dispatch($this->argument('userId'), Carbon::parse($this->option('date')));
+        if ($this->option('date'))
+            SendShiftReminders::dispatch($this->argument('userId'), Carbon::parse($this->option('date')));
+        else
+            SendShiftReminders::dispatch($this->argument('userId'), $this->option('date'));
     }
 
     protected function rules(): array

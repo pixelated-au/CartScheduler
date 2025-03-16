@@ -22,7 +22,7 @@ class SendShiftReminders implements ShouldQueue
 
     public function __invoke(GeneralSettings $settings, GetUserShifts $getUserShiftsData): void
     {
-        if ($this->date) {
+        if ($this->date != null) {
             $targetDate = $this->date;
         } else {
             $targetDate = Carbon::today();
@@ -43,3 +43,4 @@ class SendShiftReminders implements ShouldQueue
         }
     }
 }
+
