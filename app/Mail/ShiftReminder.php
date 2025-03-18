@@ -9,6 +9,7 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use App\Enums\ReminderEmail;
 
 class ShiftReminder extends Mailable
 {
@@ -23,7 +24,9 @@ class ShiftReminder extends Mailable
         public Carbon $date,
         public string $name,
         public string $gender,
-        public Collection $shifts
+        public Collection $shifts,
+        public Collection $problemShifts,
+        public ReminderEmail $emailTemplate,
     ) {
         $this->subject = config('app.name') . ' Upcoming ' . Str::plural('Shift', $shifts->count());
     }
@@ -31,7 +34,7 @@ class ShiftReminder extends Mailable
     public function content(): Content
     {
         return new Content(
-            markdown: 'emails.upcoming-shift',
+            markdown: $this->emailTemplate->value,
             with: [
                 'relativeDate' => match ((int) Carbon::now()->startOfDay()->diffInDays($this->date)) {
                     0 => 'today',

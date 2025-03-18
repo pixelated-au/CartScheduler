@@ -9,6 +9,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Mail;
+use App\Enums\ReminderEmail;
 
 class SendShiftReminders implements ShouldQueue
 {
@@ -32,13 +33,41 @@ class SendShiftReminders implements ShouldQueue
 
         $users = $getUserShiftsData->execute($targetDate, $this->userId);
 
+        $getuser = new GetUserShiftsData();
+
+
         /** @var User $user */
         foreach ($users as $user) {
+            $emailTemplate = ReminderEmail::DefaultEmail;
+            $problemShifts = collect([]);
+            foreach ($user->shifts as $userShift) {
+                $targetShiftId = $userShift->pivot->shift_id;
+                $targetShiftDate = $userShift->pivot->shift_date;
+
+                $targetShiftUsers = $users->where(function ($shiftUser) use ($targetShiftId, $targetShiftDate) {
+                    foreach ($shiftUser->shifts as $shift) {
+                        if ($shift->pivot->shift_id == $targetShiftId && $shift->pivot->shift_date == $targetShiftDate) {
+                            return true;
+                        }
+                    }
+                    return false;
+                });
+
+                $shiftCanRun = CanShiftRun::CanShiftRun($userShift->location_id, $targetShiftUsers);
+
+                if (!$shiftCanRun) {
+                    $problemShifts->push($userShift);
+                    $emailTemplate = ReminderEmail::IssueEmail;
+                }
+            }
+
             Mail::to($user->email)->send(new ShiftReminder(
                 date: $targetDate,
                 name: $user->name,
                 gender: $user->gender,
                 shifts: $user->shifts,
+                problemShifts: $problemShifts,
+                emailTemplate: $emailTemplate,
             ));
         }
     }

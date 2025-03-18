@@ -12,10 +12,10 @@ scheduled for **{{ $relativeDate }}** ({{ $date->format('l, F jS') }}):
 @endforeach
 
 **Please note that the following scheduled
-@if(count($problem_shifts) > 1) shifts @else shift @endif
+@if(count($problemShifts) > 1) shifts @else shift @endif
 will currently not be able to go ahead:**
 
-@foreach($problem_shifts as $shift)
+@foreach($problemShifts as $shift)
 - {{ $shift->location->name }} from {{ $shift->start_time12_hr }} to {{ $shift->end_time12_hr }} <br>
 @endforeach
 
