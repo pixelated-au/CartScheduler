@@ -23,11 +23,6 @@ class Shift extends Model
     use HasFactory;
     use LogsActivity;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var string[]
-     */
     protected $fillable = [
         'name',
         'location_id',
@@ -44,6 +39,22 @@ class Shift extends Model
         'available_to',
         'is_enabled',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'day_monday'     => 'boolean',
+            'day_tuesday'    => 'boolean',
+            'day_wednesday'  => 'boolean',
+            'day_thursday'   => 'boolean',
+            'day_friday'     => 'boolean',
+            'day_saturday'   => 'boolean',
+            'day_sunday'     => 'boolean',
+            'is_enabled'     => 'boolean',
+            'available_from' => 'datetime',
+            'available_to'   => 'datetime',
+        ];
+    }
 
     /** @noinspection PhpUnused */
     protected function availableFrom(): Attribute
@@ -86,7 +97,7 @@ class Shift extends Model
 
     public function users(): BelongsToMany
     {
-        return $this->belongsToMany(User::class)->withPivot(['id', 'shift_date']);
+        return $this->belongsToMany(User::class)->using(ShiftUser::class)->withPivot('id', 'shift_date');
     }
 
     public function getUsersOnDate(Carbon|string $date): BelongsToMany
@@ -123,20 +134,5 @@ class Shift extends Model
         return LogOptions::defaults()
             ->logAll()
             ->logOnlyDirty();
-    }
-    protected function casts(): array
-    {
-        return [
-            'day_monday'     => 'boolean',
-            'day_tuesday'    => 'boolean',
-            'day_wednesday'  => 'boolean',
-            'day_thursday'   => 'boolean',
-            'day_friday'     => 'boolean',
-            'day_saturday'   => 'boolean',
-            'day_sunday'     => 'boolean',
-            'is_enabled'     => 'boolean',
-            'available_from' => 'datetime',
-            'available_to'   => 'datetime',
-        ];
     }
 }
