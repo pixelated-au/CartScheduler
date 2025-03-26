@@ -36,6 +36,18 @@ class User extends Authenticatable
     use LogsActivity;
     use CausesActivity;
 
+    protected function casts(): array
+    {
+        return [
+            'is_enabled'          => 'boolean',
+            'is_unrestricted'     => 'boolean',
+            'responsible_brother' => 'boolean',
+            'email_verified_at'   => 'datetime',
+            'year_of_birth'       => 'integer',
+            'password'            => 'hashed',
+        ];
+    }
+
     protected static function booted(): void
     {
         static::created(static function (self $user) {
@@ -129,6 +141,15 @@ class User extends Authenticatable
         return $query->where('is_enabled', true);
     }
 
+    /** @noinspection PhpUnused */
+    public function scopeShiftsOnDate(Builder $query, Carbon $date): Builder
+    {
+        return $query->with([
+            'shifts' => fn(BelongsToMany $query) => $query
+                ->wherePivot('shift_date', '=', $date)
+        ]);
+    }
+
     /**
      * Format the phone number
      *
@@ -174,7 +195,7 @@ class User extends Authenticatable
 
     public function shifts(): BelongsToMany
     {
-        return $this->belongsToMany(Shift::class)->withPivot('shift_user');
+        return $this->belongsToMany(Shift::class)->using(ShiftUser::class)->withPivot('id', 'shift_date');
     }
 
     public function getShiftsOnDate(Carbon|string $date): BelongsToMany
@@ -223,22 +244,5 @@ class User extends Authenticatable
             ->logAll()
             ->logExcept(['password', 'remember_token', 'two_factor_recovery_codes', 'two_factor_secret'])
             ->logOnlyDirty();
-    }
-    /**
-     * The attributes that should be cast.
-     *
-     * @return array
-     */
-    protected function casts(): array
-    {
-        return [
-            'is_enabled'          => 'boolean',
-            'is_unrestricted'     => 'boolean',
-            'responsible_brother' => 'boolean',
-            'email_verified_at'   => 'datetime',
-            'year_of_birth'       => 'integer',
-            'password'            => 'hashed',
-            //TODO add in a Role enum class
-        ];
     }
 }
