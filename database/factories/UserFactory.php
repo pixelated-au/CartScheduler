@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
@@ -12,6 +13,15 @@ class UserFactory extends Factory
      * The current password being used by the factory.
      */
     protected static ?string $password = null;
+
+    /**
+     * This factory does not need to send emails whenever a new user has been created so instead of updating the entire
+     * codebase, I'm just overriding the create method
+     */
+    public function create($attributes = [], ?Model $parent = null)
+    {
+        return Model::withoutEvents(fn () => parent::create($attributes, $parent));
+    }
 
     /**
      * Define the model's default state.
