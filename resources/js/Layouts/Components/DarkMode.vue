@@ -1,64 +1,29 @@
 <script setup>
-import {onMounted, ref} from 'vue';
+import {computed} from 'vue';
+import {useColorMode} from '@vueuse/core'
 
-defineProps({
-    darkMode: {
-        type: Boolean,
-    },
-});
+const {system, store} = useColorMode()
+
+system.value // 'dark' | 'light'
+store.value // 'dark' | 'light' | 'auto'
+
+const colorMode = computed(() => {
+    const mode = store.value === 'auto' ? system.value : store.value;
+    emit('is-dark-mode', mode === 'dark');
+    return mode;
+})
 
 const emit = defineEmits(['is-dark-mode']);
 
-const isDarkMode = ref(false);
-
-const toggleDarkMode = () => {
-    if (localStorage.getItem('color-theme')) {
-        if (localStorage.getItem('color-theme') === 'light') {
-            document.documentElement.classList.add('dark');
-            localStorage.setItem('color-theme', 'dark');
-            isDarkMode.value = true;
-        } else {
-            document.documentElement.classList.remove('dark');
-            localStorage.setItem('color-theme', 'light');
-            isDarkMode.value = false;
-        }
-
-        // if NOT set via local storage previously
-    } else {
-        if (document.documentElement.classList.contains('dark')) {
-            document.documentElement.classList.remove('dark');
-            localStorage.setItem('color-theme', 'light');
-            isDarkMode.value = false;
-        } else {
-            document.documentElement.classList.add('dark');
-            localStorage.setItem('color-theme', 'dark');
-            isDarkMode.value = true;
-        }
-    }
-    emit('is-dark-mode', isDarkMode.value);
-};
-
-const setDarkMode = () => {
-    isDarkMode.value =
-        localStorage.getItem('color-theme') === 'dark'
-        || (
-            !('color-theme' in localStorage)
-            && window.matchMedia('(prefers-color-scheme: dark)').matches
-        );
-    emit('is-dark-mode', isDarkMode.value);
-};
-
-onMounted(() => {
-    setDarkMode();
-});
 </script>
 <template>
     <button id="theme-toggle"
             type="button"
             class="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 rounded-lg text-sm p-2.5"
-            @click="toggleDarkMode">
+            @click="store = colorMode === 'dark' ? 'light' : 'dark'">
+        <!--                @click="toggleDarkMode">-->
         <svg id="theme-toggle-dark-icon"
-             :class="{hidden: isDarkMode}"
+             :class="{hidden: colorMode === 'light'}"
              class="w-5 h-5"
              fill="currentColor"
              viewBox="0 0 20 20"
@@ -66,7 +31,7 @@ onMounted(() => {
             <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path>
         </svg>
         <svg id="theme-toggle-light-icon"
-             :class="{hidden: !isDarkMode}"
+             :class="{hidden: colorMode === 'dark'}"
              class="w-5 h-5"
              fill="currentColor"
              viewBox="0 0 20 20"
@@ -77,5 +42,4 @@ onMounted(() => {
                 clip-rule="evenodd"></path>
         </svg>
     </button>
-
 </template>
