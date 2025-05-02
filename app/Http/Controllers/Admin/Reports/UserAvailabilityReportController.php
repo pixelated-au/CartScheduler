@@ -6,10 +6,12 @@ use App\Actions\Admin\Reports\GetUserAvailabilityReportAction;
 use App\Http\Controllers\Controller;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
+use Inertia\Response;
 
 class UserAvailabilityReportController extends Controller
 {
-    public function __invoke(Request $request, GetUserAvailabilityReportAction $action)
+    public function __invoke(Request $request, GetUserAvailabilityReportAction $action): Response
     {
         // Validate date parameters if provided
         $validated = $request->validate([
@@ -30,8 +32,7 @@ class UserAvailabilityReportController extends Controller
         // Execute the action with the date parameters
         $reportData = $action->execute($startDate, $endDate);
 
-        // Return JSON response with data and metadata
-        return response()->json([
+        return Inertia::render('Admin/Reporting/UserAvailabilityReport', [
             'data' => $reportData,
             'meta' => [
                 'start_date' => $startDate->toDateString(),
