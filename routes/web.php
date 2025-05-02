@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\Reports\UserAvailabilityReportController;
+use App\Http\Controllers\Admin\UserDataController;
 use App\Http\Controllers\AdminAvailableShiftsController;
 use App\Http\Controllers\AdminCheckForUpdateController;
 use App\Http\Controllers\AdminDashboardController;
@@ -58,7 +59,7 @@ use Inertia\Inertia;
     ]);
 });*/
 
-Route::get('/', static fn () => Inertia::render('Auth/Login'));
+Route::get('/', static fn() => Inertia::render('Auth/Login'));
 
 Route::get('/set-password/{user}/{hashedEmail}', [SetUserPasswordController::class, 'show'])->name('set.password.show');
 Route::post('/set-password', [SetUserPasswordController::class, 'update'])->name('set.password.update');
@@ -66,7 +67,7 @@ Route::post('/set-password', [SetUserPasswordController::class, 'update'])->name
 // Route::get('/mail', static fn() => new App\Mail\UserAccountCreated(App\Models\User::find(1)));
 
 Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified', 'user-enabled'])->group(function () {
-    Route::get('/', static fn () => Inertia::render('Dashboard'))->name('dashboard');
+    Route::get('/', static fn() => Inertia::render('Dashboard'))->name('dashboard');
     Route::get('/shifts/{shiftDate}', AvailableShiftsController::class)->where(['shiftDate' => '\d\d\d\d-\d\d-\d\d']);
     Route::get('/outstanding-reports', MissingReportsForUserController::class);
     Route::post('/reserve-shift', ToggleShiftReservationController::class);
@@ -85,8 +86,10 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified',
     Route::put('/user/vacations', UpdateUserVacationsController::class)->name('update.user.vacations');
 
     Route::get('/user/available-locations', GetUserLocationChoicesController::class)->name('user.location-choices');
-    Route::put('/user/available-locations',
-        UpdateUserLocationsChoicesController::class)->name('update.user.location-choices');
+    Route::put(
+        '/user/available-locations',
+        UpdateUserLocationsChoicesController::class
+    )->name('update.user.location-choices');
 
     Route::prefix('admin')
         ->middleware('is-admin')
@@ -95,6 +98,8 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified',
 
             Route::get('/users/import', [UsersImportController::class, 'show'])->name('admin.users.import.show');
             Route::post('/users/import', [UsersImportController::class, 'import'])->name('admin.users.import.import');
+
+            Route::get('/users/get/{user}', UserDataController::class)->name('admin.users.get');
 
             Route::resource('/users', UsersController::class)->names([
                 'index' => 'admin.users.index',
@@ -124,9 +129,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified',
             ])->only(['index']);
 
             // New user availability report endpoint
-            Route::get('/reports/users-availability',
-                UserAvailabilityReportController::class)
-                ->name('admin.reports.users-availability');
+            Route::get('/reporting/users-availability', UserAvailabilityReportController::class)->name('admin.reports.users-availability');
 
             Route::resource('/report-tags', ReportTagsController::class)->parameter('report-tags', 'tag')->names([
                 'index' => 'admin.report-tags.index',
@@ -135,11 +138,15 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified',
                 'destroy' => 'admin.report-tags.destroy',
             ]);
             Route::put('/report-tag-sort-order', ReportTagsSortOrderController::class);
-            Route::post('/resend-welcome-email',
-                ResendWelcomeEmailController::class)->name('admin.resend-welcome-email');
+            Route::post(
+                '/resend-welcome-email',
+                ResendWelcomeEmailController::class
+            )->name('admin.resend-welcome-email');
 
-            Route::get('/assigned-shifts/{shiftDate}',
-                AdminAvailableShiftsController::class)->where(['shiftDate' => '\d\d\d\d-\d\d-\d\d']);
+            Route::get(
+                '/assigned-shifts/{shiftDate}',
+                AdminAvailableShiftsController::class
+            )->where(['shiftDate' => '\d\d\d\d-\d\d-\d\d']);
 
             Route::delete('/shifts/{shift}', DeleteShiftsController::class)->name('admin.shifts.destroy');
 
@@ -150,17 +157,25 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified',
 
             Route::get('/settings', ShowGeneralSettingsController::class)->name('admin.settings');
 
-            Route::put('/general-settings',
-                UpdateGeneralSettingsController::class)->name('admin.general-settings.update');
-            Route::put('/allowed-settings-users',
-                UpdateAllowedSettingsUsersController::class)->name('admin.allowed-settings-users.update');
+            Route::put(
+                '/general-settings',
+                UpdateGeneralSettingsController::class
+            )->name('admin.general-settings.update');
+            Route::put(
+                '/allowed-settings-users',
+                UpdateAllowedSettingsUsersController::class
+            )->name('admin.allowed-settings-users.update');
             Route::get('/admin-users', GetAdminUsersController::class)->name('admin.admin-users.get');
             Route::get('/check-update', AdminCheckForUpdateController::class)->name('admin.check-update');
             Route::post('/do-update', AdminRunSoftwareUpdateController::class)->name('admin.do-update');
-            Route::get('/users-as-spreadsheet',
-                DownloadUsersAsSpreadsheetController::class)->name('admin.users-as-spreadsheet');
-            Route::get('/users-import-template',
-                DownloadUserImportSpreadsheetController::class)->name('admin.user-import-template');
+            Route::get(
+                '/users-as-spreadsheet',
+                DownloadUsersAsSpreadsheetController::class
+            )->name('admin.users-as-spreadsheet');
+            Route::get(
+                '/users-import-template',
+                DownloadUserImportSpreadsheetController::class
+            )->name('admin.user-import-template');
 
             // Route::get('/', static fn() => Inertia::render('Admin/Dashboard'))->name('admin.dashboard');
 
