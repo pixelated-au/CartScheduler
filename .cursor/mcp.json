@@ -1,0 +1,21 @@
+{
+    "mcpServers": {
+        "mysql": {
+            "command": "bunx",
+            "args": [
+                "-y",
+                "@benborla29/mcp-server-mysql"
+            ],
+            "env": {
+                "MYSQL_HOST": "127.0.0.1",
+                "MYSQL_PORT": "3306",
+                "MYSQL_USER": "sail",
+                "MYSQL_PASS": "password",
+                "MYSQL_DB": "cart_app",
+                "ALLOW_INSERT_OPERATION": "false",
+                "ALLOW_UPDATE_OPERATION": "false",
+                "ALLOW_DELETE_OPERATION": "false"
+            }
+        }
+    }
+}
