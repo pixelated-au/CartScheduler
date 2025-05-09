@@ -1,6 +1,11 @@
-@tailwind base;
+/* @tailwind base;
 @tailwind components;
-@tailwind utilities;
+@tailwind utilities; */
+
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+/*@import "./primevue/tailwind.css";*/
+@import "tailwindcss/utilities";
 
 @layer base {
     h1 {
@@ -52,4 +57,9 @@
 
 .page-content ol li {
     @apply list-decimal;
+}
+
+.grid-cols-page {
+    grid-template-areas:
+        "left content right";
 }
