@@ -6,6 +6,8 @@ import 'flowbite';
 
 import {resolvePageComponent} from 'laravel-vite-plugin/inertia-helpers';
 import {createApp, h} from 'vue';
+import PrimeVue from 'primevue/config';
+import Theme from '@primeuix/themes/lara';
 
 import Toast from 'vue-toastification';
 import 'vue-toastification/dist/index.css';
@@ -37,6 +39,14 @@ createInertiaApp({
     },
     setup({el, App, props, plugin}) {
         const vueApp = createApp({render: () => h(App, props)})
+            .use(PrimeVue, {
+                theme: {
+                    preset: Theme,
+                    options: {
+                        darkModeSelector: '.dark',
+                    }
+                }
+            })
             .use(plugin)
             .use(ZiggyVue)
             .use(Toast);
