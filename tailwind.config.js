@@ -1,15 +1,17 @@
 const defaultTheme = require('tailwindcss/defaultTheme')
+const colors = require('tailwindcss/colors');
 
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-    darkMode: 'class',
+    darkMode: ['class'],
     content: [
-        './vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php',
-        './vendor/laravel/jetstream/**/*.blade.php',
+        // './vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php',
+        // './vendor/laravel/jetstream/**/*.blade.php',
         './storage/framework/views/*.php',
         './resources/views/**/*.blade.php',
-        './resources/js/**/*.vue',
-        './node_modules/flowbite/**/*.js',
+        './resources/js/**/*.{ts,js,vue}',
+        '!./resources/css/**.*.css',
+        // './node_modules/flowbite/**/*.js',
     ],
 
     theme: {
@@ -20,7 +22,8 @@ module.exports = {
             transitionDelay: {
                 '9000': '9000ms',
             },
-            gridTemplateColumns: {
+            gridTemplateColumns: ({theme}) => ({
+                'page': `auto minmax(0, ${theme('screens.xl')}) auto`,
                 'reservation-1': 'auto repeat(1, minmax(0, 30px)) 1fr',
                 'reservation-2': 'auto repeat(2, minmax(0, 30px)) 1fr',
                 'reservation-3': 'auto repeat(3, minmax(0, 30px)) 1fr',
@@ -31,8 +34,53 @@ module.exports = {
                 'sm-reservation-3': '2fr repeat(3, minmax(0, 30px))',
                 'sm-reservation-4': '2fr repeat(4, minmax(0, 30px))',
                 'sm-reservation-5': '2fr repeat(5, minmax(0, 30px))',
+            }),
+        colors: ({theme}) => ({
+            primary: {
+                DEFAULT: colors.violet['500'],
+                hover: colors.violet['600'],
+                active: colors.violet['900'],
+                dark: colors.violet['300'],
             },
+            secondary: {
+                DEFAULT: colors.slate['500'],
+                hover: colors.slate['600'],
+                active: colors.slate['900'],
+                dark: colors.slate['300'],
+            },
+            success: {
+                DEFAULT: colors.green['500'],
+                hover: colors.green['600'],
+                active: colors.green['900'],
+                dark: colors.green['300'],
+            },
+            info: {
+                DEFAULT: colors.blue['500'],
+                hover: colors.blue['600'],
+                active: colors.blue['900'],
+                dark: colors.blue['300'],
+            },
+            danger: {
+                DEFAULT: colors.amber['500'],
+                hover: colors.amber['600'],
+                active: colors.amber['900'],
+                dark: colors.amber['300'],
+            },
+            help: {
+                DEFAULT: colors.purple['500'],
+                hover: colors.purple['600'],
+                active: colors.purple['900'],
+                dark: colors.purple['300'],
+            },
+            warning: {
+                DEFAULT: colors.red['500'],
+                hover: colors.red['600'],
+                active: colors.red['900'],
+                dark: colors.red['300'],
+            },
+        }),
         },
+
     },
 
     safelist: [
@@ -42,10 +90,10 @@ module.exports = {
         'border-2',
         'hover:text-white',
         'active:text-white',
-        {
-            pattern: /(violet|slate|green|blue|amber|purple|red)-(300|500|600|900)/,
-            variants: ['hover', 'focus', 'dark:hover', 'dark:focus'],
-        },
+        // {
+        //     pattern: /(bg|text)-([^/]+violet|slate|green|blue|amber|purple|red)-(300|500|600|900)+/,
+        //     variants: ['hover', 'focus', 'dark:hover', 'dark:focus'],
+        // },
     ],
 
     plugins: [
@@ -53,5 +101,6 @@ module.exports = {
         require('@tailwindcss/typography'),
         require('flowbite/plugin'),
         require('@vueform/slider/tailwind'),
+        require('tailwindcss-primeui'),
     ],
 }
