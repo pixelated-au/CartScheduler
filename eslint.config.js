@@ -1,21 +1,21 @@
 // noinspection NpmUsedModulesInstalled
 
+import importPlugin from "eslint-plugin-import";
+import { defineConfig, globalIgnores } from "eslint/config";
 import css from "@eslint/css";
 import js from "@eslint/js";
-import plugin from "@stylistic/eslint-plugin";
-import importPlugin from "eslint-plugin-import";
 import pluginVue from "eslint-plugin-vue";
-import { defineConfig, globalIgnores } from "eslint/config";
+import stylistic from "@stylistic/eslint-plugin";
 import globals from "globals";
 
 export default defineConfig([
   globalIgnores(["node_modules", "vendor"]),
   ...pluginVue.configs["flat/essential"],
-  importPlugin.flatConfigs.recommended,
   {
+    name: "eslint-defaults",
     files: ["./*.js", "./resources/js/**/*.{js,vue}"],
-    plugins: { js, "@stylistic": plugin },
-    extends: ["js/recommended"],
+    plugins: { js, "@stylistic": stylistic },
+    extends: ["js/recommended", importPlugin.flatConfigs.recommended],
     languageOptions: {
       ecmaVersion: 2020,
       globals: {
@@ -27,29 +27,42 @@ export default defineConfig([
     },
   },
   {
+    name: "eslint-css",
     files: ["./resources/css/**/*.css"],
     plugins: { css },
     language: "css/css",
-    extends: ["css/recommended"],
     rules: {
+      "css/no-empty-blocks": "error",
       "css/no-duplicate-imports": "error",
+      "css/no-important": "error",
+      "css/no-invalid-at-rules": "error",
+      "css/no-invalid-properties": "error",
+      "css/use-baseline": "warn",
     },
   },
   {
-    // eslint rules
+    name: "eslint-js",
     rules: {
       "no-empty": ["warn", { "allowEmptyCatch": true }],
       "no-unused-vars": "warn",
     },
   },
   {
+    name: "eslint-imports",
     rules: {
+      "import/consistent-type-specifier-style": ["error", "prefer-top-level"],
       "import/default": "off",
       "import/namespace": "off",
       "import/no-named-as-default": "off",
       "import/no-named-as-default-member": "off",
       "import/no-unresolved": "off",
-      "import/order": ["error"],
+      /**
+       * import/order:
+       * If the ordering of `eslint --fix` isn't working, it's likely because there is an unbound import.
+       * Eg import 'xyz.css' as opposed to import abc from 'abc'.
+       * @see https://github.com/import-js/eslint-plugin-import/blob/main/docs/rules/order.md#limitations-of---fix
+       */
+      "import/order": "warn",
     },
   },
   {
@@ -149,6 +162,7 @@ export default defineConfig([
       "@stylistic/arrow-parens": ["error", "always"],
       "@stylistic/brace-style": ["warn", "1tbs"],
       "@stylistic/comma-dangle": ["warn", "always-multiline"],
+      "@stylistic/comma-spacing": ["warn"],
       "@stylistic/function-call-argument-newline": ["warn", "consistent"],
       "@stylistic/function-paren-newline": ["warn", "consistent"],
       "@stylistic/indent": [
