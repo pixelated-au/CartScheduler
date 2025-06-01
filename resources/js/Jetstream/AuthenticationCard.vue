@@ -1,12 +1,11 @@
 <template>
-    <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-gray-100 dark:bg-slate-800">
-        <div>
-            <slot name="logo"/>
-        </div>
-
-        <div
-            class="w-full sm:max-w-md mt-6 px-6 py-4 bg-white dark:bg-slate-900 shadow-md overflow-hidden sm:rounded-lg">
-            <slot/>
-        </div>
+  <div class="flex flex-col items-center pt-6 min-h-screen sm:justify-center sm:pt-0 bg-page dark:bg-page-dark">
+    <div>
+      <slot name="logo"/>
     </div>
+
+    <div class="overflow-hidden px-6 py-4 mt-6 w-full shadow-md sm:max-w-md sm:rounded-lg bg-panel dark:bg-panel-dark">
+      <slot/>
+    </div>
+  </div>
 </template>

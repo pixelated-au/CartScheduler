@@ -103,14 +103,14 @@ const closeModal = () => {
                     Cancel
                 </JetSecondaryButton>
 
-                <JetButton
+                <PButton
                     class="ml-3"
                     :class="{ 'opacity-25': form.processing }"
                     :disabled="form.processing"
                     @click="confirmPassword"
                 >
                     {{ button }}
-                </JetButton>
+                </PButton>
             </template>
         </JetDialogModal>
     </span>

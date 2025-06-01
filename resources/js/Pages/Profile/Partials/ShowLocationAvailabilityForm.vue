@@ -1,7 +1,7 @@
 
 <script setup>
 import JetActionMessage from '@/Jetstream/ActionMessage.vue';
-import JetButton from '@/Jetstream/Button.vue';
+
 import JetCheckbox from "@/Jetstream/Checkbox.vue";
 import JetFormSection from '@/Jetstream/FormSection.vue';
 import JetInputError from '@/Jetstream/InputError.vue';
@@ -125,12 +125,12 @@ onMounted(async () => {
             <div v-if="form.hasErrors" class="text-red-500 font-bold mr-3">
                 An error occurred with the data. See above.
             </div>
-            <JetButton style-type="secondary" type="button" class="mr-3" @click="resetForm">
+            <PButton severity="secondary" type="button" class="mr-3" @click="resetForm">
                 Cancel
-            </JetButton>
-            <JetButton :class="{ 'opacity-25': form.processing }" :disabled="form.processing">
+            </PButton>
+            <PButton :class="{ 'opacity-25': form.processing }" :disabled="form.processing">
                 Save
-            </JetButton>
+            </PButton>
         </template>
     </JetFormSection>
 </template>

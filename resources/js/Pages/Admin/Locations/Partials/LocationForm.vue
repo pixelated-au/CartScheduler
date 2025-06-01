@@ -1,6 +1,6 @@
 <script setup>
 import JetActionMessage from '@/Jetstream/ActionMessage.vue';
-import JetButton from '@/Jetstream/Button.vue';
+
 import JetConfirmationModal from '@/Jetstream/ConfirmationModal.vue';
 import JetFormSection from '@/Jetstream/FormSection.vue';
 import JetSectionBorder from '@/Jetstream/SectionBorder.vue';
@@ -163,14 +163,14 @@ const hasErrors = computed(() => Object.keys(form.errors).length > 0);
 
         <template #actions>
             <div v-if="action === 'edit'" class="grow text-left">
-                <JetButton outline
+                <PButton outline
                            type="button"
                            style-type="warning"
                            :class="{ 'opacity-25': form.processing }"
                            :disabled="form.processing"
                            @click.prevent="onDelete">
                     Delete
-                </JetButton>
+                </PButton>
             </div>
             <JetActionMessage :on="form.recentlySuccessful" class="mr-3">
                 Success: Location Saved.
@@ -180,19 +180,19 @@ const hasErrors = computed(() => Object.keys(form.errors).length > 0);
             </div>
 
             <div>
-                <JetButton class="mx-3"
+                <PButton class="mx-3"
                            type="button"
                            style-type="secondary"
                            :class="{ 'opacity-25': form.processing }"
                            :disabled="form.processing"
                            @click.prevent="confirmCancel">
                     {{ cancelButtonText }}
-                </JetButton>
-                <JetButton :class="{ 'opacity-25': form.processing }"
+                </PButton>
+                <PButton :class="{ 'opacity-25': form.processing }"
                            :disabled="form.processing"
                            @click.prevent="saveAction">
                     Save
-                </JetButton>
+                </PButton>
             </div>
         </template>
     </JetFormSection>
@@ -204,10 +204,10 @@ const hasErrors = computed(() => Object.keys(form.errors).length > 0);
             <template v-else>Are you sure you wish to return? Your changes will be lost!</template>
         </template>
         <template #footer>
-            <JetButton class="mx-3" style-type="secondary" @click="showConfirmationModal = false">
+            <PButton class="mx-3" style-type="secondary" @click="showConfirmationModal = false">
                 Cancel
-            </JetButton>
-            <JetButton style-type="warning" @click="performConfirmationAction">Ok</JetButton>
+            </PButton>
+            <PButton severity="warning" @click="performConfirmationAction">Ok</PButton>
         </template>
     </JetConfirmationModal>
 </template>

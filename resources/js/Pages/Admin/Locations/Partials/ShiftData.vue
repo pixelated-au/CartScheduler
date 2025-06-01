@@ -1,5 +1,5 @@
 <script setup>
-import JetButton from '@/Jetstream/Button.vue';
+
 // import RadioDropDown from '@/Components/RadioDropDown.vue'
 import Shift from '@/Pages/Admin/Locations/Partials/Shift.vue';
 //https://vue3datepicker.com/
@@ -56,7 +56,7 @@ const removeShift = index => {
 
 <template>
     <div class="col-span-full flex justify-end">
-        <JetButton type="button" style-type="info" @click="addShift">Add New Shift</JetButton>
+        <PButton type="button" style-type="info" @click="addShift">Add New Shift</PButton>
     </div>
 
     <div v-if="form.shifts && form.shifts.length"

@@ -1,5 +1,5 @@
 <script setup>
-import JetButton from '@/Jetstream/Button.vue';
+
 import AppLayout from '@/Layouts/AppLayout.vue';
 import {router, useForm} from '@inertiajs/vue3';
 import {computed} from 'vue';
@@ -49,9 +49,9 @@ const templateFile = route('admin.user-import-template');
         <template #header>
             <div class="flex justify-between">
                 <h1 class="font-semibold text-2xl text-gray-800 leading-tight">Import Users</h1>
-                <JetButton class="mx-3" type="button" style-type="secondary" outline @click.prevent="listRouteAction">
+                <PButton class="mx-3" type="button" style-type="secondary" outline @click.prevent="listRouteAction">
                     Back
-                </JetButton>
+                </PButton>
             </div>
         </template>
 
@@ -130,12 +130,12 @@ const templateFile = route('admin.user-import-template');
                                 <a :href="templateFile">Template Excel file</a>
                             </div>
                         </div>
-                        <JetButton type="submit"
+                        <PButton type="submit"
                                    style-type="primary"
                                    :disabled="!form.file">
                             <template v-if="form.file">Upload and Import</template>
                             <template v-else>Select a file to upload</template>
-                        </JetButton>
+                        </PButton>
                     </div>
                     <div class="w-full">
                         <progress v-if="form.progress" :value="form.progress.percentage" max="100">

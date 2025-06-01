@@ -1,6 +1,6 @@
 <script setup>
 import JetActionSection from '@/Jetstream/ActionSection.vue';
-import JetButton from '@/Jetstream/Button.vue';
+
 import JetConfirmsPassword from '@/Jetstream/ConfirmsPassword.vue';
 import JetDangerButton from '@/Jetstream/DangerButton.vue';
 import JetInput from '@/Jetstream/Input.vue';
@@ -184,21 +184,21 @@ const disableTwoFactorAuthentication = () => {
             <div class="mt-5">
                 <div v-if="! twoFactorEnabled">
                     <JetConfirmsPassword @confirmed="enableTwoFactorAuthentication">
-                        <JetButton type="button" :class="{ 'opacity-25': enabling }" :disabled="enabling">
+                        <PButton type="button" :class="{ 'opacity-25': enabling }" :disabled="enabling">
                             Enable
-                        </JetButton>
+                        </PButton>
                     </JetConfirmsPassword>
                 </div>
 
                 <div v-else>
                     <JetConfirmsPassword @confirmed="confirmTwoFactorAuthentication">
-                        <JetButton v-if="confirming"
+                        <PButton v-if="confirming"
                                    type="button"
                                    class="mr-3"
                                    :class="{ 'opacity-25': enabling }"
                                    :disabled="enabling">
                             Confirm
-                        </JetButton>
+                        </PButton>
                     </JetConfirmsPassword>
 
                     <JetConfirmsPassword @confirmed="regenerateRecoveryCodes">

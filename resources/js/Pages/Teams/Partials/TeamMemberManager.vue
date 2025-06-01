@@ -1,7 +1,7 @@
 <script setup>
 import JetActionMessage from '@/Jetstream/ActionMessage.vue';
 import JetActionSection from '@/Jetstream/ActionSection.vue';
-import JetButton from '@/Jetstream/Button.vue';
+
 import JetConfirmationModal from '@/Jetstream/ConfirmationModal.vue';
 import JetDangerButton from '@/Jetstream/DangerButton.vue';
 import JetDialogModal from '@/Jetstream/DialogModal.vue';
@@ -176,10 +176,10 @@ const displayableRole = (role) => {
                         Added.
                     </JetActionMessage>
 
-                    <JetButton :class="{ 'opacity-25': addTeamMemberForm.processing }"
+                    <PButton :class="{ 'opacity-25': addTeamMemberForm.processing }"
                                :disabled="addTeamMemberForm.processing">
                         Add
-                    </JetButton>
+                    </PButton>
                 </template>
             </JetFormSection>
         </div>
@@ -339,14 +339,14 @@ const displayableRole = (role) => {
                     Cancel
                 </JetSecondaryButton>
 
-                <JetButton
+                <PButton
                     class="ml-3"
                     :class="{ 'opacity-25': updateRoleForm.processing }"
                     :disabled="updateRoleForm.processing"
                     @click="updateRole"
                 >
                     Save
-                </JetButton>
+                </PButton>
             </template>
         </JetDialogModal>
 

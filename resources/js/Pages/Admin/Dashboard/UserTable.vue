@@ -359,9 +359,9 @@ const hasDaysAvailable = daysAvailable => Object.values(daysAvailable).some(day 
                 </div>
             </template>
             <template #item-action="{ id, name }">
-                <JetButton style-type="info" @click="assignVolunteer(id, name)">
+                <PButton severity="info" @click="assignVolunteer(id, name)">
                     <UserAdd color="#fff"/>
-                </JetButton>
+                </PButton>
             </template>
         </data-table>
     </div>

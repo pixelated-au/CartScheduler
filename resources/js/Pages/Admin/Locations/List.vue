@@ -1,7 +1,7 @@
 <script setup>
 import DragDrop from "@/Components/Icons/DragDrop.vue";
 import useToast from "@/Composables/useToast.js";
-import JetButton from '@/Jetstream/Button.vue';
+
 import AppLayout from '@/Layouts/AppLayout.vue';
 import {router} from '@inertiajs/vue3';
 import {useSortable} from "@vueuse/integrations/useSortable";
@@ -103,14 +103,14 @@ const transitionDelayStyle = (index) => `animation-delay: -${index * 0.37}s`;
             <div class="flex justify-between">
                 <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">Locations</h2>
                 <div class="flex">
-                    <JetButton outline :style-type="isSortingMode ? 'danger' : 'secondary'" class="mx-3"
+                    <PButton outline :style-type="isSortingMode ? 'danger' : 'secondary'" class="mx-3"
                                @click="isSortingMode = !isSortingMode">
                         <drag-drop color="currentColor" box="16"/>
                         <span class="ml-3">{{ isSortingMode ? 'Stop sorting' : 'Sort locations' }}</span>
-                    </JetButton>
-                    <JetButton class="mx-3" style-type="primary" @click="onNewLocation">
+                    </PButton>
+                    <PButton class="mx-3" style-type="primary" @click="onNewLocation">
                         New Location
-                    </JetButton>
+                    </PButton>
                 </div>
             </div>
         </template>

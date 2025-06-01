@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios from "axios";
 import {useToast} from "vue-toastification";
 
 /**
@@ -9,20 +9,20 @@ import {useToast} from "vue-toastification";
 
 window.axios = axios;
 
-window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
+window.axios.defaults.headers.common["X-Requested-With"] = "XMLHttpRequest";
 
 window.axios.interceptors.response.use(
     response => response,
     error => {
         // todo, this can be improved
         if (error.response.status === 400) {
-            if (error.response.data?.message?.startsWith('ENDPOINT UPDATED:')) {
+            if (error.response.data?.message?.startsWith("ENDPOINT UPDATED:")) {
                 const toast = useToast();
                 toast.error(
-                    'You are running an outdated version of the system. The browser will refresh to update.',
+                    "You are running an outdated version of the system. The browser will refresh to update.",
                     {
                         autoClose: false,
-                        position: 'top-center',
+                        position: "top-center",
                         icon: true,
                         onClose: () => window.location.reload(),
                     },
@@ -31,7 +31,6 @@ window.axios.interceptors.response.use(
             return new Promise(() => {
             });
         }
-        console.log('returning....');
         return Promise.reject(error);
     },
 );

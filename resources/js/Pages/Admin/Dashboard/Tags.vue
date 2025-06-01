@@ -1,5 +1,5 @@
 <script setup>
-import JetButton from '@/Jetstream/Button.vue';
+
 import ConfirmationModal from '@/Jetstream/ConfirmationModal.vue';
 import JetInput from '@/Jetstream/Input.vue';
 import JetLabel from '@/Jetstream/Label.vue';
@@ -107,7 +107,7 @@ watch(allTags, async (val, oldVal) => {
             <form class="flex flex-wrap" @submit.prevent="addTag">
                 <JetInput id="name" v-model="currentTag.name" type="text" class="w-full mb-3" autocomplete="name"/>
                 <div class="flex justify-between w-full">
-                    <JetButton v-if="currentTag?.id"
+                    <PButton v-if="currentTag?.id"
                                class=""
                                outline
                                type="button"
@@ -122,19 +122,19 @@ watch(allTags, async (val, oldVal) => {
                             <path
                                 d="M17 6h5v2h-2v13a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V8H2V6h5V3a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v3zm1 2H6v12h12V8zm-4.586 6l1.768 1.768-1.414 1.414L12 15.414l-1.768 1.768-1.414-1.414L10.586 14l-1.768-1.768 1.414-1.414L12 12.586l1.768-1.768 1.414 1.414L13.414 14zM9 4v2h6V4H9z"/>
                         </svg>
-                    </JetButton>
+                    </PButton>
                     <div class="flex">
-                        <JetButton v-if="currentTag?.id"
+                        <PButton v-if="currentTag?.id"
                                    class="mr-3"
                                    type="button"
                                    style-type="primary"
                                    @click.prevent="updateTag">
                             Save
-                        </JetButton>
-                        <JetButton v-else class="" type="button" style-type="primary" @click.prevent="addTag">
+                        </PButton>
+                        <PButton v-else class="" type="button" style-type="primary" @click.prevent="addTag">
                             Add
-                        </JetButton>
-                        <JetButton v-if="currentTag?.id"
+                        </PButton>
+                        <PButton v-if="currentTag?.id"
                                    outline
                                    type="button"
                                    style-type="secondary"
@@ -148,7 +148,7 @@ watch(allTags, async (val, oldVal) => {
                                 <path
                                     d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10zm0-2a8 8 0 1 0 0-16 8 8 0 0 0 0 16zm0-9.414l2.828-2.829 1.415 1.415L13.414 12l2.829 2.828-1.415 1.415L12 13.414l-2.828 2.829-1.415-1.415L10.586 12 7.757 9.172l1.415-1.415L12 10.586z"/>
                             </svg>
-                        </JetButton>
+                        </PButton>
                     </div>
                 </div>
             </form>
@@ -162,12 +162,12 @@ watch(allTags, async (val, oldVal) => {
             <p>Are you sure you want to delete this tag?</p>
         </template>
         <template #footer>
-            <JetButton class="mr-3" type="button" style-type="primary" @click.prevent="deleteTag">
+            <PButton class="mr-3" type="button" style-type="primary" @click.prevent="deleteTag">
                 Delete
-            </JetButton>
-            <JetButton outline type="button" style-type="secondary" @click.prevent="showDeleteModal = false">
+            </PButton>
+            <PButton outline type="button" style-type="secondary" @click.prevent="showDeleteModal = false">
                 Cancel
-            </JetButton>
+            </PButton>
         </template>
     </ConfirmationModal>
 </template>

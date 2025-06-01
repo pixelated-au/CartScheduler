@@ -1,6 +1,6 @@
 <script setup>
 import BaseButton from '@/Components/EditorToolbar/BaseButton.vue';
-import JetButton from '@/Jetstream/Button.vue';
+
 import JetInput from '@/Jetstream/Input.vue';
 import JetLabel from '@/Jetstream/Label.vue';
 import {Dropdown} from 'floating-vue';
@@ -58,12 +58,12 @@ onMounted(() => {
             <div class="flex items-center p-3 dark:bg-slate-900">
                 <JetLabel for="url" value="Url:"/>
                 <JetInput id="url" v-model="url" type="text" class="block mx-3" autocomplete="name"/>
-                <JetButton outline type="button" style-type="success" @click.prevent="setLink">
+                <PButton outline type="button" style-type="success" @click.prevent="setLink">
                     Ok
-                </JetButton>
-                <JetButton outline type="button" style-type="secondary" @click.prevent="doShow = false" class="ml-3">
+                </PButton>
+                <PButton outline type="button" style-type="secondary" @click.prevent="doShow = false" class="ml-3">
                     X
-                </JetButton>
+                </PButton>
             </div>
         </template>
     </Dropdown>

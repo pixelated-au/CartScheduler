@@ -1,5 +1,5 @@
 <script setup>
-import JetButton from '@/Jetstream/Button.vue';
+
 import AppLayout from '@/Layouts/AppLayout.vue';
 import UserProfileForm from '@/Pages/Admin/Users/Partials/UserProfileForm.vue';
 import {router} from '@inertiajs/vue3';
@@ -19,9 +19,9 @@ const listRouteAction = () => {
         <template #header>
             <div class="flex justify-between">
                 <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">New User</h2>
-                <JetButton class="mx-3" type="button" style-type="secondary" outline @click.prevent="listRouteAction">
+                <PButton class="mx-3" type="button" style-type="secondary" outline @click.prevent="listRouteAction">
                     Back
-                </JetButton>
+                </PButton>
             </div>
         </template>
 

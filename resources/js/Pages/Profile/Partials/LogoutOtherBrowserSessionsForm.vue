@@ -1,7 +1,7 @@
 <script setup>
 import JetActionMessage from '@/Jetstream/ActionMessage.vue';
 import JetActionSection from '@/Jetstream/ActionSection.vue';
-import JetButton from '@/Jetstream/Button.vue';
+
 import JetDialogModal from '@/Jetstream/DialogModal.vue';
 import JetInput from '@/Jetstream/Input.vue';
 import JetInputError from '@/Jetstream/InputError.vue';
@@ -110,9 +110,9 @@ const closeModal = () => {
             </div>
 
             <div class="flex items-center mt-5">
-                <JetButton @click="confirmLogout">
+                <PButton @click="confirmLogout">
                     Log Out Other Browser Sessions
-                </JetButton>
+                </PButton>
 
                 <JetActionMessage :on="form.recentlySuccessful" class="ml-3">
                     Done.
@@ -146,12 +146,12 @@ const closeModal = () => {
                         Cancel
                     </JetSecondaryButton>
 
-                    <JetButton class="ml-3"
+                    <PButton class="ml-3"
                                :class="{ 'opacity-25': form.processing }"
                                :disabled="form.processing"
                                @click="logoutOtherBrowserSessions">
                         Log Out Other Browser Sessions
-                    </JetButton>
+                    </PButton>
                 </template>
             </JetDialogModal>
         </template>

@@ -1,6 +1,6 @@
 <script setup>
 import useToast from '@/Composables/useToast.js';
-import JetButton from '@/Jetstream/Button.vue';
+
 import JetCheckbox from '@/Jetstream/Checkbox.vue';
 import JetInput from '@/Jetstream/Input.vue';
 import JetInputError from '@/Jetstream/InputError.vue';
@@ -143,9 +143,9 @@ const formatTime = time => format(parse(time, 'HH:mm:ss', new Date()), 'h:mm a')
         </div>
 
         <div class="mb-3">
-            <JetButton type="button" style-type="primary" @click.prevent="saveReport" :disabled="isSaving">
+            <PButton type="button" style-type="primary" @click.prevent="saveReport" :disabled="isSaving">
                 Save Report
-            </JetButton>
+            </PButton>
         </div>
     </div>
 

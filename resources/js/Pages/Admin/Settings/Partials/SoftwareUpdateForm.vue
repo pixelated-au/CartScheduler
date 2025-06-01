@@ -3,7 +3,7 @@ import Bell from "@/Components/Icons/Bell.vue";
 import OozeLoader from "@/Components/Loaders/OozeLoader.vue";
 import useToast from "@/Composables/useToast";
 import vAutoScroll from '@/Directives/v-autoscroll.js';
-import JetButton from '@/Jetstream/Button.vue';
+
 import JetCheckbox from '@/Jetstream/Checkbox.vue';
 import JetFormSection from '@/Jetstream/FormSection.vue';
 import {router, usePage} from '@inertiajs/vue3';
@@ -164,33 +164,33 @@ onMounted(async () => {
         </template>
 
         <template #actions>
-            <JetButton v-if="hasUpdate" :class="{ 'opacity-25': processing }" :disabled="processing">
+            <PButton v-if="hasUpdate" :class="{ 'opacity-25': processing }" :disabled="processing">
                 Update Now
-            </JetButton>
+            </PButton>
 
             <template v-else-if="!updateLog">
                 <label class="mr-3 flex items-center text-gray-400 dark:text-gray-600">
                     <JetCheckbox v-model:checked="betaCheck" value="true"/>
                     <span class="ml-1.5">Check for Beta updates</span>
                 </label>
-                <JetButton outline style-type="danger" :class="{ 'opacity-25': processing }" class="mr-3"
+                <PButton outline style-type="danger" :class="{ 'opacity-25': processing }" class="mr-3"
                            :disabled="processing" @click.prevent.stop="updateCheck">
                     Check for update
-                </JetButton>
-                <JetButton style-type="warning" :class="{ 'opacity-25': processing }" :disabled="processing">
+                </PButton>
+                <PButton severity="warning" :class="{ 'opacity-25': processing }" :disabled="processing">
                     Reinstall Current Version
-                </JetButton>
+                </PButton>
             </template>
 
             <template v-else-if="updateCompleted">
-                <JetButton style-type="secondary" class="mr-3"
+                <PButton severity="secondary" class="mr-3"
                            :disabled="processing" @click.prevent.stop="downloadLog">
                     Download update log
-                </JetButton>
-                <JetButton style-type="primary" class="mr-3"
+                </PButton>
+                <PButton severity="primary" class="mr-3"
                            :disabled="processing" @click.prevent.stop="reloadSite">
                     Reload the page to see changes
-                </JetButton>
+                </PButton>
             </template>
         </template>
     </JetFormSection>

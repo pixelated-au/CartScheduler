@@ -1,6 +1,6 @@
 <script setup>
 import useToast from '@/Composables/useToast.js';
-import JetButton from '@/Jetstream/Button.vue';
+
 import ConfirmationModal from '@/Jetstream/ConfirmationModal.vue';
 import ReportForm from '@/Pages/Components/Dashboard/ReportForm.vue';
 import {onMounted, provide, ref} from 'vue';
@@ -65,7 +65,7 @@ const reportSaved = () => getData();</script>
         </template>
 
         <template #footer>
-            <JetButton type="button" style-type="secondary" @click="close">Close</JetButton>
+            <PButton type="button" style-type="secondary" @click="close">Close</PButton>
         </template>
     </ConfirmationModal>
 </template>

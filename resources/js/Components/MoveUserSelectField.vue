@@ -1,12 +1,3 @@
-<script>
-import {VTooltip} from 'floating-vue';
-
-export default {
-    directives: {
-        tooltip: VTooltip,
-    },
-};
-</script>
 <script setup>
 import UserMove from "@/Components/Icons/UserMove.vue";
 import SelectField from '@/Components/SelectField.vue';

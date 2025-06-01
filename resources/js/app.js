@@ -1,21 +1,20 @@
-import Bugsnag from '@bugsnag/js';
-import BugsnagPluginVue from '@bugsnag/plugin-vue';
-import {createInertiaApp} from '@inertiajs/vue3';
+import Bugsnag from "@bugsnag/js";
+import BugsnagPluginVue from "@bugsnag/plugin-vue";
+import {createInertiaApp, Head, Link} from "@inertiajs/vue3";
+import "flowbite";
+import {resolvePageComponent} from "laravel-vite-plugin/inertia-helpers";
+import PrimeVue from "primevue/config";
+import {createApp, h} from "vue";
+import Toast from "vue-toastification";
+import "vue-toastification/dist/index.css";
+import {ZiggyVue} from "ziggy-js";
+import PrimeVuePreset from "./primevue-customisations.js";
+import {Ziggy} from "./ziggy.js";
+import "../css/app.css";
+import "./bootstrap";
 
-import 'flowbite';
 
-import {resolvePageComponent} from 'laravel-vite-plugin/inertia-helpers';
-import {createApp, h} from 'vue';
-import PrimeVue from 'primevue/config';
-import Theme from '@primeuix/themes/lara';
-
-import Toast from 'vue-toastification';
-import 'vue-toastification/dist/index.css';
-import {ZiggyVue} from 'ziggy-js';
-import '../css/app.css';
-import './bootstrap';
-
-const appName = window.document.getElementsByTagName('title')[0]?.innerText || 'Laravel';
+const appName = window.document.getElementsByTagName("title")[0]?.innerText || "Laravel";
 
 const bugsnagKey = import.meta.env.VITE_BUGSNAG_FRONT_END_API_KEY;
 
@@ -33,27 +32,34 @@ if (bugsnagKey) {
  */
 createInertiaApp({
     title: (title) => `${title} - ${appName}`,
-    resolve: (name) => resolvePageComponent(`./Pages/${name}.vue`, import.meta.glob('./Pages/**/*.vue')),
+    resolve: (name) => resolvePageComponent(`./Pages/${name}.vue`, import.meta.glob("./Pages/**/*.vue")),
     progress: {
-        color: '#4B5563',
+        color: "#4B5563",
     },
     setup({el, App, props, plugin}) {
         const vueApp = createApp({render: () => h(App, props)})
             .use(PrimeVue, {
                 theme: {
-                    preset: Theme,
+                    preset: PrimeVuePreset,
                     options: {
-                        darkModeSelector: '.dark',
+                        darkModeSelector: ".dark",
+                        cssLayer: {
+                            name: "primevue",
+                            order: "tailwind-base, primevue, tailwind-utilities"
+                        },
                     }
                 }
             })
             .use(plugin)
-            .use(ZiggyVue)
-            .use(Toast);
+            .use(ZiggyVue, Ziggy)
+            .use(Toast)
+            .component("Head", Head)
+            .component("Link", Link);
 
         if (bugsnagKey) {
-            vueApp.use(Bugsnag.getPlugin('vue'));
+            vueApp.use(Bugsnag.getPlugin("vue"));
         }
+
         vueApp.mount(el);
         return vueApp;
     },

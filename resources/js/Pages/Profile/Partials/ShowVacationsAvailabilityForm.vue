@@ -3,7 +3,7 @@ import CloseCircle from "@/Components/Icons/CloseCircle.vue";
 import QuestionCircle from "@/Components/Icons/QuestionCircle.vue";
 import InputTextEIPField from "@/Components/InputTextEIPField.vue";
 import JetActionMessage from '@/Jetstream/ActionMessage.vue';
-import JetButton from '@/Jetstream/Button.vue';
+
 import JetFormSection from '@/Jetstream/FormSection.vue';
 import JetInput from '@/Jetstream/Input.vue';
 import JetInputError from '@/Jetstream/InputError.vue';
@@ -77,11 +77,11 @@ const deleteVacation = (idx) => form.deletedVacations = [...form.deletedVacation
                 <div v-if="form.vacations?.length">
                     <div v-for="(vacation, idx) in form.vacations" :key="vacation.id"
                          class="bg-slate-200 dark:bg-slate-800 grid grid-cols-[auto_minmax(0,_1fr)] sm:grid-cols-[auto_minmax(0,_2fr)] gap-y-px gap-x-3 rounded p-3 items-center mb-3">
-                        <JetButton style-type="" type="button"
+                        <PButton severity="" type="button"
                                    class="bg-slate-300 dark:bg-transparent dark:border dark:border-slate-700 self-stretch row-span-2 sm:row-span-2 px-1 py-1 mr-2"
                                    @click="deleteVacation(idx)">
                             <CloseCircle/>
-                        </JetButton>
+                        </PButton>
                         <vacation-date-range v-model:start-date="vacation.start_date"
                                              v-model:end-date="vacation.end_date"
                                              :start-error="form.errors['vacations.' + idx + '.start_date']"
@@ -112,10 +112,10 @@ const deleteVacation = (idx) => form.deletedVacations = [...form.deletedVacation
                     <div class="w-full text-center">No vacations set</div>
                 </div>
                 <div class="flex justify-center">
-                    <JetButton style-type="primary" type="button" class="mt-3"
+                    <PButton severity="primary" type="button" class="mt-3"
                                @click="addVacation">
                         Add a New Vacation
-                    </JetButton>
+                    </PButton>
                 </div>
             </div>
         </template>
@@ -127,12 +127,12 @@ const deleteVacation = (idx) => form.deletedVacations = [...form.deletedVacation
             <div v-if="form.hasErrors" class="text-red-500 font-bold mr-3">
                 An error occurred with the data. See above.
             </div>
-            <JetButton style-type="secondary" type="button" class="mr-3" @click="resetForm">
+            <PButton severity="secondary" type="button" class="mr-3" @click="resetForm">
                 Cancel
-            </JetButton>
-            <JetButton :class="{ 'opacity-25': form.processing }" :disabled="form.processing">
+            </PButton>
+            <PButton :class="{ 'opacity-25': form.processing }" :disabled="form.processing">
                 Save
-            </JetButton>
+            </PButton>
         </template>
     </JetFormSection>
 </template>

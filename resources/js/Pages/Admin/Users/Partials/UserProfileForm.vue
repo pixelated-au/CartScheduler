@@ -3,7 +3,7 @@ import SelectField from "@/Components/SelectField.vue";
 import VerticalRadioButtons from '@/Components/VerticalRadioButtons.vue';
 import useToast from '@/Composables/useToast.js';
 import JetActionMessage from '@/Jetstream/ActionMessage.vue';
-import JetButton from '@/Jetstream/Button.vue';
+
 import JetCheckbox from '@/Jetstream/Checkbox.vue';
 import JetConfirmationModal from '@/Jetstream/ConfirmationModal.vue';
 import JetFormSection from '@/Jetstream/FormSection.vue';
@@ -125,11 +125,11 @@ const cancelButtonText = computed(() => form.isDirty ? 'Cancel' : 'Back');
 
         <template #description>
             <div>Update the user's personal information.</div>
-            <JetButton v-if="action === 'edit'" outline class="mt-5" style-type="info"
+            <PButton v-if="action === 'edit'" outline class="mt-5" style-type="info"
                        @click="performResendWelcomeAction">
                 <template v-if="user.has_logged_in">Send Password Reset Email</template>
                 <template v-else>Resend Welcome Email</template>
-            </JetButton>
+            </PButton>
 
         </template>
 
@@ -279,33 +279,33 @@ const cancelButtonText = computed(() => form.isDirty ? 'Cancel' : 'Back');
 
         <template #actions>
             <div v-if="action === 'edit'" class="grow text-left">
-                <JetButton outline
+                <PButton outline
                            type="button"
                            style-type="warning"
                            :class="{ 'opacity-25': form.processing }"
                            :disabled="form.processing"
                            @click.prevent="onDelete">
                     Delete
-                </JetButton>
+                </PButton>
             </div>
             <JetActionMessage :on="form.recentlySuccessful" class="mr-3">
                 Success: User Saved.
             </JetActionMessage>
 
             <div>
-                <JetButton class="mx-3"
+                <PButton class="mx-3"
                            type="button"
                            style-type="secondary"
                            :class="{ 'opacity-25': form.processing }"
                            :disabled="form.processing"
                            @click.prevent="confirmCancel">
                     {{ cancelButtonText }}
-                </JetButton>
-                <JetButton :class="{ 'opacity-25': form.processing }"
+                </PButton>
+                <PButton :class="{ 'opacity-25': form.processing }"
                            :disabled="form.processing"
                            @click.prevent="saveAction">
                     Save
-                </JetButton>
+                </PButton>
             </div>
         </template>
     </JetFormSection>
@@ -317,10 +317,10 @@ const cancelButtonText = computed(() => form.isDirty ? 'Cancel' : 'Back');
             <template v-else>Are you sure you wish to return? Your changes will be lost!</template>
         </template>
         <template #footer>
-            <JetButton class="mx-3" style-type="secondary" @click="showConfirmationModal = false">
+            <PButton class="mx-3" style-type="secondary" @click="showConfirmationModal = false">
                 Cancel
-            </JetButton>
-            <JetButton style-type="warning" @click="performConfirmationAction">Ok</JetButton>
+            </PButton>
+            <PButton severity="warning" @click="performConfirmationAction">Ok</PButton>
         </template>
     </JetConfirmationModal>
 </template>

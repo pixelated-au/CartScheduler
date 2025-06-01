@@ -1,6 +1,6 @@
 <script setup>
 import useToast from '@/Composables/useToast.js';
-import JetButton from '@/Jetstream/Button.vue';
+
 import JetCheckbox from '@/Jetstream/Checkbox.vue';
 import JetConfirmationModal from '@/Jetstream/ConfirmationModal.vue';
 import JetInputError from '@/Jetstream/InputError.vue';
@@ -149,13 +149,13 @@ const darkMode = inject('darkMode', false);
             <JetInputError :message="errors[`shifts.${index}.available_to`]" class="mt-2"/>
         </div>
         <div class="self-end">
-            <JetButton type="button" style-type="warning" outline @click="showModal = true">
+            <PButton type="button" style-type="warning" outline @click="showModal = true">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16">
                     <path fill="none" d="M0 0h24v24H0z"/>
                     <path class="fill-red-600"
                           d="M4 8h16v13a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V8zm2 2v10h12V10H6zm3 2h2v6H9v-6zm4 0h2v6h-2v-6zM7 5V3a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v2h5v2H2V5h5zm2-1v1h6V4H9z"/>
                 </svg>
-            </JetButton>
+            </PButton>
         </div>
         <JetSectionBorder class="col-span-full"/>
     </template>
@@ -166,8 +166,8 @@ const darkMode = inject('darkMode', false);
             <p>Are you sure you want to delete this shift?</p>
         </template>
         <template #footer>
-            <JetButton type="button" style-type="secondary" @click="showModal = false" class="mr-3">Cancel</JetButton>
-            <JetButton type="button" style-type="warning" outline @click="deleteShift">Delete</JetButton>
+            <PButton type="button" style-type="secondary" @click="showModal = false" class="mr-3">Cancel</PButton>
+            <PButton type="button" style-type="warning" outline @click="deleteShift">Delete</PButton>
         </template>
     </JetConfirmationModal>
 </template>
