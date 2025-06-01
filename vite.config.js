@@ -1,12 +1,16 @@
-import vue from '@vitejs/plugin-vue'
-import laravel from 'laravel-vite-plugin'
-import {defineConfig} from 'vite'
+import * as path from "node:path";
+import {PrimeVueResolver} from "@primevue/auto-import-resolver";
+import vue from "@vitejs/plugin-vue";
+import laravel from "laravel-vite-plugin";
+import Components from "unplugin-vue-components/vite";
+import {defineConfig} from "vite";
 import vueDevTools from "vite-plugin-vue-devtools";
+import IconsResolver from "unplugin-icons/resolver";
 
 export default defineConfig({
     plugins: [
         laravel({
-            input: 'resources/js/app.js',
+            input: "resources/js/app.js",
             refresh: true,
         }),
         vue({
@@ -23,9 +27,21 @@ export default defineConfig({
             // See: https://devtools.vuejs.org/getting-started/open-in-editor
             // and https://github.com/webfansplz/vite-plugin-vue-inspector?tab=readme-ov-file#--configuration-ide--editor
         }),
+        Components({
+            dirs: [
+                "resources/js/Components",
+                "resources/js/Layouts/Components",
+            ],
+            dts: true,
+            directoryAsNamespace: true,
+            resolvers: [
+                PrimeVueResolver({components: {prefix: "P"}}),
+                IconsResolver()
+            ]
+        }),
     ],
     server: {
-        host: '0.0.0.0',
+        host: "0.0.0.0",
     },
     compilerOptions: {
         baseUrl: ".",
@@ -33,7 +49,12 @@ export default defineConfig({
             "@/*": [
                 "./resources/js/*"
             ]
-        }
+        },
     },
-    envDir: './',
-})
+    resolve: {
+        alias: {
+            "ziggy-js": path.resolve("./vendor/tightenco/ziggy"),
+        },
+    },
+    envDir: "./",
+});

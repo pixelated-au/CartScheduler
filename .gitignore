@@ -20,3 +20,4 @@ yarn-error.log
 /.cursor
 /z-deployment-test
 /docs
+/components.d.ts
