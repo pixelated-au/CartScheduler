@@ -13,7 +13,7 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap">
 
     <!-- Scripts -->
-    @routes
+{{--    @routes--}}
     @vite('resources/js/app.js')
     @inertiaHead
 
@@ -37,7 +37,7 @@
     <meta name="msapplication-config" content="/icons/browserconfig.xml?v=1">
     <meta name="theme-color" content="#ffffff">
 </head>
-<body class="font-sans antialiased dark:bg-slate-800">
+<body class="font-sans antialiased">
 @inertia
 </body>
 </html>
