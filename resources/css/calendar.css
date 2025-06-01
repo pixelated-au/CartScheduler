@@ -28,7 +28,7 @@
 
   /* Custom Highlight and Marker Classes */
   --highlighted-date-bg: theme('colors.blue.600 / 20%');
-  --marker-date-border: 2px solid theme('colors.rostered-marker.DEFAULT');
+  --marker-date-border-color: theme('colors.rostered-marker.DEFAULT');
 
   /* Dark Mode Overrides */
 
@@ -41,7 +41,7 @@
     --p-datepicker-other-month-text-color: theme('colors.gray.600');
     --p-datepicker-disabled-text-color: theme('colors.gray.600');
     --highlighted-date-bg: theme('colors.blue.400 / 20%');
-    --marker-date-border: 2px solid theme('colors.rostered-marker.light');
+    --marker-date-border-color: theme('colors.rostered-marker.light');
   }
 }
 
@@ -62,18 +62,19 @@
         .formatted-date {
           @apply w-full h-full flex items-center justify-center;
         }
-      }
 
-      .highlighted-date {
-        background-color: var(--highlighted-date-bg);
-      }
+        &.p-datepicker-day-selected {
+          @apply bg-blue-500/70 text-white;
+        }
 
-      .marker-date {
-        border-bottom: var(--marker-date-border);
-      }
+        .highlighted-date {
+          @apply bg-[var(--highlighted-date-bg)];
+        }
 
-      .p-datepicker-day-selected {
-        @apply bg-blue-500/70 text-white;
+        .marker-date {
+          @apply border-b-2 border-[var(--marker-date-border-color)];
+        }
+
       }
     }
   }
