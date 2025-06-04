@@ -45,7 +45,7 @@ mv public_html public_html.bak && ln -s /home/[MY ACCOUNT]/smpw_app/public /home
 
 > [!IMPORTANT]
 > :warning: If you are using cPanel, in the instructions below, you may need to replace the default PHP version with PHP 8.x by
-> replacing `php` with `ea-php82` in the commands below. You can check the PHP version by running `php -v`. If the 
+> replacing `php` with `ea-php82` in the commands below. You can check the PHP version by running `php -v`. If the
 > version is below 8.1, you will need to use the `ea-php82` command. An example is provided below
 
 ### Standard Deployment
@@ -62,12 +62,12 @@ To deploy a release requires the following steps:
     - ```dotenv
       MAIL_MAILER=sendmail
       MAIL_HOST=localhost
-      ``` 
+      ```
 1. SSH into the server if you haven't yet already.
 1. Make sure the permissions on the installation direcotry are set to 775 and files are set to 644. Navigate to the installed directory and use this:
     ```bash
     find . -type d -exec chmod 775 {} \; && find . -type f -exec chmod 644 {} \;
-   
+
     ```
 1. Run the following command to enable the Laravel cache:
     ```bash
@@ -145,3 +145,4 @@ will be available in this interface.
 - [ ] Make a 'trainer' user type and allow them to un-restrict users who are with them on a shift. This feature needs to be configurable
 - [ ] In admin, if 'location choices' is enabled, add location filter to the find volunteers dialog
 - [ ] Add capability for admin to self-publish shifts per location. This will override automatic publishing of shifts per location
+- [ ] Admin controlled feature to limit how many shifts a user can be assigned to
