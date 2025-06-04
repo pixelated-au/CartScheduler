@@ -90,8 +90,6 @@ const checkLater = () => {
   <div class="bg-page bg-gradient-to-b from-page  to-neutral-50 dark:bg-page-dark dark:bg-gradient-to-b dark:from-page-dark dark:to-neutral-950">
     <Head :title="title" />
 
-    <JetBanner />
-
     <div class="grid content-start min-h-dvh w-dvw max-w-full-dvw justify-stretch">
       <Menu @toggle-dark-mode="isDarkMode = $event" />
 
