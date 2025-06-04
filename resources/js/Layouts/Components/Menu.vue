@@ -71,11 +71,9 @@ const userMenuItems = shallowReactive([
   { label: "Logout", command: () => logout() },
 ]);
 
-const userMenu = useTemplateRef();
+const userMenu = useTemplateRef("userMenu");
 
-const toggle = (event) => {
-  userMenu.value.toggle(event);
-};
+const toggle = (event) => userMenu.value.toggle(event);
 </script>
 
 <template>
