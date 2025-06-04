@@ -105,7 +105,7 @@ const checkLater = () => {
       </header>
 
       <!-- Page Content -->
-      <main class="grid gap-0 justify-self-center py-12 main-content w-dvw grid-cols-page">
+      <main class="grid gap-0 justify-self-center main-content w-dvw grid-cols-page">
         <!-- Page Top -->
         <section
             v-if="$slots['page-top']"
