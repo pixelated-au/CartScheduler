@@ -74,7 +74,14 @@ export default defineConfig([
           order: ["script:not([setup])", "script[setup]", "template", "style"],
         },
       ],
-      "vue/block-tag-newline": ["error", { singleline: "never", multiline: "always" }],
+      "vue/block-tag-newline": ["error", {
+        blocks: {
+          script: {
+            singleline: "always",
+            multiline: "always",
+          },
+        },
+      }],
       "vue/first-attribute-linebreak": ["error", { singleline: "ignore", multiline: "below" }],
       "vue/html-closing-bracket-newline": [
         "warn",
