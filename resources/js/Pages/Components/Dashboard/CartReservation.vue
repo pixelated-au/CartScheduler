@@ -105,7 +105,6 @@ watch(
       if (isMyShift(location)) {
         classes.push(...["text-green-800", "dark:text-green-300", "border-b-2", "border-green-500"]);
         tooltip = "You have at least one shift";
-        console.log("location", firstReservationForUser.value, location.id, location.name);
         if (firstReservationForUser.value === undefined) {
           firstReservationForUser.value = location.id;
         }
@@ -120,12 +119,11 @@ watch(
 
 const accordionExpandIndex = ref(undefined);
 
-watch(firstReservationForUser,(val) => {
+watch(firstReservationForUser, (val) => {
   if (val === undefined) {
     accordionExpandIndex.value = undefined;
     return;
   }
-  console.log(val);
   accordionExpandIndex.value = val;
 
 });
