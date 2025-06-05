@@ -1,138 +1,154 @@
 <script setup>
+import { useForm } from "@inertiajs/vue3";
+import { Dropdown as VDropdown } from "floating-vue";
+import { inject } from "vue";
 import CloseCircle from "@/Components/Icons/CloseCircle.vue";
 import QuestionCircle from "@/Components/Icons/QuestionCircle.vue";
 import InputTextEIPField from "@/Components/InputTextEIPField.vue";
-import JetActionMessage from '@/Jetstream/ActionMessage.vue';
-
-import JetFormSection from '@/Jetstream/FormSection.vue';
-import JetInput from '@/Jetstream/Input.vue';
-import JetInputError from '@/Jetstream/InputError.vue';
+import JetActionMessage from "@/Jetstream/ActionMessage.vue";
+import JetFormSection from "@/Jetstream/FormSection.vue";
+import JetInput from "@/Jetstream/Input.vue";
+import JetInputError from "@/Jetstream/InputError.vue";
 import VacationDateRange from "@/Pages/Profile/Partials/VacationDateRange.vue";
-import {useForm} from '@inertiajs/vue3';
-import {Dropdown as VDropdown} from 'floating-vue';
 
 const props = defineProps({
-    vacations: {
-        type: Array,
-        required: true,
-    },
-    userId: {
-        type: Number,
-        default: null,
-    },
+  vacations: {
+    type: Array,
+    required: true,
+  },
+  userId: {
+    type: Number,
+    default: null,
+  },
 });
 const form = useForm({
-    vacations: props.vacations || [],
-    deletedVacations: [],
+  vacations: props.vacations || [],
+  deletedVacations: [],
 });
 
+const route = inject("route");
+
 const update = () => {
-    form.transform((data) => {
-            if (props.userId) {
-                return {
-                    ...data,
-                    user_id: props.userId,
-                };
-            }
-            return data;
-        })
-        .put(route('update.user.vacations'), {
-            preserveScroll: true,
-            onSuccess: () => {
-                form.defaults({
-                    vacations: props.vacations || [],
-                    deletedVacations: [],
-                });
-                form.reset();
-            },
-            onError: (r) => {
-                console.log('error', r);
-            },
+  form.transform((data) => {
+    if (props.userId) {
+      return {
+        ...data,
+        user_id: props.userId,
+      };
+    }
+    return data;
+  })
+    .put(route("update.user.vacations"), {
+      preserveScroll: true,
+      onSuccess: () => {
+        form.defaults({
+          vacations: props.vacations || [],
+          deletedVacations: [],
         });
+        form.reset();
+      },
+      onError: (r) => {
+        console.log("error", r);
+      },
+    });
 };
 
 const resetForm = () => {
-    form.reset();
-    form.clearErrors();
+  form.reset();
+  form.clearErrors();
 };
 
-const addVacation = () => form.vacations = [...form.vacations, {start_date: '', end_date: '', description: ''}];
+const addVacation = () => form.vacations = [...form.vacations, { start_date: "", end_date: "", description: "" }];
 
 const deleteVacation = (idx) => form.deletedVacations = [...form.deletedVacations, form.vacations.splice(idx, 1)[0]];
-
 </script>
 
 <template>
-    <JetFormSection @submitted="update">
-        <template #title>
-            Vacations
-        </template>
+  <JetFormSection @submitted="update">
+    <template #title>
+      Vacations
+    </template>
 
-        <template #description>
-            Indicate when {{ props.userId ? 'this volunteer' : 'you' }} may be on holiday or are unable to be rostered.
-        </template>
+    <template #description>
+      Indicate when {{ props.userId ? 'this volunteer' : 'you' }} may be on holiday or are unable to be rostered.
+    </template>
 
-        <template #form>
-            <div class="col-span-6 text-gray-700 dark:text-gray-100">
-                <div v-if="form.vacations?.length">
-                    <div v-for="(vacation, idx) in form.vacations" :key="vacation.id"
-                         class="bg-slate-200 dark:bg-slate-800 grid grid-cols-[auto_minmax(0,_1fr)] sm:grid-cols-[auto_minmax(0,_2fr)] gap-y-px gap-x-3 rounded p-3 items-center mb-3">
-                        <PButton severity="" type="button"
-                                   class="bg-slate-300 dark:bg-transparent dark:border dark:border-slate-700 self-stretch row-span-2 sm:row-span-2 px-1 py-1 mr-2"
-                                   @click="deleteVacation(idx)">
-                            <CloseCircle/>
-                        </PButton>
-                        <vacation-date-range v-model:start-date="vacation.start_date"
-                                             v-model:end-date="vacation.end_date"
-                                             :start-error="form.errors['vacations.' + idx + '.start_date']"
-                                             :end-error="form.errors['vacations.' + idx + '.end_date']"/>
-                        <div class="mt-2 sm:mt-0">
-                            <div class="flex items-center">
-                                <span class="font-bold">Comment</span>
-                                <v-dropdown v-if="vacation.id" class="ml-2 inline-block">
-                                    <span><QuestionCircle/></span>
-                                    <template #popper>
-                                        <div class="">
-                                            <p class="text-sm">Tap on the comment to edit it.</p>
-                                        </div>
-                                    </template>
-                                </v-dropdown>
-                            </div>
-                            <JetInput v-if="!vacation.id" type="text" class="w-full dark:bg-slate-700"
-                                      v-model="vacation.description"/>
-                            <InputTextEIPField v-else input-class="w-full dark:bg-slate-700"
-                                               v-model="vacation.description"
-                                               empty-value="No comment set"/>
-                            <JetInputError :message="form.errors['vacations.' + idx + '.description']"/>
-                        </div>
+    <template #form>
+      <div class="col-span-6 text-gray-700 dark:text-gray-100">
+        <div v-if="form.vacations?.length">
+          <div
+              v-for="(vacation, idx) in form.vacations"
+              :key="vacation.id"
+              class="bg-slate-200 dark:bg-slate-800 grid grid-cols-[auto_minmax(0,_1fr)] sm:grid-cols-[auto_minmax(0,_2fr)] gap-y-px gap-x-3 rounded p-3 items-center mb-3">
+            <PButton
+                severity=""
+                type="button"
+                class="bg-slate-300 dark:bg-transparent dark:border dark:border-slate-700 self-stretch row-span-2 sm:row-span-2 px-1 py-1 mr-2"
+                @click="deleteVacation(idx)">
+              <CloseCircle/>
+            </PButton>
+            <vacation-date-range
+                v-model:start-date="vacation.start_date"
+                v-model:end-date="vacation.end_date"
+                :start-error="form.errors['vacations.' + idx + '.start_date']"
+                :end-error="form.errors['vacations.' + idx + '.end_date']"/>
+            <div class="mt-2 sm:mt-0">
+              <div class="flex items-center">
+                <span class="font-bold">Comment</span>
+                <v-dropdown v-if="vacation.id" class="ml-2 inline-block">
+                  <span><QuestionCircle/></span>
+
+                  <template #popper>
+                    <div class="">
+                      <p class="text-sm">Tap on the comment to edit it.</p>
                     </div>
-                </div>
-                <div v-else
-                     class="items-stretch gap-y-px bg-slate-200 dark:bg-slate-800 border border-gray-200 dark:border-gray-900 rounded p-3 flex flex-wrap justify-center">
-                    <div class="w-full text-center">No vacations set</div>
-                </div>
-                <div class="flex justify-center">
-                    <PButton severity="primary" type="button" class="mt-3"
-                               @click="addVacation">
-                        Add a New Vacation
-                    </PButton>
-                </div>
+                  </template>
+                </v-dropdown>
+              </div>
+              <JetInput
+                  v-if="!vacation.id"
+                  type="text"
+                  class="w-full dark:bg-slate-700"
+                  v-model="vacation.description"/>
+              <InputTextEIPField
+                  v-else
+                  input-class="w-full dark:bg-slate-700"
+                  v-model="vacation.description"
+                  empty-value="No comment set"/>
+              <JetInputError :message="form.errors['vacations.' + idx + '.description']"/>
             </div>
-        </template>
+          </div>
+        </div>
+        <div
+            v-else
+            class="items-stretch gap-y-px bg-slate-200 dark:bg-slate-800 border border-gray-200 dark:border-gray-900 rounded p-3 flex flex-wrap justify-center">
+          <div class="w-full text-center">No vacations set</div>
+        </div>
+        <div class="flex justify-center">
+          <PButton
+              severity="primary"
+              type="button"
+              class="mt-3"
+              @click="addVacation">
+            Add a New Vacation
+          </PButton>
+        </div>
+      </div>
+    </template>
 
-        <template #actions>
-            <JetActionMessage :on="form.recentlySuccessful" class="mr-3">
-                Saved.
-            </JetActionMessage>
-            <div v-if="form.hasErrors" class="text-red-500 font-bold mr-3">
-                An error occurred with the data. See above.
-            </div>
-            <PButton severity="secondary" type="button" class="mr-3" @click="resetForm">
-                Cancel
-            </PButton>
-            <PButton :class="{ 'opacity-25': form.processing }" :disabled="form.processing">
-                Save
-            </PButton>
-        </template>
-    </JetFormSection>
+    <template #actions>
+      <JetActionMessage :on="form.recentlySuccessful" class="mr-3">
+        Saved.
+      </JetActionMessage>
+      <div v-if="form.hasErrors" class="text-red-500 font-bold mr-3">
+        An error occurred with the data. See above.
+      </div>
+      <PButton severity="secondary" type="button" class="mr-3" @click="resetForm">
+        Cancel
+      </PButton>
+      <PButton type="submit" :class="{ 'opacity-25': form.processing }" :disabled="form.processing">
+        Save
+      </PButton>
+    </template>
+  </JetFormSection>
 </template>
