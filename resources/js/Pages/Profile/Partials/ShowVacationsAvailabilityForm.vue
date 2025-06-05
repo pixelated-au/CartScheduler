@@ -66,7 +66,7 @@ const deleteVacation = (idx) => form.deletedVacations = [...form.deletedVacation
 <template>
   <JetFormSection @submitted="update">
     <template #title>
-      Vacations
+      Vacations & Time Off
     </template>
 
     <template #description>
@@ -79,11 +79,11 @@ const deleteVacation = (idx) => form.deletedVacations = [...form.deletedVacation
           <div
               v-for="(vacation, idx) in form.vacations"
               :key="vacation.id"
-              class="bg-slate-200 dark:bg-slate-800 grid grid-cols-[auto_minmax(0,_1fr)] sm:grid-cols-[auto_minmax(0,_2fr)] gap-y-px gap-x-3 rounded p-3 items-center mb-3">
+              class="grid grid-cols-[auto_minmax(0,_1fr)] sm:grid-cols-[auto_minmax(0,_2fr)] gap-y-px gap-x-3 rounded p-3 items-center mb-3 bg-sub-panel dark:bg-sub-panel-dark shadow">
             <PButton
                 severity=""
                 type="button"
-                class="bg-slate-300 dark:bg-transparent dark:border dark:border-slate-700 self-stretch row-span-2 sm:row-span-2 px-1 py-1 mr-2"
+                class="bg-transparent dark:bg-transparent dark:border dark:border-slate-700 self-stretch row-span-2 sm:row-span-2 px-1 py-1 mr-2"
                 @click="deleteVacation(idx)">
               <CloseCircle/>
             </PButton>
@@ -108,11 +108,11 @@ const deleteVacation = (idx) => form.deletedVacations = [...form.deletedVacation
               <JetInput
                   v-if="!vacation.id"
                   type="text"
-                  class="w-full dark:bg-slate-700"
+                  class="w-full"
                   v-model="vacation.description"/>
               <InputTextEIPField
                   v-else
-                  input-class="w-full dark:bg-slate-700"
+                  input-class="w-full bg-text-input dark:bg-text-input-dark"
                   v-model="vacation.description"
                   empty-value="No comment set"/>
               <JetInputError :message="form.errors['vacations.' + idx + '.description']"/>
@@ -121,7 +121,7 @@ const deleteVacation = (idx) => form.deletedVacations = [...form.deletedVacation
         </div>
         <div
             v-else
-            class="items-stretch gap-y-px bg-slate-200 dark:bg-slate-800 border border-gray-200 dark:border-gray-900 rounded p-3 flex flex-wrap justify-center">
+            class="items-stretch gap-y-px  bg-sub-panel dark:bg-sub-panel-dark border-gray-200 dark:border-gray-900 rounded p-3 flex flex-wrap justify-center">
           <div class="w-full text-center">No vacations set</div>
         </div>
         <div class="flex justify-center">

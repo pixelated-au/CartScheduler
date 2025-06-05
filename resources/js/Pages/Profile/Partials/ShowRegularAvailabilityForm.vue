@@ -6,9 +6,7 @@ import JetActionMessage from "@/Jetstream/ActionMessage.vue";
 import JetFormSection from "@/Jetstream/FormSection.vue";
 import JetInputError from "@/Jetstream/InputError.vue";
 import JetLabel from "@/Jetstream/Label.vue";
-import JetToggle from "@/Jetstream/Toggle.vue";
 import DayOfWeekConfiguration from "@/Pages/Profile/Partials/DayOfWeekConfiguration.vue";
-import "@vueform/slider/themes/tailwind.scss";
 
 const props = defineProps({
   availability: {
@@ -67,6 +65,16 @@ const hasNumError = computed(() => {
     || form.errors["num_saturdays"]?.length > 0
     || form.errors["num_sundays"]?.length > 0;
 });
+
+const rosters = reactive([
+  { label:"Monday", value: toggleRosterDay("monday") },
+  { label:"Tuesday", value: toggleRosterDay("tuesday") },
+  { label:"Wednesday", value: toggleRosterDay("wednesday") },
+  { label:"Thursday", value: toggleRosterDay("thursday") },
+  { label:"Friday", value: toggleRosterDay("friday") },
+  { label:"Saturday", value: toggleRosterDay("saturday") },
+  { label:"Sunday", value: toggleRosterDay("sunday") },
+]);
 
 const rosterMonday = toggleRosterDay("monday");
 const rosterTuesday = toggleRosterDay("tuesday");
@@ -132,38 +140,23 @@ watch(() => form.comments, (value, oldValue) => {
     </template>
 
     <template #description>
-      Please indicate {{ props.userId ? 'this volunteers' : 'your' }} availability
+      Please indicate {{ props.userId ? "this volunteers" : "your" }} availability
     </template>
 
     <template #form>
       <div
-          class="col-span-6 grid grid-cols-4 md:grid-cols-7 text-gray-700 dark:text-gray-100 items-stretch gap-y-px bg-slate-100 dark:bg-slate-800 border border-gray-200 dark:border-gray-900 rounded p-3">
-        <div class="col-span-4 md:col-span-7 font-bold">
-          {{ props.userId ? 'Volunteer is' : 'I am' }} available
+          class="col-span-6 grid grid-cols-4 lg:grid-cols-7 text-gray-700 dark:text-gray-100 items-stretch gap-y-px  border border-gray-200 dark:border-gray-900 rounded p-3 bg-sub-panel dark:bg-sub-panel-dark">
+        <div class="col-span-4 lg:col-span-7 font-bold">
+          {{ props.userId ? "Volunteer is" : "I am" }} available
           to be rostered:
         </div>
-        <div class="col text-center">
-          <JetToggle id="check-monday" v-model="rosterMonday" label="Monday"/>
+        <div v-for="roster in rosters" :key="roster.label" class="col text-center flex flex-col justify-center items-center">
+          <div class="text-sm">
+            {{ roster.label }}
+          </div>
+          <PToggleSwitch :id="`check-${roster.label}`" v-model="roster.value" label="Monday" />
         </div>
-        <div class="col text-center">
-          <JetToggle id="check-tuesday" v-model="rosterTuesday" label="Tuesday"/>
-        </div>
-        <div class="col text-center">
-          <JetToggle id="check-wednesday" v-model="rosterWednesday" label="Wednesday"/>
-        </div>
-        <div class="col text-center">
-          <JetToggle id="check-thursday" v-model="rosterThursday" label="Thursday"/>
-        </div>
-        <div class="col text-center">
-          <JetToggle id="check-friday" v-model="rosterFriday" label="Friday"/>
-        </div>
-        <div class="col text-center">
-          <JetToggle id="check-saturday" v-model="rosterSaturday" label="Saturday"/>
-        </div>
-        <div class="col text-center">
-          <JetToggle id="check-sunday" v-model="rosterSunday" label="Sunday"/>
-        </div>
-        <div v-if="hasDayError" class="col-span-4 md:col-span-7 font-bold">
+        <div v-if="hasDayError" class="col-span-4 lg:col-span-7 font-bold">
           <p class="text-sm text-red-600">
             {{ form.errors.day_monday }}
             {{ form.errors.day_tuesday }}
@@ -175,77 +168,83 @@ watch(() => form.comments, (value, oldValue) => {
           </p>
         </div>
       </div>
-      <Transition>
-        <div
-            v-show="showConfigurations"
-            class="col-span-6 text-gray-700 dark:text-gray-100 grid grid-cols-2 md:grid-cols-12 items-stretch gap-y-5 md:gap-y-px bg-slate-200 dark:bg-slate-800 border border-gray-200 dark:border-gray-900 rounded p-3">
-          <DayOfWeekConfiguration
-              v-model:hours-each-day="hoursEachDay.monday"
-              v-model:number-of-days-per-month="form.num_mondays"
-              :start="ranges.start"
-              :end="ranges.end"
-              :number-of-weeks="numberOfWeeks"
-              label="Monday"
-              :tooltip-format="tooltipFormat"/>
+      <!--      <Transition -->
+      <!--          enter-from-class="opacity-0" -->
+      <!--          enter-active-class="transition-[grid-template-rows] ease-in duration-300" -->
+      <!--          enter-to-class="opacity-100" -->
+      <!--          leave-from-class="opacity-100" -->
+      <!--          leave-active-class="transition-[grid-template-rows] ease-in duration-300" -->
+      <!--          leave-to-class="opacity-0"> -->
+      <div
+          v-show="showConfigurations"
+          class="col-span-6 text-gray-700 dark:text-gray-100 grid grid-cols-12 gap-y-8 gap-x-2 lg:gap-x-6 items-center border border-gray-200 dark:border-gray-900 rounded p-3  bg-sub-panel dark:bg-sub-panel-dark">
+        <DayOfWeekConfiguration
+            v-model:hours-each-day="hoursEachDay.monday"
+            v-model:number-of-days-per-month="form.num_mondays"
+            :start="ranges.start"
+            :end="ranges.end"
+            :number-of-weeks="numberOfWeeks"
+            label="Monday"
+            :tooltip-format="tooltipFormat" />
 
-          <DayOfWeekConfiguration
-              v-model:hours-each-day="hoursEachDay.tuesday"
-              v-model:number-of-days-per-month="form.num_tuesdays"
-              :start="ranges.start"
-              :end="ranges.end"
-              :number-of-weeks="numberOfWeeks"
-              label="Tuesday"
-              :tooltip-format="tooltipFormat"/>
+        <DayOfWeekConfiguration
+            v-model:hours-each-day="hoursEachDay.tuesday"
+            v-model:number-of-days-per-month="form.num_tuesdays"
+            :start="ranges.start"
+            :end="ranges.end"
+            :number-of-weeks="numberOfWeeks"
+            label="Tuesday"
+            :tooltip-format="tooltipFormat" />
 
-          <DayOfWeekConfiguration
-              v-model:hours-each-day="hoursEachDay.wednesday"
-              v-model:number-of-days-per-month="form.num_wednesdays"
-              :start="ranges.start"
-              :end="ranges.end"
-              :number-of-weeks="numberOfWeeks"
-              label="Wednesday"
-              :tooltip-format="tooltipFormat"/>
+        <DayOfWeekConfiguration
+            v-model:hours-each-day="hoursEachDay.wednesday"
+            v-model:number-of-days-per-month="form.num_wednesdays"
+            :start="ranges.start"
+            :end="ranges.end"
+            :number-of-weeks="numberOfWeeks"
+            label="Wednesday"
+            :tooltip-format="tooltipFormat" />
 
-          <DayOfWeekConfiguration
-              v-model:hours-each-day="hoursEachDay.thursday"
-              v-model:number-of-days-per-month="form.num_thursdays"
-              :start="ranges.start"
-              :end="ranges.end"
-              :number-of-weeks="numberOfWeeks"
-              label="Thursday"
-              :tooltip-format="tooltipFormat"/>
+        <DayOfWeekConfiguration
+            v-model:hours-each-day="hoursEachDay.thursday"
+            v-model:number-of-days-per-month="form.num_thursdays"
+            :start="ranges.start"
+            :end="ranges.end"
+            :number-of-weeks="numberOfWeeks"
+            label="Thursday"
+            :tooltip-format="tooltipFormat" />
 
-          <DayOfWeekConfiguration
-              v-model:hours-each-day="hoursEachDay.friday"
-              v-model:number-of-days-per-month="form.num_fridays"
-              :start="ranges.start"
-              :end="ranges.end"
-              :number-of-weeks="numberOfWeeks"
-              label="Friday"
-              :tooltip-format="tooltipFormat"/>
+        <DayOfWeekConfiguration
+            v-model:hours-each-day="hoursEachDay.friday"
+            v-model:number-of-days-per-month="form.num_fridays"
+            :start="ranges.start"
+            :end="ranges.end"
+            :number-of-weeks="numberOfWeeks"
+            label="Friday"
+            :tooltip-format="tooltipFormat" />
 
-          <DayOfWeekConfiguration
-              v-model:hours-each-day="hoursEachDay.saturday"
-              v-model:number-of-days-per-month="form.num_saturdays"
-              :start="ranges.start"
-              :end="ranges.end"
-              :number-of-weeks="numberOfWeeks"
-              label="Saturday"
-              :tooltip-format="tooltipFormat"/>
+        <DayOfWeekConfiguration
+            v-model:hours-each-day="hoursEachDay.saturday"
+            v-model:number-of-days-per-month="form.num_saturdays"
+            :start="ranges.start"
+            :end="ranges.end"
+            :number-of-weeks="numberOfWeeks"
+            label="Saturday"
+            :tooltip-format="tooltipFormat" />
 
-          <DayOfWeekConfiguration
-              v-model:hours-each-day="hoursEachDay.sunday"
-              v-model:number-of-days-per-month="form.num_sundays"
-              :start="ranges.start"
-              :end="ranges.end"
-              :number-of-weeks="numberOfWeeks"
-              label="Sunday"
-              :tooltip-format="tooltipFormat"/>
-        </div>
-      </Transition>
+        <DayOfWeekConfiguration
+            v-model:hours-each-day="hoursEachDay.sunday"
+            v-model:number-of-days-per-month="form.num_sundays"
+            :start="ranges.start"
+            :end="ranges.end"
+            :number-of-weeks="numberOfWeeks"
+            label="Sunday"
+            :tooltip-format="tooltipFormat" />
+      </div>
+      <!--      </Transition> -->
       <div
           v-if="hasNumError"
-          class="col-span-6 text-gray-700 dark:text-gray-100 items-stretch gap-y-5 md:gap-y-px bg-slate-200 dark:bg-slate-800 border border-gray-200 dark:border-gray-900 rounded p-3">
+          class="col-span-6 text-gray-700 dark:text-gray-100 items-stretch gap-y-5 sm:gap-y-px  border border-gray-200 dark:border-gray-900 rounded p-3">
         <p class="text-sm text-red-600">
           {{ form.errors.num_mondays }}
           {{ form.errors.num_tuesdays }}
@@ -258,14 +257,14 @@ watch(() => form.comments, (value, oldValue) => {
       </div>
 
       <div
-          class="col-span-6 text-gray-700 dark:text-gray-100 items-stretch bg-slate-200 dark:bg-slate-800 border border-gray-200 dark:border-gray-900 rounded p-3">
-        <JetLabel for="availability-comments" value="Comments (optional)"/>
+          class="col-span-6 text-gray-700 dark:text-gray-100 items-stretch  border border-gray-200  bg-sub-panel dark:bg-sub-panel-dark dark:border-gray-900 rounded p-3">
+        <JetLabel for="availability-comments" value="Comments (optional)" />
         <textarea
             id="availability-comments"
-            class="border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 rounded-md shadow-sm w-full h-40 dark:bg-slate-800 dark:border-slate-700 dark:text-white"
-            v-model="form.comments"/>
+            class="border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 rounded-md shadow-sm w-full h-40 bg-transparent dark:border-slate-700 dark:text-white"
+            v-model="form.comments" />
         <div class="text-sm">{{ commentsRemainingCharacters }} characters remaining</div>
-        <JetInputError :message="form.errors.comments" class="mt-2"/>
+        <JetInputError :message="form.errors.comments" class="mt-2" />
         <div class="italic, text-gray-500 text-sm">
           If relevant, use this to provide any additional information about your availability that could
           assist in scheduling.
@@ -288,11 +287,11 @@ watch(() => form.comments, (value, oldValue) => {
 <style lang="scss" scoped>
 .v-enter-active,
 .v-leave-active {
-    transition: opacity 0.5s ease;
+  transition: opacity 0.5s ease;
 }
 
 .v-enter-from,
 .v-leave-to {
-    opacity: 0;
+  opacity: 0;
 }
 </style>

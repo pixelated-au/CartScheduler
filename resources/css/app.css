@@ -3,6 +3,7 @@
 @import "tailwindcss/utilities";
 
 @import "calendar.css";
+@import "range-slider.css";
 
 @layer tailwind-base, primevue, tailwind-utilities;
 
@@ -49,6 +50,11 @@
         @apply hover:dark:text-blue-400;
         @apply decoration-dotted;
     }
+}
+
+:root {
+  /* Modern browsers to allow for dynamic resizing */
+  interpolate-size: allow-keywords;
 }
 
 .v-popper__popper .v-popper__inner div {

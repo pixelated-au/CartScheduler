@@ -1,7 +1,7 @@
 <script setup>
 import { Link, router, usePage } from "@inertiajs/vue3";
 import { breakpointsTailwind, useBreakpoints } from "@vueuse/core";
-import { computed, inject, onBeforeMount, shallowReactive, useTemplateRef } from "vue";
+import { computed, inject, onBeforeMount, shallowReactive, useTemplateRef, onMounted } from "vue";
 import DarkMode from "./DarkMode.vue";
 import JetApplicationMark from "@/Jetstream/ApplicationMark.vue";
 
@@ -65,11 +65,13 @@ const menuItems = computed(() => {
 /**
  * @type MenuItem[]
  */
-const userMenuItems = shallowReactive([
-  { label: "Profile", route: route("profile.show") },
-  { label: "Availability", route: route("user.availability") },
-  { label: "Logout", command: () => logout() },
-]);
+const userMenuItems = [];
+
+onMounted(() => {
+  userMenuItems.push({ label: "Profile", route: route("profile.show") });
+  if (page.props.enableUserAvailability) userMenuItems.push({ label: "Availability", route: route("user.availability") });
+  userMenuItems.push({ label: "Logout", command: () => logout() });
+});
 
 const userMenu = useTemplateRef("userMenu");
 
