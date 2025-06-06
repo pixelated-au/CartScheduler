@@ -26,12 +26,12 @@ class UserAvailabilityReportTest extends TestCase
 
         // Admin should be able to access the report
         $this->actingAs($admin)
-            ->get('/admin/reports/users-availability')
+            ->get('/admin/reporting/users-availability')
             ->assertStatus(200);
 
         // Regular user should not be able to access the report
         $this->actingAs($user)
-            ->get('/admin/reports/users-availability')
+            ->get('/admin/reporting/users-availability')
             ->assertStatus(403);
     }
 
@@ -102,7 +102,7 @@ class UserAvailabilityReportTest extends TestCase
         // User 1 has a total of 4 shifts, User 2 has 3 shifts, and User 3 has 3 shifts
 
         // Test 1: No date parameters (default dates)
-        $response = $this->actingAs($admin)->get('/admin/reports/users-availability');
+        $response = $this->actingAs($admin)->get('/admin/reporting/users-availability');
         $response->assertStatus(200);
 
         $data = $response->json('data');
@@ -143,7 +143,7 @@ class UserAvailabilityReportTest extends TestCase
         // Test 2: Start date only (2 weeks ago)
         $startDate = Carbon::now()->subWeeks(2)->toDateString();
         $response = $this->actingAs($admin)
-            ->get("/admin/reports/users-availability?start_date={$startDate}");
+            ->get("/admin/reporting/users-availability?start_date={$startDate}");
 
         $response->assertStatus(200);
         $meta = $response->json('meta');
@@ -158,7 +158,7 @@ class UserAvailabilityReportTest extends TestCase
         // Test 3: End date only (2 weeks from now)
         $endDate = Carbon::now()->addWeeks(2)->toDateString();
         $response = $this->actingAs($admin)
-            ->get("/admin/reports/users-availability?end_date={$endDate}");
+            ->get("/admin/reporting/users-availability?end_date={$endDate}");
 
         $response->assertStatus(200);
         $meta = $response->json('meta');
@@ -175,7 +175,7 @@ class UserAvailabilityReportTest extends TestCase
         $endDate = Carbon::now()->addMonths(1)->toDateString();
 
         $response = $this->actingAs($admin)
-            ->get("/admin/reports/users-availability?start_date={$startDate}&end_date={$endDate}");
+            ->get("/admin/reporting/users-availability?start_date={$startDate}&end_date={$endDate}");
 
         $response->assertStatus(200);
         $meta = $response->json('meta');

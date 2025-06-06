@@ -1,10 +1,10 @@
 <script setup>
-import {BarChart} from 'echarts/charts';
-import {GridComponent, LegendComponent, TitleComponent, TooltipComponent} from 'echarts/components';
-import {use} from 'echarts/core';
-import {CanvasRenderer} from 'echarts/renderers';
-import {computed, inject, provide} from 'vue';
-import VChart, {THEME_KEY} from 'vue-echarts';
+import { BarChart } from "echarts/charts";
+import { GridComponent, LegendComponent, TitleComponent, TooltipComponent } from "echarts/components";
+import { use } from "echarts/core";
+import { CanvasRenderer } from "echarts/renderers";
+import { computed, inject, provide } from "vue";
+import VChart, { THEME_KEY } from "vue-echarts";
 
 const props = defineProps({
     shiftData: Array,
@@ -12,10 +12,10 @@ const props = defineProps({
 
 use([CanvasRenderer, TitleComponent, TooltipComponent, LegendComponent, BarChart, GridComponent]);
 
-const isDarkMode = inject('darkMode', false);
+const isDarkMode = inject("darkMode", false);
 
 const themeKey = computed(() => {
-    return isDarkMode.value ? 'dark' : 'light';
+    return isDarkMode.value ? "dark" : "light";
 });
 
 provide(THEME_KEY, themeKey);
@@ -32,8 +32,8 @@ const shiftsData = computed(() => ({
     responsive: true,
     maintainAspectRatio: false,
     tooltip: {
-        trigger: 'item',
-        formatter: '{a} <br/>{b}: {c}',
+        trigger: "item",
+        formatter: "{a} <br/>{b}: {c}",
     },
     xAxis: {
         data: props.shiftData.map((item) => item.date),
@@ -46,20 +46,20 @@ const shiftsData = computed(() => ({
     series: [
         {
             data: props.shiftData.map((item) => item.shifts_filled),
-            type: 'bar',
-            stack: 'x',
-            name: 'Filled Shifts',
+            type: "bar",
+            stack: "x",
+            name: "Filled Shifts",
         },
         {
             data: props.shiftData.map((item) => item.shifts_available - item.shifts_filled),
-            type: 'bar',
-            stack: 'x',
-            name: 'Shifts Available',
+            type: "bar",
+            stack: "x",
+            name: "Shifts Available",
         },
     ],
 }));
 </script>
 
 <template>
-    <VChart class="shifts-chart" :option="shiftsData"/>
+<VChart class="shifts-chart min-h-72" :option="shiftsData"/>
 </template>
