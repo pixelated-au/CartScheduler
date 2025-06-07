@@ -87,7 +87,7 @@ export default defineConfig([
                     },
                 },
             }],
-            "vue/first-attribute-linebreak": ["error", { singleline: "ignore", multiline: "below" }],
+            "vue/first-attribute-linebreak": ["warn", { singleline: "ignore", multiline: "beside" }],
             "vue/html-closing-bracket-newline": [
                 "warn",
                 {
