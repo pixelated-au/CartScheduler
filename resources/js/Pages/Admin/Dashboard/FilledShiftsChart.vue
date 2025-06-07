@@ -3,8 +3,9 @@ import { BarChart } from "echarts/charts";
 import { GridComponent, LegendComponent, TitleComponent, TooltipComponent } from "echarts/components";
 import { use } from "echarts/core";
 import { CanvasRenderer } from "echarts/renderers";
-import { computed, inject, provide } from "vue";
+import { computed, inject, provide, watch } from "vue";
 import VChart, { THEME_KEY } from "vue-echarts";
+import useEChartsTheme from "@/lib/useEChartsTheme";
 
 const props = defineProps({
     shiftData: Array,
@@ -14,21 +15,15 @@ use([CanvasRenderer, TitleComponent, TooltipComponent, LegendComponent, BarChart
 
 const isDarkMode = inject("darkMode", false);
 
-const themeKey = computed(() => {
-    return isDarkMode.value ? "dark" : "light";
-});
+const theme = useEChartsTheme(isDarkMode);
 
-provide(THEME_KEY, themeKey);
-// provide(THEME_KEY, {
-//     color: ['#3398DB'],
-//     backgroundColor: '#fff',
-// })
+watch(theme, () => {
+    console.log("theme changed");
+}, { deep: true });
+
+provide(THEME_KEY, theme);
 
 const shiftsData = computed(() => ({
-    // title: {
-    //     text: 'Filled Shifts',
-    //     left: 'center',
-    // },
     responsive: true,
     maintainAspectRatio: false,
     tooltip: {
@@ -61,5 +56,5 @@ const shiftsData = computed(() => ({
 </script>
 
 <template>
-<VChart class="shifts-chart min-h-72" :option="shiftsData"/>
+<VChart class="min-h-72" :option="shiftsData"/>
 </template>
