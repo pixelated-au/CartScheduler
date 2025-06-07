@@ -1,9 +1,9 @@
 import * as path from "node:path";
-import {PrimeVueResolver} from "@primevue/auto-import-resolver";
+import { PrimeVueResolver } from "@primevue/auto-import-resolver";
 import vue from "@vitejs/plugin-vue";
 import laravel from "laravel-vite-plugin";
 import Components from "unplugin-vue-components/vite";
-import {defineConfig} from "vite";
+import { defineConfig } from "vite";
 import vueDevTools from "vite-plugin-vue-devtools";
 import IconsResolver from "unplugin-icons/resolver";
 
@@ -35,24 +35,18 @@ export default defineConfig({
             dts: true,
             directoryAsNamespace: true,
             resolvers: [
-                PrimeVueResolver({components: {prefix: "P"}}),
-                IconsResolver()
-            ]
+                PrimeVueResolver({ components: { prefix: "P" } }),
+                IconsResolver(),
+            ],
         }),
     ],
     server: {
         host: "0.0.0.0",
     },
-    compilerOptions: {
-        baseUrl: ".",
-        paths: {
-            "@/*": [
-                "./resources/js/*"
-            ]
-        },
-    },
     resolve: {
         alias: {
+            "@": path.resolve("./resources/js"),
+            "@@": path.resolve("./"),
             "ziggy-js": path.resolve("./vendor/tightenco/ziggy"),
         },
     },
