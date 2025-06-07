@@ -8,7 +8,6 @@ import Menu from "./Components/Menu.vue";
 import { useGlobalState } from "@/store";
 import useToast from "@/Composables/useToast";
 import ObtrusiveNotification from "@/Components/ObtrusiveNotification.vue";
-import JetBanner from "@/Jetstream/Banner.vue";
 import "@vuepic/vue-datepicker/dist/main.css"; // FIXME AFTER REMOVING VUE-DATEPICKER, DELETE
 import "floating-vue/dist/style.css"; // TODO AFTER REMOVING FLOATING-VUE, DELETE
 
