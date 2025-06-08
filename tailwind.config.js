@@ -1,5 +1,6 @@
 import defaultTheme from "tailwindcss/defaultTheme";
 import colors from "tailwindcss/colors";
+import { formatColor, parseColor } from "tailwindcss/lib/util/color";
 import { addIconSelectors } from "@iconify/tailwind";
 
 /** @type {import('tailwindcss').Config} */
@@ -70,7 +71,7 @@ export default {
                     dark: colors.neutral[950],
                 },
                 "sub-panel": {
-                    DEFAULT: colors.neutral[100],
+                    DEFAULT: formatColor({ ...parseColor(colors.neutral[200]), alpha: 0.85 }),
                     dark: colors.neutral[900],
                 },
                 "text-input": {
