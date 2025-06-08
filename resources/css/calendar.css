@@ -31,6 +31,7 @@
   --marker-date-border-color: theme('colors.rostered-marker.DEFAULT');
 
   /* Dark Mode Overrides */
+}
 
   .dark {
     --p-datepicker-bg: theme('colors.gray.900');
@@ -40,10 +41,9 @@
     --p-datepicker-header-border: 1px solid theme('colors.gray.700');
     --p-datepicker-other-month-text-color: theme('colors.gray.600');
     --p-datepicker-disabled-text-color: theme('colors.gray.600');
-    --highlighted-date-bg: theme('colors.blue.400 / 20%');
+    --highlighted-date-bg: theme('colors.blue.400 / 35%');
     --marker-date-border-color: theme('colors.rostered-marker.light');
   }
-}
 
 @layer theme {
   .p-datepicker {
