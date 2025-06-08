@@ -229,8 +229,8 @@ const accordionExpandIndex = ref(undefined);
             <div v-for="(volunteer, index) in shift.filterVolunteers"
                  :key="index"
                  class="justify-self-center self-center">
-              <User gender="male" v-if="volunteer?.gender === 'male'" v-tooltip="volunteer.name" />
-              <User gender="female" v-else-if="volunteer?.gender === 'female'" v-tooltip="volunteer.name" />
+              <User status="male" v-if="volunteer?.status === 'male'" v-tooltip="volunteer.name" />
+              <User status="female" v-else-if="volunteer?.status === 'female'" v-tooltip="volunteer.name" />
 
               <EmptySlot v-else v-tooltip="'Available shift'" />
             </div>
@@ -239,10 +239,10 @@ const accordionExpandIndex = ref(undefined);
               <div v-for="(volunteer, index) in shift.filterVolunteers"
                    :key="index"
                    class="p-2 border-b border-gray-400 transition duration-150 first:rounded-t-md last:rounded-b-md last:border-b-0 hover:ease-in"
-                   :class="rowClass(volunteer?.gender)">
+                   :class="rowClass(volunteer?.status)">
                 <div v-if="volunteer" class="grid grid-cols-2 gap-1.5">
                   <div class="md:mr-3">
-                    {{ volunteer.gender === "male" ? "Bro" : "Sis" }}
+                    {{ volunteer.status === "male" ? "Bro" : "Sis" }}
                     {{ volunteer.name }}
                   </div>
                   <div class="text-right">

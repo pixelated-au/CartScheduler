@@ -2,16 +2,19 @@
 import { onBeforeMount } from "vue";
 
 const props = defineProps({
-    gender: {
+    status: {
         type: String,
-        validator: (value) => ["male", "female"].includes(value),
+        validator: (value) => ["male", "female", "reserved"].includes(value),
     },
 });
 let fill = "#79B9ED";
 
 onBeforeMount(() => {
-    if (props.gender === "female") {
+    if (props.status === "female") {
         fill = "#FBBBFC";
+    }
+    if (props.status === "reserved") {
+        fill = "#24C26A";
     }
 });
 </script>

@@ -3,7 +3,6 @@ import { usePage } from "@inertiajs/vue3";
 import { format, isSameDay, parse } from "date-fns";
 import { computed, ref, watch } from "vue";
 import ComponentSpinner from "@/Components/ComponentSpinner.vue";
-import BookedSlot from "@/Components/Icons/BookedSlot.vue";
 import EmptySlot from "@/Components/Icons/EmptySlot.vue";
 import User from "@/Components/Icons/User.vue";
 import Loading from "@/Components/Loading.vue";
@@ -196,13 +195,13 @@ watch(firstReservationForUser, (val) => {
                               type="button"
                               class="block"
                               @click="toggleReservation(location.id, shift.id, false)">
-                        <BookedSlot v-tooltip="`${volunteer.name}: Tap to un-reserve this shift`" />
+                        <User status="reserved" v-tooltip="`${volunteer.name}: Tap to un-reserve this shift`" />
                       </button>
-                      <BookedSlot v-else />
+                      <User status="reserved" v-else />
                     </template>
 
-                    <User gender="male" v-else-if="volunteer.gender === 'male'" v-tooltip="volunteer.name" />
-                    <User gender="female"
+                    <User status="male" v-else-if="volunteer.gender === 'male'" v-tooltip="volunteer.name" />
+                    <User status="female"
                           v-else-if="volunteer.gender === 'female'"
                           v-tooltip="volunteer.name" />
                   </template>
