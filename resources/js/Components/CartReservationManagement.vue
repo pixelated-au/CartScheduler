@@ -4,12 +4,10 @@ import axios from "axios";
 import { format, parse } from "date-fns";
 import { computed, reactive, ref } from "vue";
 import EmptySlot from "@/Components/Icons/EmptySlot.vue";
-import Female from "@/Components/Icons/Female.vue";
-import Male from "@/Components/Icons/Male.vue";
+import User from "@/Components/Icons/User.vue";
 import UserAdd from "@/Components/Icons/UserAdd.vue";
 import UserRemove from "@/Components/Icons/UserRemove.vue";
 import Loading from "@/Components/Loading.vue";
-import Accordion from "@/Components/LocationAccordion.vue";
 import MoveUserSelectField from "@/Components/MoveUserSelectField.vue";
 import useToast from "@/Composables/useToast";
 import JetConfirmModal from "@/Jetstream/ConfirmationModal.vue";
@@ -144,9 +142,9 @@ const showUserAddModal = ref(false);
 
 const rowClass = (gender) => {
     if (gender === "male") {
-        return "bg-blue-100 hover:bg-blue-200 dark:bg-blue-900/40 dark:hover:bg-blue-900/60";
+        return "bg-blue-200/50 hover:bg-blue-300 dark:bg-blue-600/20 dark:hover:bg-blue-900/60";
     } else if (gender === "female") {
-        return "bg-pink-100 hover:bg-pink-200 dark:bg-fuchsia-900/40 dark:hover:bg-fuchsia-900/60";
+        return "bg-pink-200/50 hover:bg-pink-300 dark:bg-fuchsia-600/20 dark:hover:bg-fuchsia-900/60";
     }
 
     return "bg-slate-200 dark:bg-slate-700 dark:text-gray-50";
@@ -181,30 +179,32 @@ const removeTooltip = (name) => `Remove ${name} from this shift`;
 const locationClasses = (location) => location.freeShifts
     ? "border-amber-600 text-amber-500 group-hover:bg-amber-500 group-hover:text-amber-800"
     : "text-gray-400 dark:text-gray-500 border-gray-400 group-hover:bg-gray-400 group-hover:text-gray-50";
+
+const accordionExpandIndex = ref(undefined);
 </script>
 
 <template>
 <div class="grid grid-cols-1 gap-3 sm:grid-cols-[min-content_auto]">
   <div class="pb-3 md:pb-0">
-    <DatePicker
-        can-view-historical
-        v-model:date="date"
-        :locations="locations"
-        :user="user"
-        :free-shifts="freeShifts"
-        :marker-dates="serverDates"
-        @locations-for-day="setLocationMarkers"/>
+    <DatePicker can-view-historical
+                v-model:date="date"
+                :locations="locations"
+                :user="user"
+                :free-shifts="freeShifts"
+                :marker-dates="serverDates"
+                @locations-for-day="setLocationMarkers" />
   </div>
-  <div class="text-sm">
-    <Loading v-if="isLoading" class="min-h-[200px] sm:min-h-full"/>
-    <Accordion v-show="!isLoading" :items="locations" label="name" uid="id">
-      <template #label="{ label, location }">
+  <Loading v-if="isLoading" class="min-h-[200px] sm:min-h-full" />
+  <PAccordion v-if="!isLoading" v-model:value="accordionExpandIndex">
+    <PAccordionPanel v-for="location in locations" :key="location.id" :value="location.id" class="group">
+      <PAccordionHeader class="relative after:absolute after:bottom-2 after:left-0 after:right-0 group-[.p-accordionpanel-active]:after:block after:h-px after:hidden after:bg-gradient-to-r after:from-transparent after:from-20% after:via-surface-500/70 after:to-transparent after:to-80%">
         <div class="flex items-center dark:text-gray-200">
-          {{ label }}
-          <div class="flex items-center py-1.5 ml-1 group">
-            <div
-                :class="locationClasses(location)"
-                class="flex justify-center items-center mr-2 ml-1 w-5 h-5 text-xs leading-none rounded-full border transition-colors">
+          <span class="dark:text-gray-200">
+            {{ location.name }}
+          </span>
+          <div class="flex items-center py-1.5 ml-1 group font-bold">
+            <div :class="locationClasses(location)"
+                 class="flex justify-center items-center mr-2 ml-1 w-5 h-5 text-xs leading-none rounded-full border transition-colors">
               {{ location.freeShifts }}
             </div>
             <div class="hidden min-w-5 sm:block">
@@ -214,71 +214,64 @@ const locationClasses = (location) => location.freeShifts
             </div>
           </div>
         </div>
-      </template>
 
-      <template v-slot="{ location }">
+        <template #toggleicon="{ active }">
+          <span class="iconify mdi--chevron-down text-2xl ml-auto transition-rotate duration-500 delay-100 ease-in-out"
+                :class="active ? 'rotate-180' : ''" />
+        </template>
+      </PAccordionHeader>
+      <PAccordionContent>
         <div class="grid gap-x-2 gap-y-4 w-full" :class="gridCols[location.max_volunteers]">
           <template v-for="shift in location.filterShifts" :key="shift.id">
             <div class="self-center pl-3 dark:text-gray-100">
               {{ formatTime(shift.start_time) }} - {{ formatTime(shift.end_time) }}
             </div>
-            <div
-                v-for="(volunteer, index) in shift.filterVolunteers"
-                :key="index"
-                class="justify-self-center self-center">
-              <template v-if="volunteer">
-                <Male v-if="volunteer.gender === 'male'" v-tooltip="volunteer.name"/>
-                <Female v-else-if="volunteer.gender === 'female'" v-tooltip="volunteer.name"/>
-              </template>
+            <div v-for="(volunteer, index) in shift.filterVolunteers"
+                 :key="index"
+                 class="justify-self-center self-center">
+              <User gender="male" v-if="volunteer?.gender === 'male'" v-tooltip="volunteer.name" />
+              <User gender="female" v-else-if="volunteer?.gender === 'female'" v-tooltip="volunteer.name" />
 
-              <EmptySlot v-else v-tooltip="'Available shift'"/>
+              <EmptySlot v-else v-tooltip="'Available shift'" />
             </div>
             <div></div>
             <div class="col-span-full dark:text-gray-50">
-              <div
-                  v-for="(volunteer, index) in shift.filterVolunteers"
-                  :key="index"
-                  class="p-2 border-b border-gray-400 transition duration-150 first:rounded-t-md last:rounded-b-md last:border-b-0 hover:ease-in"
-                  :class="rowClass(volunteer?.gender)">
+              <div v-for="(volunteer, index) in shift.filterVolunteers"
+                   :key="index"
+                   class="p-2 border-b border-gray-400 transition duration-150 first:rounded-t-md last:rounded-b-md last:border-b-0 hover:ease-in"
+                   :class="rowClass(volunteer?.gender)">
                 <div v-if="volunteer" class="grid grid-cols-2 gap-1.5">
                   <div class="md:mr-3">
-                    {{ volunteer.gender === 'male' ? 'Bro' : 'Sis' }}
+                    {{ volunteer.gender === "male" ? "Bro" : "Sis" }}
                     {{ volunteer.name }}
                   </div>
                   <div class="text-right">
-                    Ph: <a
-
-                        :href="`tel:${volunteer.mobile_phone}`"
-                        class="underline decoration-blue-800 decoration-dotted decoration-1 underline-offset-4 visited:decoration-blue-800">
-                      {{
-                        volunteer.mobile_phone
-                      }}
+                    Ph: <a :href="`tel:${volunteer.mobile_phone}`"
+                           class="underline decoration-blue-800 decoration-dotted decoration-1 underline-offset-4 visited:decoration-blue-800">
+                      {{ volunteer.mobile_phone }}
                     </a>
                   </div>
                   <div class="grid grid-cols-2 col-span-2 gap-1.5 lg:flex lg:gap-3">
-                    <MoveUserSelectField
-                        class="inline-block"
-                        :volunteer="volunteer"
-                        :date="date"
-                        :shift="shift"
-                        :location-id="location.id"
-                        :empty-shifts-for-time="emptyShiftsForTime"
-                        @update:modelValue="promptMoveVolunteer($event, volunteer, shift)"/>
+                    <MoveUserSelectField class="inline-block"
+                                         :volunteer="volunteer"
+                                         :date="date"
+                                         :shift="shift"
+                                         :location-id="location.id"
+                                         :empty-shifts-for-time="emptyShiftsForTime"
+                                         @update:modelValue="promptMoveVolunteer($event, volunteer, shift)" />
                     <div class="text-right">
-                      <PButton
-                          severity="danger"
-                          v-tooltip="removeTooltip(volunteer.name)"
-                          @click="setRemoveUser(volunteer, shift, location, date)">
-                        <UserRemove color="#000"/>
+                      <PButton severity="danger"
+                               v-tooltip="removeTooltip(volunteer.name)"
+                               @click="setRemoveUser(volunteer, shift, location, date)">
+                        <UserRemove color="#000" />
                       </PButton>
                     </div>
                   </div>
                 </div>
                 <div v-else>
-                  <PButton
-                      severity="info"
-                      @click="doShowAssignVolunteerModal(shift, location)">
-                    <UserAdd color="#fff"/>
+                  <PButton severity="info"
+                           @click="doShowAssignVolunteerModal(shift, location)">
+                    <UserAdd color="#fff" />
                     <span class="ml-3">Add Volunteer</span>
                   </PButton>
                 </div>
@@ -286,16 +279,16 @@ const locationClasses = (location) => location.freeShifts
             </div>
           </template>
         </div>
-      </template>
-    </Accordion>
-  </div>
+      </PAccordionContent>
+    </PAccordionPanel>
+  </PAccordion>
 </div>
-<UserActionsModal
-    v-model:show="showUserAddModal"
-    :date="date"
-    :shift="assignUserData.shift"
-    :location="assignUserData.location"
-    @assignVolunteer="assignVolunteer"/>
+
+<UserActionsModal v-model:show="showUserAddModal"
+                  :date="date"
+                  :shift="assignUserData.shift"
+                  :location="assignUserData.location"
+                  @assignVolunteer="assignVolunteer" />
 <JetConfirmModal v-model:show="showMoveUserModal">
   <template #title>
     <h2 class="text-lg font-medium text-gray-900">Move user</h2>
@@ -311,9 +304,8 @@ const locationClasses = (location) => location.freeShifts
   <template #footer>
     <div class="flex justify-end">
       <PButton severity="secondary" @click="selectedMoveUser = null">Cancel</PButton>
-      <PButton
-          @click="moveVolunteer(selectedMoveUser?.volunteer.id, selectedMoveUser?.selection.newLocationId, selectedMoveUser?.selection.newShiftId, selectedMoveUser?.shift.id)"
-          class="ml-2">
+      <PButton @click="moveVolunteer(selectedMoveUser?.volunteer.id, selectedMoveUser?.selection.newLocationId, selectedMoveUser?.selection.newShiftId, selectedMoveUser?.shift.id)"
+               class="ml-2">
         Move
       </PButton>
     </div>
@@ -334,10 +326,9 @@ const locationClasses = (location) => location.freeShifts
   <template #footer>
     <div class="flex justify-end">
       <PButton severity="secondary" @click="selectedRemoveUser = null">Cancel</PButton>
-      <PButton
-          style-type="warning"
-          @click="removeVolunteer()"
-          class="ml-2">
+      <PButton style-type="warning"
+               @click="removeVolunteer()"
+               class="ml-2">
         Remove
       </PButton>
     </div>

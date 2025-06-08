@@ -1,12 +1,11 @@
 <script setup>
 import { usePage } from "@inertiajs/vue3";
 import { format, isSameDay, parse } from "date-fns";
-import { computed, onBeforeMount, onMounted, ref, watch } from "vue";
+import { computed, ref, watch } from "vue";
 import ComponentSpinner from "@/Components/ComponentSpinner.vue";
 import BookedSlot from "@/Components/Icons/BookedSlot.vue";
 import EmptySlot from "@/Components/Icons/EmptySlot.vue";
-import Female from "@/Components/Icons/Female.vue";
-import Male from "@/Components/Icons/Male.vue";
+import User from "@/Components/Icons/User.vue";
 import Loading from "@/Components/Loading.vue";
 import useToast from "@/Composables/useToast";
 import useLocationFilter from "@/Pages/Admin/Locations/Composables/useLocationFilter";
@@ -145,10 +144,7 @@ watch(firstReservationForUser, (val) => {
   </div>
   <div>
     <Loading v-if="isLoading" class="min-h-[200px] sm:min-h-full" />
-    <PAccordion v-model:value="accordionExpandIndex"
-                expand-icon="iconify mdi--chevron-down text-2xl ml-auto transition-rotate duration-500 delay-100 ease-in-out"
-                collapse-icon="iconify mdi--chevron-down text-2xl rotate-180">
-      <!--      <PAccordion v-model:value="accordionExpandIndex" expand-icon="iconify mdi&#45;&#45;chevron-down text-2xl ml-auto transition-rotate duration-500 delay-100 ease-in-out" collapse-icon="iconify mdi&#45;&#45;chevron-down text-2xl rotate-180"> -->
+    <PAccordion v-model:value="accordionExpandIndex">
       <PAccordionPanel v-for="location in locations" :key="location.id" :value="location.id" class="group">
         <PAccordionHeader class="relative after:absolute after:bottom-2 after:left-0 after:right-0 group-[.p-accordionpanel-active]:after:block after:h-px after:hidden after:bg-gradient-to-r after:from-transparent after:from-20% after:via-surface-500/70 after:to-transparent after:to-80%">
           <div class="flex items-center text-base font-bold">
@@ -156,7 +152,8 @@ watch(firstReservationForUser, (val) => {
                   v-tooltip="locationLabel[location.id].tooltip">
               {{ location.name }}
             </span>
-            <div class="flex items-center py-1.5 ml-2 group" v-if="!isRestricted && location.freeShifts">
+            <div class="flex items-center py-1.5 ml-2 group"
+                 v-if="!isRestricted && location.freeShifts">
               <div class="mr-3 ml-1 w-2 h-2 bg-amber-500 rounded-full transition-colors group-hover:bg-amber-600 group-hover:dark:bg-amber-200"></div>
               <div class="hidden min-w-5 sm:block">
                 <div class="overflow-x-hidden w-0 text-sm text-gray-600 whitespace-nowrap transition-all group-hover:w-full dark:text-gray-400">
@@ -182,8 +179,10 @@ watch(firstReservationForUser, (val) => {
               </div>
             </div>
 
-            <div v-html="location.description" class="p-3 pt-0 w-full description dark:text-gray-100"></div>
-            <div class="grid gap-x-2 gap-y-2 w-full sm:gap-y-4" :class="gridCols[location.max_volunteers]">
+            <div v-html="location.description"
+                 class="p-3 pt-0 w-full description dark:text-gray-100"></div>
+            <div class="grid gap-x-2 gap-y-2 w-full sm:gap-y-4"
+                 :class="gridCols[location.max_volunteers]">
               <template v-for="shift in location.filterShifts" :key="shift.id">
                 <div class="self-center pt-4 pl-3 sm:pr-4 dark:text-gray-100">
                   {{ formatTime(shift.start_time) }} - {{ formatTime(shift.end_time) }}
@@ -202,8 +201,10 @@ watch(firstReservationForUser, (val) => {
                       <BookedSlot v-else />
                     </template>
 
-                    <Male v-else-if="volunteer.gender === 'male'" v-tooltip="volunteer.name" />
-                    <Female v-else-if="volunteer.gender === 'female'" v-tooltip="volunteer.name" />
+                    <User gender="male" v-else-if="volunteer.gender === 'male'" v-tooltip="volunteer.name" />
+                    <User gender="female"
+                          v-else-if="volunteer.gender === 'female'"
+                          v-tooltip="volunteer.name" />
                   </template>
 
                   <EmptySlot v-else-if="isRestricted" v-tooltip="'You cannot reserve a shift'" />
@@ -225,11 +226,8 @@ watch(firstReservationForUser, (val) => {
                       <template v-if="volunteer">
                         <div>{{ volunteer.name }}</div>
                         <div>
-                          Ph: <a :href="`tel:${volunteer.mobile_phone}`">
-                            {{
-                              volunteer.mobile_phone
-                            }}
-                          </a>
+                          Ph:
+                          <a :href="`tel:${volunteer.mobile_phone}`">{{ volunteer.mobile_phone }}</a>
                         </div>
                       </template>
 
@@ -251,28 +249,28 @@ watch(firstReservationForUser, (val) => {
 
 <style>
 .description {
-  p {
-    @apply mb-3;
-  }
-
-  ul, ol {
-    @apply pl-5;
-
-    li p {
-      @apply mb-0.5;
+    p {
+        @apply mb-3;
     }
-  }
 
-  ul {
-    @apply list-disc;
-  }
+    ul, ol {
+        @apply pl-5;
 
-  ol {
-    @apply list-decimal;
-  }
+        li p {
+            @apply mb-0.5;
+        }
+    }
 
-  strong {
-    @apply font-bold
-  }
+    ul {
+        @apply list-disc;
+    }
+
+    ol {
+        @apply list-decimal;
+    }
+
+    strong {
+        @apply font-bold
+    }
 }
 </style>
