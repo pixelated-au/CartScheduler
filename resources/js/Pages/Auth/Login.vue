@@ -2,7 +2,7 @@
 import { useForm, usePage } from "@inertiajs/vue3";
 import { computed, inject, onMounted } from "vue";
 import Alert from "@/Components/Alert.vue";
-import JetAuthenticationCard from "@/Jetstream/AuthenticationCard.vue";
+import AuthLayout from "@/Layouts/AuthLayout.vue";
 import JetAuthenticationCardLogo from "@/Jetstream/AuthenticationCardLogo.vue";
 import JetCheckbox from "@/Jetstream/Checkbox.vue";
 import JetValidationErrors from "@/Jetstream/ValidationErrors.vue";
@@ -40,14 +40,12 @@ if (import.meta.env.DEV) {
 </script>
 
 <template>
-<Head title="Log in"/>
-
-<JetAuthenticationCard>
+<AuthLayout title="Log in">
   <template #logo>
-    <JetAuthenticationCardLogo/>
+    <JetAuthenticationCardLogo />
   </template>
 
-  <JetValidationErrors class="mb-4"/>
+  <JetValidationErrors class="mb-4" />
 
   <div v-if="status" class="mb-4 text-sm font-medium text-green-600">
     {{ status }}
@@ -60,35 +58,39 @@ if (import.meta.env.DEV) {
   <form @submit.prevent="submit">
     <div class="flex flex-col gap-3 [&>div]:flex [&>div]:flex-col [&>div]:gap-1">
       <div>
-        <FormLabel for="email" value="Email"/>
-        <PInputText id="email" v-model="form.email" type="email" class="block mt-1 w-full" required autocomplete="username" autofocus/>
+        <FormLabel for="email" value="Email" />
+        <PInputText id="email"
+                    v-model="form.email"
+                    type="email"
+                    class="block mt-1 w-full"
+                    required
+                    autocomplete="username"
+                    autofocus />
       </div>
 
       <div>
-        <FormLabel for="password" value="Password"/>
-        <PPassword
-            input-id="password"
-            v-model="form.password"
-            :feedback="false"
-            toggle-mask
-            input-class="w-full"
-            required
-            autocomplete="current-password"/>
+        <FormLabel for="password" value="Password" />
+        <PPassword input-id="password"
+                   v-model="form.password"
+                   :feedback="false"
+                   toggle-mask
+                   input-class="w-full"
+                   required
+                   autocomplete="current-password" />
       </div>
 
       <div class="mt-4">
         <label class="flex items-center">
-          <JetCheckbox v-model:checked="form.remember" name="remember"/>
+          <JetCheckbox v-model:checked="form.remember" name="remember" />
           <span class="ml-2 text-gray-600 dark:text-gray-200">Remember me</span>
         </label>
       </div>
     </div>
 
     <div class="flex gap-4 justify-end items-center mt-4">
-      <Link
-          v-if="canResetPassword"
-          :href="route('password.request')"
-          class="text-gray-600 underline hover:text-gray-900 dark:text-gray-200 dark:hover-text-gray-500">
+      <Link v-if="canResetPassword"
+            :href="route('password.request')"
+            class="text-gray-600 underline hover:text-gray-900 dark:text-gray-200 dark:hover-text-gray-500">
         Forgot your password?
       </Link>
 
@@ -97,5 +99,5 @@ if (import.meta.env.DEV) {
       </PButton>
     </div>
   </form>
-</JetAuthenticationCard>
+</AuthLayout>
 </template>

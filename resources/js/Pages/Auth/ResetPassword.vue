@@ -1,11 +1,10 @@
 <script setup>
-import JetAuthenticationCard from '@/Jetstream/AuthenticationCard.vue';
-import JetAuthenticationCardLogo from '@/Jetstream/AuthenticationCardLogo.vue';
-
-import JetInput from '@/Jetstream/Input.vue';
-import JetLabel from '@/Jetstream/Label.vue';
-import JetValidationErrors from '@/Jetstream/ValidationErrors.vue';
-import {Head, useForm} from '@inertiajs/vue3';
+import { useForm } from "@inertiajs/vue3";
+import AuthLayout from "@/Layouts/AuthLayout.vue";
+import JetAuthenticationCardLogo from "@/Jetstream/AuthenticationCardLogo.vue";
+import JetInput from "@/Jetstream/Input.vue";
+import JetLabel from "@/Jetstream/Label.vue";
+import JetValidationErrors from "@/Jetstream/ValidationErrors.vue";
 
 const props = defineProps({
     email: String,
@@ -15,69 +14,61 @@ const props = defineProps({
 const form = useForm({
     token: props.token,
     email: props.email,
-    password: '',
-    password_confirmation: '',
+    password: "",
+    password_confirmation: "",
 });
 
 const submit = () => {
-    form.post(route('password.update'), {
-        onFinish: () => form.reset('password', 'password_confirmation'),
+    form.post(route("password.update"), {
+        onFinish: () => form.reset("password", "password_confirmation"),
     });
 };
 </script>
 
 <template>
-    <Head title="Reset Password"/>
+<AuthLayout title="Reset Password">
+  <template #logo>
+    <JetAuthenticationCardLogo />
+  </template>
 
-    <JetAuthenticationCard>
-        <template #logo>
-            <JetAuthenticationCardLogo/>
-        </template>
+  <JetValidationErrors class="mb-4" />
 
-        <JetValidationErrors class="mb-4"/>
+  <form @submit.prevent="submit">
+    <div>
+      <JetLabel for="email" value="Email" />
+      <JetInput id="email"
+                v-model="form.email"
+                type="email"
+                class="mt-1 block w-full"
+                required
+                autofocus />
+    </div>
 
-        <form @submit.prevent="submit">
-            <div>
-                <JetLabel for="email" value="Email"/>
-                <JetInput
-                    id="email"
-                    v-model="form.email"
-                    type="email"
-                    class="mt-1 block w-full"
-                    required
-                    autofocus
-                />
-            </div>
+    <div class="mt-4">
+      <JetLabel for="password" value="Password" />
+      <JetInput id="password"
+                v-model="form.password"
+                type="password"
+                class="mt-1 block w-full"
+                required
+                autocomplete="new-password" />
+    </div>
 
-            <div class="mt-4">
-                <JetLabel for="password" value="Password"/>
-                <JetInput
-                    id="password"
-                    v-model="form.password"
-                    type="password"
-                    class="mt-1 block w-full"
-                    required
-                    autocomplete="new-password"
-                />
-            </div>
+    <div class="mt-4">
+      <JetLabel for="password_confirmation" value="Confirm Password" />
+      <JetInput id="password_confirmation"
+                v-model="form.password_confirmation"
+                type="password"
+                class="mt-1 block w-full"
+                required
+                autocomplete="new-password" />
+    </div>
 
-            <div class="mt-4">
-                <JetLabel for="password_confirmation" value="Confirm Password"/>
-                <JetInput
-                    id="password_confirmation"
-                    v-model="form.password_confirmation"
-                    type="password"
-                    class="mt-1 block w-full"
-                    required
-                    autocomplete="new-password"
-                />
-            </div>
-
-            <div class="flex items-center justify-end mt-4">
-                <PButton :class="{ 'opacity-25': form.processing }" :disabled="form.processing">
-                    Reset Password
-                </PButton>
-            </div>
-        </form>
-    </JetAuthenticationCard>
+    <div class="flex items-center justify-end mt-4">
+      <PButton :class="{ 'opacity-25': form.processing }" :disabled="form.processing">
+        Reset Password
+      </PButton>
+    </div>
+  </form>
+</AuthLayout>
 </template>
