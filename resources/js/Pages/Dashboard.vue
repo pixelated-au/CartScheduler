@@ -33,9 +33,9 @@ const showReportsModal = ref(false);
     </div>
   </template>
 
-  <div class="py-2 dashboard sm:py-12">
-    <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
-      <div class="overflow-hidden shadow-xl bg-panel dark:bg-panel-dark sm:rounded-lg">
+  <div class="py-2 dashboard">
+    <div class="mx-auto max-w-7xl">
+      <div class="overflow-hidden sm:shadow-xl bg-panel dark:bg-panel-dark sm:rounded-lg">
         <CartReservation :user="user"/>
       </div>
     </div>
