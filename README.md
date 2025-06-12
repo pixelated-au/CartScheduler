@@ -99,14 +99,27 @@ To deploy a release requires the following steps:
     - If you are having a server issue (eg 500 error), review the log file at `storage/logs/laravel.log`.
     - If you have this issue: `Your serialized closure might have been modified or it's unsafe to be unserialized`,
       you may need to run the following command: `php artisan route:clear`
+   
+## Development
 
-## Email Testing
+This section is for development only and is not required to run the application on a live server.
+
+### Vue Devtools
+
+Vue devtools is enabled in development. You can configure the 'component inspector' to open the respective component
+in your editor by setting the `LAUNCH_EDITOR` [environment variable](https://github.com/yyx990803/launch-editor?tab=readme-ov-file#custom-editor-support):
+
+```env
+LAUNCH_EDITOR=
+```
+
+### Email Testing
 
 For development, the system uses [MailHog](https://github.com/mailhog/MailHog) that can be accessed
 at http://localhost:8025. All emails sent from the system
 will be available in this interface.
 
-## Notes:
+### Notes:
 
 - If the link to `/storage/example-user-import.xlsx` isn't working (found on the admin, import users page), make sure
   the symlink has been created. Run `php artisan storage:link` to create the symlink.
