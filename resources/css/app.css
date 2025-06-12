@@ -50,6 +50,10 @@
         @apply hover:dark:text-blue-400;
         @apply decoration-dotted;
     }
+
+    .p-dialog-mask {
+        backdrop-filter: blur(5px);
+    }
 }
 
 :root {
