@@ -1,20 +1,21 @@
 <script setup>
-import useToast from '@/Composables/useToast.js';
-
-import JetCheckbox from '@/Jetstream/Checkbox.vue';
-import JetInput from '@/Jetstream/Input.vue';
-import JetInputError from '@/Jetstream/InputError.vue';
-import JetLabel from '@/Jetstream/Label.vue';
-import ReportTags from '@/Pages/Components/Dashboard/ReportTags.vue';
-import axios from 'axios';
-import {format, parse} from 'date-fns';
-import {computed, nextTick, reactive, ref, watch} from 'vue';
+import axios from "axios";
+import { format, parse } from "date-fns";
+import { computed, nextTick, reactive, ref, watch, inject } from "vue";
+import useToast from "@/Composables/useToast.js";
+import JetCheckbox from "@/Jetstream/Checkbox.vue";
+import JetInput from "@/Jetstream/Input.vue";
+import JetInputError from "@/Jetstream/InputError.vue";
+import JetLabel from "@/Jetstream/Label.vue";
+import ReportTags from "@/Pages/Components/Dashboard/ReportTags.vue";
 
 const props = defineProps({
     report: Object,
 });
 
-const emit = defineEmits(['saved']);
+const emit = defineEmits(["saved"]);
+
+const route = inject("route");
 
 const formData = reactive({
     shift_id: props.report.shift_id,
@@ -33,7 +34,7 @@ const errorMessages = computed(() => {
     const messages = {};
     for (const key in errors.value) {
         if (errors.value.hasOwnProperty(key)) {
-            messages[key] = errors.value[key].join(', ');
+            messages[key] = errors.value[key].join(", ");
         }
     }
     return messages;
@@ -49,9 +50,9 @@ const saveReport = async () => {
     try {
         isSaving.value = true;
         errors.value = {};
-        const response = await axios.post(route('save.report'), formData);
+        const response = await axios.post(route("save.report"), formData);
         toast.success(response.data.message);
-        emit('saved');
+        emit("saved");
     } catch (e) {
         errors.value = e.response.data.errors;
         toast.error(e.response.data.message);
@@ -61,7 +62,7 @@ const saveReport = async () => {
 };
 
 const formatDate = (date) => {
-    return format(new Date(date), 'E, do MMMM yyyy');
+    return format(new Date(date), "E, do MMMM yyyy");
 };
 
 const fieldUnique = computed(() => Math.random().toString(36).substring(2, 9));
@@ -84,69 +85,69 @@ watch(() => formData.comments, (value, oldValue) => {
 
 const disableFields = computed(() => !!formData.shift_was_cancelled);
 
-const formatTime = time => format(parse(time, 'HH:mm:ss', new Date()), 'h:mm a');
+const formatTime = (time) => format(parse(time, "HH:mm:ss", new Date()), "h:mm a");
 </script>
 
 <template>
-    <h4><span class="mr-1">{{ formatDate(report.shift_date) }}:</span> {{ report.location_name }}</h4>
-    <div class="mb-3">{{ formatTime(report.start_time) }} - {{ formatTime(report.end_time) }}</div>
+<h4><span class="mr-1">{{ formatDate(report.shift_date) }}:</span> {{ report.location_name }}</h4>
+<div class="mb-3">{{ formatTime(report.start_time) }} - {{ formatTime(report.end_time) }}</div>
 
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-6">
-        <div class="sm:col-span-2 flex items-center">
-            <JetCheckbox :id="`${fieldUnique}-cancelled`"
-                         v-model:checked="formData.shift_was_cancelled"
-                         value="true"
-                         class="mr-3"/>
-            <JetLabel :for="`${fieldUnique}-cancelled`" value="Shift was Canceled"/>
-        </div>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-6">
+  <div class="sm:col-span-2 flex items-center">
+    <JetCheckbox :id="`${fieldUnique}-cancelled`"
+                 v-model:checked="formData.shift_was_cancelled"
+                 value="true"
+                 class="mr-3"/>
+    <JetLabel :for="`${fieldUnique}-cancelled`" value="Shift was Canceled"/>
+  </div>
 
-        <div class="sm:col-span-2 mb-4 text-left">
-            <div class="block font-medium mb-2">Quick Tags</div>
-            <ReportTags @toggled="formData.tags = $event"/>
-            <div class="text-sm text-gray-500">Select any relevant tags</div>
-        </div>
+  <div class="sm:col-span-2 mb-4 text-left">
+    <div class="block font-medium mb-2">Quick Tags</div>
+    <ReportTags @toggled="formData.tags = $event"/>
+    <div class="text-sm text-gray-500">Select any relevant tags</div>
+  </div>
 
-        <div class="mb-3 text-left text-left">
-            <JetLabel :for="`${fieldUnique}-placements`" value="Placements" :is-disabled="disableFields"/>
-            <JetInput :id="`${fieldUnique}-placements`"
-                      v-model="formData.placements_count"
-                      type="number"
-                      class="mt-1 block w-full disabled:text-gray-100 disabled:bg-gray-100 disabled:cursor-not-allowed"
-                      :disabled="disableFields"/>
-            <JetInputError :message="errorMessages.placements_count" class="mt-2"/>
-        </div>
-        <div class="mb-3 text-left">
-            <JetLabel :for="`${fieldUnique}-videos`" value="Videos" :is-disabled="disableFields"/>
-            <JetInput :id="`${fieldUnique}-videos`"
-                      v-model="formData.videos_count"
-                      type="number"
-                      class="mt-1 block w-full disabled:text-gray-100 disabled:bg-gray-100 disabled:cursor-not-allowed"
-                      :disabled="disableFields"/>
-            <JetInputError :message="errorMessages.videos_count" class="mt-2"/>
-        </div>
-        <div class="mb-3 text-left">
-            <JetLabel :for="`${fieldUnique}-requests`" value="Requests" :is-disabled="disableFields"/>
-            <JetInput :id="`${fieldUnique}-requests`"
-                      v-model="formData.requests_count"
-                      type="number"
-                      class="mt-1 block w-full disabled:text-gray-100 disabled:bg-gray-100 disabled:cursor-not-allowed"
-                      :disabled="disableFields"/>
-            <JetInputError :message="errorMessages.requests_count" class="mt-2"/>
-        </div>
-        <div class="sm:col-span-2 mb-3 text-left">
-            <JetLabel :for="`${fieldUnique}-comments`" value="Comments"/>
-            <textarea :id="`${fieldUnique}-comments`"
-                      class="border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 rounded-md shadow-sm w-full h-40 dark:bg-slate-800 dark:border-slate-700 dark:text-white"
-                      v-model="formData.comments"/>
-            <div class="text-sm">{{ commentsRemainingCharacters }} characters remaining</div>
-            <JetInputError :message="errorMessages.comments" class="mt-2"/>
-        </div>
+  <div class="mb-3 text-left text-left">
+    <JetLabel :for="`${fieldUnique}-placements`" value="Placements" :is-disabled="disableFields"/>
+    <PInputNumber :id="`${fieldUnique}-placements`"
+                  v-model="formData.placements_count"
+                  type="number"
+                  class="mt-1 block w-full disabled:text-gray-100 disabled:bg-gray-100 disabled:cursor-not-allowed"
+                  :disabled="disableFields"/>
+    <JetInputError :message="errorMessages.placements_count" class="mt-2"/>
+  </div>
+  <div class="mb-3 text-left">
+    <JetLabel :for="`${fieldUnique}-videos`" value="Videos" :is-disabled="disableFields"/>
+    <PInputNumber :id="`${fieldUnique}-videos`"
+                  v-model="formData.videos_count"
+                  type="number"
+                  class="mt-1 block w-full disabled:text-gray-100 disabled:bg-gray-100 disabled:cursor-not-allowed"
+                  :disabled="disableFields"/>
+    <JetInputError :message="errorMessages.videos_count" class="mt-2"/>
+  </div>
+  <div class="mb-3 text-left">
+    <JetLabel :for="`${fieldUnique}-requests`" value="Requests" :is-disabled="disableFields"/>
+    <PInputNumber :id="`${fieldUnique}-requests`"
+                  v-model="formData.requests_count"
+                  type="number"
+                  class="mt-1 block w-full disabled:text-gray-100 disabled:bg-gray-100 disabled:cursor-not-allowed"
+                  :disabled="disableFields"/>
+    <JetInputError :message="errorMessages.requests_count" class="mt-2"/>
+  </div>
+  <div class="sm:col-span-2 mb-3 text-left">
+    <JetLabel :for="`${fieldUnique}-comments`" value="Comments"/>
+    <PTextarea auto-resize
+               :id="`${fieldUnique}-comments`"
+               class="rounded-md shadow-sm w-full min-h-32"
+               v-model="formData.comments"/>
+    <div class="text-sm">{{ commentsRemainingCharacters }} characters remaining</div>
+    <JetInputError :message="errorMessages.comments" class="mt-2"/>
+  </div>
 
-        <div class="mb-3">
-            <PButton type="button" style-type="primary" @click.prevent="saveReport" :disabled="isSaving">
-                Save Report
-            </PButton>
-        </div>
-    </div>
-
+  <div class="mb-3">
+    <PButton type="button" style-type="primary" @click="saveReport" :disabled="isSaving">
+      Save Report
+    </PButton>
+  </div>
+</div>
 </template>
