@@ -1,20 +1,27 @@
 <script setup>
-import { onMounted } from "vue";
-import { templateRef } from "@vueuse/core";
+import { onMounted, useTemplateRef } from "vue";
 
-defineProps({
-    modelValue: {
-        type: [String, Number],
-        default: "",
+const props = defineProps({
+    autofocus: {
+        type: Boolean,
+        required: false,
+        default: false,
+    },
+    autocomplete: {
+        type: String,
+        required: false,
+        default: "off",
     },
 });
 
-defineEmits(["update:modelValue"]);
+const model = defineModel({ type: [String, Number] });
 
-const input = templateRef("input");
+defineEmits(["update:model"]);
+
+const input = useTemplateRef("input");
 
 onMounted(() => {
-    if (input.value?.hasAttribute("autofocus")) {
+    if (props.autofocus) {
         input.value.focus();
     }
 });
@@ -25,7 +32,5 @@ defineExpose({ focus: () => input.value.focus() });
 </script>
 
 <template>
-<PInputText ref="input"
-            :value="modelValue"
-            @input="$emit('update:modelValue', $event.target.value)"/>
+<PInputText ref="input" v-model="model" :autocomplete/>
 </template>
