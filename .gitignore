@@ -18,6 +18,7 @@ yarn-error.log
 /.idea
 /.vscode
 /.cursor
+/.windsurf*
 /z-deployment-test
 /docs
 /components.d.ts
