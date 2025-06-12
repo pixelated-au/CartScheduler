@@ -1,18 +1,17 @@
 import Bugsnag from "@bugsnag/js";
 import BugsnagPluginVue from "@bugsnag/plugin-vue";
-import {createInertiaApp, Head, Link} from "@inertiajs/vue3";
-import "flowbite";
-import {resolvePageComponent} from "laravel-vite-plugin/inertia-helpers";
+import { createInertiaApp, Head, Link } from "@inertiajs/vue3";
+import { resolvePageComponent } from "laravel-vite-plugin/inertia-helpers";
 import PrimeVue from "primevue/config";
-import {createApp, h} from "vue";
+import { createApp, h } from "vue";
 import Toast from "vue-toastification";
-import "vue-toastification/dist/index.css";
-import {ZiggyVue} from "ziggy-js";
+import { ZiggyVue } from "ziggy-js";
 import PrimeVuePreset from "./primevue-customisations.js";
-import {Ziggy} from "./ziggy.js";
+import { Ziggy } from "./ziggy.js";
+import "flowbite";
+import "vue-toastification/dist/index.css";
 import "../css/app.css";
 import "./bootstrap";
-
 
 const appName = window.document.getElementsByTagName("title")[0]?.innerText || "Laravel";
 
@@ -36,8 +35,8 @@ createInertiaApp({
     progress: {
         color: "#4B5563",
     },
-    setup({el, App, props, plugin}) {
-        const vueApp = createApp({render: () => h(App, props)})
+    setup({ el, App, props, plugin }) {
+        const vueApp = createApp({ render: () => h(App, props) })
             .use(PrimeVue, {
                 theme: {
                     preset: PrimeVuePreset,
@@ -45,10 +44,10 @@ createInertiaApp({
                         darkModeSelector: ".dark",
                         cssLayer: {
                             name: "primevue",
-                            order: "tailwind-base, primevue, tailwind-utilities"
+                            order: "tailwind-base, primevue, tailwind-utilities",
                         },
-                    }
-                }
+                    },
+                },
             })
             .use(plugin)
             .use(ZiggyVue, Ziggy)
