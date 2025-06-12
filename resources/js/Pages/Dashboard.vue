@@ -41,7 +41,6 @@ const showReportsModal = ref(false);
     </div>
   </div>
 </AppLayout>
-<ReportsModal :show="showReportsModal"
-              @has-outstanding-reports="outstandingReportCount = $event"
-              @close="showReportsModal = false"/>
+<ReportsModal v-model="showReportsModal"
+              @has-outstanding-reports="outstandingReportCount = $event"/>
 </template>
