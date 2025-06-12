@@ -11,7 +11,7 @@ defineProps({
 
 defineEmits(["update:modelValue"]);
 
-const input = templateRef();
+const input = templateRef("input");
 
 onMounted(() => {
     if (input.value?.hasAttribute("autofocus")) {
