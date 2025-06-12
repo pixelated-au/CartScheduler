@@ -103,7 +103,7 @@ watch(allTags, async (val, oldVal) => {
     <h4 class="dark:text-gray-100">Add new Tag</h4>
     <JetLabel for="name" value="Name"/>
     <form class="flex flex-wrap" @submit.prevent="addTag">
-      <JetInput id="name" v-model="currentTag.name" type="text" class="w-full mb-3" autocomplete="name"/>
+      <JetInput id="name" v-model="currentTag.name" type="text" class="w-full mb-3"/>
       <div class="flex justify-between w-full">
         <PButton v-if="currentTag?.id"
                  class=""
