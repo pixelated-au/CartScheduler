@@ -184,7 +184,7 @@ const accordionExpandIndex = ref(undefined);
 </script>
 
 <template>
-<div class="grid grid-cols-1 gap-3 sm:grid-cols-[min-content_auto]">
+<div class="grid gap-3 grid-cols-1 sm:grid-cols-[20rem_3fr] sm:items-stretch">
   <div class="pb-3 md:pb-0">
     <DatePicker can-view-historical
                 v-model:date="date"

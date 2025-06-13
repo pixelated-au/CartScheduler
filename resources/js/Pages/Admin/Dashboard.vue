@@ -1,5 +1,5 @@
 <script setup>
-import { Link, router } from "@inertiajs/vue3";
+import { Link } from "@inertiajs/vue3";
 import CartReservationManagement from "@/Components/CartReservationManagement.vue";
 import AppLayout from "@/Layouts/AppLayout.vue";
 import FilledShiftsChart from "@/Pages/Admin/Dashboard/FilledShiftsChart.vue";
@@ -11,8 +11,6 @@ defineProps({
     shiftFilledData: Array,
     outstandingReports: Array,
 });
-
-const go = (url) => router.visit(url);
 </script>
 
 <template>
@@ -54,7 +52,7 @@ const go = (url) => router.visit(url);
 
       <div
           class="dashboard col-span-full sm:p-6 rounded-lg grid grid-cols-1 border border-neutral-300/75 dark:border-neutral-700/75">
-        <CartReservationManagement/>
+        <CartReservationManagement />
       </div>
       <div
           class="col-span-full border border-neutral-300/75 dark:border-neutral-700/75 p-6 rounded-lg grid grid-cols-1">
@@ -62,9 +60,9 @@ const go = (url) => router.visit(url);
           <span class="text-gray-600 dark:text-gray-300">Filled Shifts</span>
         </h3>
         <p class="text-gray-700 dark:text-gray-300">For the next 14 days.</p>
-        <FilledShiftsChart :shiftData="shiftFilledData"/>
+        <FilledShiftsChart :shiftData="shiftFilledData" />
       </div>
-      <Tags/>
+      <Tags />
     </div>
   </div>
 </AppLayout>

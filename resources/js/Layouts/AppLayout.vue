@@ -86,31 +86,32 @@ const checkLater = () => {
 
 <template>
 <StagewiseToolbar v-if="false" :config="config" />
-<div class="bg-page bg-gradient-to-b from-page  to-neutral-50 dark:bg-page-dark dark:bg-gradient-to-b dark:from-page-dark dark:to-neutral-950">
+<div class="text-neutral-900 dark:text-neutral-100 bg-gradient-to-b from-page  to-neutral-50 dark:bg-page-dark dark:bg-gradient-to-b dark:from-page-dark dark:to-neutral-950">
   <Head :title="title" />
 
-  <div class="grid content-start min-h-dvh w-dvw max-w-full-dvw justify-stretch">
-    <Menu @toggle-dark-mode="isDarkMode = $event" />
+  <div class="flex flex-col content-start min-h-dvh w-dvw max-w-full-dvw justify-stretch">
+    <Nav class="grid grid-cols-page justify-center px-4 xl:px-0  border-b border-neutral-300 dark:border-neutral-700/85"
+         @toggle-dark-mode="isDarkMode = $event" />
 
     <!-- Page Heading -->
     <header v-if="$slots.header"
-            class="grid justify-center shadow w-dvw grid-cols-page dark:text-gray-100 dark:border-b dark:border-zinc-500/25">
-      <div class="col-span-3 gap-0 px-6 py-6 sm:col-span-1 sm:col-start-2">
+            class="grid grid-cols-page px-4 xl:px-0 justify-center border-b border-neutral-200 w-dvw dark:text-gray-100 dark:border-b dark:border-neutral-700/85">
+      <div class="py-6">
         <slot name="header" />
       </div>
     </header>
 
-    <!-- Page Content -->
-    <main class="grid gap-0 justify-self-center main-content w-dvw grid-cols-page">
+    <main class="flex flex-col flex-1 gap-0 justify-self-center main-content w-dvw grid-cols-page">
       <!-- Page Top -->
-      <section v-if="$slots['page-top']"
-               class="col-span-3 w-full dark:text-gray-100">
+      <section v-if="$slots['page-top']" class="col-span-3 w-full dark:text-gray-100">
         <slot name="page-top" />
       </section>
 
       <!-- Page Content -->
-      <section class="col-span-3 gap-0 sm:col-span-1 sm:col-start-2">
-        <slot />
+      <section class="w-dvw grid grid-cols-page flex-1 justify-center items-start col-span-3 gap-0 sm:col-span-1 sm:col-start-2">
+        <div class="grid grid-cols-1 justify-items-stretch justify-stretch pt-4 sm:pb-6 px-4 sm:px-4 bg-panel dark:bg-panel-dark overflow-hidden border border-t-0 std-border sm:rounded-b-md sm:mb-5">
+          <slot />
+        </div>
       </section>
     </main>
 

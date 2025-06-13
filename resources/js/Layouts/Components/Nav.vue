@@ -201,8 +201,8 @@ const isActive = (routeName) => route().current() === routeName;
 </script>
 
 <template>
-<nav class="relative z-50 text-gray-700 bg-gray-100 shadow-md dark:bg-gray-800 dark:text-gray-200">
-  <div class="container px-4 mx-auto sm:px-6 lg:px-8">
+<nav class="relative z-50 bg-panel dark:bg-panel-dark">
+  <div class="container">
     <div class="flex justify-between items-center h-16">
       <!-- Left side: Logo and Desktop Main Menu -->
       <div class="flex items-center">
@@ -216,11 +216,11 @@ const isActive = (routeName) => route().current() === routeName;
             <!-- Regular Link -->
             <Link v-if="!item.isDropdown"
                   :href="item.href"
-                  class="px-3 py-2 rounded-md text-sm font-medium transition-colors duration-150 ease-in-out text-current"
+                  class="px-3 py-2 rounded-md font-medium transition-colors duration-150 ease-in-out !text-current"
                   :class="[
                     isActive(item.routeName)
-                      ? 'bg-primary-500 text-white dark:bg-primary-600'
-                      : 'hover:bg-gray-200 dark:hover:bg-gray-700'
+                      ? '!font-bold underline underline-offset-4 decoration-dashed'
+                      : 'hover:bg-neutral-200 dark:hover:bg-neutral-700'
                   ]"
                   :aria-current="isActive(item.routeName) ? 'page' : undefined">
               {{ item.label }}
@@ -230,23 +230,18 @@ const isActive = (routeName) => route().current() === routeName;
             <div v-if="item.isDropdown && item.label === 'Administration'" class="relative" ref="adminDropdownRef">
               <button @click="toggleDesktopAdminDropdown"
                       type="button"
-                      class="flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors duration-150 ease-in-out text-current"
+                      class="flex items-center px-3 py-2 rounded-md font-medium transition-colors duration-150 ease-in-out text-current hover:underline decoration-dotted"
                       :class="[
                         desktopAdminDropdownOpen || item.submenu.some(subItem => isActive(subItem.routeName))
-                          ? 'bg-gray-200 dark:bg-gray-700'
-                          : 'hover:bg-gray-200 dark:hover:bg-gray-700'
+                          ? '!font-bold underline underline-offset-4 decoration-dotted'
+                          : 'hover:bg-neutral-200 dark:hover:bg-neutral-700'
                       ]"
                       aria-haspopup="true"
                       :aria-expanded="desktopAdminDropdownOpen.toString()"
                       aria-controls="desktop-admin-menu">
                 <span>{{ item.label }}</span>
-                <svg class="ml-1 w-5 h-5 transition-transform duration-150 transform"
-                     :class="{ 'rotate-180': desktopAdminDropdownOpen }"
-                     xmlns="http://www.w3.org/2000/svg"
-                     viewBox="0 0 20 20"
-                     fill="currentColor">
-                  <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-                </svg>
+                <span class="iconify mdi--chevron-down text-lg transition-rotate duration-500 delay-100 ease-in-out"
+                      :class="{ 'rotate-180 !delay-0 !duration-300': desktopAdminDropdownOpen }"></span>
               </button>
               <transition @before-enter="onBeforeEnter"
                           @enter="onEnter"
@@ -256,18 +251,21 @@ const isActive = (routeName) => route().current() === routeName;
                           @after-leave="onAfterLeave">
                 <div v-show="desktopAdminDropdownOpen"
                      id="desktop-admin-menu"
-                     class="overflow-hidden absolute right-0 z-50 py-1 mt-2 w-48 bg-white rounded-md ring-1 ring-black ring-opacity-5 shadow-lg origin-top-right dark:bg-gray-700 focus:outline-none"
+                     class="overflow-hidden absolute right-0 z-50 py-1 mt-2 w-48 bg-white rounded-md ring-1 ring-black ring-opacity-5 shadow-lg origin-top-right dark:bg-neutral-700 focus:outline-none"
                      role="menu"
                      aria-orientation="vertical"
                      :aria-labelledby="item.label + '-button'">
                   <Link v-for="subItem in item.submenu"
                         :key="subItem.label"
                         :href="subItem.href"
-                        class="block px-4 py-2 w-full text-sm text-left text-gray-700 transition-colors duration-150 ease-in-out dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600"
-                        :class="{ 'bg-gray-100 dark:bg-gray-600 font-semibold': isActive(subItem.routeName) }"
+                        class="flex items-center px-6 py-2 w-full !text-current transition-colors duration-150 ease-in-out hover:bg-neutral-100 dark:hover:bg-neutral-600"
+                        :class="{ '!no-underline': isActive(subItem.routeName) }"
                         role="menuitem"
                         @click="desktopAdminDropdownOpen = false">
-                    {{ subItem.label }}
+                    <span v-if="isActive(subItem.routeName)" class="iconify mdi--chevron-right -ml-4"></span>
+                    <span :class="{ '!font-bold underline underline-offset-4 decoration-dotted': isActive(subItem.routeName) }">
+                      {{ subItem.label }}
+                    </span>
                   </Link>
                 </div>
               </transition>
@@ -277,19 +275,21 @@ const isActive = (routeName) => route().current() === routeName;
       </div>
 
       <!-- Right side: Mobile Toggles & Desktop User Menu -->
-      <div class="flex items-center">
+      <div class="flex justify-end items-center">
+        <DarkMode @is-dark-mode="$emit('toggle-dark-mode', $event)" />
+
         <!-- Mobile User Menu Toggle -->
         <div class="sm:hidden mr-3">
-           <button @click="toggleMobileUserMenu"
-                   type="button"
-                   class="p-2 text-gray-400 rounded-md transition hover:text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white"
-                   aria-controls="mobile-user-menu"
-                   :aria-expanded="mobileUserMenuOpen.toString()">
-             <span class="sr-only">Open user menu</span>
-             <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-             </svg>
-           </button>
+          <button @click="toggleMobileUserMenu"
+                  type="button"
+                  class="p-2 rounded-md transition hover:text-white hover:bg-neutral-700"
+                  aria-controls="mobile-user-menu"
+                  :aria-expanded="mobileUserMenuOpen.toString()">
+            <span class="sr-only">Open user menu</span>
+            <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </button>
         </div>
 
         <!-- Desktop User Menu -->
@@ -297,14 +297,14 @@ const isActive = (routeName) => route().current() === routeName;
           <div class="relative">
             <button @click="toggleDesktopUserDropdown"
                     type="button"
-                    class="flex text-sm bg-gray-100 rounded-full transition dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 dark:focus:ring-offset-gray-800 focus:ring-primary-500"
+                    class="flex rounded-full transition"
                     id="user-menu-button"
                     aria-haspopup="true"
                     :aria-expanded="desktopUserDropdownOpen.toString()">
               <span class="sr-only">Open user menu</span>
               <img v-if="page.props.auth.user?.profile_photo_url" class="w-8 h-8 rounded-full" :src="page.props.auth.user.profile_photo_url" :alt="page.props.auth.user?.name || 'User Avatar'">
-              <span v-else class="inline-flex justify-center items-center w-8 h-8 bg-gray-300 rounded-full dark:bg-gray-600">
-                <span class="text-sm font-medium leading-none text-gray-700 dark:text-gray-200">{{ page.props.auth.user?.name?.charAt(0) || 'U' }}</span>
+              <span v-else class="inline-flex justify-center items-center w-8 h-8 bg-neutral-300 rounded-full dark:bg-neutral-600">
+                <span class="font-medium leading-none !text-current">{{ page.props.auth.user?.name?.charAt(0) || 'U' }}</span>
               </span>
             </button>
             <transition @before-enter="onBeforeEnter"
@@ -314,22 +314,22 @@ const isActive = (routeName) => route().current() === routeName;
                         @leave="onLeave"
                         @after-leave="onAfterLeave">
               <div v-show="desktopUserDropdownOpen"
-                   class="overflow-hidden absolute right-0 z-50 py-1 mt-2 w-48 bg-white rounded-md ring-1 ring-black ring-opacity-5 shadow-lg origin-top-right dark:bg-gray-700 focus:outline-none"
+                   class="overflow-hidden absolute right-0 z-50 py-1 mt-2 w-48 bg-white rounded-md ring-1 ring-black ring-opacity-5 shadow-lg origin-top-right dark:bg-neutral-700 focus:outline-none"
                    role="menu"
                    aria-orientation="vertical"
                    aria-labelledby="user-menu-button">
                 <template v-for="userItem in userNavMenuItems" :key="userItem.label">
                   <Link v-if="userItem.href"
                         :href="userItem.href"
-                        class="block px-4 py-2 w-full text-sm text-left text-gray-700 transition-colors duration-150 ease-in-out dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600"
-                        :class="{ 'bg-gray-100 dark:bg-gray-600 font-semibold': isActive(userItem.routeName) }"
+                        class="block px-4 py-2 w-full !text-current transition-colors duration-150 ease-in-out hover:bg-neutral-100 dark:hover:bg-neutral-600"
+                        :class="{ 'bg-neutral-100 dark:bg-neutral-600 font-semibold': isActive(userItem.routeName) }"
                         role="menuitem"
                         @click="desktopUserDropdownOpen = false">
                     {{ userItem.label }}
                   </Link>
                   <button v-if="userItem.command"
                           @click="() => { userItem.command(); desktopUserDropdownOpen = false; }"
-                          class="block px-4 py-2 w-full text-sm text-left text-gray-700 transition-colors duration-150 ease-in-out dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600"
+                          class="block px-4 py-2 w-full !text-current transition-colors duration-150 ease-in-out hover:bg-neutral-100 dark:hover:bg-neutral-600"
                           role="menuitem">
                     {{ userItem.label }}
                   </button>
@@ -343,7 +343,7 @@ const isActive = (routeName) => route().current() === routeName;
         <div class="flex items-center -mr-2 sm:hidden">
           <button @click="toggleMobileNav"
                   type="button"
-                  class="p-2 text-gray-400 rounded-md transition hover:text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white"
+                  class="p-2 rounded-md transition hover:text-white hover:bg-neutral-700"
                   aria-controls="mobile-main-menu"
                   :aria-expanded="mobileNavOpen.toString()">
             <span class="sr-only">Open main menu</span>
@@ -366,23 +366,23 @@ const isActive = (routeName) => route().current() === routeName;
               @before-leave="onBeforeLeave"
               @leave="onLeave"
               @after-leave="onAfterLeave">
-    <div v-show="mobileUserMenuOpen" class="overflow-hidden bg-gray-50 sm:hidden dark:bg-gray-750" id="mobile-user-menu" ref="mobileUserMenuRef">
+    <div v-show="mobileUserMenuOpen" class="overflow-hidden bg-neutral-50 sm:hidden dark:bg-neutral-700" id="mobile-user-menu" ref="mobileUserMenuRef">
       <div class="px-2 pt-2 pb-3 space-y-1">
         <template v-for="userItem in userNavMenuItems" :key="'mobile-user-' + userItem.label">
           <Link v-if="userItem.href"
                 :href="userItem.href"
-                class="block px-3 py-2 text-base font-medium rounded-md transition-colors duration-150 ease-in-out"
+                class="block px-3 py-2 text-base font-medium rounded-md transition-colors duration-150 ease-in-out !text-current"
                 :class="[
                   isActive(userItem.routeName)
-                    ? 'bg-primary-500 text-white dark:bg-primary-600'
-                    : 'text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white'
+                    ? 'bg-neutral-500 dark:bg-neutral-600'
+                    : 'hover:bg-neutral-200 dark:hover:bg-neutral-700'
                 ]"
                 @click="mobileUserMenuOpen = false">
             {{ userItem.label }}
           </Link>
           <button v-if="userItem.command"
                   @click="() => { userItem.command(); mobileUserMenuOpen = false; }"
-                  class="block px-3 py-2 w-full text-base font-medium text-left text-gray-700 rounded-md transition-colors duration-150 ease-in-out dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white">
+                  class="block px-3 py-2 w-full text-base font-medium !text-current rounded-md transition-colors duration-150 ease-in-out hover:bg-neutral-200 dark:hover:bg-neutral-700">
             {{ userItem.label }}
           </button>
         </template>
@@ -397,19 +397,20 @@ const isActive = (routeName) => route().current() === routeName;
               @before-leave="onBeforeLeave"
               @leave="onLeave"
               @after-leave="onAfterLeave">
-    <div v-show="mobileNavOpen" class="overflow-hidden bg-gray-50 sm:hidden dark:bg-gray-750" id="mobile-main-menu" ref="mobileNavRef">
+    <div v-show="mobileNavOpen" class="overflow-hidden sm:hidden bg-neutral-50 dark:bg-sub-panel-dark" id="mobile-main-menu" ref="mobileNavRef">
       <div class="px-2 pt-2 pb-3 space-y-1">
         <template v-for="item in mainMenuItems" :key="'mobile-main-' + item.label">
           <!-- Regular Mobile Link -->
           <Link v-if="!item.isDropdown"
                 :href="item.href"
-                class="block px-3 py-2 text-base font-medium rounded-md transition-colors duration-150 ease-in-out"
+                class="block px-3 py-2 text-base font-medium rounded-md transition-colors duration-150 ease-in-out !text-current"
                 :class="[
                   isActive(item.routeName)
-                    ? 'bg-primary-500 text-white dark:bg-primary-600'
-                    : 'text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white'
+                    ? '!font-bold underline underline-offset-4 decoration-dashed'
+                    : 'hover:bg-neutral-200 dark:hover:bg-neutral-700'
                 ]"
                 @click="mobileNavOpen = false">
+            <span v-if="isActive(item.routeName)" class="iconify mdi--chevron-right -ml-4"></span>
             {{ item.label }}
           </Link>
 
@@ -417,17 +418,12 @@ const isActive = (routeName) => route().current() === routeName;
           <div v-if="item.isDropdown && item.label === 'Administration'">
             <button @click="toggleMobileSubmenu(item.label)"
                     type="button"
-                    class="flex justify-between items-center px-3 py-2 w-full text-base font-medium text-gray-700 rounded-md transition-colors duration-150 ease-in-out dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white"
+                    class="flex justify-between items-center px-3 py-2 w-full font-medium rounded-md transition-colors duration-150 ease-in-out hover:ring-1 ring-black/25 dark:ring-white/25"
                     :aria-expanded="(openMobileSubmenus[item.label] || false).toString()"
                     :aria-controls="'mobile-submenu-' + item.label">
               <span>{{ item.label }}</span>
-              <svg class="ml-1 w-5 h-5 transition-transform duration-150 transform"
-                   :class="{ 'rotate-180': openMobileSubmenus[item.label] }"
-                   xmlns="http://www.w3.org/2000/svg"
-                   viewBox="0 0 20 20"
-                   fill="currentColor">
-                <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-              </svg>
+              <span class="iconify mdi--chevron-down text-2xl transition-rotate duration-500 delay-100 ease-in-out"
+                    :class="{ 'rotate-180': openMobileSubmenus[item.label] }"></span>
             </button>
             <transition @before-enter="onBeforeEnter"
                         @enter="onEnter"
@@ -435,17 +431,18 @@ const isActive = (routeName) => route().current() === routeName;
                         @before-leave="onBeforeLeave"
                         @leave="onLeave"
                         @after-leave="onAfterLeave">
-              <div v-show="openMobileSubmenus[item.label]" :id="'mobile-submenu-' + item.label" class="overflow-hidden pl-4 mt-1 space-y-1">
+              <div v-show="openMobileSubmenus[item.label]" :id="'mobile-submenu-' + item.label" class="overflow-hidden mt-3 pl-4 mt-1 gap-2">
                 <Link v-for="subItem in item.submenu"
                       :key="'mobile-sub-' + subItem.label"
                       :href="subItem.href"
-                      class="block px-3 py-2 text-base font-medium rounded-md transition-colors duration-150 ease-in-out"
+                      class="flex items-center px-3 py-2 text-base font-medium rounded-md transition-colors duration-150 ease-in-out !text-current"
                       :class="[
                         isActive(subItem.routeName)
-                          ? 'bg-primary-500 text-white dark:bg-primary-600'
-                          : 'text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white'
+                          ? '!font-bold underline underline-offset-4 decoration-dashed'
+                          : 'dark: hover:bg-neutral-200 dark:hover:bg-neutral-700'
                       ]"
                       @click="() => { mobileNavOpen = false; openMobileSubmenus[item.label] = false; }">
+                  <span v-if="isActive(subItem.routeName)" class="iconify mdi--chevron-right -ml-4"></span>
                   {{ subItem.label }}
                 </Link>
               </div>

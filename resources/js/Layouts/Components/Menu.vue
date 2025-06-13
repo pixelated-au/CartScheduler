@@ -110,8 +110,7 @@ const toggle = (event) => userMenu.value.toggle(event);
     <Link v-else
           :href="item.route"
           v-bind="props.action"
-          as="button"
-          class="flex relative w-full flex-center">
+          class="flex relative w-full flex-center font-normal !text-inherit cursor-pointer hover:no-underline">
       {{ item.label }}
       <div v-if="item.hasUpdate"
            class="flex absolute -top-1 -right-2 justify-center items-center rounded-full bg-warning dark:bg-warning-light size-2" />
