@@ -2,6 +2,7 @@
   /* PrimeVue DatePicker Variables */
   /* General */
   --p-datepicker-width: 100%;
+  --p-datepicker-date-width: auto;
   --p-datepicker-border: none;
   --p-datepicker-background: transparent;
 
@@ -49,8 +50,12 @@
   .p-datepicker {
     @apply w-full border-separate border-spacing-12;
 
+    .p-datepicker-day-view {
+      @apply table-fixed;
+    }
+
     .p-datepicker-day-cell {
-      @apply relative sm:min-w-10 w-[calc(100%/7)] p-0 border-8 border-transparent before:block before:pt-[100%];
+      @apply relative p-0 border-8 sm:border md:border-4 border-transparent before:block before:pt-[100%];
 
       .p-datepicker-day {
         @apply absolute inset-0 w-full h-full flex items-center justify-center;
