@@ -5,6 +5,7 @@ import { resolvePageComponent } from "laravel-vite-plugin/inertia-helpers";
 import PrimeVue from "primevue/config";
 import { createApp, h } from "vue";
 import Toast from "vue-toastification";
+import ToastService from "primevue/toastservice";
 import { ZiggyVue } from "ziggy-js";
 import PrimeVuePreset from "./primevue-customisations.js";
 import { Ziggy } from "./ziggy.js";
@@ -51,7 +52,8 @@ createInertiaApp({
             })
             .use(plugin)
             .use(ZiggyVue, Ziggy)
-            .use(Toast)
+            .use(ToastService)
+            .use(Toast) // TODO delete the "old" toast
             .component("Head", Head)
             .component("Link", Link);
 
