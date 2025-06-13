@@ -14,16 +14,18 @@
         p-6
         rounded
         text-neutral-600
-        hover:text-black
         dark:text-neutral-300
-        dark:hover:text-white
-        hover:border-neutral-700/25
-        dark:hover:border-neutral-300/30
-        hover:bg-white
-        dark:hover:bg-neutral-800/75 ;
+        ;
 
         a& {
-            @apply !no-underline font-light;
+            @apply !no-underline
+            font-light
+            hover:text-black
+            dark:hover:text-white
+            hover:border-neutral-700/25
+            dark:hover:border-neutral-300/30
+            hover:bg-white
+            dark:hover:bg-neutral-800/75;
         }
     }
 }
