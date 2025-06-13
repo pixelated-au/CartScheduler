@@ -1,6 +1,6 @@
 <script setup>
 import { router } from "@inertiajs/vue3";
-import { ref } from "vue";
+import { inject, ref } from "vue";
 import headers from "./Lib/UserDataTableHeaders";
 import DataTable from "@/Components/DataTable.vue";
 import JetHelpText from "@/Jetstream/HelpText.vue";
@@ -14,6 +14,7 @@ defineProps({
     permissions: Object,
 });
 
+const route = inject("route");
 const userSearch = ref("");
 
 const onNewUser = () => {
