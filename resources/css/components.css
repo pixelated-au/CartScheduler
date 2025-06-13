@@ -1,4 +1,4 @@
-@layer components {
+@layer theme {
     .std-border {
         @apply  border-neutral-300/75 dark:border-neutral-700/75;
     }
@@ -23,7 +23,7 @@
         dark:hover:bg-neutral-800/75 ;
 
         a& {
-            @apply !no-underline;
+            @apply !no-underline font-light;
         }
     }
 }
