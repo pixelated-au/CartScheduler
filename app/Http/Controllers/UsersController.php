@@ -40,7 +40,7 @@ class UsersController extends Controller
         // The user model will automatically send a welcome email via the created event
         $user = User::unguarded(static fn() => User::create($data));
 
-        session()->flash('flash.banner', "User $user->name successfully created.");
+        session()->flash('flash.banner', "$user->name was successfully created.");
         session()->flash('flash.bannerStyle', 'success');
 
         return Redirect::route('admin.users.edit', $user);
@@ -59,7 +59,7 @@ class UsersController extends Controller
     {
         $user->update($request->validated());
 
-        session()->flash('flash.banner', "User $user->name successfully modified.");
+        session()->flash('flash.banner', "$user->name was successfully modified.");
         return Redirect::route('admin.users.edit', $user->fresh());
     }
 
@@ -68,9 +68,8 @@ class UsersController extends Controller
         $name = $user->name;
         $user->delete();
 
-        session()->flash('flash.banner', "User $name successfully deleted.");
+        session()->flash('flash.banner', "$name was successfully deleted.");
         session()->flash('flash.bannerStyle', 'danger');
-
         return Redirect::route('admin.users.index');
     }
 }
