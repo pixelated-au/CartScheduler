@@ -128,7 +128,7 @@ watch(firstReservationForUser, (val) => {
 </script>
 
 <template>
-<div class="p-3 grid gap-3 grid-cols-1 sm:grid-cols-[min-content_auto] sm:items-stretch">
+<div class="grid gap-3 grid-cols-1 sm:grid-cols-[20rem_3fr] sm:items-stretch">
   <div class="pb-3">
     <ComponentSpinner :show="!locations">
       <DatePicker v-model:date="date"
