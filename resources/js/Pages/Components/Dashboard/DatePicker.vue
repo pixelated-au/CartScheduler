@@ -30,6 +30,7 @@ const props = defineProps({
         type: Boolean,
         default: false,
     },
+    class:  String,
 });
 
 const emit = defineEmits([
