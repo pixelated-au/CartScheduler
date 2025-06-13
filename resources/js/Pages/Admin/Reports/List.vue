@@ -54,16 +54,14 @@ const filter = computed(() => {
     </div>
   </template>
 
-  <div class="max-w-7xl mx-auto pt-10 pb-5 sm:px-6 lg:px-8">
-    <div class="bg-panel dark:bg-panel-dark shadow-xl sm:rounded-lg sm:p-6">
+  <div class="flex flex-col gap-4">
+    <div class="bg-panel dark:bg-panel-dark border border-neutral-300/75 dark:border-neutral-800 sm:rounded-lg sm:p-6">
       <JetLabel for="search" value="Search on Reports"/>
       <JetInput id="search" v-model="userSearch" type="text" class="mt-1 block w-full"/>
       <JetHelpText>Search on location, user name, date, etc</JetHelpText>
     </div>
-  </div>
 
-  <div class="max-w-7xl mx-auto pb-10 sm:px-6 lg:px-8">
-    <div class="bg-panel dark:bg-panel-dark shadow-xl sm:rounded-lg sm:p-6">
+    <div class="bg-panel dark:bg-panel-dark border border-neutral-300/75 dark:border-neutral-800 sm:rounded-lg sm:p-6">
       <data-table :headers="headers"
                   :items="reportData"
                   :search-value="userSearch"
