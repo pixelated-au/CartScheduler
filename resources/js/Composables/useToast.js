@@ -1,50 +1,77 @@
-import 'floating-vue/dist/style.css';
-import {POSITION, TYPE, useToast as ut} from 'vue-toastification';
-//https://vue-toastification.maronato.dev/
+// import "floating-vue/dist/style.css";
+import { useToast as ut } from "primevue/usetoast";
+
+// https://vue-toastification.maronato.dev/
 
 const options = {
-    position: POSITION.TOP_CENTER,
-    timeout: 2000,
-    closeOnClick: true,
-    pauseOnFocusLoss: true,
-    pauseOnHover: true,
-    draggable: true,
-    draggablePercent: 0.6,
-    showCloseButtonOnHover: true,
-    hideProgressBar: false,
-    closeButton: 'button',
-    icon: true,
-    rtl: false,
+    group: "default",
+    closable: true,
+    life: 5000,
+    styleClass: undefined,
+    contentStyleClass: undefined,
 };
 
 export default function useToast() {
     const toast = ut();
 
-    const error = (message, itemOptions = null) => {
-        toast.error(message, {...options, ...itemOptions});
-    };
-
-    const success = (message, itemOptions = null) => {
-        toast.success(message, {...options, ...itemOptions});
-    };
-
-    const warning = (message, itemOptions = null) => {
-        toast.warning(message, {...options, ...itemOptions});
+    /**
+     * @param {string} message
+     * @param {?string} title
+     * @param {?object|undefined} itemOptions
+     */
+    const error = (message, title = undefined, itemOptions = undefined) => {
+        makeToast("error", message, title, itemOptions);
     };
 
     /**
-     * @param {TYPE} type
      * @param {string} message
-     * @param {object} itemOptions
+     * @param {?string} title
+     * @param {?object|undefined} itemOptions
      */
-    const message = (type, message, itemOptions = null) => {
-        toast(message, {...options, ...itemOptions, ...{type: type}});
+    const success = (message, title = undefined, itemOptions = undefined) => {
+        makeToast("success", message, title, itemOptions);
+    };
+
+    /**
+     * @param {string} message
+     * @param {?string} title
+     * @param {?object|undefined} itemOptions
+     */
+    const warning = (message, title = undefined, itemOptions = undefined) => {
+        makeToast("warn", message, title, itemOptions);
+    };
+
+    /**
+     * @param {"success"|"secondary"|"info"|"warn"|"error"|"contrast"} severity
+     * @param {string} message
+     * @param {?string|undefined} title
+     * @param {?object|undefined} itemOptions
+     */
+    const makeToast = (severity, message, title = undefined, itemOptions = undefined) => {
+        console.log("toast!!", severity, message, title, itemOptions);
+        const summary = title ? { summary: title } : { summary: "Notice" };
+        const overrides = itemOptions ? itemOptions : {};
+        if (severity === "danger") {
+            severity = "warn";
+        }
+        console.log({
+            ...summary,
+            ...options,
+            ...overrides,
+            ...{ severity, detail: message },
+        });
+        toast.add({
+            ...summary,
+            ...options,
+            ...overrides,
+            ...{ severity, detail: message },
+        });
     };
 
     return {
         error,
         success,
         warning,
-        message,
+        message: makeToast,
     };
 }
