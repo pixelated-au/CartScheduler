@@ -1,7 +1,7 @@
 <script setup>
 import { router } from "@inertiajs/vue3";
 import { useSortable } from "@vueuse/integrations/useSortable";
-import { nextTick, onMounted, onUnmounted, ref, watch, useTemplateRef } from "vue";
+import { inject, nextTick, onMounted, onUnmounted, ref, watch, useTemplateRef } from "vue";
 import DragDrop from "@/Components/Icons/DragDrop.vue";
 import useToast from "@/Composables/useToast.js";
 import AppLayout from "@/Layouts/AppLayout.vue";
@@ -11,6 +11,7 @@ const props = defineProps({
 });
 
 const toast = useToast();
+const route = inject("route");
 
 const onNewLocation = () => {
     if (isSortingMode.value) {
