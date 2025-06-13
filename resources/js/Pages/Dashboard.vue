@@ -35,7 +35,7 @@ const showReportsModal = ref(false);
 
   <div class="py-2 dashboard">
     <div class="mx-auto max-w-7xl">
-      <div class="overflow-hidden sm:shadow-xl bg-panel dark:bg-panel-dark sm:rounded-lg">
+      <div class="overflow-hidden bg-panel dark:bg-panel-dark sm:rounded-lg">
         <CartReservation :user="user"/>
       </div>
     </div>
