@@ -195,7 +195,7 @@ const accordionExpandIndex = ref(undefined);
                 @locations-for-day="setLocationMarkers" />
   </div>
   <Loading v-if="isLoading" class="min-h-[200px] sm:min-h-full" />
-  <PAccordion v-if="!isLoading" v-model:value="accordionExpandIndex">
+  <PAccordion v-if="!isLoading" v-model:value="accordionExpandIndex" class="border border-std rounded border-b-0">
     <PAccordionPanel v-for="location in locations" :key="location.id" :value="location.id" class="group">
       <PAccordionHeader class="relative after:absolute after:bottom-2 after:left-0 after:right-0 group-[.p-accordionpanel-active]:after:block after:h-px after:hidden after:bg-gradient-to-r after:from-transparent after:from-20% after:via-surface-500/70 after:to-transparent after:to-80%">
         <div class="flex items-center dark:text-gray-200">
