@@ -25,7 +25,7 @@ export default {
                 "9000": "9000ms",
             },
             gridTemplateColumns: ({ theme }) => ({
-                "page": `auto minmax(0, ${theme("screens.xl")}) auto`,
+                "page": `minmax(0, ${theme("screens.xl")})`,
                 "reservation-1": "auto repeat(1, minmax(0, 30px)) 1fr",
                 "reservation-2": "auto repeat(2, minmax(0, 30px)) 1fr",
                 "reservation-3": "auto repeat(3, minmax(0, 30px)) 1fr",
