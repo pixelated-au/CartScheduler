@@ -8,17 +8,11 @@
     }
 
     .card {
-        @apply
-        border
-        std-border
-        p-6
-        rounded
-        text-neutral-600
-        dark:text-neutral-300
-        ;
+        @apply border std-border p-4 rounded text-neutral-600 dark:text-neutral-300;
 
         a& {
-            @apply !no-underline
+            @apply
+            !no-underline
             font-light
             hover:text-black
             dark:hover:text-white
