@@ -19,7 +19,7 @@ export default {
     theme: {
         extend: {
             fontFamily: {
-                sans: ["Nunito", ...defaultTheme.fontFamily.sans],
+                sans: ["InterVariable", ...defaultTheme.fontFamily.sans],
             },
             transitionDelay: {
                 "9000": "9000ms",
