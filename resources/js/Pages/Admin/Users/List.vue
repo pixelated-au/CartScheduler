@@ -40,67 +40,63 @@ const handleSelection = (selection) => {
       <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight w-full md:w-auto">
         Users
       </h2>
-      <div class="w-full md:w-auto">
-        <PButton class="hidden sm:inline-flex md:mx-3 w-full md:w-auto my-3 md:my-0"
+      <div class="w-full md:w-auto hidden sm:flex gap-4">
+        <PButton class=""
                  style-type="secondary"
                  outline
                  @click="onImportUsers">
           Import Users
         </PButton>
-        <PButton class="py-4 sm:py-2 md:mx-3 w-full md:w-auto" style-type="primary" @click="onNewUser">
-          New User
-        </PButton>
+        <PButton outline severity="info" @click="onDownloadUsers">Download Users</PButton>
       </div>
     </div>
   </template>
 
-  <div class="max-w-7xl mx-auto sm:pt-10 sm:pb-5 sm:px-6 lg:px-8 grid gap-3 grid-cols-1 sm:grid-cols-12">
-    <div class="bg-panel dark:bg-panel-dark shadow-xl sm:rounded-lg py-3 px-4 sm:p-6 sm:col-span-10">
-      <JetLabel for="search" value="Search for a user:"/>
-      <!-- Overriding background colours for usability -->
-      <JetInput id="search"
-                v-model="userSearch"
-                type="text"
-                class="mt-1 block w-full dark:bg-slate-700 sm:dark:bg-slate-800"/>
-      <JetHelpText>Search on name, email, phone, role or any field</JetHelpText>
-    </div>
-    <div class="hidden sm:flex sm:flex-wrap sm:justify-center sm:items-center col-span-2">
-      <div class="text-center">
-        <PButton outline style-type="info" @click="onDownloadUsers">
-          Download Users
+  <div class="flex flex-col gap-4">
+    <div class="flex items-end gap-24 py-3 sm:py-6 ">
+      <div class="bg-panel flex-grow dark:bg-panel-dark sm:rounded-lg">
+        <JetLabel for="search" value="Search for a user:"/>
+        <!-- Overriding background colours for usability -->
+        <JetInput id="search"
+                  v-model="userSearch"
+                  type="text"
+                  class="mt-1 block w-full dark:bg-slate-700 sm:dark:bg-slate-800"/>
+        <JetHelpText>Search on name, email, phone, role or any field</JetHelpText>
+      </div>
+
+      <div>
+        <PButton style-type="primary" @click="onNewUser">
+          New User
         </PButton>
-        <div class="mt-2 text-sm text-gray-800 dark:text-gray-400 text-center">
-          Download an Excel
-          Spreadsheet
-        </div>
+        <JetHelpText>&nbsp;</JetHelpText>
       </div>
     </div>
-  </div>
 
-  <div class="max-w-7xl mx-auto pb-10 sm:px-6 lg:px-8">
-    <div class="bg-panel dark:bg-panel-dark shadow-xl sm:rounded-lg sm:p-6">
-      <data-table :headers="headers"
-                  :items="users.data"
-                  :search-value="userSearch"
-                  @click-row="handleSelection">
-        <template #item-email="{ email }">
-          <a :href="`mailto:${email}`">{{ email }}</a>
-        </template>
+    <div class="">
+      <div class="bg-panel dark:bg-panel-dark">
+        <data-table :headers="headers"
+                    :items="users.data"
+                    :search-value="userSearch"
+                    @click-row="handleSelection">
+          <template #item-email="{ email }">
+            <a :href="`mailto:${email}`">{{ email }}</a>
+          </template>
 
-        <template #item-phone="{ mobile_phone }">
-          <a :href="`tel:${mobile_phone}`">{{ mobile_phone }}</a>
-        </template>
+          <template #item-phone="{ mobile_phone }">
+            <a :href="`tel:${mobile_phone}`">{{ mobile_phone }}</a>
+          </template>
 
-        <template #item-is_enabled="{ is_enabled }">
-          <div v-if="is_enabled">Yes</div>
-          <div v-else class="text-red-600 dark:text-red-400">No</div>
-        </template>
+          <template #item-is_enabled="{ is_enabled }">
+            <div v-if="is_enabled">Yes</div>
+            <div v-else class="text-red-600 dark:text-red-400">No</div>
+          </template>
 
-        <template #item-is_unrestricted="{ is_unrestricted }">
-          <div v-if="!is_unrestricted" class="text-red-600 dark:text-red-400">Yes</div>
-          <div v-else>No</div>
-        </template>
-      </data-table>
+          <template #item-is_unrestricted="{ is_unrestricted }">
+            <div v-if="!is_unrestricted" class="text-red-600 dark:text-red-400">Yes</div>
+            <div v-else>No</div>
+          </template>
+        </data-table>
+      </div>
     </div>
   </div>
 </AppLayout>
