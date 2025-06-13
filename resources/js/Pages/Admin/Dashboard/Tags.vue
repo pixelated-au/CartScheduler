@@ -66,7 +66,7 @@ watch(allTags, async (val, oldVal) => {
 
 <template>
 <div
-    class="col-span-full bg-sub-panel dark:bg-sub-panel-dark p-6 rounded-lg shadow-lg grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+    class="col-span-full bg-sub-panel dark:bg-sub-panel-dark p-6 rounded-lg border border-transparent grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
   <div>
     <h3 class="text-lg font-semibold text-gray-900">
       <span class="text-gray-600 dark:text-gray-200">{{ allTags?.length }}</span>
