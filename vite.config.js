@@ -48,6 +48,7 @@ export default defineConfig({
             "@": path.resolve("./resources/js"),
             "@@": path.resolve("./"),
             "ziggy-js": path.resolve("./vendor/tightenco/ziggy"),
+            "@static-fonts": path.resolve(__dirname, "./resources/assets/fonts"),
         },
     },
     envDir: "./",
