@@ -172,12 +172,12 @@ const handleEscapeKey = (event) => {
     }
 };
 
-const handleClickOutside = (event) => {
+const handleClickOutside = () => {
     // Desktop dropdowns
-    if (desktopAdminDropdownOpen.value && adminDropdownRef.value && !adminDropdownRef.value.contains(event.target)) {
+    if (desktopAdminDropdownOpen.value) {
         desktopAdminDropdownOpen.value = false;
     }
-    if (desktopUserDropdownOpen.value && userDropdownRef.value && !userDropdownRef.value.contains(event.target)) {
+    if (desktopUserDropdownOpen.value) {
         desktopUserDropdownOpen.value = false;
     }
     // Mobile menus (if they are overlays)
