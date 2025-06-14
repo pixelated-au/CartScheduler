@@ -1,5 +1,6 @@
 <script setup>
 import { router } from "@inertiajs/vue3";
+import { inject } from "vue";
 import AppLayout from "@/Layouts/AppLayout.vue";
 import UserProfileForm from "@/Pages/Admin/Users/Partials/UserProfileForm.vue";
 
@@ -7,6 +8,8 @@ defineProps({
     availableRoles: Array,
     permissions: Object,
 });
+
+const route = inject("route");
 
 const listRouteAction = () => {
     router.visit(route("admin.users.index"));
@@ -26,7 +29,7 @@ const listRouteAction = () => {
 
   <div>
     <div class="max-w-7xl mx-auto py-10 sm:px-6 lg:px-8">
-      <UserProfileForm :user="{ role: 'user', is_unrestricted: false, is_enabled: false }" action="add"/>
+      <UserProfileForm :user="{ role: 'user', is_unrestricted: false, is_enabled: false }" action="add" />
     </div>
   </div>
 </AppLayout>
