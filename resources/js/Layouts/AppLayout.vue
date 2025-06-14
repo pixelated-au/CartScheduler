@@ -3,8 +3,7 @@ import Bugsnag from "@bugsnag/js";
 import { router, usePage } from "@inertiajs/vue3";
 import { StagewiseToolbar } from "@stagewise/toolbar-vue";
 import { differenceInDays } from "date-fns";
-import { computed, inject, onMounted, onUpdated, provide, ref } from "vue";
-import Menu from "./Components/Menu.vue";
+import { computed, inject, onMounted, provide, ref } from "vue";
 import { useGlobalState } from "@/store";
 import useToast from "@/Composables/useToast";
 import ObtrusiveNotification from "@/Components/ObtrusiveNotification.vue";
@@ -41,29 +40,16 @@ provide("darkMode", isDarkMode);
 provide("enableUserAvailability", !!page.props.enableUserAvailability || false);
 
 const toast = useToast();
-onUpdated(() => {
-    // TODO this appears to be running twice. It may be fixed after updating to v1.x of Inertia (current is 0.11.0).
-    const flash = page.props.jetstream.flash;
-    const type = flash?.bannerStyle || "success";
-    const message = flash?.banner || "";
-    if (!message) {
-        return;
-    }
-    toast.message(type, message);
-});
 
+const flash = computed(() => page.props.jetstream.flash);
 const state = useGlobalState();
 const showUpdateAvailabilityReminder = ref(false);
-onMounted(() => {
-    const pageProps = page.props;
-    if (
-        pageProps.user &&
-        pageProps.needsToUpdateAvailability &&
-        didHideAvailabilityReminderOverOneDayAgo.value
-    ) {
-        showUpdateAvailabilityReminder.value = true;
+
+const showToast = () => {
+    if (!Array.isArray(flash.value) && flash.value.banner) {
+        toast.message(flash.value.bannerStyle || "success", flash.value.banner);
     }
-});
+};
 
 const didHideAvailabilityReminderOverOneDayAgo = computed(() => {
     const dismissedOn = state.value.dismissedAvailabilityOn;
@@ -71,6 +57,17 @@ const didHideAvailabilityReminderOverOneDayAgo = computed(() => {
         return true;
     }
     return differenceInDays(new Date(), new Date(dismissedOn)) > 1;
+});
+
+const availabilityReminderPrompt = () => {
+    if (page.props.user && page.props.needsToUpdateAvailability && didHideAvailabilityReminderOverOneDayAgo.value) {
+        showUpdateAvailabilityReminder.value = true;
+    }
+};
+
+onMounted(() => {
+    showToast();
+    availabilityReminderPrompt();
 });
 
 const checkAvailability = () => {
@@ -121,6 +118,8 @@ const checkLater = () => {
     </section>
   </div>
 </div>
+
+<PToast class="z-50" position="top-center" group="default" :auto-z-index="false" />
 
 <ObtrusiveNotification :draggable="false"
                        :close-on-escape="false"
