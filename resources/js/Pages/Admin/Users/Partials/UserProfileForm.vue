@@ -265,25 +265,6 @@ const cancelButtonText = computed(() => form.isDirty ? "Cancel" : "Back");
     </div>
 
     <div class="col-span-6 grid grid-cols-1 gap-6">
-      <!-- Role -->
-      <div class="card grid grid-cols-[max-content_1fr] items-center gap-x-4 gap-y-2">
-        <JetLabel for="role" value="Role" />
-        <PSelectButton name="role"
-                       id="role"
-                       v-model="form.role"
-                       option-label="label"
-                       option-value="value"
-                       :options="[
-                         { label: 'Standard User', value: 'user' },
-                         { label: 'Administrator', value: 'admin' },
-                       ]" />
-        <JetInputError :message="form.errors.role" class="mt-2" />
-        <div class="col-span-2 text-sm">
-          <span class="font-medium italic">Warning:</span>
-          Assigning an admin role to a user can grant them full access to the system.
-        </div>
-      </div>
-
       <!-- System Access -->
       <div class="card grid grid-cols-[max-content_1fr] items-center gap-x-4 gap-y-2">
         <JetLabel for="is-unrestricted" value="System Access" />
@@ -301,6 +282,25 @@ const cancelButtonText = computed(() => form.isDirty ? "Cancel" : "Back");
           <span class="font-medium italic">Restricted users</span>
           cannot self-roster and can only access shifts relevant to them.
           This includes their shift and the shifts either side of their shift.
+        </div>
+      </div>
+
+      <!-- Role -->
+      <div class="card grid grid-cols-[max-content_1fr] items-center gap-x-4 gap-y-2">
+        <JetLabel for="role" value="Role" />
+        <PSelectButton name="role"
+                       id="role"
+                       v-model="form.role"
+                       option-label="label"
+                       option-value="value"
+                       :options="[
+                         { label: 'Standard User', value: 'user' },
+                         { label: 'Administrator', value: 'admin' },
+                       ]" />
+        <JetInputError :message="form.errors.role" class="mt-2" />
+        <div class="col-span-2 text-sm">
+          <span class="font-medium italic">Warning:</span>
+          Assigning an admin role to a user can grant them full access to the system.
         </div>
       </div>
 
