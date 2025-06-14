@@ -48,7 +48,6 @@ export default function useToast() {
      * @param {?object|undefined} itemOptions
      */
     const makeToast = (severity, message, title = undefined, itemOptions = undefined) => {
-        console.log("toast!!", severity, message, title, itemOptions);
         const summary = title ? { summary: title } : { summary: "Notice" };
         const overrides = itemOptions ? itemOptions : {};
         if (severity === "danger") {
