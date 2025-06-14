@@ -1,14 +1,10 @@
 <script setup>
 import { router, useForm } from "@inertiajs/vue3";
-import { computed, ref, watch } from "vue";
-import SelectField from "@/Components/SelectField.vue";
-import VerticalRadioButtons from "@/Components/VerticalRadioButtons.vue";
+import { computed, inject, ref, watch, nextTick } from "vue";
 import useToast from "@/Composables/useToast.js";
 import JetActionMessage from "@/Jetstream/ActionMessage.vue";
-import JetCheckbox from "@/Jetstream/Checkbox.vue";
 import JetConfirmationModal from "@/Jetstream/ConfirmationModal.vue";
 import JetFormSection from "@/Jetstream/FormSection.vue";
-import JetInput from "@/Jetstream/Input.vue";
 import JetInputError from "@/Jetstream/InputError.vue";
 import JetLabel from "@/Jetstream/Label.vue";
 
@@ -20,9 +16,11 @@ const props = defineProps({
     },
 });
 
-const emit = defineEmits([
+defineEmits([
     "cancel",
 ]);
+
+const route = inject("route");
 
 const form = useForm({
     id: props.user.id,
@@ -46,6 +44,7 @@ const updateUserData = () => {
         errorBag: "updateUserData",
         preserveScroll: true,
     });
+    toast.success(`Data for ${props.user.name} was updated.`);
 };
 
 const createUserData = () => {
@@ -106,10 +105,13 @@ const performResendWelcomeAction = async () => {
     }
 };
 
-watch(() => form.is_unrestricted, (value) => {
-    if (!value && form.role === "admin") {
-        form.role = "user";
-        toast.warning("Restricted users cannot be administrators. The role has been changed to a standard user.");
+watch([() => form.is_unrestricted, () => form.role], ([isUnrestricted, role]) => {
+    console.log("watch", isUnrestricted, role);
+    if (!isUnrestricted && role === "admin") {
+        nextTick(() => {
+            form.role = "user";
+            toast.warning("Restricted users cannot be administrators. The role has been changed to a standard user.");
+        });
     }
 });
 
@@ -123,11 +125,12 @@ const cancelButtonText = computed(() => form.isDirty ? "Cancel" : "Back");
   </template>
 
   <template #description>
-    <div>Update the user's personal information.</div>
+    <div v-if="action === 'edit'">Update the information for {{ user.name }}.</div>
+    <div v-else>Create a new user record</div>
     <PButton v-if="action === 'edit'"
-             outline
+             severity="info"
+             variant="outlined"
              class="mt-5"
-             style-type="info"
              @click="performResendWelcomeAction">
       <template v-if="user.has_logged_in">Send Password Reset Email</template>
 
@@ -138,204 +141,215 @@ const cancelButtonText = computed(() => form.isDirty ? "Cancel" : "Back");
   <template #form>
     <!-- Name -->
     <div class="col-span-6 sm:col-span-3">
-      <JetLabel for="name" value="Name"/>
-      <JetInput id="name" v-model="form.name" type="text" class="mt-1 block w-full" autocomplete="name"/>
-      <JetInputError :message="form.errors.name" class="mt-2"/>
+      <JetLabel for="name" value="Name" />
+      <PInputText id="name" v-model="form.name" type="text" class="mt-1 block w-full" autocomplete="name" />
+      <JetInputError :message="form.errors.name" class="mt-2" />
     </div>
 
     <!-- Email -->
     <div class="col-span-6 sm:col-span-3">
-      <JetLabel for="email" value="Email"/>
-      <JetInput id="email" v-model="form.email" type="email" class="mt-1 block w-full"/>
-      <JetInputError :message="form.errors.email" class="mt-2"/>
+      <JetLabel for="email" value="Email" />
+      <PInputText id="email" v-model="form.email" type="email" class="mt-1 block w-full" />
+      <JetInputError :message="form.errors.email" class="mt-2" />
     </div>
 
     <!-- Mobile Phone -->
     <div class="col-span-6 sm:col-span-3">
-      <JetLabel for="mobile-phone" value="Mobile Phone"/>
-      <JetInput id="mobile-phone" v-model="form.mobile_phone" type="tel" class="mt-1 block w-full"/>
-      <JetInputError :message="form.errors.mobile_phone" class="mt-2"/>
+      <JetLabel for="mobile-phone" value="Mobile Phone" />
+      <PInputText id="mobile-phone" v-model="form.mobile_phone" type="tel" class="mt-1 block w-full" />
+      <JetInputError :message="form.errors.mobile_phone" class="mt-2" />
     </div>
 
     <!-- Baptism Year -->
     <div class="col-span-6 sm:col-span-2">
-      <JetLabel for="birth-year" value="Birth Year"/>
-      <JetInput id="birth-year"
-                v-model="form.year_of_birth"
-                type="number"
-                inputmode="numeric"
-                class="mt-1 block w-full"/>
-      <JetInputError :message="form.errors.year_of_birth" class="mt-2"/>
+      <JetLabel for="birth-year" value="Birth Year" />
+      <PInputNumber id="birth-year"
+                    v-model="form.year_of_birth"
+                    :use-grouping="false"
+                    :maxFractionDigits="0"
+                    inputmode="numeric"
+                    class="mt-1 block w-full" />
+      <JetInputError :message="form.errors.year_of_birth" class="mt-2" />
     </div>
 
-    <div class="my-3 col-span-6 grid grid-cols-1 sm:grid-cols-3 gap-3">
-      <div>
+    <div class="my-3 col-span-6 grid grid-cols-1 sm:grid-cols-2 gap-6">
+      <div class="flex flex-col">
         <!-- Gender -->
-        <div class="font-medium text-gray-700 dark:text-gray-100">
-          Gender
-        </div>
-        <SelectField return-object-value
-                     name="gender"
-                     v-model="form.gender"
-                     :options="[
-                       { label: 'User', value: 'male' },
-                       { label: 'Female', value: 'female' },
-                     ]"/>
-        <JetInputError :message="form.errors.gender" class="mt-2"/>
+        <JetLabel for="gender" value="Gender" />
+        <PSelect name="gender"
+                 id="gender"
+                 placeholder="Select Gender"
+                 v-model="form.gender"
+                 option-label="label"
+                 option-value="value"
+                 :options="[
+                   { label: 'Male', value: 'male' },
+                   { label: 'Female', value: 'female' },
+                 ]" />
+        <JetInputError :message="form.errors.gender" class="mt-2" />
       </div>
-      <div>
+      <div class="flex flex-col">
         <!-- Appointment -->
-        <div class="font-medium text-gray-700 dark:text-gray-100">
-          Appointment
-        </div>
-        <SelectField return-object-value
-                     name="appointment"
-                     v-model="form.appointment"
-                     :options="[
-                       { label: 'None', value: null },
-                       { label: 'Ministerial Servant', value: 'ministerial servant' },
-                       { label: 'Elder', value: 'elder' },
-                     ]"/>
-        <JetInputError :message="form.errors.appointment" class="mt-2"/>
+        <JetLabel for="appointment" value="Appointment" />
+        <PSelect name="appointment"
+                 id="appointment"
+                 placeholder="Select An Appointment"
+                 v-model="form.appointment"
+                 option-label="label"
+                 option-value="value"
+                 :options="[
+                   { label: 'None', value: null },
+                   { label: 'Ministerial Servant', value: 'ministerial servant' },
+                   { label: 'Elder', value: 'elder' },
+                 ]" />
+        <JetInputError :message="form.errors.appointment" class="mt-2" />
       </div>
-      <div>
+      <div class="flex flex-col">
         <!-- Serving As -->
-        <div class="font-medium text-gray-700 dark:text-gray-100">
-          Serving As
-        </div>
+        <JetLabel for="serving_as" value="Serving As" />
         <!-- suppress SpellCheckingInspection -->
-        <SelectField return-object-value
-                     name="serving_as"
-                     v-model="form.serving_as"
-                     :options=" [
-                       { label: 'Field Missionary', value: 'field missionary' },
-                       { label: 'Special Pioneer', value: 'special pioneer' },
-                       { label: 'Regular Pioneer', value: 'regular pioneer' },
-                       { label: 'Circuit Overseer', value: 'circuit overseer' },
-                       { label: 'Bethelite', value: 'bethel family member' },
-                       { label: 'Publisher', value: 'publisher' },
-                     ]"/>
-        <JetInputError :message="form.errors.serving_as" class="mt-2"/>
+        <PSelect name="serving_as"
+                 id="serving_as"
+                 placeholder="Select A Privilege"
+                 v-model="form.serving_as"
+                 option-label="label"
+                 option-value="value"
+                 :options=" [
+                   { label: 'Field Missionary', value: 'field missionary' },
+                   { label: 'Special Pioneer', value: 'special pioneer' },
+                   { label: 'Regular Pioneer', value: 'regular pioneer' },
+                   { label: 'Circuit Overseer', value: 'circuit overseer' },
+                   { label: 'Bethelite', value: 'bethel family member' },
+                   { label: 'Publisher', value: 'publisher' },
+                 ]" />
+        <JetInputError :message="form.errors.serving_as" class="mt-2" />
       </div>
-      <div>
+      <div class="flex flex-col">
         <!-- Marital Status -->
-        <div class="font-medium text-gray-700 dark:text-gray-100">
-          Marital Status
-        </div>
-        <SelectField return-object-value
-                     name="marital_status"
-                     v-model="form.marital_status"
-                     :options="[
-                       { label: 'Single', value: 'single' },
-                       { label: 'Married', value: 'married' },
-                       { label: 'Separated', value: 'separated' },
-                       { label: 'Divorced', value: 'divorced' },
-                       { label: 'Widowed', value: 'widowed' },
-                     ]"/>
-        <JetInputError :message="form.errors.marital_status" class="mt-2"/>
+        <JetLabel for="marital_status" value="Marital Status" />
+        <PSelect name="marital_status"
+                 id="marital_status"
+                 placeholder="Select A Status"
+                 v-model="form.marital_status"
+                 option-label="label"
+                 option-value="value"
+                 :options="[
+                   { label: 'Single', value: 'single' },
+                   { label: 'Married', value: 'married' },
+                   { label: 'Separated', value: 'separated' },
+                   { label: 'Divorced', value: 'divorced' },
+                   { label: 'Widowed', value: 'widowed' },
+                 ]" />
+        <JetInputError :message="form.errors.marital_status" class="mt-2" />
       </div>
       <div v-if="user.spouse_name" class="self-center">
-        <div class="font-medium text-gray-700 dark:text-gray-100">
+        <strong>
           Spouse: {{ user.spouse_name }}
-        </div>
+        </strong>
       </div>
-      <div class="sm:col-span-3">
+      <div class="sm:col-span-2 mt-3">
         <!-- Responsible Brother -->
-        <label class="font-medium text-gray-700 dark:text-gray-100">
-          <div>Trained Responsible Brother</div>
-          <JetCheckbox v-model:checked="form.responsible_brother"
-                       value="responsible_brother"
-                       name="responsible_brother"/>
+        <JetLabel>
+          <span class="flex items-center font-medium">Trained Responsible Brother: {{ form.responsible_brother ? "✅" : "❌" }}</span>
+          <PCheckbox binary
+                     v-model="form.responsible_brother"
+                     value="responsible_brother"
+                     name="responsible_brother" />
           <small class="ml-3 text-gray-700 dark:text-gray-300">
             Typically used to flag brothers who can be
             trusted to oversee a shift.
           </small>
-        </label>
-        <JetInputError :message="form.errors.responsible_brother" class="mt-2"/>
+        </JetLabel>
+        <JetInputError :message="form.errors.responsible_brother" class="mt-2" />
       </div>
     </div>
 
-    <!-- Role -->
-    <div class="col-span-6 sm:col-span-2">
-      <div class="font-medium text-gray-700 dark:text-gray-100">
-        Role
+    <div class="col-span-6 grid grid-cols-1 gap-6">
+      <!-- Role -->
+      <div class="card grid grid-cols-[max-content_1fr] items-center gap-x-4 gap-y-2">
+        <JetLabel for="role" value="Role" />
+        <PSelectButton name="role"
+                       id="role"
+                       v-model="form.role"
+                       option-label="label"
+                       option-value="value"
+                       :options="[
+                         { label: 'Standard User', value: 'user' },
+                         { label: 'Administrator', value: 'admin' },
+                       ]" />
+        <JetInputError :message="form.errors.role" class="mt-2" />
+        <div class="col-span-2 text-sm">
+          <span class="font-medium italic">Warning:</span>
+          Assigning an admin role to a user can grant them full access to the system.
+        </div>
       </div>
-      <VerticalRadioButtons name="role"
-                            v-model="form.role"
-                            :options="[
-                              { label: 'Administrator', value: 'admin' },
-                              { label: 'Standard User', value: 'user' },
-                            ]"/>
-      <JetInputError :message="form.errors.role" class="mt-2"/>
-    </div>
 
-    <!-- Activate User -->
-    <div class="col-span-6 sm:col-span-2">
-      <div class="font-medium text-gray-700 dark:text-gray-100">
-        System Access
+      <!-- System Access -->
+      <div class="card grid grid-cols-[max-content_1fr] items-center gap-x-4 gap-y-2">
+        <JetLabel for="is-unrestricted" value="System Access" />
+        <PSelectButton name="is-unrestricted"
+                       id="is-unrestricted"
+                       v-model="form.is_unrestricted"
+                       option-label="label"
+                       option-value="value"
+                       :options="[
+                         { label: 'Restricted', value: false },
+                         { label: 'Unrestricted', value: true },
+                       ]" />
+        <JetInputError :message="form.errors.is_unrestricted" class="mt-2" />
+        <div class="col-span-2 text-sm">
+          <span class="font-medium italic">Restricted users</span>
+          cannot self-roster and can only access shifts relevant to them.
+          This includes their shift and the shifts either side of their shift.
+        </div>
       </div>
-      <VerticalRadioButtons name="is-unrestricted"
-                            v-model="form.is_unrestricted"
-                            :options="[
-                              { label: 'Restricted', value: false },
-                              { label: 'Unrestricted', value: true },
-                            ]"/>
-      <JetInputError :message="form.errors.is_unrestricted" class="mt-2"/>
-    </div>
 
-    <!-- Activate User -->
-    <div class="col-span-6 sm:col-span-2">
-      <div class="font-medium text-gray-700 dark:text-gray-100">
-        Account Status
+      <!-- Account Status -->
+      <div class="card grid grid-cols-[max-content_1fr] items-center gap-x-4 gap-y-2">
+        <JetLabel for="is-enabled" value="Account Status" />
+        <PSelectButton name="is-enabled"
+                       id="is-enabled"
+                       v-model="form.is_enabled"
+                       option-label="label"
+                       option-value="value"
+                       :options="[
+                         { label: 'Inactive', value: false },
+                         { label: 'Active', value: true },
+                       ]" />
+        <JetInputError :message="form.errors.is_enabled" class="mt-2" />
+        <div class="col-span-2 text-sm">
+          <span class="font-medium italic">Inactive users</span> cannot log into or interact with the system.
+        </div>
       </div>
-      <VerticalRadioButtons name="is-enabled"
-                            v-model="form.is_enabled"
-                            :options="[
-                              { label: 'Active', value: true },
-                              { label: 'Inactive', value: false },
-                            ]"/>
-      <JetInputError :message="form.errors.is_enabled" class="mt-2"/>
-    </div>
-    <div class="col-start-3 col-span-4 text-sm text-gray-700 dark:text-gray-300">
-      <p>
-        <strong>Restricted users</strong> cannot self-roster and can only access shifts relevant to them.
-        This includes their shift and the shifts either side of their shift.
-      </p>
-      <p class="mt-3"><strong>Inactive users</strong> cannot log into or interact with the system.</p>
     </div>
   </template>
 
   <template #actions>
-    <div v-if="action === 'edit'" class="grow text-left">
-      <PButton outline
-               type="button"
-               style-type="warning"
-               :class="{ 'opacity-25': form.processing }"
-               :disabled="form.processing"
-               @click.prevent="onDelete">
-        Delete
-      </PButton>
-    </div>
-    <JetActionMessage :on="form.recentlySuccessful" class="mr-3">
-      Success: User Saved.
-    </JetActionMessage>
+    <PButton v-if="action === 'edit'"
+             class="mr-auto"
+             label="Delete"
+             severity="danger"
+             variant="outlined"
+             :class="{ 'opacity-25': form.processing }"
+             :disabled="form.processing"
+             @click.prevent="onDelete" />
 
-    <div>
-      <PButton class="mx-3"
-               type="button"
-               style-type="secondary"
-               :class="{ 'opacity-25': form.processing }"
-               :disabled="form.processing"
-               @click.prevent="confirmCancel">
-        {{ cancelButtonText }}
-      </PButton>
-      <PButton :class="{ 'opacity-25': form.processing }"
-               :disabled="form.processing"
-               @click.prevent="saveAction">
-        Save
-      </PButton>
-    </div>
+    <PButton :label="cancelButtonText"
+             severity="secondary"
+             variant="outlined"
+             :class="{ 'opacity-25': form.processing }"
+             :disabled="form.processing"
+             @click.prevent="confirmCancel" />
+
+    <PButton :class="{ 'opacity-25': form.processing }"
+             label="Save"
+             :disabled="form.processing"
+             @click.prevent="saveAction" />
   </template>
+
+  <JetActionMessage :on="form.recentlySuccessful" class="mr-3">
+    Success: User Saved.
+  </JetActionMessage>
 </JetFormSection>
 
 <JetConfirmationModal :show="showConfirmationModal">
@@ -348,10 +362,8 @@ const cancelButtonText = computed(() => form.isDirty ? "Cancel" : "Back");
   </template>
 
   <template #footer>
-    <PButton class="mx-3" style-type="secondary" @click="showConfirmationModal = false">
-      Cancel
-    </PButton>
-    <PButton severity="warning" @click="performConfirmationAction">Ok</PButton>
+    <PButton label="Cancel" severity="secondary" variant="outlined" @click="showConfirmationModal = false" />
+    <PButton severity="danger" label="Ok" @click="performConfirmationAction" />
   </template>
 </JetConfirmationModal>
 </template>
