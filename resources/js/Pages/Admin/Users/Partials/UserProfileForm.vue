@@ -342,7 +342,7 @@ const cancelButtonText = computed(() => form.isDirty ? "Cancel" : "Back");
              @click.prevent="confirmCancel" />
 
     <PButton :class="{ 'opacity-25': form.processing }"
-             label="Save"
+             :label="action === 'edit' ? 'Update' : 'Save'"
              :disabled="form.processing"
              @click.prevent="saveAction" />
   </template>
