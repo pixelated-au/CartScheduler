@@ -53,18 +53,7 @@ export default function useToast() {
         if (severity === "danger") {
             severity = "warn";
         }
-        console.log({
-            ...summary,
-            ...options,
-            ...overrides,
-            ...{ severity, detail: message },
-        });
-        toast.add({
-            ...summary,
-            ...options,
-            ...overrides,
-            ...{ severity, detail: message },
-        });
+        toast.add({ ...summary, ...options, ...overrides, ...{ severity, detail: message } });
     };
 
     return {
