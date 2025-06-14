@@ -10,7 +10,7 @@
     .card {
         @apply border std-border p-4 rounded text-neutral-600 dark:text-neutral-300;
 
-        a& {
+        a&, &.action {
             @apply
             !no-underline
             font-light
