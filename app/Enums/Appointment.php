@@ -2,7 +2,7 @@
 
 namespace App\Enums;
 
-enum Appontment: string
+enum Appointment: string
 {
     case Elder = 'elder';
     case MinisterialServant = 'ministerial servant';

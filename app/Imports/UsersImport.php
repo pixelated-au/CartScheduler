@@ -3,7 +3,7 @@
 namespace App\Imports;
 
 use App\Actions\GetUserValidationPreparations;
-use App\Enums\Appontment;
+use App\Enums\Appointment;
 use App\Enums\MaritalStatus;
 use App\Enums\ServingAs;
 use App\Models\User;
@@ -72,7 +72,7 @@ class UsersImport implements WithHeadingRow, WithValidation, WithBatchInserts, O
             'mobile_phone'        => ['required', 'string', 'regex:/^([0-9\+\-\s]+)$/', 'min:8', 'max:15'],
             'gender'              => ['required', 'in:male,female,m,f'],
             'year_of_birth'       => ['nullable', 'integer', 'min:' . Carbon::now()->year - 100, 'max:' . Carbon::now()->year],
-            'appointment'         => ['nullable', 'string', new Enum(Appontment::class)],
+            'appointment'         => ['nullable', 'string', new Enum(Appointment::class)],
             'serving_as'          => ['nullable', 'string', new Enum(ServingAs::class)],
             'marital_status'      => ['nullable', 'string', new Enum(MaritalStatus::class)],
             'spouse_email'        => ['nullable', 'email'],
