@@ -8,8 +8,8 @@ use Illuminate\Contracts\Validation\ValidationRule;
 class NotAllowedWhenRule implements ValidationRule
 {
     /**
-     * @param \Closure(): bool $condition - The condition to check, must return a boolean
-     * @param string  $message - The error message
+     * @param \Closure(): bool $condition The condition to check, must return a boolean
+     * @param string  $message The error message
      */
     public function __construct(
         protected Closure $condition,
