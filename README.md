@@ -86,15 +86,28 @@ To deploy a release requires the following steps:
     && ea-php82 artisan view:cache \
     && ea-php82 artisan event:cache \
     && ea-php82 artisan storage:link
-    ```
+    ```    
+
+> [!TIP]
+> Note: If you are having issues with something not working, it's likely because 'something' has been cached. You may need to run the following command to clear it:_
+> ```bash
+> php artisan optimize:clear
+> ```
+
 1. Run the following command to migrate/install the database:
-    - `php artisan migrate`
+    ```bash
+    php artisan migrate
+    ```
 1. Setup the cron job to run the following command every minute:
-    - `php artisan schedule:run >> /dev/null 2>&1`
+    ```bash
+    php artisan schedule:run >> /dev/null 2>&1
+    ```
         - eg: `* * * * * cd (/home/[MY_ACCOUNT]/[MY_APP] && php artisan schedule:run >> /dev/null 2>&1)`
           <- Note, you may need to replace `php` with `ea-php82` if you're using cPanel
 1. Create the admin user. Note, this can only be run once.:
-    - `php artisan carts:create-user <name> <email> <phone> <gender> [<password>]`
+```bash
+php artisan carts:create-user <name> <email> <phone> <gender> [<password>]
+```
 1. Navigate to the site and login with the admin user you just created.
     - If you are having a server issue (eg 500 error), review the log file at `storage/logs/laravel.log`.
     - If you have this issue: `Your serialized closure might have been modified or it's unsafe to be unserialized`,
