@@ -1,11 +1,11 @@
 // noinspection NpmUsedModulesInstalled
 
-import importPlugin from "eslint-plugin-import";
-import { defineConfig, globalIgnores } from "eslint/config";
 import css from "@eslint/css";
 import js from "@eslint/js";
-import pluginVue from "eslint-plugin-vue";
 import stylistic from "@stylistic/eslint-plugin";
+import { defineConfig, globalIgnores } from "eslint/config";
+import { importX } from "eslint-plugin-import-x";
+import pluginVue from "eslint-plugin-vue";
 import globals from "globals";
 
 export default defineConfig([
@@ -13,8 +13,8 @@ export default defineConfig([
   {
     name: "eslint-defaults",
     files: ["./*.js", "./resources/js/**/*.{js,vue}"],
-    plugins: { js, "@stylistic": stylistic },
-    extends: ["js/recommended", pluginVue.configs["flat/essential"], importPlugin.flatConfigs.recommended],
+    plugins: { js, "@stylistic": stylistic, "import-x": importX },
+    extends: ["js/recommended", pluginVue.configs["flat/essential"]],
     languageOptions: {
       ecmaVersion: 2020,
       globals: {
@@ -48,21 +48,42 @@ export default defineConfig([
     },
   },
   {
-    name: "eslint-imports",
+    name: "eslint-import-x",
     rules: {
-      "import/consistent-type-specifier-style": ["error", "prefer-top-level"],
-      "import/default": "off",
-      "import/namespace": "off",
-      "import/no-named-as-default": "off",
-      "import/no-named-as-default-member": "off",
-      "import/no-unresolved": "off",
-      /**
-       * import/order:
-       * If the ordering of `eslint --fix` isn't working, it's likely because there is an unbound import.
-       * Eg import 'xyz.css' as opposed to import abc from 'abc'.
-       * @see https://github.com/import-js/eslint-plugin-import/blob/main/docs/rules/order.md#limitations-of---fix
-       */
-      "import/order": "warn",
+      "import-x/consistent-type-specifier-style": ["error", "prefer-top-level"],
+      "import-x/default": "off",
+      "import-x/namespace": "off",
+      "import-x/no-named-as-default": "off",
+      "import-x/no-named-as-default-member": "off",
+      "import-x/no-unresolved": "off",
+            /**
+             * import/order:
+             * If the ordering of `eslint --fix` isn't working, it's likely because there is an unbound import.
+             * Eg import 'xyz.css' as opposed to import abc from 'abc'.
+             * @see https://github.com/un-ts/eslint-plugin-import-x/blob/master/docs/rules/order.md#limitations-of---fix
+             */
+      "import-x/order": [
+        "warn",
+        {
+          groups: [
+            "builtin",
+            "external",
+            "internal",
+            "unknown",
+            ["parent", "sibling"],
+            "index",
+            "object",
+            "type",
+          ],
+          alphabetize: {
+            order: "asc",
+            orderImportKind: "asc",
+            caseInsensitive: true,
+          },
+          warnOnUnassignedImports: true,
+          "sortTypesGroup": true,
+        },
+      ],
     },
   },
   {
