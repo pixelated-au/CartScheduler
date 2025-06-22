@@ -18,8 +18,6 @@ class CanShiftRun
         $requires_brother = $shiftData[0]->requires_brother;
 
         if ($targetShiftUsers->count() > $max_volunteers || $targetShiftUsers->count() < $min_volunteers) {
-            //dd("min: $min_volunteers, max: $max_volunteers, requires_brother: $requires_brother, name: {$shiftData[0]->name}");
-            dump("not enough volunteers ({$targetShiftUsers->count()} vs $max_volunteers vs $min_volunteers)");
             return false;
         }
 
@@ -30,15 +28,12 @@ class CanShiftRun
                     }
                 )
             ) {
-                dump("requires brother - found");
                 return true;
             }
             else
-                dump("requires brother - not found");
                 return false;
         }
 
-        dump("final true");
         return true;
     }
 
