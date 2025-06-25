@@ -2,12 +2,18 @@
 
 namespace App\Actions;
 
+use App\Enums\Appointment;
+use App\Enums\MaritalStatus;
+use App\Enums\Role;
+use App\Enums\ServingAs;
 use App\Models\User;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 
-class GetUserValidationPreparations
+class GetUserValidationUtils
 {
-    public function execute(array $data): array
+    public function prepare(array $data): array
     {
         $data['mobile_phone'] = isset($data['mobile_phone'])
             ? Str::of($data['mobile_phone'])
@@ -68,5 +74,24 @@ class GetUserValidationPreparations
             || strtolower(trim((string)$data[$fieldName])) === 'true') {
             $data[$fieldName] = true;
         }
+    }
+
+    public function rules(): array
+    {
+        return [
+            'name'                => ['required', 'string', 'max:255'],
+            'email'               => ['required', 'email', 'max:255'],
+            'role'                => ['required', 'string', rule::enum(Role::class)],
+            'gender'              => ['required', 'string', 'in:male,female'],
+            'mobile_phone'        => ['required', 'string', 'regex:/^([0-9\+\-\s]+)$/', 'min:8', 'max:15'],
+            'year_of_birth'       => [
+                'nullable', 'integer', 'min:' . Carbon::now()->year - 100, 'max:' . Carbon::now()->year
+            ],
+            'appointment'         => ['nullable', 'string', rule::enum(Appointment::class)],
+            'serving_as'          => ['nullable', 'string', rule::enum(ServingAs::class)],
+            'marital_status'      => ['nullable', 'string', rule::enum(MaritalStatus::class)],
+            'responsible_brother' => ['nullable', 'boolean'],
+            'is_unrestricted'     => ['boolean'],
+        ];
     }
 }

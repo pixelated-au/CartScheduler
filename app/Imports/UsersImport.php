@@ -2,40 +2,30 @@
 
 namespace App\Imports;
 
-use App\Actions\GetUserValidationPreparations;
-use App\Enums\Appointment;
-use App\Enums\MaritalStatus;
-use App\Enums\ServingAs;
+use App\Actions\GetUserValidationUtils;
+use App\Enums\Role;
 use App\Models\User;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
-use Illuminate\Validation\Rules\Enum;
+use Illuminate\Validation\Rules\In;
+use Illuminate\Validation\Validator;
 use Maatwebsite\Excel\Concerns\OnEachRow;
 use Maatwebsite\Excel\Concerns\WithBatchInserts;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Maatwebsite\Excel\Concerns\WithValidation;
 use Maatwebsite\Excel\Row;
 
+/*******************************************************************************************************************
+ * @see \App\Exports\UsersExport CHANGES IN THIS FILE NEED HERE MAY NEED TO BE REFLECTED HERE
+ *******************************************************************************************************************/
 class UsersImport implements WithHeadingRow, WithValidation, WithBatchInserts, OnEachRow
 {
     private int $createCount = 0;
     private int $updateCount = 0;
 
-    /*******************************************************************************************************************
-     *******************************************************************************************************************
-     * @param Row $row Each row in the spreadsheet
-     *
-     * @see \App\Exports\UsersExport CHANGES IN THIS FILE NEED HERE MAY NEED TO BE REFLECTED HERE
-     */
-
     public function onRow(Row $row): void
     {
         $rowData = $row->toArray();
 
-        /**
-         * @noinspection PhpIssetCanBeReplacedWithCoalesceInspection
-         * @noinspection NullCoalescingOperatorCanBeUsedInspection
-         */
         $data = [
             'name'                => $rowData['name'],
             'email'               => $rowData['email'],
@@ -54,7 +44,6 @@ class UsersImport implements WithHeadingRow, WithValidation, WithBatchInserts, O
         if ($user) {
             $user->update($data);
             ++$this->updateCount;
-
         } else {
             $data['uuid']     = Str::uuid();
             $data['password'] = null;
@@ -64,38 +53,41 @@ class UsersImport implements WithHeadingRow, WithValidation, WithBatchInserts, O
         }
     }
 
-    public function rules(): array
-    {
-        return [
-            'name'                => ['required', 'string', 'max:255'],
-            'email'               => ['required', 'email'],
-            'mobile_phone'        => ['required', 'string', 'regex:/^([0-9\+\-\s]+)$/', 'min:8', 'max:15'],
-            'gender'              => ['required', 'in:male,female,m,f'],
-            'year_of_birth'       => ['nullable', 'integer', 'min:' . Carbon::now()->year - 100, 'max:' . Carbon::now()->year],
-            'appointment'         => ['nullable', 'string', new Enum(Appointment::class)],
-            'serving_as'          => ['nullable', 'string', new Enum(ServingAs::class)],
-            'marital_status'      => ['nullable', 'string', new Enum(MaritalStatus::class)],
-            'spouse_email'        => ['nullable', 'email'],
-            'spouse_id'           => ['nullable', 'exists:users,id'],
-            'responsible_brother' => ['nullable', 'boolean'],
-            'is_unrestricted'     => ['nullable', 'boolean'],
-        ];
-    }
-
-    private function tidyNullableData(?string $datum): ?string
-    {
-        return (!$datum || !trim($datum)) ? null : $datum;
-    }
-
     /**
      * @throws \Illuminate\Contracts\Container\BindingResolutionException
      * @noinspection PhpUnusedParameterInspection
      */
     public function prepareForValidation(array $data, int $index): array
     {
-        $getUserValidationPreparations = app()->make(GetUserValidationPreparations::class);
+        $data['role'] = Role::User->value;
 
-        return $getUserValidationPreparations->execute($data);
+        return app()->make(GetUserValidationUtils::class)->prepare($data);
+    }
+
+    public function rules(): array
+    {
+        $validationUtils = app()->make(GetUserValidationUtils::class);
+        $rules           = $validationUtils->rules();
+
+        $rules['spouse_email'] = ['nullable', 'email'];
+        $rules['spouse_id']    = ['nullable', 'exists:users,id'];
+
+        return $rules;
+    }
+
+    public function withValidator(Validator $validator): void
+    {
+        $data = $validator->getData();
+        $data = current($data);
+
+        $validator->sometimes('gender', 'not_in:female', fn() => $data['appointment'] !== null);
+        $validator->sometimes('role', new In(Role::User->value), fn() => $data['is_unrestricted'] !== true
+        );
+    }
+
+    private function tidyNullableData(?string $datum): ?string
+    {
+        return (!$datum || !trim($datum)) ? null : $datum;
     }
 
     public function headingRow(): int

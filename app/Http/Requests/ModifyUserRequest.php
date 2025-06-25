@@ -2,14 +2,10 @@
 
 namespace App\Http\Requests;
 
-use App\Actions\GetUserValidationPreparations;
-use App\Enums\Appointment;
-use App\Enums\MaritalStatus;
+use App\Actions\GetUserValidationUtils;
 use App\Enums\Role;
-use App\Enums\ServingAs;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Carbon;
 use Illuminate\Validation\Rule;
 
 class ModifyUserRequest extends FormRequest
@@ -20,33 +16,36 @@ class ModifyUserRequest extends FormRequest
     }
 
     /**
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
+     */
+    public function prepareForValidation(): void
+    {
+        $validationUtils = app()->make(GetUserValidationUtils::class);
+
+        $this->merge(
+            $validationUtils->prepare($this->all())
+        );
+    }
+
+    /**
      * Get the validation rules that apply to the request.
      *
      * @return array<string, mixed>
      */
     public function rules(): array
     {
-        // NOTE, if updating these, also update the rules in the UsersImport class which also has validations
-        return [
-            'name'                => ['required', 'string', 'max:255'],
-            'email'               => ['required', 'email', 'max:255', Rule::unique('users')->ignore($this->get('id'))],
-            'role'                => ['required', 'string', rule::enum(Role::class)],
-            'gender'              => ['required', 'string', 'in:male,female'],
-            'mobile_phone'        => ['required', 'string', 'regex:/^([0-9\+\-\s]+)$/', 'min:8', 'max:15'],
-            'year_of_birth'       => [
-                'nullable', 'integer', 'min:' . Carbon::now()->year - 100, 'max:' . Carbon::now()->year
-            ],
-            'appointment'         => ['nullable', 'string', rule::enum(Appointment::class)],
-            'serving_as'          => ['nullable', 'string', rule::enum(ServingAs::class)],
-            'marital_status'      => ['nullable', 'string', rule::enum(MaritalStatus::class)],
-            'responsible_brother' => ['nullable', 'boolean'],
-            'is_enabled'          => ['boolean'],
-            'is_unrestricted'     => ['boolean'],
-        ];
+        $validationUtils = app()->make(GetUserValidationUtils::class);
+        $rules           = $validationUtils->rules();
+
+        $rules['email'][]      = Rule::unique('users')->ignore($this->get('id'));
+        $rules['is_enabled'][] = ['boolean'];
+
+        return $rules;
     }
 
     public function after(): array
     {
+        // NOTE, if updating these, also update the rules in the UsersImport class which also has validations
         return [
             function (Validator $validator) {
                 $fields = $validator->validated();
@@ -58,18 +57,6 @@ class ModifyUserRequest extends FormRequest
                 }
             }
         ];
-    }
-
-    /**
-     * @throws \Illuminate\Contracts\Container\BindingResolutionException
-     */
-    public function prepareForValidation(): void
-    {
-        $getUserValidationPreparations = app()->make(GetUserValidationPreparations::class);
-
-        $this->merge(
-            $getUserValidationPreparations->execute($this->all())
-        );
     }
 
     public function messages(): array
