@@ -80,7 +80,6 @@ export default defineConfig([
             orderImportKind: "asc",
             caseInsensitive: true,
           },
-          warnOnUnassignedImports: true,
           "sortTypesGroup": true,
         },
       ],
@@ -131,7 +130,7 @@ export default defineConfig([
           exceptions: [],
         },
       ],
-      "vue/html-comment-content-spacing": ["warn", "always", { exceptions: ["*", "#"] }],
+      "vue/html-comment-content-spacing": ["warn", "always", { exceptions: ["*", "#", "suppress"] }],
       "vue/html-indent": [
         "warn",
         2,
@@ -245,7 +244,7 @@ export default defineConfig([
         "always",
         {
           line: {
-            markers: ["/", "##", "todo", "TODO"],
+            markers: ["/", "##", "todo", "TODO", "suppress"],
             exceptions: ["-", "+"],
           },
           block: {
