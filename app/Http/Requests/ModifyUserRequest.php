@@ -3,13 +3,14 @@
 namespace App\Http\Requests;
 
 use App\Actions\GetUserValidationPreparations;
-use App\Enums\Appontment;
+use App\Enums\Appointment;
 use App\Enums\MaritalStatus;
 use App\Enums\Role;
 use App\Enums\ServingAs;
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Carbon;
 use Illuminate\Validation\Rule;
-use Illuminate\Validation\Rules\Enum;
 
 class ModifyUserRequest extends FormRequest
 {
@@ -29,16 +30,33 @@ class ModifyUserRequest extends FormRequest
         return [
             'name'                => ['required', 'string', 'max:255'],
             'email'               => ['required', 'email', 'max:255', Rule::unique('users')->ignore($this->get('id'))],
-            'role'                => ['required', 'string', new Enum(Role::class)],
+            'role'                => ['required', 'string', rule::enum(Role::class)],
             'gender'              => ['required', 'string', 'in:male,female'],
             'mobile_phone'        => ['required', 'string', 'regex:/^([0-9\+\-\s]+)$/', 'min:8', 'max:15'],
-            'year_of_birth'       => ['nullable', 'integer', 'min:' . date('Y') - 100, 'max:' . date('Y')],
-            'appointment'         => ['nullable', 'string', new Enum(Appontment::class)],
-            'serving_as'          => ['nullable', 'string', new Enum(ServingAs::class)],
-            'marital_status'      => ['nullable', 'string', new Enum(MaritalStatus::class)],
+            'year_of_birth'       => [
+                'nullable', 'integer', 'min:' . Carbon::now()->year - 100, 'max:' . Carbon::now()->year
+            ],
+            'appointment'         => ['nullable', 'string', rule::enum(Appointment::class)],
+            'serving_as'          => ['nullable', 'string', rule::enum(ServingAs::class)],
+            'marital_status'      => ['nullable', 'string', rule::enum(MaritalStatus::class)],
             'responsible_brother' => ['nullable', 'boolean'],
             'is_enabled'          => ['boolean'],
             'is_unrestricted'     => ['boolean'],
+        ];
+    }
+
+    public function after(): array
+    {
+        return [
+            function (Validator $validator) {
+                $fields = $validator->validated();
+                if (isset($fields['gender']) && $fields['gender'] === 'female' && $fields['appointment']) {
+                    $validator->errors()->add('gender', 'A sister user cannot have an appointment');
+                }
+                if (!$fields['is_unrestricted'] && $fields['role'] === Role::Admin->value) {
+                    $validator->errors()->add('is_unrestricted', 'Restricted users cannot be an administrator');
+                }
+            }
         ];
     }
 
@@ -64,5 +82,4 @@ class ModifyUserRequest extends FormRequest
             'mobile_phone.max'   => $formatMsg,
         ];
     }
-
 }
