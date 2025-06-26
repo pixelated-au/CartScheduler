@@ -107,13 +107,10 @@ class GetUserValidationUtils
                 $key .= '.';
             }
 
-            $checkGender = !$isPrecognitive || isset($fields['gender']);
-            $checkUnrestricted = !$isPrecognitive || isset($fields['is_unrestricted']);
-
-            if ($checkGender && $fields['gender'] === 'female' && $fields['appointment']) {
+            if (!$isPrecognitive && $fields['gender'] === 'female' && $fields['appointment']) {
                 $validator->errors()->add("{$key}gender", 'A sister user cannot have an appointment');
             }
-            if ($checkUnrestricted && !$fields['is_unrestricted'] && $fields['role'] === Role::Admin->value) {
+            if (!$isPrecognitive && !$fields['is_unrestricted'] && $fields['role'] === Role::Admin->value) {
                 $validator->errors()->add("{$key}is_unrestricted", 'Restricted users cannot be an administrator');
             }
         };
