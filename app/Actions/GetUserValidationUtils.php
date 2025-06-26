@@ -7,6 +7,8 @@ use App\Enums\MaritalStatus;
 use App\Enums\Role;
 use App\Enums\ServingAs;
 use App\Models\User;
+use Closure;
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
@@ -67,11 +69,10 @@ class GetUserValidationUtils
     {
         if (!isset($data[$fieldName])
             || trim((string) $data[$fieldName]) === '0'
-            || strtolower(trim((string)$data[$fieldName])) === 'false') {
+            || strtolower(trim((string) $data[$fieldName])) === 'false') {
             $data[$fieldName] = false;
-
-        } else if (trim((string) $data[$fieldName]) === '1'
-            || strtolower(trim((string)$data[$fieldName])) === 'true') {
+        } elseif (trim((string) $data[$fieldName]) === '1'
+            || strtolower(trim((string) $data[$fieldName])) === 'true') {
             $data[$fieldName] = true;
         }
     }
@@ -93,5 +94,25 @@ class GetUserValidationUtils
             'responsible_brother' => ['nullable', 'boolean'],
             'is_unrestricted'     => ['boolean'],
         ];
+    }
+
+    public function extraValidation(?string $key = '', ?array $fields = null): Closure
+    {
+        return static function (Validator $validator) use ($key, $fields) {
+            if (!$fields) {
+                $fields = $validator->validated();
+            }
+
+            if ($key && !Str::endsWith($key, '.')) {
+                $key .= '.';
+            }
+
+            if ($fields['gender'] === 'female' && $fields['appointment']) {
+                $validator->errors()->add("{$key}gender", 'A sister user cannot have an appointment');
+            }
+            if (!$fields['is_unrestricted'] && $fields['role'] === Role::Admin->value) {
+                $validator->errors()->add("{$key}is_unrestricted", 'Restricted users cannot be an administrator');
+            }
+        };
     }
 }

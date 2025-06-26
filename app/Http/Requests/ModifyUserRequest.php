@@ -3,8 +3,6 @@
 namespace App\Http\Requests;
 
 use App\Actions\GetUserValidationUtils;
-use App\Enums\Role;
-use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -45,17 +43,8 @@ class ModifyUserRequest extends FormRequest
 
     public function after(): array
     {
-        // NOTE, if updating these, also update the rules in the UsersImport class which also has validations
         return [
-            function (Validator $validator) {
-                $fields = $validator->validated();
-                if (isset($fields['gender']) && $fields['gender'] === 'female' && $fields['appointment']) {
-                    $validator->errors()->add('gender', 'A sister user cannot have an appointment');
-                }
-                if (!$fields['is_unrestricted'] && $fields['role'] === Role::Admin->value) {
-                    $validator->errors()->add('is_unrestricted', 'Restricted users cannot be an administrator');
-                }
-            }
+            (app()->make(GetUserValidationUtils::class))->extraValidation()
         ];
     }
 

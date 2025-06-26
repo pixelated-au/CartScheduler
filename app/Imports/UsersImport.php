@@ -6,7 +6,6 @@ use App\Actions\GetUserValidationUtils;
 use App\Enums\Role;
 use App\Models\User;
 use Illuminate\Support\Str;
-use Illuminate\Validation\Rules\In;
 use Illuminate\Validation\Validator;
 use Maatwebsite\Excel\Concerns\OnEachRow;
 use Maatwebsite\Excel\Concerns\WithBatchInserts;
@@ -77,11 +76,12 @@ class UsersImport implements WithHeadingRow, WithValidation, WithBatchInserts, O
 
     public function withValidator(Validator $validator): void
     {
-        $data = $validator->getData();
-        $data = current($data);
+        $data   = $validator->getData();
+        $key    = key($data);
+        $data   = current($data);
 
-        $validator->sometimes('gender', 'not_in:female', fn() => $data['appointment'] !== null);
-        $validator->sometimes('role', new In(Role::User->value), fn() => $data['is_unrestricted'] !== true
+        $validator->after(
+            (app()->make(GetUserValidationUtils::class))->extraValidation($key, $data)
         );
     }
 
