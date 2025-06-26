@@ -1,6 +1,7 @@
 <script setup>
 import { router, usePage } from "@inertiajs/vue3";
 import { inject } from "vue";
+import BackButton from "@/Components/Form/Buttons/BackButton.vue";
 import AppLayout from "@/Layouts/AppLayout.vue";
 import UserProfileForm from "@/Pages/Admin/Users/Partials/UserProfileForm.vue";
 import ShowLocationAvailabilityForm from "@/Pages/Profile/Partials/ShowLocationAvailabilityForm.vue";
@@ -27,11 +28,9 @@ const canChooseLocations = !!usePage().props.enableUserLocationChoices;
     <template #header>
       <div class="flex justify-between">
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-          User {{ editUser.data.name }}
+          {{ editUser.data.name }}
         </h2>
-        <PButton class="mx-3" type="button" style-type="secondary" outline @click.prevent="listRouteAction">
-          Back
-        </PButton>
+        <BackButton class="mx-3" @click.prevent="listRouteAction"/>
       </div>
     </template>
 
