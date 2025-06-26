@@ -1,6 +1,6 @@
 <script setup>
 import { router } from "@inertiajs/vue3";
-import { computed, inject, ref, watch, nextTick } from "vue";
+import { inject, ref, watch, nextTick } from "vue";
 import useExtendedPrecognition from "@/Composables/useExtendedPrecognition.js";
 import useToast from "@/Composables/useToast.js";
 import JetActionMessage from "@/Jetstream/ActionMessage.vue";
@@ -13,7 +13,9 @@ const props = defineProps({
   user: Object,
   action: {
     type: String,
+    required: false,
     default: "edit",
+    validator: (value) => ["edit", "save"].includes(value),
   },
 });
 
@@ -22,7 +24,6 @@ defineEmits([
 ]);
 
 const route = inject("route");
-//todo and create a reusable button that shows the user if the request is successful. Show pending state also
 
 const extendedPrecognition = useExtendedPrecognition();
 
@@ -111,7 +112,6 @@ watch([() => form.gender, () => form.appointment], ([gender, appointment]) => {
     });
   }
 });
-const cancelButtonText = computed(() => form.isDirty ? "Cancel" : "Back");
 </script>
 
 <template>
@@ -124,14 +124,12 @@ const cancelButtonText = computed(() => form.isDirty ? "Cancel" : "Back");
       <div v-if="action === 'edit'">Update the information for {{ user.name }}.</div>
       <div v-else>Create a new user record</div>
       <PButton v-if="action === 'edit'"
+               icon="iconify mdi--email-outline"
+               :label="user.has_logged_in ? 'Send Password Reset Email' : 'Resend Welcome Email'"
                severity="info"
                variant="outlined"
                class="mt-5"
-               @click="performResendWelcomeAction">
-        <template v-if="user.has_logged_in">Send Password Reset Email</template>
-
-        <template v-else>Resend Welcome Email</template>
-      </PButton>
+               @click="performResendWelcomeAction" />
     </template>
 
     <template #form>
@@ -195,7 +193,7 @@ const cancelButtonText = computed(() => form.isDirty ? "Cancel" : "Back");
                        { label: 'Male', value: 'male' },
                        { label: 'Female', value: 'female' },
                      ]"
-                     @change="form.validate('gender')"/>
+                     @change="form.validate('gender')" />
             <JetInputError :message="form.errors.gender" class="mt-2" />
           </div>
           <div class="flex flex-col">
@@ -211,7 +209,7 @@ const cancelButtonText = computed(() => form.isDirty ? "Cancel" : "Back");
                      :options="[
                        { label: 'Ministerial Servant', value: 'ministerial servant' },
                        { label: 'Elder', value: 'elder' },
-                     ]" />
+                     ]"/>
             <JetInputError :message="form.errors.appointment" class="mt-2" />
           </div>
           <div class="flex flex-col">
@@ -343,27 +341,16 @@ const cancelButtonText = computed(() => form.isDirty ? "Cancel" : "Back");
     </template>
 
     <template #actions>
-      <PButton v-if="action === 'edit'"
-               class="mr-auto"
-               label="Delete"
-               severity="danger"
-               variant="outlined"
-               :class="{ 'opacity-25': form.processing }"
-               :disabled="form.processing"
-               @click.prevent="onDelete" />
+      <DangerButton v-if="action === 'edit'"
+                    class="mr-auto"
+                    label="Delete"
+                    :disabled="form.processing"
+                    @click.prevent="onDelete" />
 
-      <PButton :label="cancelButtonText"
-               severity="secondary"
-               variant="outlined"
-               :class="{ 'opacity-25': form.processing }"
-               :disabled="form.processing"
-               @click.prevent="confirmCancel" />
-
-      <PButton :class="{ 'opacity-25': form.processing }"
-               :label="action === 'edit' ? 'Update' : 'Save'"
-               :disabled="form.processing"
-               @click.prevent="saveAction" />
+      <CancelButton :processing="form.processing" @click.prevent="confirmCancel" />
+      <SubmitButton :action :processing="form.processing" :success="form.wasSuccessful" @click.prevent="saveAction" />
     </template>
+    todo move this button to a new component
 
     <JetActionMessage :on="form.recentlySuccessful" class="mr-3">
       Success: User Saved.
