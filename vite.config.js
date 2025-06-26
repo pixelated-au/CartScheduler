@@ -2,54 +2,54 @@ import * as path from "node:path";
 import { PrimeVueResolver } from "@primevue/auto-import-resolver";
 import vue from "@vitejs/plugin-vue";
 import laravel from "laravel-vite-plugin";
+import IconsResolver from "unplugin-icons/resolver";
 import Components from "unplugin-vue-components/vite";
 import { defineConfig } from "vite";
 import vueDevTools from "vite-plugin-vue-devtools";
-import IconsResolver from "unplugin-icons/resolver";
 
 export default defineConfig({
-    plugins: [
-        laravel({
-            input: "resources/js/app.js",
-            refresh: true,
-        }),
-        vue({
-            template: {
-                transformAssetUrls: {
-                    base: null,
-                    includeAbsolute: false,
-                },
-            },
-        }),
-        vueDevTools({
-            appendTo: "resources/js/app.js",
+  plugins: [
+    laravel({
+      input: "resources/js/app.js",
+      refresh: true,
+    }),
+    vue({
+      template: {
+        transformAssetUrls: {
+          base: null,
+          includeAbsolute: false,
+        },
+      },
+    }),
+    vueDevTools({
+      appendTo: "resources/js/app.js",
             // Set the editor by setting the env var on your $PATH: export LAUNCH_EDITOR=[your editor path or executable]
             // See: https://devtools.vuejs.org/getting-started/open-in-editor
             // and https://github.com/webfansplz/vite-plugin-vue-inspector?tab=readme-ov-file#--configuration-ide--editor
-        }),
-        Components({
-            dirs: [
-                "resources/js/Components",
-                "resources/js/Layouts/Components",
-            ],
-            dts: true,
-            directoryAsNamespace: true,
-            resolvers: [
-                PrimeVueResolver({ components: { prefix: "P" } }),
-                IconsResolver(),
-            ],
-        }),
-    ],
-    server: {
-        host: "0.0.0.0",
+    }),
+    Components({
+      globs: [
+        "./resources/js/Components/**/*.vue",
+        "./resources/js/Jetstream/**/*.vue",
+      ],
+      dts: true,
+      directoryAsNamespace: true,
+      resolvers: [
+        PrimeVueResolver({ components: { prefix: "P" } }),
+        IconsResolver(),
+      ],
+    }),
+  ],
+  server: {
+    host: "0.0.0.0",
+  },
+  resolve: {
+    alias: {
+      "@": path.resolve("./resources/js"),
+      "@@": path.resolve("./"),
+      "ziggy-js": path.resolve("./vendor/tightenco/ziggy"),
+      "@static-fonts": path.resolve(__dirname, "./resources/assets/fonts"),
     },
-    resolve: {
-        alias: {
-            "@": path.resolve("./resources/js"),
-            "@@": path.resolve("./"),
-            "ziggy-js": path.resolve("./vendor/tightenco/ziggy"),
-            "@static-fonts": path.resolve(__dirname, "./resources/assets/fonts"),
-        },
-    },
-    envDir: "./",
+  },
+  envDir: "./",
 });
