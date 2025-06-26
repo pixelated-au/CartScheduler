@@ -44,7 +44,7 @@ class UserRequest extends FormRequest
     public function after(): array
     {
         return [
-            (app()->make(GetUserValidationUtils::class))->extraValidation()
+            (app()->make(GetUserValidationUtils::class))->extraValidation($this->isPrecognitive())
         ];
     }
 

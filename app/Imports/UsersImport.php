@@ -81,7 +81,7 @@ class UsersImport implements WithHeadingRow, WithValidation, WithBatchInserts, O
         $data   = current($data);
 
         $validator->after(
-            (app()->make(GetUserValidationUtils::class))->extraValidation($key, $data)
+            (app()->make(GetUserValidationUtils::class))->extraValidation(false, $key, $data)
         );
     }
 

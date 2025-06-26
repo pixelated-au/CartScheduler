@@ -96,9 +96,9 @@ class GetUserValidationUtils
         ];
     }
 
-    public function extraValidation(?string $key = '', ?array $fields = null): Closure
+    public function extraValidation(bool $isPrecognitive, ?string $key = '', ?array $fields = null): Closure
     {
-        return static function (Validator $validator) use ($key, $fields) {
+        return static function (Validator $validator) use ($isPrecognitive, $key, $fields) {
             if (!$fields) {
                 $fields = $validator->validated();
             }
@@ -107,10 +107,13 @@ class GetUserValidationUtils
                 $key .= '.';
             }
 
-            if ($fields['gender'] === 'female' && $fields['appointment']) {
+            $checkGender = !$isPrecognitive || isset($fields['gender']);
+            $checkUnrestricted = !$isPrecognitive || isset($fields['is_unrestricted']);
+
+            if ($checkGender && $fields['gender'] === 'female' && $fields['appointment']) {
                 $validator->errors()->add("{$key}gender", 'A sister user cannot have an appointment');
             }
-            if (!$fields['is_unrestricted'] && $fields['role'] === Role::Admin->value) {
+            if ($checkUnrestricted && !$fields['is_unrestricted'] && $fields['role'] === Role::Admin->value) {
                 $validator->errors()->add("{$key}is_unrestricted", 'Restricted users cannot be an administrator');
             }
         };
