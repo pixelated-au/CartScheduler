@@ -30,7 +30,6 @@ export default defineConfig({
     Components({
       globs: [
         "./resources/js/Components/**/*.vue",
-        "./resources/js/Jetstream/**/*.vue",
       ],
       dts: true,
       directoryAsNamespace: true,
