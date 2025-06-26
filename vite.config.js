@@ -30,6 +30,7 @@ export default defineConfig({
     Components({
       globs: [
         "./resources/js/Components/**/*.vue",
+        "./resources/js/Layouts/Components/**/*.vue",
       ],
       dts: true,
       directoryAsNamespace: true,
