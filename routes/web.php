@@ -35,6 +35,7 @@ use App\Http\Controllers\UpdateUserRegularAvailabilityController;
 use App\Http\Controllers\UpdateUserVacationsController;
 use App\Http\Controllers\UsersController;
 use App\Http\Controllers\UsersImportController;
+use Illuminate\Foundation\Http\Middleware\HandlePrecognitiveRequests;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -59,7 +60,7 @@ use Inertia\Inertia;
     ]);
 });*/
 
-Route::get('/', static fn() => Inertia::render('Auth/Login'));
+Route::get('/', static fn () => Inertia::render('Auth/Login'));
 
 Route::get('/set-password/{user}/{hashedEmail}', [SetUserPasswordController::class, 'show'])->name('set.password.show');
 Route::post('/set-password', [SetUserPasswordController::class, 'update'])->name('set.password.update');
@@ -67,7 +68,7 @@ Route::post('/set-password', [SetUserPasswordController::class, 'update'])->name
 // Route::get('/mail', static fn() => new App\Mail\UserAccountCreated(App\Models\User::find(1)));
 
 Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified', 'user-enabled'])->group(function () {
-    Route::get('/', static fn() => Inertia::render('Dashboard'))->name('dashboard');
+    Route::get('/', static fn () => Inertia::render('Dashboard'))->name('dashboard');
     Route::get('/shifts/{shiftDate}', AvailableShiftsController::class)->where(['shiftDate' => '\d\d\d\d-\d\d-\d\d']);
     Route::get('/outstanding-reports', MissingReportsForUserController::class);
     Route::post('/reserve-shift', ToggleShiftReservationController::class);
@@ -101,15 +102,17 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified',
 
             Route::get('/users/get/{user}', UserDataController::class)->name('admin.users.get');
 
-            Route::resource('/users', UsersController::class)->names([
-                'index' => 'admin.users.index',
-                'create' => 'admin.users.create',
-                'store' => 'admin.users.store',
-                'show' => 'admin.users.show',
-                'edit' => 'admin.users.edit',
-                'update' => 'admin.users.update',
-                'destroy' => 'admin.users.destroy',
-            ]);
+            Route::group(['middleware' => HandlePrecognitiveRequests::class], static function () {
+                Route::resource('/users', UsersController::class)->names([
+                    'index' => 'admin.users.index',
+                    'create' => 'admin.users.create',
+                    'store' => 'admin.users.store',
+                    'show' => 'admin.users.show',
+                    'edit' => 'admin.users.edit',
+                    'update' => 'admin.users.update',
+                    'destroy' => 'admin.users.destroy',
+                ]);
+            });
 
             Route::put('/locations/sort-order', AdminUpdateLocationSortOrderController::class)
                 ->name('admin.locations.sort-order');
@@ -129,7 +132,8 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified',
             ])->only(['index']);
 
             // New user availability report endpoint
-            Route::get('/reporting/users-availability', UserAvailabilityReportController::class)->name('admin.reports.users-availability');
+            Route::get('/reporting/users-availability',
+                UserAvailabilityReportController::class)->name('admin.reports.users-availability');
 
             Route::resource('/report-tags', ReportTagsController::class)->parameter('report-tags', 'tag')->names([
                 'index' => 'admin.report-tags.index',
