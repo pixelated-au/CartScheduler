@@ -13,9 +13,7 @@ const props = defineProps({
   user: Object,
   action: {
     type: String,
-    required: false,
-    default: "edit",
-    validator: (value) => ["edit", "save"].includes(value),
+    validator: (value) => ["edit", "add"].includes(value),
   },
 });
 
@@ -27,7 +25,7 @@ const route = inject("route");
 
 const extendedPrecognition = useExtendedPrecognition();
 
-const form = extendedPrecognition({ routeName: "admin.users.update", id: props.user.id }, {
+const form = extendedPrecognition({ routeName: props.action === "edit" ? "admin.users.update" : "admin.users.store", id: props.user.id }, {
   id: props.user.id,
   name: props.user.name,
   role: props.user.role,
