@@ -118,7 +118,7 @@ const transitionDelayStyle = (index) => `animation-delay: -${(index * 0.1173)}s`
        :class="{ '!gap-4': isSortingMode }">
     <div v-for="(location, idx) in locations.data"
          :key="location.id"
-         class="bg-panel dark:bg-panel-dark shadow-sm card cursor-pointer duration-500 scale-[.98] transition-all"
+         class="shadow-sm card subtle-zoom action cursor-pointer duration-500 scale-[.98] transition-all"
          :class="{ 'is-sorting-mode !scale-100': isSortingMode }"
          :style="transitionDelayStyle(idx)"
          @click="locationClicked(location)">
