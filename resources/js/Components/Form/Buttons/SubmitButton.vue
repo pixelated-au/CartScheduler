@@ -4,7 +4,7 @@ defineProps({
     type: String,
     required: false,
     default: "edit",
-    validator: (value) => ["edit", "save"].includes(value),
+    validator: (value) => ["edit", "add"].includes(value),
   },
   success: Boolean,
   processing: Boolean,
