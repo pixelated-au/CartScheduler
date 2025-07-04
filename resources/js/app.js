@@ -3,9 +3,9 @@ import BugsnagPluginVue from "@bugsnag/plugin-vue";
 import { createInertiaApp, Head, Link } from "@inertiajs/vue3";
 import { resolvePageComponent } from "laravel-vite-plugin/inertia-helpers";
 import PrimeVue from "primevue/config";
+import ToastService from "primevue/toastservice";
 import { createApp, h } from "vue";
 import Toast from "vue-toastification";
-import ToastService from "primevue/toastservice";
 import { ZiggyVue } from "ziggy-js";
 import PrimeVuePreset from "./primevue-customisations.js";
 import { Ziggy } from "./ziggy.js";
@@ -19,9 +19,9 @@ const appName = window.document.getElementsByTagName("title")[0]?.innerText || "
 const bugsnagKey = import.meta.env.VITE_BUGSNAG_FRONT_END_API_KEY;
 
 if (bugsnagKey) {
-    Bugsnag.start({
-        apiKey: bugsnagKey, plugins: [new BugsnagPluginVue()],
-    });
+  Bugsnag.start({
+    apiKey: bugsnagKey, plugins: [new BugsnagPluginVue()],
+  });
 }
 
 /**
@@ -31,37 +31,37 @@ if (bugsnagKey) {
  * }>
  */
 createInertiaApp({
-    title: (title) => `${title} - ${appName}`,
-    resolve: (name) => resolvePageComponent(`./Pages/${name}.vue`, import.meta.glob("./Pages/**/*.vue")),
-    progress: {
-        color: "#4B5563",
-    },
-    setup({ el, App, props, plugin }) {
-        const vueApp = createApp({ render: () => h(App, props) })
-            .use(PrimeVue, {
-                theme: {
-                    preset: PrimeVuePreset,
-                    options: {
-                        darkModeSelector: ".dark",
-                        cssLayer: {
-                            name: "primevue",
-                            order: "tailwind-base, primevue, tailwind-utilities",
-                        },
-                    },
-                },
-            })
-            .use(plugin)
-            .use(ZiggyVue, Ziggy)
-            .use(ToastService)
-            .use(Toast) // TODO delete the "old" toast
-            .component("Head", Head)
-            .component("Link", Link);
+  title: (title) => `${title} - ${appName}`,
+  resolve: (name) => resolvePageComponent(`./Pages/${name}.vue`, import.meta.glob("./Pages/**/*.vue")),
+  progress: {
+    color: "#4B5563",
+  },
+  setup({ el, App, props, plugin }) {
+    const vueApp = createApp({ render: () => h(App, props) })
+      .use(PrimeVue, {
+        theme: {
+          preset: PrimeVuePreset,
+          options: {
+            darkModeSelector: ".dark",
+            cssLayer: {
+              name: "primevue",
+              order: "tailwind-base, primevue, tailwind-utilities",
+            },
+          },
+        },
+      })
+      .use(plugin)
+      .use(ZiggyVue, Ziggy)
+      .use(ToastService)
+      .use(Toast) // TODO delete the "old" toast
+      .component("Head", Head)
+      .component("Link", Link);
 
-        if (bugsnagKey) {
-            vueApp.use(Bugsnag.getPlugin("vue"));
-        }
+    if (bugsnagKey) {
+      vueApp.use(Bugsnag.getPlugin("vue"));
+    }
 
-        vueApp.mount(el);
-        return vueApp;
-    },
+    vueApp.mount(el);
+    return vueApp;
+  },
 });
