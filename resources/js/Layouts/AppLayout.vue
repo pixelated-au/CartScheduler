@@ -113,6 +113,8 @@ const checkLater = () => {
   </div>
 
   <PToast class="z-50" position="top-center" group="default" :auto-z-index="false" />
+  <PToast class="z-50" position="center" group="center" :auto-z-index="false" />
+  <PToast class="z-50" position="bottom-center" group="bottom" :auto-z-index="false" />
 
   <ObtrusiveNotification :draggable="false"
                          :close-on-escape="false"
