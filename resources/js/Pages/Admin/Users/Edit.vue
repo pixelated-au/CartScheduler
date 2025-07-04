@@ -35,7 +35,7 @@ const canChooseLocations = !!usePage().props.enableUserLocationChoices;
 
     <div>
       <div class="max-w-7xl mx-auto pt-10 sm:px-6 lg:px-8">
-        <UserProfileForm :user="editUser.data" />
+        <UserProfileForm :user="editUser.data" action="edit" />
       </div>
 
       <template v-if="$page.props.enableUserAvailability">

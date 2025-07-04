@@ -13,6 +13,7 @@ const props = defineProps({
   user: Object,
   action: {
     type: String,
+    required: true,
     validator: (value) => ["edit", "add"].includes(value),
   },
 });
