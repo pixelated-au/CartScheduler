@@ -5,6 +5,7 @@
 @import "calendar.css";
 @import "range-slider.css";
 @import "components.css";
+@import "animations.css";
 @import "@static-fonts/inter/inter.css";
 
 @layer tailwind-base, primevue, tailwind-utilities;
