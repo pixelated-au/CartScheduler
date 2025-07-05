@@ -23,10 +23,13 @@ defineEmits([
 ]);
 
 const route = inject("route");
-
 const extendedPrecognition = useExtendedPrecognition();
+const toast = useToast();
 
-const form = extendedPrecognition({ routeName: props.action === "edit" ? "admin.users.update" : "admin.users.store", id: props.user.id }, {
+const form = extendedPrecognition({
+  routeName: props.action === "edit" ? "admin.users.update" : "admin.users.store",
+  id: props.user.id,
+}, {
   id: props.user.id,
   name: props.user.name,
   role: props.user.role,
@@ -47,8 +50,16 @@ const saveAction = () => {
   form.submit({
     errorBag: "updateUserData",
     preserveScroll: true,
-    onSuccess: () => toast.success(`${props.user.name} was saved.`, "Success!"),
-    onError: () => toast.error(`${props.user.name} could not be saved. Please check the validation messages`, "Not Saved!"),
+    onSuccess: () => toast.success(
+      `${props.user.name} was saved.`,
+      "Success!",
+      { group: "bottom" },
+    ),
+    onError: () => toast.error(
+      `${props.user.name} could not be saved. Please check the validation messages`,
+      "Not Saved!",
+      { group: "bottom" },
+    ),
   });
 };
 
@@ -84,14 +95,12 @@ const performConfirmationAction = () => {
   }
 };
 
-const toast = useToast();
-
 const performResendWelcomeAction = async () => {
   try {
     const response = await axios.post(route("admin.resend-welcome-email", { user_id: props.user.id }));
-    toast.success(response.data.message);
+    toast.success(response.data.message, "Success!", { group: "center" });
   } catch (e) {
-    toast.error(e.response.data.message, { timeout: 3000 });
+    toast.error(e.response.data.message, "Error!", { timeout: 4000 });
   }
 };
 
@@ -99,7 +108,11 @@ watch([() => form.is_unrestricted, () => form.role], ([isUnrestricted, role]) =>
   if (!isUnrestricted && role === "admin") {
     nextTick(() => {
       form.role = "user";
-      toast.warning("Restricted users cannot be administrators. The role has been changed to a standard user.");
+      toast.warning(
+        "Restricted users cannot be administrators. The role has been changed to a standard user.",
+        "Oops!",
+        { group: "center" },
+      );
     });
   }
 });
@@ -107,7 +120,11 @@ watch([() => form.gender, () => form.appointment], ([gender, appointment]) => {
   if (appointment && gender === "female") {
     nextTick(() => {
       form.appointment = null;
-      toast.warning("Sisters cannot be appointed. The appointment has been reset");
+      toast.warning(
+        "Sisters cannot be appointed. The appointment has been reset",
+        "Oops!",
+        { group: "center" },
+      );
     });
   }
 });
@@ -208,7 +225,7 @@ watch([() => form.gender, () => form.appointment], ([gender, appointment]) => {
                      :options="[
                        { label: 'Ministerial Servant', value: 'ministerial servant' },
                        { label: 'Elder', value: 'elder' },
-                     ]"/>
+                     ]" />
             <JetInputError :message="form.errors.appointment" class="mt-2" />
           </div>
           <div class="flex flex-col">
@@ -347,9 +364,13 @@ watch([() => form.gender, () => form.appointment], ([gender, appointment]) => {
                     @click.prevent="onDelete" />
 
       <CancelButton :processing="form.processing" @click.prevent="confirmCancel" />
-      <SubmitButton :action :processing="form.processing" :success="form.wasSuccessful" @click.prevent="saveAction" />
+      <SubmitButton :action
+                    :processing="form.processing"
+                    :success="form.wasSuccessful"
+                    :failure="form.hasErrors"
+                    :errors="form.errors"
+                    @click.prevent="saveAction" />
     </template>
-    todo move this button to a new component
 
     <JetActionMessage :on="form.recentlySuccessful" class="mr-3">
       Success: User Saved.
