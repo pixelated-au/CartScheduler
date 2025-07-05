@@ -30,10 +30,10 @@ const invalid = computed(() => !!props.form?.invalid(props.errorKey));
          :class="[
            [$slots['default'] ? 'grid-cols-[max-content_1fr]' : 'grid-cols-1'],
          ]">
-    <span class="flex items-center transition-colors duration-300"
+    <span class="flex items-center transition-[color,gap] duration-300"
           :class="[
             { 'text-neutral-800 dark:text-neutral-200': !isDisabled, 'text-neutral-400 dark:text-neutral-600': isDisabled },
-            { '!text-red-500':invalid },
+            [ invalid ? '!text-warning gap-1' : 'gap-0 delay-[0ms,300ms]' ],
           ]">
       <LabelError :invalid />
       <span class="font-medium">
