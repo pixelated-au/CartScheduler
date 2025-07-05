@@ -1,5 +1,7 @@
-<script setup lang="ts">
-defineProps({
+<script setup>
+import { computed } from "vue";
+
+const { action, success, failure, errors, processing } = defineProps({
   action: {
     type: String,
     required: false,
@@ -7,35 +9,77 @@ defineProps({
     validator: (value) => ["edit", "add"].includes(value),
   },
   success: Boolean,
+  failure: Boolean,
+  errors: {
+    type: [String, Array, Object],
+    required: false,
+  },
   processing: Boolean,
+});
+
+const icon = computed(() => {
+  if (success) {
+    return "iconify mdi--tick-circle-outline animate-pop";
+  } else if (failure) {
+    return "iconify mdi--alert-circle-outline animate-pop";
+  } else {
+    return "iconify mdi--cloud-upload-outline";
+  }
+});
+
+const label = computed(() => action === "edit" ? "Update" : "Save");
+
+const tooltip = computed(() => {
+  if (
+    !failure ||
+    (Array.isArray(errors) && errors.length === 0) ||
+    (typeof errors === "object" && Object.keys(errors).length === 0)
+  ) {
+    return undefined;
+  }
+
+  let value;
+  if (typeof errors === "string") {
+    value = errors;
+
+  } else if (Array.isArray(errors) && errors.length > 0) {
+    value = "Oops! The following problems were found: ";
+    value += errors[0];
+    if (errors.length > 1) {
+      value += ` and ${errors.length - 1} more problems found.`;
+    }
+    value += "";
+
+  } else if (typeof errors === "object" && Object.keys(errors).length > 0) {
+    const keys = Object.keys(errors);
+    value = "Oops! The following problems were found: \n\n";
+    value += errors[keys[0]];
+    if (keys.length > 1) {
+      value += ` and ${keys.length - 1} more problems found.`;
+    }
+    value += "";
+
+  } else {
+    value = "Hmm... something doesn't look right. Please fix any problems and try again.";
+  }
+
+  return {
+    value,
+    pt: {
+      arrow: "border-t-warning",
+      text: "bg-warning text-white",
+    },
+  };
 });
 </script>
 
 <template>
   <PButton v-bind="$attrs"
-           :icon="success ? 'inline-block iconify mdi--tick-circle-outline success-icon' : 'iconify mdi--cloud-upload-outline'"
+           v-tooltip.top="tooltip"
+           :icon
            loading-icon="animate-spin iconify mdi--sync"
-           :label="action === 'edit' ? 'Update' : 'Save'"
+           :label
+           :severity="success ? 'success' : failure ? 'warn' : 'primary'"
            :disabled="processing"
            :loading="processing" />
 </template>
-
-<!--suppress CssUnusedSymbol -->
-<style scoped>
-:deep(.success-icon) {
-    animation-name: pop;
-    animation-duration: 750ms;
-    /*noinspection CssInvalidFunction*/
-    animation-timing-function: linear(0, 0.618 4.6%, 1.072 9.7%, 1.358 15.3%, 1.446 18.4%, 1.497 21.7%, 1.512 23.9%, 1.514 26.2%, 1.481 31.5%, 1.421 36.4%, 1.174 53.4%, 1.108 59.5%, 1.059 65.7%, 1.028 71.9%, 1.009 78.9%, 1);
-    animation-iteration-count: 1;
-}
-
-@keyframes pop {
-    0%, 100% {
-        scale: .1;
-    }
-    100% {
-        scale: 1;
-    }
-}
-</style>
