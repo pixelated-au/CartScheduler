@@ -46,7 +46,7 @@
     --marker-date-border-color: theme('colors.rostered-marker.light');
   }
 
-@layer theme {
+@layer {
   .p-datepicker {
     @apply w-full border-separate border-spacing-12;
 
