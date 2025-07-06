@@ -1,0 +1,54 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "strict": true,
+    "importHelpers": true,
+    "esModuleInterop": true,
+    "moduleResolution": "node",
+    "sourceMap": true,
+    "forceConsistentCasingInFileNames": true,
+    "allowSyntheticDefaultImports": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "strictPropertyInitialization": false,
+    "allowUnreachableCode": true,
+    "resolveJsonModule": true,
+    "allowJs": true,
+    "checkJs": true,
+    "allowUmdGlobalAccess": true,
+    "isolatedModules": true,
+    "typeRoots": [
+      "./node_modules/@types",
+      "./node_modules/unplugin-icons"
+    ],
+    "types": [
+      "chai",
+      "types/vue"
+    ],
+    "paths": {
+      "@static-fonts/*": [
+        "./resources/assets/fonts/*"
+      ],
+      "@/*": [
+        "./resources/js/*"
+      ]
+    },
+    "lib": [
+      "ESNext",
+      "DOM",
+      "DOM.Iterable"
+    ]
+  },
+  "include": [
+    "./resources/js/**/*.ts",
+    "./resources/js/**/*.tsx",
+    "./resources/js/**/*.vue",
+    "./resources/js/tests/**/*.ts",
+    "./resources/js/tests/**/*.tsx"
+  ],
+  "exclude": [
+    "node_modules",
+    "./resources/js/types/generated.ts"
+  ]
+}
