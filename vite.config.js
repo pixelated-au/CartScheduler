@@ -6,7 +6,6 @@ import IconsResolver from "unplugin-icons/resolver";
 import Components from "unplugin-vue-components/vite";
 import { defineConfig } from "vite";
 import vueDevTools from "vite-plugin-vue-devtools";
-import { resolve } from "node:path";
 
 export default defineConfig({
   plugins: [
