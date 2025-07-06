@@ -1,20 +1,34 @@
 // noinspection NpmUsedModulesInstalled
 
+import { resolve } from "node:path";
 import css from "@eslint/css";
 import js from "@eslint/js";
 import stylistic from "@stylistic/eslint-plugin";
-import { defineConfig, globalIgnores } from "eslint/config";
+import { configureVueProject, defineConfigWithVueTs, vueTsConfigs } from "@vue/eslint-config-typescript";
+import { globalIgnores } from "eslint/config";
+import { createTypeScriptImportResolver } from "eslint-import-resolver-typescript";
 import { importX } from "eslint-plugin-import-x";
 import pluginVue from "eslint-plugin-vue";
 import globals from "globals";
 
-export default defineConfig([
-  globalIgnores(["node_modules", "vendor"]),
+configureVueProject({
+  scriptLangs: ["ts", "js"],
+  rootDir: resolve(import.meta.dirname, "./resources/js"),
+});
+
+export default defineConfigWithVueTs([
+  importX.flatConfigs.recommended,
+  importX.flatConfigs.typescript,
+  globalIgnores(["node_modules", "vendor", "public"]),
   {
     name: "eslint-defaults",
-    files: ["./*.js", "./resources/js/**/*.{js,vue}"],
-    plugins: { js, "@stylistic": stylistic, "import-x": importX },
-    extends: ["js/recommended", pluginVue.configs["flat/essential"]],
+    files: ["./*.{ts,js}", "./resources/js/**/*.{ts,js,vue}"],
+    ignores: ["*.d.ts"],
+    plugins: { "@stylistic": stylistic, "import-x": importX },
+    extends: [pluginVue.configs["flat/essential"], vueTsConfigs.recommended],
+    settings: {
+      "import-x/resolver-next": [createTypeScriptImportResolver()],
+    },
     languageOptions: {
       ecmaVersion: 2020,
       globals: {
@@ -41,10 +55,19 @@ export default defineConfig([
   },
   {
     name: "eslint-js",
+    files: ["./*.js", "./resources/js/**/*.js,vue"],
     rules: {
       "no-empty": ["warn", { allowEmptyCatch: true }],
       "no-unused-expressions": ["warn", { allowShortCircuit: true, allowTernary: true }],
       "no-unused-vars": "warn",
+    },
+  },
+  {
+    name: "eslint-ts",
+    rules: {
+      "@typescript-eslint/ban-ts-comment": ["warn", { "ts-nocheck": "allow-with-description" }],
+      "@typescript-eslint/no-unused-expressions": ["warn", { allowShortCircuit: true, allowTernary: true }],
+      "@typescript-eslint/no-unused-vars": "warn",
     },
   },
   {
@@ -56,15 +79,16 @@ export default defineConfig([
       "import-x/no-named-as-default": "off",
       "import-x/no-named-as-default-member": "off",
       "import-x/no-unresolved": "off",
-            /**
-             * import/order:
-             * If the ordering of `eslint --fix` isn't working, it's likely because there is an unbound import.
-             * Eg import 'xyz.css' as opposed to import abc from 'abc'.
-             * @see https://github.com/un-ts/eslint-plugin-import-x/blob/master/docs/rules/order.md#limitations-of---fix
-             */
+      /**
+       * import/order:
+       * If the ordering of `eslint --fix` isn't working, it's likely because there is an unbound import.
+       * Eg import 'xyz.css' as opposed to import abc from 'abc'.
+       * @see https://github.com/un-ts/eslint-plugin-import-x/blob/master/docs/rules/order.md#limitations-of---fix
+       */
       "import-x/order": [
         "warn",
         {
+          groups: ["builtin", "external", "internal", "unknown", ["parent", "sibling"], "index", "object", "type"],
           groups: [
             "builtin",
             "external",
@@ -80,7 +104,7 @@ export default defineConfig([
             orderImportKind: "asc",
             caseInsensitive: true,
           },
-          "sortTypesGroup": true,
+          sortTypesGroup: true,
         },
       ],
     },
@@ -94,19 +118,22 @@ export default defineConfig([
           order: ["script:not([setup])", "script[setup]", "template", "style"],
         },
       ],
-      "vue/block-tag-newline": ["error", {
-        blocks: {
-          script: {
-            singleline: "always",
-            multiline: "always",
-          },
-          template: {
-            singleline: "always",
-            multiline: "always",
-            maxEmptyLines: 0,
+      "vue/block-tag-newline": [
+        "error",
+        {
+          blocks: {
+            script: {
+              singleline: "always",
+              multiline: "always",
+            },
+            template: {
+              singleline: "always",
+              multiline: "always",
+              maxEmptyLines: 0,
+            },
           },
         },
-      }],
+      ],
       "vue/first-attribute-linebreak": ["warn", { singleline: "ignore", multiline: "beside" }],
       "vue/html-closing-bracket-newline": [
         "warn",
@@ -220,9 +247,9 @@ export default defineConfig([
           },
         },
       ],
-      "@stylistic/multiline-ternary": ["error", "always-multiline"],
+      "@stylistic/multiline-ternary": ["warn", "always-multiline"],
       "@stylistic/object-curly-newline": ["off"],
-      "@stylistic/object-curly-spacing": ["error", "always"],
+      "@stylistic/object-curly-spacing": ["warn", "always"],
       "@stylistic/padding-line-between-statements": [
         "error",
         { blankLine: "always", prev: "*", next: "import" },
@@ -240,7 +267,7 @@ export default defineConfig([
         },
       ],
       "spaced-comment": [
-        "error",
+        "warn",
         "always",
         {
           line: {
@@ -254,7 +281,7 @@ export default defineConfig([
           },
         },
       ],
-      "@stylistic/space-unary-ops": ["error"],
+      "@stylistic/space-unary-ops": ["warn"],
     },
   },
 ]);
