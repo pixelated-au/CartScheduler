@@ -2,7 +2,6 @@
 
 import { resolve } from "node:path";
 import css from "@eslint/css";
-import js from "@eslint/js";
 import stylistic from "@stylistic/eslint-plugin";
 import { configureVueProject, defineConfigWithVueTs, vueTsConfigs } from "@vue/eslint-config-typescript";
 import { globalIgnores } from "eslint/config";
