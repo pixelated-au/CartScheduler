@@ -12,7 +12,7 @@ import globals from "globals";
 
 configureVueProject({
   scriptLangs: ["ts", "js"],
-  rootDir: resolve(import.meta.dirname, "./resources/js"),
+  rootDir: resolve(import.meta.dirname),
 });
 
 export default defineConfigWithVueTs([
@@ -29,7 +29,7 @@ export default defineConfigWithVueTs([
       "import-x/resolver-next": [createTypeScriptImportResolver()],
     },
     languageOptions: {
-      ecmaVersion: 2020,
+      ecmaVersion: 2022,
       globals: {
         ...globals.browser,
         ...globals.node,
@@ -65,6 +65,16 @@ export default defineConfigWithVueTs([
     name: "eslint-ts",
     rules: {
       "@typescript-eslint/ban-ts-comment": ["warn", { "ts-nocheck": "allow-with-description" }],
+      "@typescript-eslint/consistent-type-imports": [
+        "warn",
+        {
+          prefer: "type-imports",
+          fixStyle: "separate-type-imports",
+          disallowTypeAnnotations: true,
+        },
+      ],
+      "@typescript-eslint/no-empty-object-type": "warn",
+      "@typescript-eslint/no-import-type-side-effects": "warn",
       "@typescript-eslint/no-unused-expressions": ["warn", { allowShortCircuit: true, allowTernary: true }],
       "@typescript-eslint/no-unused-vars": "warn",
     },
@@ -87,7 +97,16 @@ export default defineConfigWithVueTs([
       "import-x/order": [
         "warn",
         {
-          groups: ["builtin", "external", "internal", "unknown", ["parent", "sibling"], "index", "object", "type"],
+          groups: [
+            "builtin",
+            "external",
+            "internal",
+            "unknown",
+            ["parent", "sibling"],
+            "index",
+            "object",
+            "type",
+          ],
           alphabetize: {
             order: "asc",
             orderImportKind: "asc",
