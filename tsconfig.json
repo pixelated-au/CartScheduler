@@ -1,23 +1,46 @@
 {
   "compilerOptions": {
-    "target": "ESNext",
-    "module": "ESNext",
-    "strict": true,
-    "importHelpers": true,
-    "esModuleInterop": true,
-    "moduleResolution": "node",
-    "sourceMap": true,
-    "forceConsistentCasingInFileNames": true,
-    "allowSyntheticDefaultImports": true,
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
-    "strictPropertyInitialization": false,
-    "allowUnreachableCode": true,
-    "resolveJsonModule": true,
     "allowJs": true,
-    "checkJs": true,
+    "allowSyntheticDefaultImports": true,
     "allowUmdGlobalAccess": true,
+    "allowUnreachableCode": true,
+    "checkJs": true,
+    "emitDecoratorMetadata": true,
+    "esModuleInterop": true,
+    "experimentalDecorators": true,
+    "forceConsistentCasingInFileNames": true,
+    "importHelpers": true,
     "isolatedModules": true,
+    "lib": [
+      "ES2022",
+      "DOM",
+      "DOM.Iterable"
+    ],
+    "module": "ES2022",
+    "moduleDetection": "force",
+    "moduleResolution": "bundler",
+    "noEmit": true,
+    "noImplicitOverride": true,
+    "paths": {
+      "@static-fonts/*": [
+        "./resources/assets/fonts/*"
+      ],
+      "@/*": [
+        "./resources/js/*"
+      ],
+      "@@/*": [
+        "./*"
+      ],
+      "ziggy-js": [
+        "./vendor/tightenco/ziggy"
+      ]
+    },
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "sourceMap": true,
+    "strict": true,
+    "strictPropertyInitialization": false,
+    "target": "ES2022",
     "typeRoots": [
       "./node_modules/@types",
       "./node_modules/unplugin-icons"
@@ -26,19 +49,7 @@
       "chai",
       "types/vue"
     ],
-    "paths": {
-      "@static-fonts/*": [
-        "./resources/assets/fonts/*"
-      ],
-      "@/*": [
-        "./resources/js/*"
-      ]
-    },
-    "lib": [
-      "ESNext",
-      "DOM",
-      "DOM.Iterable"
-    ]
+    "verbatimModuleSyntax": false
   },
   "include": [
     "./resources/js/**/*.ts",
@@ -48,7 +59,6 @@
     "./resources/js/tests/**/*.tsx"
   ],
   "exclude": [
-    "node_modules",
-    "./resources/js/types/generated.ts"
+    "node_modules"
   ]
 }

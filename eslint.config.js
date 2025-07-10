@@ -13,7 +13,7 @@ import globals from "globals";
 
 configureVueProject({
   scriptLangs: ["ts", "js"],
-  rootDir: resolve(import.meta.dirname, "./resources/js"),
+  rootDir: resolve(import.meta.dirname),
 });
 
 export default defineConfigWithVueTs([
@@ -30,7 +30,7 @@ export default defineConfigWithVueTs([
       "import-x/resolver-next": [createTypeScriptImportResolver()],
     },
     languageOptions: {
-      ecmaVersion: 2020,
+      ecmaVersion: 2022,
       globals: {
         ...globals.browser,
         ...globals.node,
