@@ -1,4 +1,4 @@
-import { resolve } from "node:path";
+import * as path from "node:path";
 import vue from "@vitejs/plugin-vue";
 import laravel from "laravel-vite-plugin";
 import { defineConfig } from "vite";
@@ -20,11 +20,11 @@ export default defineConfig({
   ],
   resolve: {
     alias: {
-      "@": resolve(__dirname, "./resources/js"),
+      "@": path.resolve("./resources/js"),
     },
-  },
-  server: {
-    host: "0.0.0.0",
+    server: {
+      host: "0.0.0.0",
+    },
   },
   envDir: "./",
 });
