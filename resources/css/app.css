@@ -61,24 +61,3 @@ a {
     /* Modern browsers to allow for dynamic resizing */
     interpolate-size: allow-keywords;
 }
-
-.v-popper__popper .v-popper__inner div {
-    @apply text-sm;
-}
-
-.page-content ul, .page-content ol {
-    @apply pl-3;
-}
-
-.page-content ul li {
-    @apply list-disc;
-}
-
-.page-content ol li {
-    @apply list-decimal;
-}
-
-.grid-cols-page {
-    grid-template-areas:
-        "left content right";
-}
