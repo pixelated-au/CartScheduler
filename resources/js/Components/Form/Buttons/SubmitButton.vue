@@ -1,25 +1,19 @@
-<script setup>
+<script setup lang="ts">
 import { computed } from "vue";
 
-const { action, success, failure, errors, processing } = defineProps({
-  action: {
-    type: String,
-    required: false,
-    default: "edit",
-    validator: (value) => ["edit", "add"].includes(value),
-  },
-  success: Boolean,
-  failure: Boolean,
-  errors: {
-    type: [String, Array, Object],
-    required: false,
-  },
-  processing: Boolean,
-});
+const { action, label, icon, success = false, failure = false, errors, processing = false } = defineProps<{
+  action?: "edit" | "add";
+  label?: string;
+  icon?: string;
+  success?: boolean;
+  failure?: boolean;
+  errors?: string | string[] | Record<string, string>;
+  processing?: boolean;
+}>();
 
-const icon = computed(() => {
+const buttonIcon = computed(() => {
   if (success) {
-    return "iconify mdi--tick-circle-outline animate-pop";
+    return (icon ? icon : "iconify mdi--tick-circle-outline") + " animate-pop";
   } else if (failure) {
     return "iconify mdi--alert-circle-outline animate-pop";
   } else {
@@ -27,13 +21,17 @@ const icon = computed(() => {
   }
 });
 
-const label = computed(() => action === "edit" ? "Update" : "Save");
+const buttonLabel = computed(() => {
+  if (label) return label;
+  if (action) return action === "edit" ? "Update" : "Save";
+  return "Submit";
+});
 
 const tooltip = computed(() => {
   if (
     !failure ||
     (Array.isArray(errors) && errors.length === 0) ||
-    (typeof errors === "object" && Object.keys(errors).length === 0)
+    (typeof errors === "object" && errors !== null && Object.keys(errors).length === 0)
   ) {
     return undefined;
   }
@@ -76,9 +74,9 @@ const tooltip = computed(() => {
 <template>
   <PButton v-bind="$attrs"
            v-tooltip.top="tooltip"
-           :icon
+           :icon="buttonIcon"
            loading-icon="animate-spin iconify mdi--sync"
-           :label
+           :label="buttonLabel"
            :severity="success ? 'success' : failure ? 'warn' : 'primary'"
            :disabled="processing"
            :loading="processing" />
