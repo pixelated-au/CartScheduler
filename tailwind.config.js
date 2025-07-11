@@ -75,8 +75,8 @@ export default {
           dark: colors.neutral[900],
         },
         "text-input": {
-          DEFAULT: colors.transparent,
-          dark: colors.transparent,
+          DEFAULT: formatColor({ ...parseColor(colors.neutral[50]), alpha: 0.25 }),
+          dark: formatColor({ ...parseColor(colors.neutral[950]), alpha: 0.25 }),
         },
         page: {
           DEFAULT: colors.neutral[100],
@@ -97,7 +97,6 @@ export default {
 
   plugins: [
     import("@tailwindcss/forms"),
-    import("@tailwindcss/typography"),
     import("flowbite/plugin"),
     import("tailwindcss-primeui"),
     addIconSelectors({
