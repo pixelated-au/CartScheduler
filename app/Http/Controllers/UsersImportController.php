@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Session;
 use Inertia\Inertia;
 use Inertia\Response;
 use Maatwebsite\Excel\Facades\Excel;
@@ -29,7 +30,7 @@ class UsersImportController extends Controller
             'file' => ['required', 'file', 'mimes:csv,xlsx,xls'],
         ]);
 
-        $import = new UsersImport();
+        $import = app()->make(UsersImport::class);
         Excel::import($import, $request->file('file'));
 
         $createCount = $import->getCreateCount();
@@ -44,8 +45,8 @@ class UsersImportController extends Controller
             $updateMessage = "$updateCount users were updated";
             $updateMessage .= $createCount ? '!' : '';
         }
-        session()->flash('flash.banner', $createMessage . $updateMessage);
-        session()->flash('flash.bannerStyle', 'success');
+        Session::flash('flash.banner', $createMessage . $updateMessage);
+        Session::flash('flash.bannerStyle', 'success');
 
         return Redirect::route('admin.users.import.show');
     }
