@@ -32,7 +32,7 @@ export default defineConfig({
         "./resources/js/Components/**/*.vue",
         "./resources/js/Layouts/Components/**/*.vue",
       ],
-      dts: true,
+      dts: "./resources/js/types/auto-import-components.d.ts",
       directoryAsNamespace: true,
       resolvers: [
         PrimeVueResolver({ components: { prefix: "P" } }),
