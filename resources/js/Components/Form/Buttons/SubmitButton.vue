@@ -12,13 +12,17 @@ const { action, label, icon, success = false, failure = false, errors, processin
 }>();
 
 const buttonIcon = computed(() => {
-  if (success) {
-    return (icon ? icon : "iconify mdi--tick-circle-outline") + " animate-pop";
-  } else if (failure) {
-    return "iconify mdi--alert-circle-outline animate-pop";
-  } else {
-    return "iconify mdi--cloud-upload-outline";
+  if (icon) {
+    return icon;
   }
+  if (success) {
+    return "iconify mdi--tick-circle-outline animate-pop";
+  }
+  if (failure) {
+    return "iconify mdi--alert-circle-outline animate-pop";
+  }
+
+  return "iconify mdi--cloud-upload-outline";
 });
 
 const buttonLabel = computed(() => {
