@@ -1,24 +1,55 @@
 <script setup lang="ts">
-import { router, useForm } from "@inertiajs/vue3";
-import { computed, inject } from "vue";
+import { router, useForm, usePage } from "@inertiajs/vue3";
+import { computed, inject, nextTick, watch } from "vue";
+import FileUpload from "@/Components/Form/FileUpload.vue";
+import useToast from "@/Composables/useToast";
 import AppLayout from "@/Layouts/AppLayout.vue";
 
 defineProps({});
 
 const route = inject("route");
 
-const listRouteAction = () => {
-  router.visit(route("admin.users.index"));
-};
-
 const form = useForm<{ file: File | null }>({
   file: null,
+});
+
+const toast = useToast();
+const page = usePage();
+
+watch(() => form.wasSuccessful, (value, oldValue) => {
+  if (oldValue && !value) {
+    form.reset();
+  }
 });
 
 const uploadFile = () => {
   form.post(route("admin.users.import.import"), {
     preserveScroll: true,
+    onSuccess: () => form.reset(),
+    onError: () => {
+      form.reset("file");
+      toast.error(
+        "File could not be imported. Please check the validation messages",
+        "Not Saved!",
+        { group: "center" },
+      );
+    },
   });
+};
+
+watch(() => page.props.jetstream, (value) => {
+  if (!value?.flash?.message) return;
+  toast.success(
+    value.flash.message,
+    "Success!",
+    { group: "center" },
+  );
+
+  nextTick(() => page.props.jetstream.flash = {});
+}, { deep: true });
+
+const listRouteAction = () => {
+  router.visit(route("admin.users.index"));
 };
 
 const validationErrors = computed(() => {
@@ -35,14 +66,21 @@ const validationErrors = computed(() => {
   return errors;
 });
 
-function handleFileChange(event: Event) {
-  const inputElement = event.target as HTMLInputElement;
-  if (inputElement.files) {
-    form.file = inputElement.files?.[0] || null;
-  }
-}
-
 const templateFile = route("admin.user-import-template");
+
+const isReadyForUpload = computed(() => {
+  if (form.recentlySuccessful) return true;
+  // noinspection RedundantIfStatementJS
+  if (form.file) return true;
+  return false;
+});
+
+const label = computed(() => {
+  if (form.hasErrors) {
+    return "Please fix the above errors and try again";
+  }
+  return isReadyForUpload.value ? "Upload and Import" : "To upload: 'Choose' a file using the field above";
+});
 </script>
 
 <template>
@@ -58,7 +96,7 @@ const templateFile = route("admin.user-import-template");
 
     <div class="pt-10 mx-auto max-w-7xl sm:px-6">
       <div v-if="validationErrors.length"
-           class="overflow-auto px-5 py-3 mb-6 text-white rounded bg-warning dark:bg-warning-light min-h-10">
+           class="overflow-auto px-5 py-3 mb-6 text-white rounded bg-warning dark:bg-warning-light min-h-10 max-h-96 overflow-y-scroll">
         <h4>
           Oops! it seems you have
           {{ validationErrors.length === 1 ? 'a problem' : 'some problems' }}
@@ -76,9 +114,15 @@ const templateFile = route("admin.user-import-template");
           <div class="flex flex-col gap-3 w-full">
             <div class="flex flex-col gap-3">
               <h3>User Import</h3>
-              <div class="px-3 py-6 rounded border std-border">
+              <div class="flex flex-col gap-4 px-3 py-6 rounded border std-border">
                 <ol class="formatted-list">
-                  <li>Download and open the <a :href="templateFile">Template Excel file</a></li>
+                  <li>
+                    Download and open the
+                    <a :href="templateFile" class="align-middle inline-flex items-center gap-1">
+                      Template Excel file
+                      <span class="iconify mdi--cloud-download-outline text-sm"></span>
+                    </a>
+                  </li>
                   <li>
                     <strong>Closely</strong> follow the instructions that appear at the top of the Excel file.
                     <ul>
@@ -105,40 +149,40 @@ const templateFile = route("admin.user-import-template");
                     </ul>
                   </li>
                 </ol>
+
+                <PMessage severity="warn" variant="outlined" size="small" class="mt-4">
+                  <strong>Please note:</strong>
+                  Any <em>new users</em>
+                  in the uploaded Excel file will be sent an 'account activation' email.
+                </PMessage>
               </div>
             </div>
 
-            <div class="flex flex-col">
-              <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300" for="file-input">
-                Upload spreadsheet.<br>
-              </label>
-
-              <input class="block w-full text-sm italic rounded border cursor-pointer bg-text-input dark:bg-text-input-dark
-                        p-1 std-border hover:bg-gray-200 ease-in-out transition-colors file:text-sm
-                        file:py-2 file:px-3 file:rounded file:border-0 file:bg-neutral-300 file:text-neutral-700 dark:file:bg-neutral-500 dark:file:hover:bg-neutral-600 dark:file:text-gray-200
-                      file:hover:ring-primary dark:file:hover:ring-primary-light file:hover:ring-1 file:mr-3 file:cursor-pointer  file:hover:scale-[103%]
-                      file:hover:bg-gray-100 file:ease-in-out file:transition-[background-color,transform,box-shadow]"
-                     aria-describedby="file-input-help"
-                     id="file-input"
-                     type="file"
-                     accept="application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, text/csv"
-                     @input="handleFileChange">
-
-              <div class="mt-1 text-sm text-gray-500 dark:text-gray-300" id="file-input-help">
-                XLSX, XLS or CSV files only
-              </div>
-              <div class="mt-1 text-sm text-blue-500 underline dark:text-gray-300"
-                   id="file-input-help">
-                <a :href="templateFile">Template Excel file</a>
-              </div>
+            <div class="flex flex-col gap-2 mt-4">
+              <FileUpload v-model="form.file"
+                          label="Upload your spreadsheet here:"
+                          accept="application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, text/csv">
+                <template #footer>
+                  <div class="text-xs italic text-gray-500 dark:text-gray-300" id="file-input-help">
+                    XLSX, XLS or CSV files only
+                  </div>
+                  <div class="text-sm text-blue-500 dark:text-gray-300" id="file-input-download">
+                    <a :href="templateFile" class="inline-flex gap-1 items-center">
+                      <span class="iconify mdi--cloud-download-outline"></span>
+                      Download the Template Excel file
+                    </a>
+                  </div>
+                </template>
+              </FileUpload>
             </div>
           </div>
           <div class="flex justify-end mt-3 w-full">
             <SubmitButton type="submit"
-                          :label="form.file ? 'Upload and Import' : 'Select a file above to upload'"
+                          :label
+                          :icon="isReadyForUpload ? undefined : 'iconify mdi--arrow-up fade-out-up'"
                           :disabled="!form.file"
                           :processing="form.processing"
-                          :success="form.wasSuccessful"
+                          :success="form.recentlySuccessful"
                           :failure="form.hasErrors"
                           :errors="form.errors" />
           </div>
@@ -153,7 +197,6 @@ const templateFile = route("admin.user-import-template");
   </AppLayout>
 </template>
 
-<style lang="scss">
+<style lang="scss" scoped>
 @import 'vue3-easy-data-table/dist/style.css';
-
 </style>
