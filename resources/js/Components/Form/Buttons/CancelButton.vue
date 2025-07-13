@@ -1,15 +1,8 @@
-<script setup>
-defineProps({
-  action: {
-    type: String,
-    required: false,
-    default: "edit",
-    validator: (value) => ["edit", "add"].includes(value),
-  },
-  isDirty: Boolean,
-  success: Boolean,
-  processing: Boolean,
-});
+<script setup lang="ts">
+const { isDirty = false, processing = false } = defineProps<{
+  isDirty?: boolean;
+  processing?: boolean;
+}>();
 </script>
 
 <template>

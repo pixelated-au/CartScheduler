@@ -1,18 +1,12 @@
-<script setup>
-defineProps({
-  action: {
-    type: String,
-    required: false,
-    default: "edit",
-    validator: (value) => ["edit", "add"].includes(value),
-  },
-  processing: Boolean,
-});
+<script setup lang="ts">
+const { processing = false } = defineProps<{
+  processing?: boolean;
+}>();
 </script>
 
 <template>
   <PButton v-bind="$attrs"
-           severity="danger"
+           severity="error"
            variant="outlined"
            icon="iconify mdi--warning-circle-outline"
            :disabled="processing"/>
