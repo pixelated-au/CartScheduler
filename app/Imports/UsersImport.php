@@ -136,6 +136,9 @@ class UsersImport implements
         return $this->updateCount;
     }
 
+    /**
+     * @throws ValidationException
+     */
     public static function importUploadedFiles(UploadedFile $files): self
     {
         try {
@@ -144,6 +147,7 @@ class UsersImport implements
             /** @var UsersImport $import */
             $import = app()->make(__CLASS__);
             Excel::import($import, $files);
+
             if ($import->failures() && $import->failures()->count()) {
                 $failures = $import->failures();
                 DB::rollBack();
@@ -158,6 +162,7 @@ class UsersImport implements
             }
             DB::commit();
             return $import;
+
         } catch (Exception $exception) {
             DB::rollBack();
             throw $exception;
