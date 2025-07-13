@@ -54,7 +54,7 @@ export default {
           DEFAULT: colors.blue[600],
           light: colors.blue[400],
         },
-        danger: {
+        error: {
           DEFAULT: colors.red[600],
           light: colors.red[400],
         },
