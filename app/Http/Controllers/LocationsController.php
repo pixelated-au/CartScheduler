@@ -113,7 +113,7 @@ class LocationsController extends Controller
         $location->delete();
 
         session()->flash('flash.banner', "Location $name successfully deleted.");
-        session()->flash('flash.bannerStyle', 'danger');
+        session()->flash('flash.bannerStyle', 'warn');
 
         return Redirect::route('admin.locations.index');
     }
