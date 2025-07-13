@@ -33,17 +33,8 @@ provide("darkMode", isDarkMode);
 
 provide("enableUserAvailability", !!page.props.enableUserAvailability || false);
 
-const toast = useToast();
-
-const flash = computed(() => page.props.jetstream.flash);
 const state = useGlobalState();
 const showUpdateAvailabilityReminder = ref(false);
-
-const showToast = () => {
-  if (!Array.isArray(flash.value) && flash.value.banner) {
-    toast.message(flash.value.bannerStyle || "success", flash.value.banner);
-  }
-};
 
 const didHideAvailabilityReminderOverOneDayAgo = computed(() => {
   const dismissedOn = state.value.dismissedAvailabilityOn;
@@ -60,7 +51,6 @@ const availabilityReminderPrompt = () => {
 };
 
 onMounted(() => {
-  showToast();
   availabilityReminderPrompt();
 });
 
