@@ -2,12 +2,13 @@
 // noinspection JSUnusedGlobalSymbols
 
 import "vite/client";
-import type { Page } from "@inertiajs/core";
+import type { Page, PageProps } from "@inertiajs/core";
 import type {
   ComponentCustomOptions as _ComponentCustomOptions,
   ComponentCustomProperties as _ComponentCustomProperties,
   DefineComponent,
 } from "vue";
+import type { ToastSeverity } from "@/Composables/useToast";
 import type { route as routeFn } from "ziggy-js";
 
 declare global {
@@ -38,12 +39,29 @@ declare module "vue" {
 }
 
 declare module "@vue/runtime-core" {
-  interface ComponentCustomProperties extends _ComponentCustomProperties {}
+  interface ComponentCustomProperties extends _ComponentCustomProperties {
+  }
 
-  interface ComponentCustomOptions extends _ComponentCustomOptions {}
+  interface ComponentCustomOptions extends _ComponentCustomOptions {
+  }
 }
 
-declare module "@inertiajs/core" {
-  interface PageProps extends InertiaPageProps, AppPageProps {
+declare module "@inertiajs/vue3" {
+  interface Flash {
+    title?: string;
+    message?: string | undefined;
+    position?: "top" | "bottom" | "center";
+    /* @deprecated - Use message instead */
+    banner?: string;
+    /* @deprecated - Only use for 'success' messages */
+    bannerStyle?: ToastSeverity extends string ? ToastSeverity : undefined;
   }
+
+    type FlashMessage = {
+      jetstream: {
+        flash: Flash;
+      };
+    };
+
+    export declare function usePage<SharedProps extends PageProps & FlashMessage>(): Page<SharedProps>;
 }
