@@ -5,21 +5,47 @@ namespace App\Imports;
 use App\Actions\GetUserValidationUtils;
 use App\Enums\Role;
 use App\Models\User;
+use Exception;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\Validator;
 use Maatwebsite\Excel\Concerns\OnEachRow;
-use Maatwebsite\Excel\Concerns\WithBatchInserts;
+use Maatwebsite\Excel\Concerns\SkipsFailures;
+use Maatwebsite\Excel\Concerns\SkipsOnFailure;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Maatwebsite\Excel\Concerns\WithValidation;
+use Maatwebsite\Excel\Facades\Excel;
 use Maatwebsite\Excel\Row;
+use Maatwebsite\Excel\Validators\Failure;
 
 /*******************************************************************************************************************
  * @see \App\Exports\UsersExport CHANGES IN THIS FILE NEED HERE MAY NEED TO BE REFLECTED HERE
  *******************************************************************************************************************/
-class UsersImport implements WithHeadingRow, WithValidation, WithBatchInserts, OnEachRow
+class UsersImport implements
+    /**
+     * @uses \Maatwebsite\Excel\Concerns\OnEachRow in place of  {@see \Maatwebsite\Excel\Concerns\ToModel}
+     * @link https://docs.laravel-excel.com/3.1/imports/model.html#handling-persistence-on-your-own
+     */
+    OnEachRow,
+    WithHeadingRow,
+    WithValidation,
+    SkipsOnFailure
+
 {
+    use SkipsFailures {
+        onFailure as attachFailure;
+    }
+
     private int $createCount = 0;
     private int $updateCount = 0;
+    private int $failureCount = 0;
+
+    public function __construct(private readonly GetUserValidationUtils $validationUtils)
+    {
+    }
 
     public function onRow(Row $row): void
     {
@@ -52,6 +78,12 @@ class UsersImport implements WithHeadingRow, WithValidation, WithBatchInserts, O
         }
     }
 
+    public function onFailure(Failure ...$failures): void
+    {
+        ++$this->failureCount;
+        $this->attachFailure(...$failures);
+    }
+
     /**
      * @throws \Illuminate\Contracts\Container\BindingResolutionException
      * @noinspection PhpUnusedParameterInspection
@@ -65,8 +97,7 @@ class UsersImport implements WithHeadingRow, WithValidation, WithBatchInserts, O
 
     public function rules(): array
     {
-        $validationUtils = app()->make(GetUserValidationUtils::class);
-        $rules           = $validationUtils->rules();
+        $rules = $this->validationUtils->rules();
 
         $rules['spouse_email'] = ['nullable', 'email'];
         $rules['spouse_id']    = ['nullable', 'exists:users,id'];
@@ -76,12 +107,12 @@ class UsersImport implements WithHeadingRow, WithValidation, WithBatchInserts, O
 
     public function withValidator(Validator $validator): void
     {
-        $data   = $validator->getData();
-        $key    = key($data);
-        $data   = current($data);
+        $data = $validator->getData();
+        $key  = key($data);
+        $data = current($data);
 
         $validator->after(
-            (app()->make(GetUserValidationUtils::class))->extraValidation(false, $key, $data)
+            $this->validationUtils->extraValidation(false, $key, $data)
         );
     }
 
@@ -105,8 +136,31 @@ class UsersImport implements WithHeadingRow, WithValidation, WithBatchInserts, O
         return $this->updateCount;
     }
 
-    public function batchSize(): int
+    public static function importUploadedFiles(UploadedFile $files): self
     {
-        return 1000;
+        try {
+            Config::set('excel.transactions.handler', 'null');
+            DB::beginTransaction();
+            /** @var UsersImport $import */
+            $import = app()->make(__CLASS__);
+            Excel::import($import, $files);
+            if ($import->failures() && $import->failures()->count()) {
+                $failures = $import->failures();
+                DB::rollBack();
+                throw ValidationException::withMessages(
+                    $failures->map(
+                        fn(Failure $failure) => collect($failure->errors())
+                            ->map(fn($error) => __(
+                                'Row :row - :message', ['row' => $failure->row(), 'message' => $error])
+                            )
+                    )->toArray()
+                );
+            }
+            DB::commit();
+            return $import;
+        } catch (Exception $exception) {
+            DB::rollBack();
+            throw $exception;
+        }
     }
 }
