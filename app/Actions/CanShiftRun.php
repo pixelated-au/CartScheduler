@@ -2,7 +2,6 @@
 
 namespace App\Actions;
 
-use App\Models\User;
 use App\Models\Location;
 use Illuminate\Support\Collection;
 

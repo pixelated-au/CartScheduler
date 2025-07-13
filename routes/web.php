@@ -21,6 +21,7 @@ use App\Http\Controllers\ResendWelcomeEmailController;
 use App\Http\Controllers\SaveShiftReportController;
 use App\Http\Controllers\SetUserPasswordController;
 use App\Http\Controllers\DeleteShiftsController;
+use App\Http\Controllers\EmailSettingsController;
 use App\Http\Controllers\ShowGeneralSettingsController;
 use App\Http\Controllers\ShowUserAvailabilityController;
 use App\Http\Controllers\ToggleShiftReservationController;
@@ -32,7 +33,6 @@ use App\Http\Controllers\UpdateUserRegularAvailabilityController;
 use App\Http\Controllers\UpdateUserVacationsController;
 use App\Http\Controllers\UsersController;
 use App\Http\Controllers\UsersImportController;
-use App\Settings\GeneralSettings;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -146,6 +146,9 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified',
             Route::post('/do-update', AdminRunSoftwareUpdateController::class)->name('admin.do-update');
             Route::get('/users-as-spreadsheet', DownloadUsersAsSpreadsheetController::class)->name('admin.users-as-spreadsheet');
             Route::get('/users-import-template', DownloadUserImportSpreadsheetController::class)->name('admin.user-import-template');
+
+            Route::get('/email-settings', EmailSettingsController::class)->name('admin.emailsettings');
+            Route::put('/email-settings-edit', [EmailSettingsController::class, "edit"])->name('admin.emailsettings.edit');
 
             //Route::get('/', static fn() => Inertia::render('Admin/Dashboard'))->name('admin.dashboard');
 

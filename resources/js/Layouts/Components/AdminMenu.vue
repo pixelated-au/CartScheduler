@@ -83,6 +83,11 @@ const hasUpdate = computed(() => {
                         </template>
                         Settings
                     </JetDropdownLink>
+
+                    <JetDropdownLink v-if="permissions.canEditSettings" :href="route('admin.emailsettings')" is-menu
+                                     inner-classes="flex content-center items-center">
+                        Email Settings
+                    </JetDropdownLink>
                 </template>
             </JetDropdown>
         </div>

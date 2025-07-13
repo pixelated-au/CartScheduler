@@ -8,39 +8,57 @@ import LinkUnsetButton from '@/Components/EditorToolbar/LinkUnsetButton.vue';
 import ListButton from '@/Components/EditorToolbar/ListButton.vue';
 import ParagraphButton from '@/Components/EditorToolbar/ParagraphButton.vue';
 import StrikethroughButton from '@/Components/EditorToolbar/StrikethroughButton.vue';
+import { SyntaxHighlight } from '@/Components/TextEditorSyntaxHighlighter';
 import Link from '@tiptap/extension-link';
 import TextAlign from '@tiptap/extension-text-align';
 import StarterKit from '@tiptap/starter-kit';
 import {EditorContent, useEditor} from '@tiptap/vue-3';
 import {provide, watch} from 'vue';
+import { serialize, deserialize } from "./TextEditorMarkdown"
 
 const props = defineProps({
     modelValue: {
         type: String,
         default: '',
     },
+    highlightSyntax: {
+        type: Boolean,
+        default: false,
+    },
 });
 
 const emit = defineEmits(['update:modelValue']);
 
+let editor_extensions = [
+    StarterKit.configure({heading: {levels: [3, 4, 5, 6]}}),
+    Link.configure({autolink: true, linkOnPaste: true, protocols: ['mailto'], openOnClick: false}),
+    TextAlign.configure({types: ['paragraph']}),
+]
+
+if (props.highlightSyntax)
+    editor_extensions.push(SyntaxHighlight)
+
 const editor = useEditor({
-    content: props.modelValue,
-    extensions: [
-        StarterKit.configure({heading: {levels: [3, 4, 5, 6]}}),
-        Link.configure({autolink: true, linkOnPaste: true, protocols: ['mailto'], openOnClick: false}),
-        TextAlign.configure({types: ['paragraph']}),
-    ],
+    content: deserialize("", props.modelValue),
+    extensions: editor_extensions,
     editable: true,
     onUpdate: (event) => {
-        emit('update:modelValue', event.editor.getHTML());
+        emit('update:modelValue', serialize(editor.value.view.state.schema, editor.value.getJSON()));
     },
+    onCreate: (event) => {
+        event.editor.content = deserialize(event.editor.schema, props.modelValue)
+        //let markdown = serialize(editor.value.view.state.schema, editor.value.getJSON());
+    }
 });
 
 watch(() => props.modelValue, (value) => {
-    if (!editor?.value || value === editor?.value?.getHTML()) {
+    if (!editor?.value || value === editor?.value) {
         return;
     }
-    editor.value.commands.setContent(value, false);
+    //let new_html = deserialize(editor.value.view.state.schema, value)
+    //editor.value.commands.setContent(new_html, false);
+    //let markdown = serialize(editor.value.view.state.schema, editor.value.getJSON())
+    //editor.value.commands.setContent(markdown, false);
 });
 
 provide('editor', editor);
@@ -105,5 +123,11 @@ provide('editor', editor);
     strong {
         @apply font-bold
     }
+
+    .syntax-highlight {
+        color: red;
+        font-style: italic;
+    }
+
 }
 </style>

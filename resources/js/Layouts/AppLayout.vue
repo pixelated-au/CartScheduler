@@ -204,6 +204,11 @@ const checkLater = () => {
                                                       :active="route().current('admin.settings')">
                                     Settings
                                 </JetResponsiveNavLink>
+                                <JetResponsiveNavLink v-if="permissions.canEditSettings"
+                                                      :href="route('admin.emailsettings')"
+                                                      :active="route().current('admin.emailsettings')">
+                                    Email settings
+                                </JetResponsiveNavLink>
                             </div>
                         </div>
                     </div>

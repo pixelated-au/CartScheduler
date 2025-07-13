@@ -1,5 +1,6 @@
 <script setup>
 import SelectField from "@/Components/SelectField.vue";
+import TextEditor from '@/Components/TextEditor.vue';
 import JetActionMessage from '@/Jetstream/ActionMessage.vue';
 import JetButton from '@/Jetstream/Button.vue';
 import JetCheckbox from '@/Jetstream/Checkbox.vue';
@@ -129,6 +130,12 @@ const hours = computed(() => {
                 <JetInputError :message="form.errors.emailReminderTime" class="mt-2"/>
                 <div class="col-span-2 ml-1 text-sm text-gray-600 dark:text-gray-300 w-full">
                     How many hours before the shift do you want publishers to receive the reminder?
+                </div>
+                <!-- Name -->
+                <div class="col-span-6 sm:col-span-4">
+                    <JetLabel for="name" value="Name"/>
+                    <JetInput id="name" v-model="form.name" type="text" class="mt-1 block w-full" autocomplete="name"/>
+                    <JetInputError :message="form.errors.name" class="mt-2"/>
                 </div>
             </div>
 
