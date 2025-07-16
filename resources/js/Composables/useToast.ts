@@ -1,7 +1,7 @@
 import { useToast as ut } from "primevue/usetoast";
 
 export interface ToastOptions {
-  group?: string;
+  group?: "top" | "center" | "bottom";
   closable?: boolean;
   life?: number;
   styleClass?: string;
