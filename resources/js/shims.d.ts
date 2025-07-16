@@ -32,8 +32,7 @@ declare module "vue" {
   export function inject<T>(key: string | InjectionKey<T>): T | undefined;
   export function inject<T>(key: string | InjectionKey<T>, defaultValue: T): T;
 
-  export function inject(key: "route"): RouteFunction;
-  export function inject(key: "route", defaultValue: RouteFunction): RouteFunction;
+  export function inject(key: "route"): RouteFn;
 
   export default component;
 }
@@ -57,11 +56,11 @@ declare module "@inertiajs/vue3" {
     bannerStyle?: ToastSeverity extends string ? ToastSeverity : undefined;
   }
 
-    type FlashMessage = {
-      jetstream: {
-        flash: Flash;
-      };
+  type FlashMessage = {
+    jetstream: {
+      flash: Flash;
     };
+  };
 
-    export declare function usePage<SharedProps extends PageProps & FlashMessage>(): Page<SharedProps>;
+  export declare function usePage<SharedProps extends PageProps & FlashMessage>(): Page<SharedProps>;
 }
