@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import useExtendedPrecognition from "@/Composables/useExtendedPrecognition";
 import useToast from "@/Composables/useToast";
 import JetActionMessage from "@/Jetstream/ActionMessage.vue";
