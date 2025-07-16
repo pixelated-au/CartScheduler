@@ -9,14 +9,10 @@ import JetFormSection from "@/Jetstream/FormSection.vue";
 import JetInputError from "@/Jetstream/InputError.vue";
 import JetLabel from "@/Jetstream/Label.vue";
 
-const props = defineProps({
-  user: Object,
-  action: {
-    type: String,
-    required: true,
-    validator: (value) => ["edit", "add"].includes(value),
-  },
-});
+const props = defineProps<{
+  user: Record<string, unknown>;
+  action: "edit" | "add";
+}>();
 
 defineEmits([
   "cancel",
