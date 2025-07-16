@@ -17,7 +17,6 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Mail;
 use Laravel\Fortify\TwoFactorAuthenticatable;
-use Laravel\Jetstream\HasProfilePhoto;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\CausesActivity;
@@ -30,7 +29,7 @@ class User extends Authenticatable
 {
     use HasApiTokens;
     use HasFactory;
-    use HasProfilePhoto;
+//    use HasProfilePhoto;
     use Notifiable;
     use TwoFactorAuthenticatable;
     use LogsActivity;
@@ -132,7 +131,7 @@ class User extends Authenticatable
      */
     protected $appends = [
         'has_logged_in', // Used to determine if the user has logged in before by checking the password field
-        'profile_photo_url',
+//        'profile_photo_url',
     ];
 
     /** @noinspection PhpUnused */
