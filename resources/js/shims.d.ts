@@ -3,6 +3,7 @@
 
 import "vite/client";
 import type { Page, PageProps } from "@inertiajs/core";
+import type { Axios } from "axios";
 import type {
   ComponentCustomOptions as _ComponentCustomOptions,
   ComponentCustomProperties as _ComponentCustomProperties,
@@ -13,6 +14,7 @@ import type { route as routeFn } from "ziggy-js";
 
 declare global {
   const route: typeof routeFn;
+  const axios: Axios;
 }
 
 declare module "vue" {
