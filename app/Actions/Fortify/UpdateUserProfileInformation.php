@@ -21,10 +21,10 @@ class UpdateUserProfileInformation implements UpdatesUserProfileInformation
             'photo' => ['prohibited'],
         ])->validateWithBag('updateProfileInformation');
 
-        if (isset($input['photo'])) {
-            $user->updateProfilePhoto($input['photo']);
-        }
-
+//        if (isset($input['photo'])) {
+//            $user->updateProfilePhoto($input['photo']);
+//        }
+//
         if ($input['email'] !== $user->email && $user instanceof MustVerifyEmail) {
             /** @noinspection PhpParamsInspection */
             $this->updateVerifiedUser($user, $input);
