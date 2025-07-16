@@ -1,10 +1,9 @@
 <script setup>
 import Bugsnag from "@bugsnag/js";
-import { router, usePage } from "@inertiajs/vue3";
+import { router, usePage, Head  } from "@inertiajs/vue3";
 import { differenceInDays } from "date-fns";
 import { computed, inject, onMounted, provide, ref } from "vue";
 import ObtrusiveNotification from "@/Components/ObtrusiveNotification.vue";
-import useToast from "@/Composables/useToast";
 import { useGlobalState } from "@/store";
 import "@vuepic/vue-datepicker/dist/main.css"; // FIXME AFTER REMOVING VUE-DATEPICKER, DELETE
 import "floating-vue/dist/style.css"; // TODO AFTER REMOVING FLOATING-VUE, DELETE
