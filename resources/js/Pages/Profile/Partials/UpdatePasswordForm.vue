@@ -1,41 +1,64 @@
-<script setup>
-import { useForm } from "@inertiajs/vue3";
-import { useTemplateRef, inject } from "vue";
+<script setup lang="ts">
+import { nextTick, useTemplateRef } from "vue";
+import SubmitButton from "@/Components/Form/Buttons/SubmitButton.vue";
+import useExtendedPrecognition from "@/Composables/useExtendedPrecognition";
+import useToast from "@/Composables/useToast";
 import JetActionMessage from "@/Jetstream/ActionMessage.vue";
 import JetFormSection from "@/Jetstream/FormSection.vue";
-import JetInput from "@/Jetstream/Input.vue";
 import JetInputError from "@/Jetstream/InputError.vue";
 import JetLabel from "@/Jetstream/Label.vue";
 
 const passwordInput = useTemplateRef("passwordInput");
 const currentPasswordInput = useTemplateRef("currentPasswordInput");
 
-const route = inject("route");
+const extendedPrecognition = useExtendedPrecognition();
+const toast = useToast();
 
-const form = useForm({
+const form = extendedPrecognition({
+  routeName: "user-password.update",
+  method: "put",
+}, {
   current_password: "",
   password: "",
   password_confirmation: "",
 });
 
-const updatePassword = () => {
-  form.put(route("user-password.update"), {
-    errorBag: "updatePassword",
-    preserveScroll: true,
-    onSuccess: () => form.reset(),
-    onError: () => {
-      if (form.errors.password) {
-        form.reset("password", "password_confirmation");
-        passwordInput.value.focus();
-      }
+const updatePassword = () => form.submit({
+  errorBag: "updatePassword",
+  preserveScroll: true,
+  onSuccess: () => {
+    form.reset();
+    toast.success(
+      "Your password has been updated.",
+      "Success!",
+      { group: "center" },
+    );
+  },
+  onError: async () => {
+    toast.error(
+      "Your password could not be updated. Please check the validation messages.",
+      "Not Saved!",
+      { group: "center" },
+    );
 
-      if (form.errors.current_password) {
-        form.reset("current_password");
-        currentPasswordInput.value.focus();
-      }
-    },
-  });
-};
+    let hasFocus = false;
+    if (form.errors.password) {
+      form.reset("password", "password_confirmation");
+      console.log("here");
+
+      await nextTick();
+      passwordInput.value?.$el.focus();
+      hasFocus = true;
+    }
+
+    if (form.errors.current_password) {
+      form.reset("current_password");
+      if (hasFocus) return;
+      await nextTick();
+      currentPasswordInput.value?.$el.focus();
+    }
+  },
+});
 </script>
 
 <template>
@@ -49,38 +72,39 @@ const updatePassword = () => {
     </template>
 
     <template #form>
+      <input style="display: none" type="email" name="email" :value="$page.props.user.email" autocomplete="username" />
       <div class="col-span-6 sm:col-span-4">
-        <JetLabel for="current_password" value="Current Password" />
-        <JetInput
-            id="current_password"
-            ref="currentPasswordInput"
-            v-model="form.current_password"
-            type="password"
-            class="mt-1 block w-full"
-            autocomplete="current-password" />
+        <JetLabel for="current_password" value="Current Password" :form error-key="current_password" />
+        <PPassword input-id="current_password"
+                   ref="currentPasswordInput"
+                   :feedback="false"
+                   v-model="form.current_password"
+                   :input-props="{ autocomplete: 'current-password' }"
+                   class="block w-full"
+                   input-class="block w-full" />
         <JetInputError :message="form.errors.current_password" class="mt-2" />
       </div>
 
       <div class="col-span-6 sm:col-span-4">
-        <JetLabel for="password" value="New Password" />
-        <JetInput
-            id="password"
-            ref="passwordInput"
-            v-model="form.password"
-            type="password"
-            class="mt-1 block w-full"
-            autocomplete="new-password" />
+        <JetLabel for="password" value="New Password" :form error-key="password" />
+        <PPassword input-id="password"
+                   ref="passwordInput"
+                   toggle-mask
+                   v-model="form.password"
+                   :input-props="{ autocomplete: 'new-password' }"
+                   class="block w-full"
+                   input-class="block w-full" />
         <JetInputError :message="form.errors.password" class="mt-2" />
       </div>
 
       <div class="col-span-6 sm:col-span-4">
-        <JetLabel for="password_confirmation" value="Confirm Password" />
-        <JetInput
-            id="password_confirmation"
-            v-model="form.password_confirmation"
-            type="password"
-            class="mt-1 block w-full"
-            autocomplete="new-password" />
+        <JetLabel for="password_confirmation" value="Confirm Password" :form error-key="password_confirmation" />
+        <PPassword input-id="password_confirmation"
+                   toggle-mask
+                   v-model="form.password_confirmation"
+                   :input-props="{ autocomplete: 'new-password' }"
+                   class="block w-full"
+                   input-class="block w-full" />
         <JetInputError :message="form.errors.password_confirmation" class="mt-2" />
       </div>
     </template>
@@ -90,9 +114,13 @@ const updatePassword = () => {
         Saved.
       </JetActionMessage>
 
-      <PButton type="submit" :class="{ 'opacity-25': form.processing }" :disabled="form.processing">
-        Save
-      </PButton>
+      <SubmitButton label="Save"
+                    type="submit"
+                    :processing="form.processing"
+                    :success="form.wasSuccessful"
+                    :failure="form.hasErrors"
+                    :errors="form.errors"
+                    @click.prevent="updatePassword" />
     </template>
   </JetFormSection>
 </template>
