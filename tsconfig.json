@@ -43,8 +43,7 @@
     "target": "ES2022",
     "typeRoots": [
       "./node_modules/@types",
-      "./node_modules/unplugin-icons",
-      "./resources/js/types"
+      "./node_modules/unplugin-icons"
     ],
     "types": [
       "chai",
