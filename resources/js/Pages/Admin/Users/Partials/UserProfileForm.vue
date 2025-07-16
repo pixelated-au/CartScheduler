@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { router } from "@inertiajs/vue3";
 import { inject, ref, watch, nextTick } from "vue";
 import useExtendedPrecognition from "@/Composables/useExtendedPrecognition.js";
