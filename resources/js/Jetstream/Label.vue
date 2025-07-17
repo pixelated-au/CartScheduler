@@ -1,28 +1,18 @@
-<script setup>
+<script setup lang="ts">
 import { computed } from "vue";
 import LabelError from "@/Jetstream/LabelError.vue";
 
-const props = defineProps({
-  value: String,
-  isDisabled: {
-    type: Boolean,
-    default: false,
-  },
-  errorKey: {
-    type: String,
-    default: undefined,
-  },
-  form: {
-    type: Object,
-    default: undefined,
-    validator: (value, props) => typeof value === "object"
-      && !Array.isArray(value)
-      && value !== null
-      && props.errorKey,
-  },
-});
+const { value, isDisabled, errorKey = "", form, hasError = false } = defineProps<{
+  value?: string;
+  isDisabled?: boolean;
+  errorKey?: string;
+  form?: {
+    invalid: (key: string) => boolean;
+  };
+  hasError?: boolean;
+}>();
 
-const invalid = computed(() => !!props.form?.invalid(props.errorKey));
+const invalid = computed(() => hasError || !!form?.invalid(errorKey));
 </script>
 
 <template>
