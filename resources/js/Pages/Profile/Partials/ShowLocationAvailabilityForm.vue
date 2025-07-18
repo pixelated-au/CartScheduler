@@ -42,7 +42,6 @@ const update = () => {
           "Success!",
           { group: "center" },
         );
-
       },
       onError: () => {
         toast.error(
