@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useForm, usePage } from "@inertiajs/vue3";
 import { computed, nextTick, reactive, watch, inject } from "vue";
+import SubmitButton from "@/Components/Form/Buttons/SubmitButton.vue";
 import useAvailabilityActions from "@/Composables/useAvailabilityActions";
 import JetActionMessage from "@/Jetstream/ActionMessage.vue";
 import JetFormSection from "@/Jetstream/FormSection.vue";
@@ -9,7 +10,7 @@ import JetLabel from "@/Jetstream/Label.vue";
 import DayOfWeekConfiguration from "@/Pages/Profile/Partials/DayOfWeekConfiguration.vue";
 
 const { availability, userId = null } = defineProps<{
-  availability: Record<string, any>;
+  availability: Record<string, number|string|number[]>;
   userId?: number | null;
 }>();
 
@@ -243,13 +244,26 @@ watch(() => form.comments, (value, oldValue) => {
     </template>
 
     <template #actions>
-      <JetActionMessage :on="form.recentlySuccessful" class="mr-3">
-        Saved.
-      </JetActionMessage>
-
-      <PButton type="submit" :class="{ 'opacity-25': form.processing }" :disabled="form.processing">
-        Save
-      </PButton>
+      <div class="flex flex-col">
+        <JetActionMessage :on="form.recentlySuccessful" class="mr-3 w-full">
+          Saved.
+        </JetActionMessage>
+        <div v-if="form.hasErrors" class="mr-3 font-bold text-red-500">
+          Hmmm... There is a problem with your submission.
+        </div>
+        <div class="flex justify-end">
+          <PButton severity="secondary" type="button" class="mr-3" @click="resetForm">
+            Cancel
+          </PButton>
+          <SubmitButton label="Save"
+                        type="submit"
+                        :processing="form.processing"
+                        :success="form.wasSuccessful"
+                        :failure="form.hasErrors"
+                        :errors="form.errors"
+                        @click.prevent="update" />
+        </div>
+      </div>
     </template>
   </JetFormSection>
 </template>
