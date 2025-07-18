@@ -47,25 +47,16 @@ const update = () => {
   })
     .submit({
       preserveScroll: true,
-      onSuccess: () => {
-        form.defaults({
-          vacations: vacations,
-          deletedVacations: [],
-        });
-        form.reset();
-        toast.success(
-          "Vacation information has been updated.",
-          "Success!",
-          { group: "center" },
-        );
-      },
-      onError: () => {
-        toast.error(
-          "Vacation information could not be updated. Please check the validation messages.",
-          "Not Saved!",
-          { group: "center" },
-        );
-      },
+      onSuccess: () => toast.success(
+        "Vacation information has been updated.",
+        "Success!",
+        { group: "center" },
+      ),
+      onError: () => toast.error(
+        "Vacation information could not be updated. Please check the validation messages.",
+        "Not Saved!",
+        { group: "center" },
+      ),
     });
 };
 

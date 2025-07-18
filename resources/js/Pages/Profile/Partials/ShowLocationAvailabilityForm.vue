@@ -32,24 +32,16 @@ const update = () => {
   })
     .put(route("update.user.location-choices"), {
       preserveScroll: true,
-      onSuccess: () => {
-        form.defaults({
-          selectedLocations: selectedLocations || [],
-        });
-        form.reset();
-        toast.success(
-          "Your location preferences have been updated.",
-          "Success!",
-          { group: "center" },
-        );
-      },
-      onError: () => {
-        toast.error(
-          "Your location preferences could not be updated due to invalid data",
-          "Not Saved!",
-          { group: "center" },
-        );
-      },
+      onSuccess: () => toast.success(
+        "Your location preferences have been updated.",
+        "Success!",
+        { group: "center" },
+      ),
+      onError: () => toast.error(
+        "Your location preferences could not be updated due to invalid data",
+        "Not Saved!",
+        { group: "center" },
+      ),
     });
 };
 
