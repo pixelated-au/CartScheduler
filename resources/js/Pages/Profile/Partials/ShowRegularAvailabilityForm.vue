@@ -1,22 +1,36 @@
 <script setup lang="ts">
 import { useForm, usePage } from "@inertiajs/vue3";
-import { computed, nextTick, reactive, watch, inject } from "vue";
+import { computed, inject, nextTick, reactive, watch } from "vue";
 import SubmitButton from "@/Components/Form/Buttons/SubmitButton.vue";
 import useAvailabilityActions from "@/Composables/useAvailabilityActions";
+import useToast from "@/Composables/useToast";
 import JetActionMessage from "@/Jetstream/ActionMessage.vue";
 import JetFormSection from "@/Jetstream/FormSection.vue";
 import JetInputError from "@/Jetstream/InputError.vue";
 import JetLabel from "@/Jetstream/Label.vue";
 import DayOfWeekConfiguration from "@/Pages/Profile/Partials/DayOfWeekConfiguration.vue";
 
+type Day = "monday" | "tuesday" | "wednesday" | "thursday" | "friday" | "saturday" | "sunday";
+type DayPredicate = `day_${Day}`;
+type NumDaysPredicate = `num_${Day}s`;
+type Hour = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 | 21 | 22 | 23;
+type DayOfMonthCount = 0 | 1 | 2 | 3 | 4;
+
+type Availability = { [K in DayPredicate]?: Hour[]; } &
+  { [K in NumDaysPredicate]?: DayOfMonthCount; } &
+  {
+    user_id?: number;
+    comments?: string;
+  };
 const { availability, userId = null } = defineProps<{
-  availability: Record<string, number|string|number[]>;
+  availability: Availability;
   userId?: number | null;
 }>();
 
 const route = inject("route");
 
 const page = usePage();
+const toast = useToast();
 
 const ranges = computed(() => ({
   start: page.props.shiftAvailability.systemShiftStartHour,
@@ -44,33 +58,33 @@ const form = useForm({
 const { computedRange, numberOfWeeks, toggleRosterDay, tooltipFormat } = useAvailabilityActions(form, ranges);
 
 const hasDayError = computed(() => {
-  return form.errors["day_monday"]?.length > 0
-    || form.errors["day_tuesday"]?.length > 0
-    || form.errors["day_wednesday"]?.length > 0
-    || form.errors["day_thursday"]?.length > 0
-    || form.errors["day_friday"]?.length > 0
-    || form.errors["day_saturday"]?.length > 0
-    || form.errors["day_sunday"]?.length > 0;
+  return form.errors.day_monday?.length || 0 > 0
+    || form.errors.day_tuesday?.length || 0 > 0
+    || form.errors.day_wednesday?.length || 0 > 0
+    || form.errors.day_thursday?.length || 0 > 0
+    || form.errors.day_friday?.length || 0 > 0
+    || form.errors.day_saturday?.length || 0 > 0
+    || form.errors.day_sunday?.length || 0 > 0;
 });
 
 const hasNumError = computed(() => {
-  return form.errors["num_mondays"]?.length > 0
-    || form.errors["num_tuesdays"]?.length > 0
-    || form.errors["num_wednesdays"]?.length > 0
-    || form.errors["num_thursdays"]?.length > 0
-    || form.errors["num_fridays"]?.length > 0
-    || form.errors["num_saturdays"]?.length > 0
-    || form.errors["num_sundays"]?.length > 0;
+  return form.errors.num_mondays?.length || 0 > 0
+    || form.errors.num_tuesdays?.length || 0 > 0
+    || form.errors.num_wednesdays?.length || 0 > 0
+    || form.errors.num_thursdays?.length || 0 > 0
+    || form.errors.num_fridays?.length || 0 > 0
+    || form.errors.num_saturdays?.length || 0 > 0
+    || form.errors.num_sundays?.length || 0 > 0;
 });
 
 const rosters = reactive([
-  { label:"Monday", value: toggleRosterDay("monday") },
-  { label:"Tuesday", value: toggleRosterDay("tuesday") },
-  { label:"Wednesday", value: toggleRosterDay("wednesday") },
-  { label:"Thursday", value: toggleRosterDay("thursday") },
-  { label:"Friday", value: toggleRosterDay("friday") },
-  { label:"Saturday", value: toggleRosterDay("saturday") },
-  { label:"Sunday", value: toggleRosterDay("sunday") },
+  { label: "Monday", value: toggleRosterDay("monday") },
+  { label: "Tuesday", value: toggleRosterDay("tuesday") },
+  { label: "Wednesday", value: toggleRosterDay("wednesday") },
+  { label: "Thursday", value: toggleRosterDay("thursday") },
+  { label: "Friday", value: toggleRosterDay("friday") },
+  { label: "Saturday", value: toggleRosterDay("saturday") },
+  { label: "Sunday", value: toggleRosterDay("sunday") },
 ]);
 
 const hoursEachDay = reactive({
@@ -95,10 +109,27 @@ const update = () => {
   })
     .put(route("update.user.availability"), {
       preserveScroll: true,
+      onSuccess: () => {
+        form.reset();
+        toast.success(
+          "Your availability preferences have been updated.",
+          "Success!",
+          { group: "center" },
+        );
+      },
       onError: () => {
-        console.log("error");
+        toast.error(
+          "Your availability preferences could not be updated due to invalid data",
+          "Not Saved!",
+          { group: "center" },
+        );
       },
     });
+};
+
+const resetForm = () => {
+  form.reset();
+  form.clearErrors();
 };
 
 const showConfigurations = computed(() => {
@@ -129,17 +160,19 @@ watch(() => form.comments, (value, oldValue) => {
     </template>
 
     <template #description>
-      Please indicate {{ userId ? "this volunteers" : "your" }} availability
+      Please indicate {{ userId ? 'this volunteers' : 'your' }} availability
     </template>
 
     <template #form>
       <div
           class="grid grid-cols-4 col-span-6 gap-y-px items-stretch p-3 text-gray-700 rounded border border-gray-200 lg:grid-cols-7 dark:text-gray-100 dark:border-gray-900 bg-sub-panel dark:bg-sub-panel-dark">
         <div class="col-span-4 font-bold lg:col-span-7">
-          {{ userId ? "Volunteer is" : "I am" }} available
+          {{ userId ? 'Volunteer is' : 'I am' }} available
           to be rostered:
         </div>
-        <div v-for="roster in rosters" :key="roster.label" class="flex flex-col justify-center items-center text-center col">
+        <div v-for="roster in rosters"
+             :key="roster.label"
+             class="flex flex-col justify-center items-center text-center col">
           <div class="text-sm">
             {{ roster.label }}
           </div>
@@ -158,7 +191,7 @@ watch(() => form.comments, (value, oldValue) => {
         </div>
       </div>
       <div v-show="showConfigurations"
-           class="grid grid-cols-12 col-span-6 gap-x-2 lg:gap-x-10 gap-y-8 items-center p-3 text-gray-700 rounded border border-gray-200 dark:text-gray-100 dark:border-gray-900 bg-sub-panel dark:bg-sub-panel-dark">
+           class="grid grid-cols-12 col-span-6 gap-x-2 gap-y-8 items-center p-3 text-gray-700 rounded border border-gray-200 lg:gap-x-10 dark:text-gray-100 dark:border-gray-900 bg-sub-panel dark:bg-sub-panel-dark">
         <DayOfWeekConfiguration v-model:hours-each-day="hoursEachDay.monday"
                                 v-model:number-of-days-per-month="form.num_mondays"
                                 :start="ranges.start"
@@ -217,7 +250,7 @@ watch(() => form.comments, (value, oldValue) => {
       </div>
 
       <div v-if="hasNumError"
-           class="col-span-6 flex gap-y-5  sm:gap-y-px  items-stretch p-3 rounded border std-border">
+           class="flex col-span-6 gap-y-5 items-stretch p-3 rounded border sm:gap-y-px std-border">
         <p class="text-sm text-red-600">
           {{ form.errors.num_mondays }}
           {{ form.errors.num_tuesdays }}
@@ -232,7 +265,7 @@ watch(() => form.comments, (value, oldValue) => {
       <div class="col-span-6 items-stretch p-3 rounded border std-border bg-sub-panel dark:bg-sub-panel-dark">
         <JetLabel for="availability-comments" value="Comments (optional)" />
         <textarea id="availability-comments"
-                  class="w-full p-3 h-40 rounded border std-border bg-text-input dark:bg-text-input-dark"
+                  class="p-3 w-full h-40 rounded border std-border bg-text-input dark:bg-text-input-dark"
                   v-model="form.comments" />
         <div class="text-sm">{{ commentsRemainingCharacters }} characters remaining</div>
         <JetInputError :message="form.errors.comments" class="mt-2" />
@@ -249,7 +282,7 @@ watch(() => form.comments, (value, oldValue) => {
           Saved.
         </JetActionMessage>
         <div v-if="form.hasErrors" class="mr-3 font-bold text-red-500">
-          Hmmm... There is a problem with your submission.
+          Hmmm... There is a problem with your submission, please contact your overseer.
         </div>
         <div class="flex justify-end">
           <PButton severity="secondary" type="button" class="mr-3" @click="resetForm">
