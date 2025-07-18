@@ -2,26 +2,15 @@
 import { useForm, usePage } from "@inertiajs/vue3";
 import { computed, inject, nextTick, reactive, watch } from "vue";
 import SubmitButton from "@/Components/Form/Buttons/SubmitButton.vue";
-import useAvailabilityActions from "@/Composables/useAvailabilityActions";
+import useAvailabilityActions, { days } from "@/Composables/useAvailabilityActions";
 import useToast from "@/Composables/useToast";
 import JetActionMessage from "@/Jetstream/ActionMessage.vue";
 import JetFormSection from "@/Jetstream/FormSection.vue";
 import JetInputError from "@/Jetstream/InputError.vue";
 import JetLabel from "@/Jetstream/Label.vue";
 import DayOfWeekConfiguration from "@/Pages/Profile/Partials/DayOfWeekConfiguration.vue";
+import type { Availability, Day, DayOfMonthCount } from "@/Composables/useAvailabilityActions";
 
-type Day = "monday" | "tuesday" | "wednesday" | "thursday" | "friday" | "saturday" | "sunday";
-type DayPredicate = `day_${Day}`;
-type NumDaysPredicate = `num_${Day}s`;
-type Hour = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 | 21 | 22 | 23;
-type DayOfMonthCount = 0 | 1 | 2 | 3 | 4;
-
-type Availability = { [K in DayPredicate]?: Hour[]; } &
-  { [K in NumDaysPredicate]?: DayOfMonthCount; } &
-  {
-    user_id?: number;
-    comments?: string;
-  };
 const { availability, userId = null } = defineProps<{
   availability: Availability;
   userId?: number | null;
@@ -45,47 +34,24 @@ const form = useForm({
   day_friday: availability.day_friday || [ranges.value.start, ranges.value.end],
   day_saturday: availability.day_saturday || [ranges.value.start, ranges.value.end],
   day_sunday: availability.day_sunday || [ranges.value.start, ranges.value.end],
-  num_mondays: availability.num_mondays || 0,
-  num_tuesdays: availability.num_tuesdays || 0,
-  num_wednesdays: availability.num_wednesdays || 0,
-  num_thursdays: availability.num_thursdays || 0,
-  num_fridays: availability.num_fridays || 0,
-  num_saturdays: availability.num_saturdays || 0,
-  num_sundays: availability.num_sundays || 0,
+  num_mondays: availability.num_mondays || 0 as DayOfMonthCount,
+  num_tuesdays: availability.num_tuesdays || 0 as DayOfMonthCount,
+  num_wednesdays: availability.num_wednesdays || 0 as DayOfMonthCount,
+  num_thursdays: availability.num_thursdays || 0 as DayOfMonthCount,
+  num_fridays: availability.num_fridays || 0 as DayOfMonthCount,
+  num_saturdays: availability.num_saturdays || 0 as DayOfMonthCount,
+  num_sundays: availability.num_sundays || 0 as DayOfMonthCount,
   comments: availability.comments || "",
 });
 
-const { computedRange, numberOfWeeks, toggleRosterDay, tooltipFormat } = useAvailabilityActions(form, ranges);
+const { computedRange, toggleRosterDay, tooltipFormat } = useAvailabilityActions(form, ranges);
 
-const hasDayError = computed(() => {
-  return form.errors.day_monday?.length || 0 > 0
-    || form.errors.day_tuesday?.length || 0 > 0
-    || form.errors.day_wednesday?.length || 0 > 0
-    || form.errors.day_thursday?.length || 0 > 0
-    || form.errors.day_friday?.length || 0 > 0
-    || form.errors.day_saturday?.length || 0 > 0
-    || form.errors.day_sunday?.length || 0 > 0;
-});
-
-const hasNumError = computed(() => {
-  return form.errors.num_mondays?.length || 0 > 0
-    || form.errors.num_tuesdays?.length || 0 > 0
-    || form.errors.num_wednesdays?.length || 0 > 0
-    || form.errors.num_thursdays?.length || 0 > 0
-    || form.errors.num_fridays?.length || 0 > 0
-    || form.errors.num_saturdays?.length || 0 > 0
-    || form.errors.num_sundays?.length || 0 > 0;
-});
-
-const rosters = reactive([
-  { label: "Monday", value: toggleRosterDay("monday") },
-  { label: "Tuesday", value: toggleRosterDay("tuesday") },
-  { label: "Wednesday", value: toggleRosterDay("wednesday") },
-  { label: "Thursday", value: toggleRosterDay("thursday") },
-  { label: "Friday", value: toggleRosterDay("friday") },
-  { label: "Saturday", value: toggleRosterDay("saturday") },
-  { label: "Sunday", value: toggleRosterDay("sunday") },
-]);
+const rosters = reactive(
+  Object.entries(days).map(([name, label]) => ({
+    label,
+    value: toggleRosterDay(name as Day),
+  })),
+);
 
 const hoursEachDay = reactive({
   monday: computedRange("monday"),
@@ -110,7 +76,7 @@ const update = () => {
     .put(route("update.user.availability"), {
       preserveScroll: true,
       onSuccess: () => {
-        form.reset();
+        // form.reset();
         toast.success(
           "Your availability preferences have been updated.",
           "Success!",
@@ -178,88 +144,17 @@ watch(() => form.comments, (value, oldValue) => {
           </div>
           <PToggleSwitch :id="`check-${roster.label}`" v-model="roster.value" label="Monday" />
         </div>
-        <div v-if="hasDayError" class="col-span-4 font-bold lg:col-span-7">
-          <p class="text-sm text-red-600">
-            {{ form.errors.day_monday }}
-            {{ form.errors.day_tuesday }}
-            {{ form.errors.day_wednesday }}
-            {{ form.errors.day_thursday }}
-            {{ form.errors.day_friday }}
-            {{ form.errors.day_saturday }}
-            {{ form.errors.day_sunday }}
-          </p>
-        </div>
       </div>
       <div v-show="showConfigurations"
            class="grid grid-cols-12 col-span-6 gap-x-2 gap-y-8 items-center p-3 text-gray-700 rounded border border-gray-200 lg:gap-x-10 dark:text-gray-100 dark:border-gray-900 bg-sub-panel dark:bg-sub-panel-dark">
-        <DayOfWeekConfiguration v-model:hours-each-day="hoursEachDay.monday"
-                                v-model:number-of-days-per-month="form.num_mondays"
+        <DayOfWeekConfiguration v-for="(label, name) in days"
+                                :key="name"
+                                v-model:hours-each-day="hoursEachDay[name as keyof typeof hoursEachDay]"
+                                v-model:number-of-days-per-month="form[`num_${name}s` as keyof typeof form] as number"
                                 :start="ranges.start"
                                 :end="ranges.end"
-                                :number-of-weeks="numberOfWeeks"
-                                label="Monday"
+                                :label="label"
                                 :tooltip-format="tooltipFormat" />
-
-        <DayOfWeekConfiguration v-model:hours-each-day="hoursEachDay.tuesday"
-                                v-model:number-of-days-per-month="form.num_tuesdays"
-                                :start="ranges.start"
-                                :end="ranges.end"
-                                :number-of-weeks="numberOfWeeks"
-                                label="Tuesday"
-                                :tooltip-format="tooltipFormat" />
-
-        <DayOfWeekConfiguration v-model:hours-each-day="hoursEachDay.wednesday"
-                                v-model:number-of-days-per-month="form.num_wednesdays"
-                                :start="ranges.start"
-                                :end="ranges.end"
-                                :number-of-weeks="numberOfWeeks"
-                                label="Wednesday"
-                                :tooltip-format="tooltipFormat" />
-
-        <DayOfWeekConfiguration v-model:hours-each-day="hoursEachDay.thursday"
-                                v-model:number-of-days-per-month="form.num_thursdays"
-                                :start="ranges.start"
-                                :end="ranges.end"
-                                :number-of-weeks="numberOfWeeks"
-                                label="Thursday"
-                                :tooltip-format="tooltipFormat" />
-
-        <DayOfWeekConfiguration v-model:hours-each-day="hoursEachDay.friday"
-                                v-model:number-of-days-per-month="form.num_fridays"
-                                :start="ranges.start"
-                                :end="ranges.end"
-                                :number-of-weeks="numberOfWeeks"
-                                label="Friday"
-                                :tooltip-format="tooltipFormat" />
-
-        <DayOfWeekConfiguration v-model:hours-each-day="hoursEachDay.saturday"
-                                v-model:number-of-days-per-month="form.num_saturdays"
-                                :start="ranges.start"
-                                :end="ranges.end"
-                                :number-of-weeks="numberOfWeeks"
-                                label="Saturday"
-                                :tooltip-format="tooltipFormat" />
-
-        <DayOfWeekConfiguration v-model:hours-each-day="hoursEachDay.sunday"
-                                v-model:number-of-days-per-month="form.num_sundays"
-                                :start="ranges.start"
-                                :end="ranges.end"
-                                :number-of-weeks="numberOfWeeks"
-                                label="Sunday"
-                                :tooltip-format="tooltipFormat" />
-      </div>
-
-      <div v-if="hasNumError"
-           class="flex col-span-6 gap-y-5 items-stretch p-3 rounded border sm:gap-y-px std-border">
-        <p class="text-sm text-red-600">
-          {{ form.errors.num_mondays }}
-          {{ form.errors.num_tuesdays }}
-          {{ form.errors.num_wednesdays }}
-          {{ form.errors.num_thursdays }}
-          {{ form.errors.num_fridays }}
-          {{ form.errors.num_saturdays }}
-          {{ form.errors.num_sundays }}
-        </p>
       </div>
 
       <div class="col-span-6 items-stretch p-3 rounded border std-border bg-sub-panel dark:bg-sub-panel-dark">
