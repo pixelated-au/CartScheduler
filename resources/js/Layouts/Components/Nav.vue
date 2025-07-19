@@ -1,7 +1,7 @@
-<script setup>
+<script setup lang="ts">
 import { Link, router, usePage } from "@inertiajs/vue3";
 import { breakpointsTailwind, useBreakpoints } from "@vueuse/core";
-import { computed, inject, ref, onBeforeMount, onMounted, onUnmounted, nextTick, watch, useTemplateRef } from "vue";
+import { computed, inject, nextTick, onBeforeMount, onMounted, onUnmounted, ref, useTemplateRef, watch } from "vue";
 import JetApplicationMark from "@/Jetstream/ApplicationMark.vue"; // Assuming this is your logo component
 
 defineEmits(["toggle-dark-mode"]);
@@ -10,9 +10,25 @@ const page = usePage();
 const breakpoints = useBreakpoints(breakpointsTailwind);
 const route = inject("route");
 
-let permissions;
+type Permissions = {
+  canAdmin: boolean;
+  canEditSettings: boolean;
+};
+
+type Item = {
+  label: string;
+  routeName?: string | undefined;
+  href?: string;
+  isDropdown?: boolean;
+  submenu?: Item[];
+  command?: () => void;
+  hasUpdate?: boolean;
+};
+
+let permissions: Permissions;
+
 onBeforeMount(() => {
-  permissions = page.props.pagePermissions;
+  permissions = page.props.pagePermissions as Permissions;
 });
 
 const isMobile = breakpoints.smaller("sm");
@@ -21,32 +37,38 @@ const mobileNavOpen = ref(false);
 const mobileUserMenuOpen = ref(false);
 const desktopAdminDropdownOpen = ref(false);
 const desktopUserDropdownOpen = ref(false);
-const openMobileSubmenus = ref({}); // E.g., { 'Administration': false }
+const openMobileSubmenus = ref<Record<string, boolean>>({}); // E.g., { 'Administration': false }
 
 const adminDropdownRef = useTemplateRef("adminDropdownRef");
 const userDropdownRef = useTemplateRef("userDropdownRef");
 const mobileNavRef = useTemplateRef("mobileNavRef");
 const mobileUserMenuRef = useTemplateRef("mobileUserMenuRef");
 
-const hasUpdate = computed(() => page.props.hasUpdate); // Keep if used for update indicators
+const hasUpdate = computed(() => page.props.hasUpdate as boolean); // Keep if used for update indicators
 
 const mainMenuItems = computed(() => {
   if (!permissions) return [];
-  const items = [{ label: "Dashboard", routeName: "dashboard", href: route("dashboard") }];
+  const items: Item[] = [{ label: "Dashboard", routeName: "dashboard", href: route("dashboard") }];
 
   if (permissions.canAdmin) {
-    const adminSubmenu = [
+    const adminSubmenu: Item[] = [
       { label: "Admin Dashboard", routeName: "admin.dashboard", href: route("admin.dashboard") },
       { label: "Users", routeName: "admin.users.index", href: route("admin.users.index") },
       { label: "Locations", routeName: "admin.locations.index", href: route("admin.locations.index") },
       { label: "Reports", routeName: "admin.reports.index", href: route("admin.reports.index") },
     ];
     if (permissions.canEditSettings) {
-      adminSubmenu.push({ label: "Settings", routeName: "admin.settings", href: route("admin.settings") /* , hasUpdate: hasUpdate.value */ });
+      adminSubmenu.push({
+        label: "Settings",
+        routeName: "admin.settings",
+        href: route("admin.settings"),
+        hasUpdate: hasUpdate.value,
+      });
     }
     items.push({
       label: "Administration",
-      // hasUpdate: hasUpdate.value, // Example if an entire section can have an update
+      routeName: undefined,
+      hasUpdate: hasUpdate.value, // Example if an entire section can have an update
       isDropdown: true,
       submenu: adminSubmenu,
     });
@@ -56,7 +78,7 @@ const mainMenuItems = computed(() => {
 
 const userNavMenuItems = computed(() => {
   if (!page.props.auth || !page.props.auth.user) return [];
-  const items = [
+  const items: Item[] = [
     { label: "Profile", routeName: "profile.show", href: route("profile.show") },
   ];
   if (page.props.enableUserAvailability) {
@@ -96,7 +118,7 @@ const toggleDesktopUserDropdown = () => {
   if (desktopUserDropdownOpen.value) desktopAdminDropdownOpen.value = false;
 };
 
-const toggleMobileSubmenu = (label) => {
+const toggleMobileSubmenu = (label: string) => {
   openMobileSubmenus.value[label] = !openMobileSubmenus.value[label];
 };
 
@@ -110,51 +132,57 @@ watch(() => page.url, () => {
 });
 
 // --- Animation Hooks (Tailwind doesn't need JS for simple opacity/transform, but height needs it) ---
-const onBeforeEnter = (el) => {
-  el.style.opacity = "0";
-  el.style.maxHeight = "0px";
+const onBeforeEnter = (el: Element) => {
+  const style = (el as HTMLElement).style;
+  style.opacity = "0";
+  style.maxHeight = "0px";
 };
-const onEnter = (el, done) => {
+const onEnter = (el: Element, done: () => void) => {
   nextTick(() => {
-    el.style.transitionProperty = "max-height, opacity";
-    el.style.transitionDuration = "300ms";
-    el.style.transitionTimingFunction = "ease-out";
-    el.style.opacity = "1";
-    el.style.maxHeight = el.scrollHeight + "px";
+    const style = (el as HTMLElement).style;
+    style.transitionProperty = "max-height, opacity";
+    style.transitionDuration = "300ms";
+    style.transitionTimingFunction = "ease-out";
+    style.opacity = "1";
+    style.maxHeight = (el as HTMLElement).scrollHeight + "px";
   });
   // Call done when transition finishes
   el.addEventListener("transitionend", done, { once: true });
 };
-const onAfterEnter = (el) => {
-  el.style.maxHeight = ""; // Use 'auto' or remove for content to dictate height
-  el.style.transitionProperty = "";
-  el.style.transitionDuration = "";
-  el.style.transitionTimingFunction = "";
+const onAfterEnter = (el: Element) => {
+  const style = (el as HTMLElement).style;
+  style.maxHeight = ""; // Use 'auto' or remove for content to dictate height
+  style.transitionProperty = "";
+  style.transitionDuration = "";
+  style.transitionTimingFunction = "";
 };
-const onBeforeLeave = (el) => {
-  el.style.transitionProperty = "max-height, opacity";
-  el.style.transitionDuration = "300ms";
-  el.style.transitionTimingFunction = "ease-in";
-  el.style.maxHeight = el.scrollHeight + "px";
-  el.style.opacity = "1"; // Start fully visible
+const onBeforeLeave = (el: Element) => {
+  const style = (el as HTMLElement).style;
+  style.transitionProperty = "max-height, opacity";
+  style.transitionDuration = "300ms";
+  style.transitionTimingFunction = "ease-in";
+  style.maxHeight = (el as HTMLElement).scrollHeight + "px";
+  style.opacity = "1"; // Start fully visible
 };
-const onLeave = (el, done) => {
+const onLeave = (el: Element, done: () => void) => {
   nextTick(() => {
-    el.style.maxHeight = "0px";
-    el.style.opacity = "0";
+    const style = (el as HTMLElement).style;
+    style.maxHeight = "0px";
+    style.opacity = "0";
   });
   el.addEventListener("transitionend", done, { once: true });
 };
-const onAfterLeave = (el) => {
-  el.style.maxHeight = "";
-  el.style.opacity = "";
-  el.style.transitionProperty = "";
-  el.style.transitionDuration = "";
-  el.style.transitionTimingFunction = "";
+const onAfterLeave = (el: Element) => {
+  const style = (el as HTMLElement).style;
+  style.maxHeight = "";
+  style.opacity = "";
+  style.transitionProperty = "";
+  style.transitionDuration = "";
+  style.transitionTimingFunction = "";
 };
 
 // --- Event Handlers for Closing Menus ---
-const handleEscapeKey = (event) => {
+const handleEscapeKey = (event: KeyboardEvent) => {
   if (event.key === "Escape") {
     if (isMobile.value) {
       if (mobileNavOpen.value) mobileNavOpen.value = false;
@@ -169,7 +197,7 @@ const handleEscapeKey = (event) => {
   }
 };
 
-const handleClickOutside = () => {
+const handleClickOutside = (event: MouseEvent) => {
   if (desktopAdminDropdownOpen.value) {
     desktopAdminDropdownOpen.value = false;
   }
@@ -188,7 +216,7 @@ onUnmounted(() => {
   document.removeEventListener("click", handleClickOutside, true);
 });
 
-const isActive = (routeName) => route().current() === routeName;
+const isActive = (routeName: string | undefined) => route().current() === routeName;
 </script>
 
 <template>
@@ -204,7 +232,7 @@ const isActive = (routeName) => route().current() === routeName;
           <div class="hidden sm:flex sm:ml-6 sm:space-x-4">
             <template v-for="item in mainMenuItems" :key="item.label">
               <Link v-if="!item.isDropdown"
-                    :href="item.href"
+                    :href="item.href as string"
                     class="px-3 py-2 rounded-md font-medium transition-colors duration-150 ease-in-out !text-current"
                     :class="[
                       isActive(item.routeName)
@@ -219,17 +247,22 @@ const isActive = (routeName) => route().current() === routeName;
               <div v-if="item.isDropdown && item.label === 'Administration'" class="relative" ref="adminDropdownRef">
                 <button @click="toggleDesktopAdminDropdown"
                         type="button"
-                        class="flex items-center px-3 py-2 rounded-md font-medium transition-colors duration-150 ease-in-out text-current hover:underline decoration-dotted"
+                        class="flex items-center px-3 py-2 font-medium text-current rounded-md transition-colors duration-150 ease-in-out hover:underline decoration-dotted relative"
                         :class="[
-                          desktopAdminDropdownOpen || item.submenu.some(subItem => isActive(subItem.routeName))
+                          desktopAdminDropdownOpen || item.submenu && item.submenu.some(subItem => isActive(subItem.routeName))
                             ? '!font-bold underline underline-offset-4 decoration-dotted'
                             : 'hover:bg-neutral-200 dark:hover:bg-neutral-700'
                         ]"
                         aria-haspopup="true"
-                        :aria-expanded="desktopAdminDropdownOpen.toString()"
+                        :aria-expanded="desktopAdminDropdownOpen ? 'true' : 'false'"
                         aria-controls="desktop-admin-menu">
-                  <span>{{ item.label }}</span>
-                  <span class="iconify mdi--chevron-down text-lg transition-rotate duration-500 delay-100 ease-in-out"
+                  <span class="relative"
+                        :class="
+                          { 'before:block before:iconify before:mdi--bell-circle before:absolute before:-top-1 before:-left-4 before:size-4 before:rounded-full before:text-help dark:before:text-help-light': item.hasUpdate }
+                        ">
+                    {{ item.label }}
+                  </span>
+                  <span class="text-lg duration-500 ease-in-out delay-100 iconify mdi--chevron-down transition-rotate"
                         :class="{ 'rotate-180 !delay-0 !duration-300': desktopAdminDropdownOpen }"></span>
                 </button>
                 <transition @before-enter="onBeforeEnter"
@@ -246,13 +279,23 @@ const isActive = (routeName) => route().current() === routeName;
                        :aria-labelledby="item.label + '-button'">
                     <Link v-for="subItem in item.submenu"
                           :key="subItem.label"
-                          :href="subItem.href"
+                          :href="subItem.href as string"
                           class="flex items-center px-6 py-2 w-full !text-current transition-colors duration-150 ease-in-out hover:bg-neutral-100 dark:hover:bg-neutral-600"
-                          :class="{ '!no-underline': isActive(subItem.routeName) }"
+                          :class="[
+                            { '!no-underline': isActive(subItem.routeName) },
+                            { 'decoration-help dark:decoration-help-light': subItem.hasUpdate }
+                          ]"
                           role="menuitem"
                           @click="desktopAdminDropdownOpen = false">
-                      <span v-if="isActive(subItem.routeName)" class="iconify mdi--chevron-right -ml-4"></span>
-                      <span :class="{ '!font-bold underline underline-offset-4 decoration-dotted': isActive(subItem.routeName) }">
+                      <span v-if="isActive(subItem.routeName)"
+                            class="-ml-4 iconify mdi--chevron-right"
+                            :class="{ 'text-help dark:text-help-light': subItem.hasUpdate }"></span>
+                      <span class="relative"
+                            :class="[
+                              { '!font-bold underline underline-offset-4 decoration-dotted': isActive(subItem.routeName) },
+                              { 'decoration-help dark:decoration-help-light': subItem.hasUpdate },
+                              { 'before:block before:iconify before:mdi--bell-circle before:absolute before:-top-1 before:-right-4 before:size-4 before:rounded-full before:text-help dark:before:text-help-light': subItem.hasUpdate },
+                            ]">
                         {{ subItem.label }}
                       </span>
                     </Link>
@@ -268,15 +311,18 @@ const isActive = (routeName) => route().current() === routeName;
           <DarkMode @is-dark-mode="$emit('toggle-dark-mode', $event)" />
 
           <!-- Mobile User Menu Toggle -->
-          <div class="sm:hidden mr-3">
+          <div class="mr-3 sm:hidden">
             <button @click="toggleMobileUserMenu"
                     type="button"
                     class="p-2 rounded-md transition hover:text-white hover:bg-neutral-700"
                     aria-controls="mobile-user-menu"
-                    :aria-expanded="mobileUserMenuOpen.toString()">
+                    :aria-expanded="mobileUserMenuOpen ? 'true' : 'false'">
               <span class="sr-only">Open user menu</span>
-              <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </button>
           </div>
@@ -289,11 +335,19 @@ const isActive = (routeName) => route().current() === routeName;
                       class="flex rounded-full transition"
                       id="user-menu-button"
                       aria-haspopup="true"
-                      :aria-expanded="desktopUserDropdownOpen.toString()">
+                      :aria-expanded="desktopUserDropdownOpen.toString() ? 'true' : 'false'">
                 <span class="sr-only">Open user menu</span>
-                <img v-if="page.props.auth.user?.profile_photo_url" class="w-8 h-8 rounded-full" :src="page.props.auth.user.profile_photo_url" :alt="page.props.auth.user?.name || 'User Avatar'">
-                <span v-else class="inline-flex justify-center items-center w-8 h-8 bg-neutral-300 rounded-full dark:bg-neutral-600">
-                  <span class="font-medium leading-none !text-current">{{ page.props.auth.user?.name?.charAt(0) || 'U' }}</span>
+                <img v-if="page.props.auth.user?.profile_photo_url"
+                     class="w-8 h-8 rounded-full"
+                     :src="page.props.auth.user.profile_photo_url"
+                     :alt="page.props.auth.user?.name || 'User Avatar'">
+                <span v-else
+                      class="inline-flex justify-center items-center w-8 h-8 rounded-full bg-neutral-300 dark:bg-neutral-600">
+                  <span class="font-medium leading-none !text-current">
+                    {{
+                      page.props.auth.user?.name?.charAt(0) || 'U'
+                    }}
+                  </span>
                 </span>
               </button>
               <transition @before-enter="onBeforeEnter"
@@ -316,12 +370,12 @@ const isActive = (routeName) => route().current() === routeName;
                           @click="desktopUserDropdownOpen = false">
                       {{ userItem.label }}
                     </Link>
-                    <button v-if="userItem.command"
-                            @click="() => { userItem.command(); desktopUserDropdownOpen = false; }"
-                            class="block px-4 py-2 w-full !text-current transition-colors duration-150 ease-in-out hover:bg-neutral-100 dark:hover:bg-neutral-600"
-                            role="menuitem">
+                    <div v-if="userItem.command"
+                         @click="() => { userItem.command && userItem.command(); desktopUserDropdownOpen = false; }"
+                         class="border-t std-border dark:border-neutral-600 block px-4 py-2 w-full !text-current transition-colors duration-150 ease-in-out hover:bg-neutral-100 dark:hover:bg-neutral-600 hover:underline decoration-dotted"
+                         role="menuitem">
                       {{ userItem.label }}
-                    </button>
+                    </div>
                   </template>
                 </div>
               </transition>
@@ -334,12 +388,22 @@ const isActive = (routeName) => route().current() === routeName;
                     type="button"
                     class="p-2 rounded-md transition hover:text-white hover:bg-neutral-700"
                     aria-controls="mobile-main-menu"
-                    :aria-expanded="mobileNavOpen.toString()">
+                    :aria-expanded="mobileNavOpen ? 'true' : 'false'">
               <span class="sr-only">Open main menu</span>
-              <svg v-if="!mobileNavOpen" class="block w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+              <svg v-if="!mobileNavOpen"
+                   class="block w-6 h-6"
+                   xmlns="http://www.w3.org/2000/svg"
+                   viewBox="0 0 24 24"
+                   stroke="currentColor"
+                   aria-hidden="true">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
               </svg>
-              <svg v-else class="block w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+              <svg v-else
+                   class="block w-6 h-6"
+                   xmlns="http://www.w3.org/2000/svg"
+                   viewBox="0 0 24 24"
+                   stroke="currentColor"
+                   aria-hidden="true">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
@@ -355,7 +419,10 @@ const isActive = (routeName) => route().current() === routeName;
                 @before-leave="onBeforeLeave"
                 @leave="onLeave"
                 @after-leave="onAfterLeave">
-      <div v-show="mobileUserMenuOpen" class="overflow-hidden bg-neutral-50 sm:hidden dark:bg-neutral-700" id="mobile-user-menu" ref="mobileUserMenuRef">
+      <div v-show="mobileUserMenuOpen"
+           class="overflow-hidden bg-neutral-50 sm:hidden dark:bg-neutral-700"
+           id="mobile-user-menu"
+           ref="mobileUserMenuRef">
         <div class="px-2 pt-2 pb-3 space-y-1">
           <template v-for="userItem in userNavMenuItems" :key="'mobile-user-' + userItem.label">
             <Link v-if="userItem.href"
@@ -370,7 +437,7 @@ const isActive = (routeName) => route().current() === routeName;
               {{ userItem.label }}
             </Link>
             <button v-if="userItem.command"
-                    @click="() => { userItem.command(); mobileUserMenuOpen = false; }"
+                    @click="() => { userItem.command && userItem.command(); mobileUserMenuOpen = false; }"
                     class="block px-3 py-2 w-full text-base font-medium !text-current rounded-md transition-colors duration-150 ease-in-out hover:bg-neutral-200 dark:hover:bg-neutral-700">
               {{ userItem.label }}
             </button>
@@ -386,11 +453,14 @@ const isActive = (routeName) => route().current() === routeName;
                 @before-leave="onBeforeLeave"
                 @leave="onLeave"
                 @after-leave="onAfterLeave">
-      <div v-show="mobileNavOpen" class="overflow-hidden sm:hidden bg-neutral-50 dark:bg-sub-panel-dark" id="mobile-main-menu" ref="mobileNavRef">
+      <div v-show="mobileNavOpen"
+           class="overflow-hidden sm:hidden bg-neutral-50 dark:bg-sub-panel-dark"
+           id="mobile-main-menu"
+           ref="mobileNavRef">
         <div class="px-2 pt-2 pb-3 space-y-1">
           <template v-for="item in mainMenuItems" :key="'mobile-main-' + item.label">
             <!-- Regular Mobile Link -->
-            <Link v-if="!item.isDropdown"
+            <Link v-if="!item.isDropdown && item.href"
                   :href="item.href"
                   class="block px-3 py-2 text-base font-medium rounded-md transition-colors duration-150 ease-in-out !text-current"
                   :class="[
@@ -399,7 +469,7 @@ const isActive = (routeName) => route().current() === routeName;
                       : 'hover:bg-neutral-200 dark:hover:bg-neutral-700'
                   ]"
                   @click="mobileNavOpen = false">
-              <span v-if="isActive(item.routeName)" class="iconify mdi--chevron-right -ml-4"></span>
+              <span v-if="isActive(item.routeName)" class="-ml-4 iconify mdi--chevron-right"></span>
               {{ item.label }}
             </Link>
 
@@ -408,10 +478,10 @@ const isActive = (routeName) => route().current() === routeName;
               <button @click="toggleMobileSubmenu(item.label)"
                       type="button"
                       class="flex justify-between items-center px-3 py-2 w-full font-medium rounded-md transition-colors duration-150 ease-in-out hover:ring-1 ring-black/25 dark:ring-white/25"
-                      :aria-expanded="(openMobileSubmenus[item.label] || false).toString()"
+                      :aria-expanded="openMobileSubmenus[item.label] ? 'true' : 'false'"
                       :aria-controls="'mobile-submenu-' + item.label">
                 <span>{{ item.label }}</span>
-                <span class="iconify mdi--chevron-down text-2xl transition-rotate duration-500 delay-100 ease-in-out"
+                <span class="text-2xl duration-500 ease-in-out delay-100 iconify mdi--chevron-down transition-rotate"
                       :class="{ 'rotate-180': openMobileSubmenus[item.label] }"></span>
               </button>
               <transition @before-enter="onBeforeEnter"
@@ -420,10 +490,12 @@ const isActive = (routeName) => route().current() === routeName;
                           @before-leave="onBeforeLeave"
                           @leave="onLeave"
                           @after-leave="onAfterLeave">
-                <div v-show="openMobileSubmenus[item.label]" :id="'mobile-submenu-' + item.label" class="overflow-hidden mt-3 pl-4 mt-1 gap-2">
+                <div v-show="openMobileSubmenus[item.label]"
+                     :id="'mobile-submenu-' + item.label"
+                     class="overflow-hidden gap-2 pl-4 mt-3">
                   <Link v-for="subItem in item.submenu"
                         :key="'mobile-sub-' + subItem.label"
-                        :href="subItem.href"
+                        :href="subItem.href as string"
                         class="flex items-center px-3 py-2 text-base font-medium rounded-md transition-colors duration-150 ease-in-out !text-current"
                         :class="[
                           isActive(subItem.routeName)
@@ -431,7 +503,7 @@ const isActive = (routeName) => route().current() === routeName;
                             : 'dark: hover:bg-neutral-200 dark:hover:bg-neutral-700'
                         ]"
                         @click="() => { mobileNavOpen = false; openMobileSubmenus[item.label] = false; }">
-                    <span v-if="isActive(subItem.routeName)" class="iconify mdi--chevron-right -ml-4"></span>
+                    <span v-if="isActive(subItem.routeName)" class="-ml-4 iconify mdi--chevron-right"></span>
                     {{ subItem.label }}
                   </Link>
                 </div>
