@@ -149,7 +149,7 @@ watch([() => form.gender, () => form.appointment], ([gender, appointment]) => {
         <div class="grid gap-4 grid-cols-1 sm:grid-cols-2">
           <!-- Name -->
           <div class="flex flex-col">
-            <JetLabel for="name" value="Name" />
+            <JetLabel for="name" value="Name" :form error-key="name" />
             <PInputText id="name"
                         v-model="form.name"
                         type="text"
@@ -160,7 +160,7 @@ watch([() => form.gender, () => form.appointment], ([gender, appointment]) => {
 
           <!-- Email -->
           <div class="flex flex-col">
-            <JetLabel for="email" value="Email" />
+            <JetLabel for="email" value="Email" :form error-key="email" />
             <PInputText id="email"
                         v-model="form.email"
                         type="email"
