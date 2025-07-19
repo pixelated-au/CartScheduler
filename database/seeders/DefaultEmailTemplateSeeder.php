@@ -16,8 +16,7 @@ class DefaultEmailTemplateSeeder extends Seeder
         DB::table('email_templates')->insert(
             array(
                 'name' => 'reminder_email',
-                'content' => "
-### {{ app_name }} Upcoming Shift
+                'content' => "### {{ app_name }} Upcoming Shift
 
 Dear {{ user_name }},
 this is a reminder that you have
@@ -25,9 +24,8 @@ upcoming shift(s) scheduled for **{{ relative_date }}** ({{ full_date }}):
 
 {{ shift_info }}
 
-Thank you,
-The {{ app_name }} Team
-                "
+Thank you,<br>
+The {{ app_name }} Team"
             )
         );
     }

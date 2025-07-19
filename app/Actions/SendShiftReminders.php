@@ -48,7 +48,7 @@ class SendShiftReminders implements ShouldQueue
                 Log::info("target shift date: ", [ "dat" => $targetShiftDate ]);
 
                 // This function: needs to be re looked at it - it seems to find shifts for +2 days, whereas the above SQL query gets all users for +3 days
-                $targetShiftUsers = $users->where(function ($shiftUser) use ($targetShiftId, $targetShiftDate) {
+                $targetShiftUsers = $users->filter(function ($shiftUser) use ($targetShiftId, $targetShiftDate) {
                     foreach ($shiftUser->shifts as $shift) {
                         if ($shift->pivot->shift_id == $targetShiftId && $shift->pivot->shift_date == $targetShiftDate) {
                             return true;
