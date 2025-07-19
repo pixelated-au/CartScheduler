@@ -1,20 +1,21 @@
 <script setup lang="ts">
 import { router, usePage } from "@inertiajs/vue3";
 import axios from "axios";
+import { useConfirm } from "primevue";
 import { computed, onMounted, ref } from "vue";
 import OozeLoader from "@/Components/Loaders/OozeLoader.vue";
 import useToast from "@/Composables/useToast";
 import vAutoScroll from "@/Directives/v-autoscroll.js";
-import JetCheckbox from "@/Jetstream/Checkbox.vue";
 import JetFormSection from "@/Jetstream/FormSection.vue";
 
-const props = defineProps({
+const { settings } = defineProps({
   settings: Object,
 });
 
 const processing = ref(false);
 const betaCheck = ref(false);
 const toast = useToast();
+const confirm = useConfirm();
 
 const updateCheck = async () => {
   processing.value = true;
@@ -35,6 +36,25 @@ const updateCheck = async () => {
 const updateLog = ref("");
 const updateCompleted = ref(false);
 const hadUpdateError = ref(false);
+
+const confirmUpdate = (event: Event) => {
+  confirm.require({
+    target: event.currentTarget as HTMLElement,
+    message: "Are you sure you want to update?",
+    header: "Confirm Update",
+    icon: "iconify mdi--alert-circle-outline text-xl",
+    acceptProps: {
+      label: "Yes",
+      severity: "danger",
+      variant: "outlined",
+    },
+    rejectProps: {
+      label: "No",
+      severity: "primary",
+    },
+    accept: () => doSoftwareUpdate(),
+  });
+};
 
 const doSoftwareUpdate = async () => {
   processing.value = true;
@@ -80,7 +100,7 @@ const downloadLog = () => {
   // Create a blob with the log content
   const blob = new Blob([updateLog.value], { type: "text/plain" });
   const url = URL.createObjectURL(blob);
-  const siteName = props.settings.siteName ? props.settings.siteName.toLowerCase().replace(/[^a-z\s]/g, "").replace(/\s+/g, "_") : "cart_scheduler";
+  const siteName = settings.siteName ? settings.siteName.toLowerCase().replace(/[^a-z\s]/g, "").replace(/\s+/g, "_") : "cart_scheduler";
 
   // Create a temporary link element to trigger the download
   const link = document.createElement("a");
@@ -108,7 +128,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <JetFormSection @submitted="doSoftwareUpdate">
+  <JetFormSection>
     <template #title>
       Software Update
     </template>
@@ -159,24 +179,26 @@ onMounted(async () => {
           You can reinstall the current update. Note that
           this usually isn't required. Use only if directed to by your IT support.
         </p>
-        <p class="col-span-12 text-gray-600 dark:text-gray-300 font-bold">
-          Do not use the Beta update option
-          unless
-          instructed by your IT support.
-        </p>
+        <PMessage :severity="betaCheck ? 'error' : 'secondary'"
+                  class="col-span-12 text-gray-600 dark:text-gray-300 font-bold"
+                  :class="{ 'animate-pulse': betaCheck }">
+          It's notrecommended to use the <em>Beta update</em> option unless instructed by your IT support.
+        </PMessage>
       </template>
     </template>
 
     <template #actions>
-      <PButton label="Update Now"
+      <PConfirmPopup/>
+      <PButton v-if="hasUpdate"
+               label="Update Now"
                icon="iconify mdi--progress-download"
-               v-if="hasUpdate"
                :class="{ 'opacity-25': processing }"
-               :disabled="processing" />
+               :disabled="processing"
+               @click="confirmUpdate"/>
 
       <template v-else-if="!updateLog">
         <label class="mr-3 flex items-center text-gray-400 dark:text-gray-600">
-          <JetCheckbox v-model:checked="betaCheck" value="true" />
+          <PCheckbox binary v-model="betaCheck" />
           <span class="ml-1.5">Check for Beta updates</span>
         </label>
         <PButton label="Check for updates"
@@ -185,10 +207,11 @@ onMounted(async () => {
                  :class="{ 'opacity-25': processing }"
                  class="mr-3"
                  :disabled="processing"
-                 @click.prevent.stop="updateCheck" />
-        <PButton severity="warning" :class="{ 'opacity-25': processing }" :disabled="processing">
-          Reinstall Current Version
-        </PButton>
+                 @click="updateCheck" />
+        <PButton label="Reinstall current version"
+                 severity="warning"
+                 :class="{ 'opacity-25': processing }"
+                 :disabled="processing" />
       </template>
 
       <template v-else-if="updateCompleted">
@@ -196,12 +219,12 @@ onMounted(async () => {
                  severity="secondary"
                  class="mr-3"
                  :disabled="processing"
-                 @click.prevent.stop="downloadLog" />
+                 @click="downloadLog" />
         <PButton label="Reload the page to see changes"
                  severity="primary"
                  class="mr-3"
                  :disabled="processing"
-                 @click.prevent.stop="reloadSite" />
+                 @click="reloadSite" />
       </template>
     </template>
   </JetFormSection>
