@@ -27,12 +27,10 @@ class SendShiftReminders implements ShouldQueue
     {
         if ($this->date != null) {
             $targetDate = $this->date;
-            Log::info("current date: ", [ "dat " => $this->date ]);
         } else {
             $targetDate = Carbon::today();
             $hours      = $settings->emailReminderTime;
             $targetDate->modify("+$hours hours");
-            Log::info("new date: ", [ "dat " => $targetDate ]);
         }
 
         $users = $getUserShiftsData->execute($targetDate, $this->userId);
@@ -45,9 +43,6 @@ class SendShiftReminders implements ShouldQueue
                 $targetShiftId = $userShift->pivot->shift_id;
                 $targetShiftDate = $userShift->pivot->shift_date;
 
-                Log::info("target shift date: ", [ "dat" => $targetShiftDate ]);
-
-                // This function: needs to be re looked at it - it seems to find shifts for +2 days, whereas the above SQL query gets all users for +3 days
                 $targetShiftUsers = $users->filter(function ($shiftUser) use ($targetShiftId, $targetShiftDate) {
                     foreach ($shiftUser->shifts as $shift) {
                         if ($shift->pivot->shift_id == $targetShiftId && $shift->pivot->shift_date == $targetShiftDate) {
