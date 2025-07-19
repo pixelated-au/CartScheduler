@@ -3,6 +3,7 @@ import BugsnagPluginVue from "@bugsnag/plugin-vue";
 import { createInertiaApp, Head, Link } from "@inertiajs/vue3";
 import { resolvePageComponent } from "laravel-vite-plugin/inertia-helpers";
 import PrimeVue from "primevue/config";
+import ConfirmationService from "primevue/confirmationservice";
 import ToastService from "primevue/toastservice";
 import { createApp, h } from "vue";
 import Toast from "vue-toastification";
@@ -52,6 +53,7 @@ createInertiaApp({
       })
       .use(plugin)
       .use(ZiggyVue, Ziggy)
+      .use(ConfirmationService)
       .use(ToastService)
       .use(Toast) // TODO delete the "old" toast
       .component("Head", Head)
