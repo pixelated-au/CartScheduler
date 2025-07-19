@@ -2,17 +2,19 @@
 import { computed } from "vue";
 import LabelError from "@/Jetstream/LabelError.vue";
 
-const { value, isDisabled, errorKey = "", form, hasError = false } = defineProps<{
+type Props<K extends string> = {
   value?: string;
   isDisabled?: boolean;
-  errorKey?: string;
   form?: {
-    invalid: (key: string) => boolean;
+    errors: Record<K, string>;
   };
+  errorKey?: K;
   hasError?: boolean;
-}>();
+};
 
-const invalid = computed(() => hasError || !!form?.invalid(errorKey));
+const { value, isDisabled = false, errorKey = "", form, hasError } = defineProps<Props<string>>();
+
+const invalid = computed(() => hasError || !!form?.errors[errorKey]);
 </script>
 
 <template>
