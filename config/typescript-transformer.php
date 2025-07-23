@@ -1,5 +1,11 @@
 <?php
 
+use Spatie\LaravelData\Support\TypeScriptTransformer;
+use Spatie\TypeScriptTransformer\Collectors;
+use Spatie\TypeScriptTransformer\Formatters;
+use Spatie\TypeScriptTransformer\Transformers;
+use Spatie\TypeScriptTransformer\Writers;
+
 return [
     /*
      * The paths where typescript-transformer will look for PHP classes
@@ -17,8 +23,8 @@ return [
      */
 
     'collectors' => [
-        Spatie\TypeScriptTransformer\Collectors\DefaultCollector::class,
-        Spatie\TypeScriptTransformer\Collectors\EnumCollector::class,
+        Collectors\DefaultCollector::class,
+        Collectors\EnumCollector::class,
     ],
 
     /*
@@ -27,8 +33,9 @@ return [
      */
 
     'transformers' => [
-//        Spatie\LaravelTypeScriptTransformer\Transformers\SpatieStateTransformer::class,
-        Spatie\TypeScriptTransformer\Transformers\EnumTransformer::class,
+//        Spatie\TypeScriptTransformer\Transformers\EnumTransformer::class,
+        Transformers\EnumTransformer::class,
+        TypeScriptTransformer\DataTypeScriptTransformer::class,
     ],
 
     /*
@@ -38,11 +45,11 @@ return [
      */
 
     'default_type_replacements' => [
-        DateTime::class => 'string',
-        DateTimeImmutable::class => 'string',
+        DateTime::class               => 'string',
+        DateTimeImmutable::class      => 'string',
         Carbon\CarbonInterface::class => 'string',
         Carbon\CarbonImmutable::class => 'string',
-        Carbon\Carbon::class => 'string',
+        Carbon\Carbon::class          => 'string',
     ],
 
     /*
@@ -57,7 +64,7 @@ return [
      * But you can also use the `ModuleWriter` or implement your own.
      */
 
-    'writer' => Spatie\TypeScriptTransformer\Writers\TypeDefinitionWriter::class,
+    'writer' => Writers\TypeDefinitionWriter::class,
 
     /*
      * The generated TypeScript file can be formatted. We ship a Prettier formatter
@@ -65,7 +72,7 @@ return [
      * The generated TypeScript will not be formatted when no formatter was set.
      */
 
-    'formatter' => Spatie\TypeScriptTransformer\Formatters\EslintFormatter::class,
+    'formatter' => Formatters\EslintFormatter::class,
 
     /*
      * Enums can be transformed into types or native TypeScript enums, by default
