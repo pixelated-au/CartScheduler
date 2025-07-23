@@ -18,7 +18,7 @@ configureVueProject({
 export default defineConfigWithVueTs([
   importX.flatConfigs.recommended,
   importX.flatConfigs.typescript,
-  globalIgnores(["node_modules", "vendor", "public"]),
+  globalIgnores(["node_modules", "vendor", "public", "resources/js/types/*.d.ts"]),
   {
     name: "eslint-defaults",
     ignores: ["*.d.ts"],
