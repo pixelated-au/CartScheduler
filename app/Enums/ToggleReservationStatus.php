@@ -2,9 +2,6 @@
 
 namespace App\Enums;
 
-use Spatie\TypeScriptTransformer\Attributes\TypeScript;
-
-#[TypeScript]
 enum ToggleReservationStatus
 {
     case RESERVATION_MADE;

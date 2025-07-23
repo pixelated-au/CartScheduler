@@ -4,9 +4,6 @@ namespace App\Enums;
 
 use Illuminate\Support\Str;
 
-use Spatie\TypeScriptTransformer\Attributes\TypeScript;
-
-#[TypeScript]
 enum DBPeriod: string
 {
     case Month = 'MONTH';

@@ -2,9 +2,6 @@
 
 namespace App\Enums;
 
-use Spatie\TypeScriptTransformer\Attributes\TypeScript;
-
-#[TypeScript]
 enum AvailabilityHours: int
 {
     case Zero        = 0;

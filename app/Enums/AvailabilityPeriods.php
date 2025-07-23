@@ -2,9 +2,7 @@
 
 namespace App\Enums;
 
-use Spatie\TypeScriptTransformer\Attributes\TypeScript;
 
-#[TypeScript]
 enum AvailabilityPeriods: string
 {
     case Morning      = 'morning';

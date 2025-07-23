@@ -2,9 +2,6 @@
 
 namespace App\Enums;
 
-use Spatie\TypeScriptTransformer\Attributes\TypeScript;
-
-#[TypeScript]
 enum MaritalStatus: string
 {
     case Single = 'single';

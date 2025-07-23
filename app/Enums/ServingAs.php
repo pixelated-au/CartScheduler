@@ -2,9 +2,6 @@
 
 namespace App\Enums;
 
-use Spatie\TypeScriptTransformer\Attributes\TypeScript;
-
-#[TypeScript]
 enum ServingAs: string
 {
     case FieldMissionary = 'field missionary';
