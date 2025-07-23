@@ -21,13 +21,7 @@ export default defineConfigWithVueTs([
   globalIgnores(["node_modules", "vendor", "public"]),
   {
     name: "eslint-defaults",
-    files: ["./*.{ts,js}", "./resources/js/**/*.{ts,js,vue}"],
     ignores: ["*.d.ts"],
-    plugins: { "@stylistic": stylistic, "import-x": importX },
-    extends: [pluginVue.configs["flat/essential"], vueTsConfigs.recommended],
-    settings: {
-      "import-x/resolver-next": [createTypeScriptImportResolver()],
-    },
     languageOptions: {
       ecmaVersion: 2022,
       globals: {
@@ -63,6 +57,14 @@ export default defineConfigWithVueTs([
   },
   {
     name: "eslint-ts",
+    extends: [vueTsConfigs.recommended],
+    files: ["./*.ts", "./resources/js/**/*.{ts,vue}"],
+    languageOptions: {
+      parserOptions: {
+        projectService: true,
+        tsconfigRootDir: import.meta.dirname,
+      },
+    },
     rules: {
       "@typescript-eslint/ban-ts-comment": ["warn", { "ts-nocheck": "allow-with-description" }],
       "@typescript-eslint/consistent-type-imports": [
@@ -81,6 +83,11 @@ export default defineConfigWithVueTs([
   },
   {
     name: "eslint-import-x",
+    files: ["./*.{ts,js}", "./resources/js/**/*.{ts,js,vue}"],
+    plugins: { "import-x": importX },
+    settings: {
+      "import-x/resolver-next": [createTypeScriptImportResolver()],
+    },
     rules: {
       "import-x/consistent-type-specifier-style": ["error", "prefer-top-level"],
       "import-x/default": "off",
@@ -119,6 +126,8 @@ export default defineConfigWithVueTs([
   },
   {
     name: "eslint-vue",
+    files: ["./resources/js/**/*.vue"],
+    extends: [pluginVue.configs["flat/essential"]],
     rules: {
       "vue/block-order": [
         "error",
@@ -223,6 +232,8 @@ export default defineConfigWithVueTs([
   },
   {
     name: "eslint-stylistic",
+    files: ["./*.{ts,js}", "./resources/js/**/*.{ts,js,vue}"],
+    plugins: { "@stylistic": stylistic },
     rules: {
       "@stylistic/array-bracket-newline": ["off"],
       "@stylistic/array-element-newline": ["error", { consistent: true }],
