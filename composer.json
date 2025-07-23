@@ -26,7 +26,7 @@
         "spatie/laravel-ray": "^1.36.2",
         "spatie/laravel-settings": "^3.3.2",
         "spatie/laravel-tags": "^4.6.1",
-        "spatie/typescript-transformer": "*",
+        "spatie/laravel-typescript-transformer": "^2.5",
         "tightenco/ziggy": "^v2.3.0"
     },
     "require-dev": {
