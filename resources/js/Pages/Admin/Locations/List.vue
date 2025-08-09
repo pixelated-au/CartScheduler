@@ -1,81 +1,85 @@
-<script setup>
+<script setup lang="ts">
 import { router } from "@inertiajs/vue3";
 import { useSortable } from "@vueuse/integrations/useSortable";
+import { SortableEvent } from "sortablejs";
 import { inject, nextTick, onMounted, onUnmounted, ref, watch, useTemplateRef } from "vue";
 import DragDrop from "@/Components/Icons/DragDrop.vue";
 import useToast from "@/Composables/useToast.js";
 import AppLayout from "@/Layouts/AppLayout.vue";
 
-const props = defineProps({
-    locations: Object.data,
-});
+const { locations } = defineProps<{
+  locations: App.Data.LocationAdminData[];
+}>();
 
 const toast = useToast();
 const route = inject("route");
 
 const onNewLocation = () => {
-    if (isSortingMode.value) {
-        toast.warning("You cannot create a new location while sorting is enabled");
-        return;
-    }
-    router.visit(route("admin.locations.create"));
+  if (isSortingMode.value) {
+    toast.warning("You cannot create a new location while sorting is enabled");
+    return;
+  }
+  router.visit(route("admin.locations.create"));
 };
 
-const locationClicked = (location) => {
-    if (isSortingMode.value) {
-        return;
-    }
-    router.visit(route("admin.locations.edit", { id: location.id }));
+const locationClicked = (location: App.Data.LocationAdminData) => {
+  if (isSortingMode.value) {
+    return;
+  }
+  router.visit(route("admin.locations.edit", { id: location.id }));
 };
 
 const locationsRef = useTemplateRef("locationsRef");
 
-const storeSortOrder = async (locations) => {
-    try {
-        await axios.put(route("admin.locations.sort-order"), {
-            locations: locations.map((location) => location.id),
-        });
-    } catch (e) {
-        return false;
-    }
+const storeSortOrder = async (locations: App.Data.LocationAdminData[]) => {
+  try {
+    await axios.put(route("admin.locations.sort-order"), {
+      locations: locations.map((location) => location.id),
+    });
+  } catch {
+    return false;
+  }
 
-    return true;
+  return true;
 };
 
-const moveArrayElement = async (evt) => {
-    const from = evt.oldIndex;
-    const to = evt.newIndex;
+const moveArrayElement = async (evt: SortableEvent) => {
+  const from = evt.oldIndex;
+  const to = evt.newIndex;
 
-    const locationsArray = props.locations.data;
+  if (!from || !to || from === to) {
+    return;
+  }
 
-    if (to >= 0 && to < locationsArray.length) {
-        const element = locationsArray.splice(from, 1)[0];
-        await nextTick(async () => {
-            locationsArray.splice(to, 0, element);
-            const success = await storeSortOrder(locationsArray);
-            if (!success) {
-                const element = locationsArray.splice(to, 1)[0];
-                locationsArray.splice(from, 0, element);
-                toast.error("There was an error while saving the sort order. The order has been reverted. Please try again.");
-                return;
-            }
-            toast.success("The sort order has been saved successfully");
-        });
-    }
+  const locationsArray = locations;
+
+  if (to >= 0 && to < locationsArray.length) {
+    const element = locationsArray.splice(from, 1)[0];
+    await nextTick(async () => {
+      locationsArray.splice(to, 0, element);
+      const success = await storeSortOrder(locationsArray);
+      if (!success) {
+        const element = locationsArray.splice(to, 1)[0];
+        locationsArray.splice(from, 0, element);
+        toast.error("There was an error while saving the sort order. The order has been reverted. Please try again.");
+        return;
+      }
+      toast.success("The sort order has been saved successfully");
+    });
+  }
 };
 
-const { start, stop, option } = useSortable(locationsRef, props.locations.data, {
-    animation: 250,
-    disabled: true,
-    onUpdate: moveArrayElement,
+const { start, stop, option } = useSortable(locationsRef, locations, {
+  animation: 250,
+  disabled: true,
+  onUpdate: moveArrayElement,
 });
 
 const pause = () => {
-    option("disabled", true);
+  option("disabled", true);
 };
 const resume = () => {
-    console.log("resume", option("disabled"), option("animation"));
-    option("disabled", false);
+  option("disabled", false);
 };
 
 onMounted(() => start());
@@ -83,58 +87,58 @@ onUnmounted(() => stop());
 
 const isSortingMode = ref(false);
 watch(isSortingMode, (value) => {
-    if (value) {
-        resume();
-    } else {
-        pause();
-    }
+  if (value) {
+    resume();
+  } else {
+    pause();
+  }
 });
 
-const transitionDelayStyle = (index) => `animation-delay: -${(index * 0.1173)}s`;
+const transitionDelayStyle = (index: number) => `animation-delay: -${(index * 0.1173)}s`;
 </script>
 
 <template>
-<AppLayout title="Locations">
-  <template #header>
-    <div class="flex justify-between">
-      <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">Locations</h2>
-      <div class="flex">
-        <PButton outline
-                 :style-type="isSortingMode ? 'danger' : 'secondary'"
-                 class="mx-3"
-                 @click="isSortingMode = !isSortingMode">
-          <drag-drop color="currentColor" box="16" />
-          <span class="ml-3">{{ isSortingMode ? "Stop sorting" : "Sort locations" }}</span>
-        </PButton>
-        <PButton class="mx-3" style-type="primary" @click="onNewLocation">
-          New Location
-        </PButton>
+  <AppLayout title="Locations">
+    <template #header>
+      <div class="flex justify-between">
+        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">Locations</h2>
+        <div class="flex">
+          <PButton outline
+                   :style-type="isSortingMode ? 'danger' : 'secondary'"
+                   class="mx-3"
+                   @click="isSortingMode = !isSortingMode">
+            <drag-drop color="currentColor" box="16" />
+            <span class="ml-3">{{ isSortingMode ? "Stop sorting" : "Sort locations" }}</span>
+          </PButton>
+          <PButton class="mx-3" style-type="primary" @click="onNewLocation">
+            New Location
+          </PButton>
+        </div>
       </div>
-    </div>
-  </template>
+    </template>
 
-  <div ref="locationsRef"
-       class="max-w-7xl mx-auto py-10 sm:px-6 grid grid-cols-1 content-start sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"
-       :class="{ '!gap-4': isSortingMode }">
-    <div v-for="(location, idx) in locations.data"
-         :key="location.id"
-         class="shadow-sm card subtle-zoom action cursor-pointer duration-500 scale-[.98] transition-all"
-         :class="{ 'is-sorting-mode !scale-100': isSortingMode }"
-         :style="transitionDelayStyle(idx)"
-         @click="locationClicked(location)">
-      <div class="flex items-start gap-8 h-full dark:text-gray-100">
-        <div>
-          <h4 class="font-semibold">{{ location.name }}</h4>
-          <div class="line-clamp-3">{{ location.clean_description }}</div>
-        </div>
-        <div>
-          <h5 class="font-semibold text-center">Shifts</h5>
-          <div class="text-center text-6xl">{{ location.shifts.length }}</div>
+    <div ref="locationsRef"
+         class="max-w-7xl mx-auto py-10 sm:px-6 grid grid-cols-1 content-start sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"
+         :class="{ '!gap-4': isSortingMode }">
+      <div v-for="(location, idx) in locations"
+           :key="location.id"
+           class="shadow-sm card subtle-zoom action cursor-pointer duration-500 scale-[.98] transition-all"
+           :class="{ 'is-sorting-mode !scale-100': isSortingMode }"
+           :style="transitionDelayStyle(idx)"
+           @click="locationClicked(location)">
+        <div class="flex items-start gap-8 h-full dark:text-gray-100">
+          <div>
+            <h4 class="font-semibold">{{ location.name }}</h4>
+            <div class="line-clamp-3">{{ location.clean_description }}</div>
+          </div>
+          <div>
+            <h5 class="font-semibold text-center">Shifts</h5>
+            <div class="text-center text-6xl">{{ location.shifts?.length }}</div>
+          </div>
         </div>
       </div>
     </div>
-  </div>
-</AppLayout>
+  </AppLayout>
 </template>
 
 <style lang="scss">
