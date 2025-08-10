@@ -6,7 +6,8 @@ import { computed, inject, onMounted, provide, ref } from "vue";
 import ObtrusiveNotification from "@/Components/ObtrusiveNotification.vue";
 import { useGlobalState } from "@/store";
 import "@vuepic/vue-datepicker/dist/main.css"; // FIXME AFTER REMOVING VUE-DATEPICKER, DELETE
-import "floating-vue/dist/style.css"; // TODO AFTER REMOVING FLOATING-VUE, DELETE
+import "floating-vue/dist/style.css";
+import { useDarkMode } from "@/Composables/useDarkMode.js"; // TODO AFTER REMOVING FLOATING-VUE, DELETE
 
 defineProps({
   title: String,
@@ -27,7 +28,9 @@ onMounted(() => {
   }
 });
 
-const isDarkMode = ref(false);
+const { isDarkMode } = useDarkMode();
+
+// const isDarkMode = ref(false);
 provide("darkMode", isDarkMode);
 
 provide("enableUserAvailability", !!page.props.enableUserAvailability || false);

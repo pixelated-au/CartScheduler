@@ -4,8 +4,6 @@ import { breakpointsTailwind, useBreakpoints } from "@vueuse/core";
 import { computed, inject, nextTick, onBeforeMount, onMounted, onUnmounted, ref, useTemplateRef, watch } from "vue";
 import JetApplicationMark from "@/Jetstream/ApplicationMark.vue"; // Assuming this is your logo component
 
-defineEmits(["toggle-dark-mode"]);
-
 const page = usePage();
 const breakpoints = useBreakpoints(breakpointsTailwind);
 const route = inject("route");
@@ -308,7 +306,7 @@ const isActive = (routeName: string | undefined) => route().current() === routeN
 
         <!-- Right side: Mobile Toggles & Desktop User Menu -->
         <div class="flex justify-end items-center">
-          <DarkMode @is-dark-mode="$emit('toggle-dark-mode', $event)" />
+          <DarkMode />
 
           <!-- Mobile User Menu Toggle -->
           <div class="mr-3 sm:hidden">
