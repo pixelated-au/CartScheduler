@@ -12,15 +12,8 @@ import JetInput from "@/Jetstream/Input.vue";
 import JetInputError from "@/Jetstream/InputError.vue";
 import VacationDateRange from "@/Pages/Profile/Partials/VacationDateRange.vue";
 
-type Vacation = {
-  id?: number;
-  start_date: string;
-  end_date: string;
-  description: string;
-};
-
 const { vacations = [], userId } = defineProps<{
-  vacations?: Vacation[];
+  vacations?: Array<App.Data.UserVacationData>;
   userId?: number;
 }>();
 
@@ -32,7 +25,7 @@ const form = extendedPrecognition({
   method: "put",
 }, {
   vacations: vacations,
-  deletedVacations: [] as Vacation[],
+  deletedVacations: [] as Array<App.Data.UserVacationData>,
 });
 
 const update = () => {
@@ -116,7 +109,9 @@ const deleteVacation = (idx: number) => form.deletedVacations = [...form.deleted
               <InputTextEIPField v-else
                                  input-class="w-full bg-text-input dark:bg-text-input-dark"
                                  v-model="vacation.description"
+                                 :maxlength="250"
                                  empty-value="No comment set" />
+              <div class="text-sm italic text-gray-500 dark:text-gray-400">This is for your reference only</div>
               <JetInputError :message="form.errors['vacations.' + idx + '.description']" />
             </div>
           </div>
