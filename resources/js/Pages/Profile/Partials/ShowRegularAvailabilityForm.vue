@@ -12,7 +12,7 @@ import DayOfWeekConfiguration from "@/Pages/Profile/Partials/DayOfWeekConfigurat
 import type { Availability, Day, DayOfMonthCount } from "@/Composables/useAvailabilityActions";
 
 const { availability, userId = null } = defineProps<{
-  availability: Availability;
+  availability: App.Data.AvailabilityData;
   userId?: number | null;
 }>();
 

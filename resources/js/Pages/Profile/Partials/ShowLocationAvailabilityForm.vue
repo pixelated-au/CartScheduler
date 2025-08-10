@@ -9,7 +9,7 @@ import JetInputError from "@/Jetstream/InputError.vue";
 import JetLabel from "@/Jetstream/Label.vue";
 
 const { selectedLocations, userId = null } = defineProps<{
-  selectedLocations: number[];
+  selectedLocations?: { [key: number]: number };
   userId?: number | null;
 }>();
 
