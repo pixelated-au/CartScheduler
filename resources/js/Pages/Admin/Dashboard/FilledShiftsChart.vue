@@ -5,6 +5,7 @@ import { use } from "echarts/core";
 import { CanvasRenderer } from "echarts/renderers";
 import { computed, inject, provide, watch } from "vue";
 import VChart, { THEME_KEY } from "vue-echarts";
+import { useDarkMode } from "@/Composables/useDarkMode.js";
 import EChartsTheme from "@/lib/eChartsTheme.js";
 
 const props = defineProps({
@@ -13,7 +14,7 @@ const props = defineProps({
 
 use([CanvasRenderer, TitleComponent, TooltipComponent, LegendComponent, BarChart, GridComponent]);
 
-const isDarkMode = inject("darkMode", false);
+const { isDarkMode } = useDarkMode();
 
 const theme = EChartsTheme(isDarkMode);
 

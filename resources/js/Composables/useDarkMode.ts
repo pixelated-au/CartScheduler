@@ -1,5 +1,5 @@
 import { useColorMode } from "@vueuse/core";
-import { computed } from "vue";
+import { computed, nextTick } from "vue";
 
 /**
  * A composable for managing dark mode state in a Vue application
@@ -13,11 +13,15 @@ export function useDarkMode() {
   const isDarkMode = computed(() => colorMode.value === "dark");
 
   const toggleDarkMode = (mode?: "light" | "dark") => {
-    if (mode) {
-      store.value = mode;
-      return;
-    }
-    store.value = isDarkMode.value ? "light" : "dark";
+    document.startViewTransition(() => {
+      nextTick(() => {
+        if (mode) {
+          store.value = mode;
+          return;
+        }
+        store.value = isDarkMode.value ? "light" : "dark";
+      });
+    });
   };
 
   return {
