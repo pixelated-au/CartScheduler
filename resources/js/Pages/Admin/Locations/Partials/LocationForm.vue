@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { router, useForm } from "@inertiajs/vue3";
 import { inject, nextTick, ref, watch } from "vue";
+import useToast from "@/Composables/useToast";
 import JetConfirmationModal from "@/Jetstream/ConfirmationModal.vue";
 import JetFormSection from "@/Jetstream/FormSection.vue";
 import JetSectionBorder from "@/Jetstream/SectionBorder.vue";
@@ -16,6 +17,7 @@ const { location, maxVolunteers, action } = defineProps<{
 defineEmits(["cancel"]);
 
 const route = inject("route");
+const toast = useToast();
 
 const form = useForm<App.Data.LocationAdminData>({
   id: location?.id,
@@ -67,12 +69,34 @@ watch(() => form.max_volunteers, (value: number | undefined, oldValue: number | 
 });
 
 const updateLocationData = () => {
-  form.put(route("admin.locations.update", location.id), { preserveScroll: true });
+  form.put(route("admin.locations.update", location.id), {
+    preserveScroll: true,
+    onSuccess: () => toast.success(
+      `${form.name} was updated.`,
+      "Success!",
+      { group: "bottom" },
+    ),
+    onError: () => toast.error(
+      `${form.name} could not be saved. Please check the validation messages`,
+      "Not Saved!",
+      { group: "bottom" },
+    ),
+  });
 };
 
 const createLocationData = () => {
   form.post(route("admin.locations.store"), {
     preserveScroll: true,
+    onSuccess: () => toast.success(
+      `${form.name} was saved.`,
+      "Success!",
+      { group: "bottom" },
+    ),
+    onError: () => toast.error(
+      `${form.name} could not be saved. Please check the validation messages`,
+      "Not Saved!",
+      { group: "bottom" },
+    ),
   });
 };
 
