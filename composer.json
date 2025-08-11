@@ -23,6 +23,7 @@
         "pixelated-au/streamline": "dev-main",
         "psr/simple-cache": "^3.0.0",
         "spatie/laravel-activitylog": "^4.7",
+        "spatie/laravel-data": "^4.17",
         "spatie/laravel-ray": "^1.36.2",
         "spatie/laravel-settings": "^3.3.2",
         "spatie/laravel-tags": "^4.6.1",

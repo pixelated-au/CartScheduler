@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { router } from "@inertiajs/vue3";
+import { isAxiosError } from "axios";
 import { inject, ref, watch, nextTick } from "vue";
 import useExtendedPrecognition from "@/Composables/useExtendedPrecognition.js";
 import useToast from "@/Composables/useToast.js";
@@ -10,7 +11,7 @@ import JetInputError from "@/Jetstream/InputError.vue";
 import JetLabel from "@/Jetstream/Label.vue";
 
 const props = defineProps<{
-  user: Record<string, unknown>;
+  user: App.Data.UserAdminData;
   action: "edit" | "add";
 }>();
 
@@ -32,7 +33,6 @@ const form = extendedPrecognition({
   email: props.user.email,
   gender: props.user.gender,
   mobile_phone: props.user.mobile_phone,
-  birth_year: props.user.birth_year,
   year_of_birth: props.user.year_of_birth,
   marital_status: props.user.marital_status,
   appointment: props.user.appointment,
@@ -96,7 +96,9 @@ const performResendWelcomeAction = async () => {
     const response = await axios.post(route("admin.resend-welcome-email", { user_id: props.user.id }));
     toast.success(response.data.message, "Success!", { group: "center" });
   } catch (e) {
-    toast.error(e.response.data.message, "Error!", { timeout: 4000 });
+    if (isAxiosError(e)) {
+      toast.error(e.response?.data.message, "Error!", { timeout: 4000 });
+    }
   }
 };
 
@@ -115,7 +117,7 @@ watch([() => form.is_unrestricted, () => form.role], ([isUnrestricted, role]) =>
 watch([() => form.gender, () => form.appointment], ([gender, appointment]) => {
   if (appointment && gender === "female") {
     nextTick(() => {
-      form.appointment = null;
+      form.appointment = undefined;
       toast.warning(
         "Sisters cannot be appointed. The appointment has been reset",
         "Oops!",

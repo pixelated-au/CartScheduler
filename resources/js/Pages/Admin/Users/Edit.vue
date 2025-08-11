@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { router, usePage } from "@inertiajs/vue3";
 import { inject } from "vue";
 import AppLayout from "@/Layouts/AppLayout.vue";
@@ -7,11 +7,9 @@ import ShowLocationAvailabilityForm from "@/Pages/Profile/Partials/ShowLocationA
 import ShowRegularAvailabilityForm from "@/Pages/Profile/Partials/ShowRegularAvailabilityForm.vue";
 import ShowVacationsAvailabilityForm from "@/Pages/Profile/Partials/ShowVacationsAvailabilityForm.vue";
 
-defineProps({
-  editUser: Object,
-  availableRoles: Array,
-  permissions: Object,
-});
+defineProps<{
+  editUser: App.Data.UserAdminData;
+}>();
 
 const route = inject("route");
 
@@ -23,11 +21,11 @@ const canChooseLocations = !!usePage().props.enableUserLocationChoices;
 </script>
 
 <template>
-  <AppLayout :title="`User: ${editUser.data.name}`">
+  <AppLayout :title="`User: ${editUser.name}`">
     <template #header>
       <div class="flex justify-between">
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-          {{ editUser.data.name }}
+          {{ editUser.name }}
         </h2>
         <BackButton class="mx-3" @click.prevent="listRouteAction"/>
       </div>
@@ -35,23 +33,23 @@ const canChooseLocations = !!usePage().props.enableUserLocationChoices;
 
     <div>
       <div class="max-w-7xl mx-auto pt-10 sm:px-6 lg:px-8">
-        <UserProfileForm :user="editUser.data" action="edit" />
+        <UserProfileForm :user="editUser" action="edit" />
       </div>
 
       <template v-if="$page.props.enableUserAvailability">
         <div class="max-w-7xl mx-auto pt-10 sm:px-6 lg:px-8">
-          <ShowVacationsAvailabilityForm :userId="editUser.data.id"
-                                         :vacations="editUser.data.vacations"
+          <ShowVacationsAvailabilityForm :userId="editUser.id"
+                                         :vacations="editUser.vacations"
                                          class="mt-10 sm:mt-0" />
         </div>
         <div v-if="canChooseLocations" class="max-w-7xl mx-auto pt-10 sm:px-6 lg:px-8">
-          <ShowLocationAvailabilityForm :userId="editUser.data.id"
-                                        :selected-locations="editUser.data.selectedLocations"
+          <ShowLocationAvailabilityForm :userId="editUser.id"
+                                        :selected-locations="editUser.selectedLocations"
                                         class="mt-10 sm:mt-0" />
         </div>
         <div class="max-w-7xl mx-auto pt-10 sm:px-6 lg:px-8">
-          <ShowRegularAvailabilityForm :userId="editUser.data.id"
-                                       :availability="editUser.data.availability"
+          <ShowRegularAvailabilityForm :userId="editUser.id"
+                                       :availability="editUser.availability"
                                        class="mt-10 sm:mt-0" />
         </div>
       </template>
@@ -60,6 +58,6 @@ const canChooseLocations = !!usePage().props.enableUserLocationChoices;
 </template>
 
 <style lang="scss">
+/*todo what is this doing here? */
 @import 'vue3-easy-data-table/dist/style.css';
-
 </style>

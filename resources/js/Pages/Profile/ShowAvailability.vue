@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { usePage } from "@inertiajs/vue3";
 import { onMounted, inject } from "vue";
 import JetSectionBorder from "@/Jetstream/SectionBorder.vue";
@@ -7,22 +7,11 @@ import ShowLocationAvailabilityForm from "@/Pages/Profile/Partials/ShowLocationA
 import ShowRegularAvailabilityForm from "@/Pages/Profile/Partials/ShowRegularAvailabilityForm.vue";
 import ShowVacationsAvailabilityForm from "@/Pages/Profile/Partials/ShowVacationsAvailabilityForm.vue";
 
-// TODO IS THIS COMPONENT IN USE??
-
-defineProps({
-  vacations: {
-    type: Object,
-    required: false,
-  },
-  availability: {
-    type: Object,
-    required: false,
-  },
-  selectedLocations: {
-    type: Array,
-    required: false,
-  },
-});
+defineProps<{
+  vacations?: Array<App.Data.UserVacationData>;
+  availability: App.Data.AvailabilityData;
+  selectedLocations: Array<App.Data.LocationData["id"]>;
+}>();
 
 const route = inject("route");
 const canChooseLocations = !!usePage().props.enableUserLocationChoices;
@@ -43,7 +32,7 @@ onMounted(() => {
     <div>
       <div class="max-w-7xl mx-auto py-10 sm:px-6 lg:px-8">
         <div>
-          <ShowVacationsAvailabilityForm :vacations="vacations?.data" class="mt-10 sm:mt-0"/>
+          <ShowVacationsAvailabilityForm :vacations="vacations" class="mt-10 sm:mt-0"/>
 
           <template v-if="canChooseLocations">
             <JetSectionBorder/>
@@ -51,7 +40,7 @@ onMounted(() => {
           </template>
 
           <JetSectionBorder/>
-          <ShowRegularAvailabilityForm :availability="availability?.data" class="mt-10 sm:mt-0"/>
+          <ShowRegularAvailabilityForm :availability="availability" class="mt-10 sm:mt-0"/>
         </div>
       </div>
     </div>

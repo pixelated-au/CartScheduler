@@ -37,8 +37,8 @@ const updateAllowedSettingsUsers = () => {
 
 const adminUsers = ref();
 onMounted(async () => {
-  const response = await axios.get("/admin/admin-users");
-  adminUsers.value = response.data.data;
+  const response = await axios.get<App.Data.AdminUserData>("/admin/admin-users");
+  adminUsers.value = response.data;
 });
 </script>
 
