@@ -1,6 +1,8 @@
-<script setup>
-import { onMounted, provide, ref } from "vue";
+<script setup lang="ts">
+import { isAxiosError } from "axios";
+import { inject, onMounted, provide, ref } from "vue";
 import useToast from "@/Composables/useToast.js";
+import { ReportTags } from "@/lib/provide-inject-keys";
 import ReportForm from "@/Pages/Components/Dashboard/ReportForm.vue";
 
 const show = defineModel({ required: true, type: Boolean });
@@ -8,52 +10,56 @@ const show = defineModel({ required: true, type: Boolean });
 const emit = defineEmits(["has-outstanding-reports"]);
 
 const toast = useToast();
+const route = inject("route");
 
-const outstandingReports = ref([]);
-const tags = ref([]);
-provide("report-tags", tags);
+const outstandingReports = ref<App.Data.OutstandingReportsData[]>([]);
+const tags = ref<App.Data.ReportTagData[]>([]);
+provide(ReportTags, tags);
 
 const getData = async () => {
-    try {
-        const [reportsResponse, tagsResponse] = await Promise.all([
-            axios.get("/outstanding-reports"),
-            axios.get("/get-report-tags"),
-        ]);
-        outstandingReports.value = reportsResponse.data;
-        emit("has-outstanding-reports", outstandingReports.value.length);
+  try {
+    const [reportsResponse, tagsResponse] = await Promise.all([
+      axios.get<App.Data.OutstandingReportsData[]>(route("outstanding-reports")),
+      axios.get<App.Data.ReportTagData[]>(route("get.report-tags")),
+    ]);
+    outstandingReports.value = reportsResponse.data;
+    tags.value = tagsResponse.data;
 
-        tags.value = tagsResponse.data.data;
-    } catch (e) {
-        toast.error(e.response.data.message);
+    emit("has-outstanding-reports", outstandingReports.value.length);
+  } catch (e) {
+    if (!isAxiosError(e)) {
+      throw e;
     }
+    toast.error(e.response?.data.message, "Error");
+  }
 };
 
 onMounted(() => {
-    getData();
+  getData();
 });
 
-const reportSaved = () => getData();
+const reportSaved = () => setTimeout(() =>getData(), 1000);
 </script>
 
 <template>
-<PDialog modal dismissable-mask v-model:visible="show">
-  <template #header>
-    <h3>Outstanding Reports</h3>
-  </template>
+  <PDialog modal dismissable-mask v-model:visible="show">
+    <template #header>
+      <h3>Outstanding Reports</h3>
+    </template>
 
-  <div v-if="outstandingReports?.length" class="mt-5">
-    <div v-for="report in outstandingReports"
-         :key="`${report.shift_date}-${report.start_time}-${report.shift_id}-${report.user_id}`"
-         class="pb-3 mb-20 border-b border-gray-200">
-      <ReportForm :report="report" @saved="reportSaved()" />
+    <div v-if="outstandingReports?.length" class="mt-5">
+      <div v-for="report in outstandingReports"
+           :key="report.shift_date + report.start_time + report.shift_id"
+           class="pb-3 mb-20 border-b border-gray-200">
+        <ReportForm :report="report" @saved="reportSaved()" />
+      </div>
     </div>
-  </div>
-  <div v-else>
-    <h4 class="my-3 text-green-700 dark:text-green-400">No more reports outstanding 🎉</h4>
-  </div>
+    <div v-else>
+      <h4 class="my-3 text-green-700 dark:text-green-400">No more reports outstanding 🎉</h4>
+    </div>
 
-  <template #footer>
-    <PButton type="button" style-type="secondary" @click="show = false">Close</PButton>
-  </template>
-</PDialog>
+    <template #footer>
+      <PButton type="button" style-type="secondary" @click="show = false">Close</PButton>
+    </template>
+  </PDialog>
 </template>
