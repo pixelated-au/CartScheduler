@@ -1,37 +1,52 @@
-<script setup>
+<script setup lang="ts">
 import { usePage } from "@inertiajs/vue3";
 import {
-  addDays,
   addMonths,
+  eachDayOfInterval,
   endOfDay,
   endOfMonth,
   isAfter,
   isBefore,
   lastDayOfMonth,
   parseISO,
-  set,
+  set, setDate,
   setHours,
   startOfDay,
   startOfMonth,
   subMonths,
 } from "date-fns";
 import { utcToZonedTime } from "date-fns-tz";
-import { computed, defineEmits, defineProps, onMounted, ref, watchEffect } from "vue";
+import { computed, defineEmits, defineProps, nextTick, ref, watchEffect } from "vue";
+import type { DatePickerDateSlotOptions, DatePickerMonthChangeEvent } from "primevue";
+import type { AuthUser } from "@/shims";
 
-const props = defineProps({
-  date: Date,
-  maxDate: Date,
-  locations: Array,
-  markerDates: Object,
-  user: Object,
-  freeShifts: Object,
-  canViewHistorical: Boolean,
-  showLegend: {
-    type: Boolean,
-    default: false,
-  },
-  class:  String,
-});
+export type DateMark = {
+  date: Date;
+  type: "line";
+  color: "#0E9F6E";
+  locations: number[];
+};
+
+export type EmittedDate = {
+  locations: DateMark["locations"];
+  date: DateMark["date"];
+};
+
+const {
+  date,
+  maxDate,
+  markerDates,
+  user,
+  freeShifts,
+  canViewHistorical = false,
+} = defineProps<{
+  date: Date;
+  maxDate?: Date;
+  markerDates?: App.Data.AvailableShiftsData["shifts"];
+  user: AuthUser;
+  freeShifts?: App.Data.AvailableShiftsData["freeShifts"];
+  canViewHistorical?: boolean;
+}>();
 
 const emit = defineEmits([
   "update:date",
@@ -39,51 +54,37 @@ const emit = defineEmits([
 ]);
 
 const selectedDate = computed({
-  get: () => props.date,
+  get: () => set(date, { hours: 12, minutes: 0, seconds: 0, milliseconds: 0 }),
   // set the date at midday to be safe...
   set: (value) => emit("update:date", set(value, { hours: 12, minutes: 0, seconds: 0, milliseconds: 0 })),
 });
 
-const shiftAvailability = computed(() => {
-  return usePage().props.shiftAvailability;
-});
+const page = usePage();
 
-const isRestricted = computed(() => {
-  return !usePage().props.isUnrestricted;
-});
+const shiftAvailability = computed(() => page.props.shiftAvailability);
+const isRestricted = computed(() => !page.props.isUnrestricted);
 
 const today = setHours(new Date(), 12);
-const notBefore = props.canViewHistorical
+const notBefore = canViewHistorical
   ? startOfDay(startOfMonth(subMonths(today, 6)))
   : startOfDay(today);
 
-// Note, this is computed because props.maxDate is a reactive value whereas notAfter has no reactivity dependency
+// Note, this is computed because maxDate is a reactive value whereas notAfter has no need for reactivity
 const notAfter = computed(() =>
-  props.canViewHistorical
+  canViewHistorical
     ? endOfMonth(addMonths(notBefore, 12))
-    : props.maxDate);
+    : maxDate);
 
-const allDates = [];
-const getAllDates = () => {
-  for (let i = notBefore; i < notAfter.value; i = addDays(i, 1)) {
-    allDates.push(i);
-  }
-};
-
-onMounted(() => {
-  getAllDates();
-});
-
-const markers = ref([]);
+const markers = ref<DateMark[]>([]);
 const highlights = computed(() => {
-  const highlighted = [];
-  if (!props.freeShifts) return highlighted;
+  const highlighted: Date[] = [];
+  if (!freeShifts) return highlighted;
 
-  for (const key in props.freeShifts) {
-    if (!Object.prototype.hasOwnProperty.call(props.freeShifts, key)) {
+  for (const key in freeShifts) {
+    if (!Object.prototype.hasOwnProperty.call(freeShifts, key)) {
       continue;
     }
-    if (!props.freeShifts[key].has_availability) {
+    if (!freeShifts[key].has_availability) {
       continue;
     }
     highlighted.push(parseISO(key));
@@ -91,28 +92,47 @@ const highlights = computed(() => {
   return highlighted;
 });
 
-const allowed = computed(() => {
+/**
+ * If the user is restricted, we need to disable all dates that they're not rostered for
+ */
+const restrictedDates = computed(() => {
   if (!isRestricted.value) {
-    return null;
+    return undefined;
   }
-  return markers.value.map((marker) => marker.date);
+
+  let paddedDates: Date[] | null = eachDayOfInterval({
+    start: startOfMonth(selectedDate.value),
+    end: endOfMonth(selectedDate.value),
+  });
+
+  const restricted: Date[] = [];
+
+  for (const date of paddedDates) {
+    if (!markers.value.some((m) => m.date.getDate() === date.getDate())) {
+      restricted.push(date);
+    }
+  }
+
+  paddedDates = null;
+
+  return restricted;
 });
 
 watchEffect(() => {
-  if (!props.markerDates) {
+  if (!markerDates) {
     return;
   }
-  const marks = [];
-  if (!props.user) {
+  const marks: DateMark[] = [];
+  if (!user) {
     return [];
   }
 
-  for (const date in props.markerDates) {
-    if (!Object.prototype.hasOwnProperty.call(props.markerDates, date)) {
+  for (const date in markerDates) {
+    if (!Object.prototype.hasOwnProperty.call(markerDates, date)) {
       continue;
     }
     const foundAtLocation = [];
-    const shiftDateGroup = props.markerDates[date];
+    const shiftDateGroup = markerDates[date];
 
     let isoDate = undefined;
     for (const shiftId in shiftDateGroup) {
@@ -124,23 +144,23 @@ watchEffect(() => {
       for (let shiftCount = 0; shiftCount < shifts.length; shiftCount++) {
         const shift = shifts[shiftCount];
         if (!isoDate) {
-          isoDate = utcToZonedTime(shift.shift_date, shiftAvailability.value.timezone);
+          isoDate = utcToZonedTime(date, shiftAvailability.value.timezone);
         }
-        // TODO is this isBefore and isAfter still needed?
-        if (isBefore(isoDate, startOfDay(parseISO(shift.available_from)))) {
+
+        if (shift.available_from && isBefore(isoDate, startOfDay(parseISO(shift.available_from)))) {
           break;
         }
-        if (isAfter(isoDate, endOfDay(parseISO(shift.available_to)))) {
+        if (shift.available_to && isAfter(isoDate, endOfDay(parseISO(shift.available_to)))) {
           break;
         }
-        if (shift.volunteer_id === props.user?.id) {
+        if (shift.volunteer_id === user?.id) {
           foundAtLocation.push(shift.location_id);
         }
       }
     }
     if (foundAtLocation.length) {
       marks.push({
-        date: isoDate,
+        date: isoDate as Date,
         type: "line",
         color: "#0E9F6E",
         locations: foundAtLocation,
@@ -154,30 +174,46 @@ watchEffect(() => {
 });
 
 /**
- * @description Used to set the date when the user changes month (or year). This ensures that the next month's values
- * are loaded.
+ * Used to set the date when the user changes month (or year). This ensures that the next month's values are loaded.
  */
-const updateMonthYear = (event) => {
-  const { month, year } = event;
+const updateMonthYear = ({ month, year }: DatePickerMonthChangeEvent) => {
+  // PrimeVue DatePickerMonthChangeEvent `month` event is 1 indexed (1 = January) instead of JS 0 indexed (0 = January)`
+  month--;
   // Setting the 'day of month' to 0, sets the day to the previous month's last day
-  const totalDays = lastDayOfMonth(new Date(year, month, 1, 0, 0, 0, 0));
+  const lastDay = lastDayOfMonth(new Date(year, month, 1, 12));
   const currentDate = selectedDate.value;
-  if (isAfter(currentDate, totalDays)) {
-    // Going back in time, set the date to the last day of the previous month
-    selectedDate.value = new Date(year, month, totalDays.getDate());
+
+  // Going back in time
+  if (isAfter(currentDate, lastDay)) {
+    if (!canViewHistorical) {
+      if (isBefore(lastDay, notBefore)) {
+        selectedDate.value = notBefore;
+        return;
+      }
+    }
+
+    // set the date to the last day of the previous month
+    selectedDate.value = new Date(year, month, lastDay.getDate());
     return;
   }
-  // Going forward in time. Check next month has enough days, i.e. if the month is February, check if the date is
-  // less than the previous month's selected date
-  const dayOfMonth = currentDate.getDate() > totalDays.getDate()
-    ? totalDays.getDate()
-    : currentDate.getDate();
-  selectedDate.value = new Date(year, month, dayOfMonth);
+
+  // Going forward in time
+
+  // If cannotViewHistorical (non-admin dashboard), make sure they cannot go further than the maximum allowed date
+  if (!canViewHistorical && notAfter.value) {
+    if (isAfter(lastDay, notAfter.value)) {
+      // Not allowed, set the date to the maximum allowed date
+      selectedDate.value = notAfter.value;
+      return;
+    }
+  }
+
+  selectedDate.value = new Date(year, month, 1, 12);
 };
 
 // Function to check if a date is highlighted (has free shifts)
-const isDateHighlighted = (date) => {
-  if (!props.freeShifts || !highlights.value.length) return false;
+const isDateHighlighted = (date: DatePickerDateSlotOptions) => {
+  if (!freeShifts || !highlights.value.length) return false;
 
   const dateObj = new Date(date.year, date.month, date.day);
 
@@ -188,7 +224,7 @@ const isDateHighlighted = (date) => {
 };
 
 // Function to check if a date has a marker (user's shifts)
-const hasMarker = (date) => {
+const hasMarker = (date: DatePickerDateSlotOptions) => {
   if (!markers.value.length) return false;
 
   const dateObj = new Date(date.year, date.month, date.day);
@@ -199,31 +235,54 @@ const hasMarker = (date) => {
     m.date.getFullYear() === dateObj.getFullYear());
 };
 
-// Function to disable dates that are not allowed
-const disabledDates = (date) => {
-  if (!isRestricted.value || !allowed.value || !allowed.value.length) return false;
+const canGoBack = computed(() => isAfter(
+  set(selectedDate.value, { date: 1, hours: 12, minutes: 0, seconds: 0, milliseconds: 0 }),
+  set(notBefore, { date: 1, hours: 12, minutes: 0, seconds: 0, milliseconds: 0 }),
+));
 
-  const dateObj = new Date(date.year, date.month, date.day);
-
-  return !allowed.value.some((d) =>
-    d.getDate() === dateObj.getDate() &&
-    d.getMonth() === dateObj.getMonth() &&
-    d.getFullYear() === dateObj.getFullYear());
-};
+const canGoForward = computed(() => {
+  if (!notAfter.value) {
+    return true;
+  }
+  return isBefore(
+    set(selectedDate.value, { date: 1, hours: 12, minutes: 0, seconds: 0, milliseconds: 0 }),
+    set(notAfter.value, { date: 1, hours: 12, minutes: 0, seconds: 0, milliseconds: 0 }),
+  );
+});
 </script>
 
 <template>
   <PDatePicker v-model="selectedDate"
                inline
+               selectOtherMonths
                :minDate="notBefore"
                :maxDate="notAfter"
                :disabled="false"
                :showIcon="false"
                :showButtonBar="false"
+               :manualInput="false"
                :dateFormat="'mm/dd/yy'"
-               :disabledDates="isRestricted ? disabledDates : null"
+               :disabledDates="restrictedDates"
                @month-change="updateMonthYear"
                @year-change="updateMonthYear">
+    <template #prevbutton="{ actionCallback }">
+      <button v-if="canGoBack"
+              @click="actionCallback"
+              class="iconify mdi--chevron-left-circle-outline text-lg text-neutral-500 hover:text-neutral-900 dark:hover:text-neutral-300"></button>
+      <div v-else class="iconify mdi--chevron-left-circle-outline text-lg text-neutral-200 dark:text-neutral-700"></div>
+    </template>
+
+    <template #>
+      <div>hi there</div>
+    </template>
+
+    <template #nextbutton="{ actionCallback }">
+      <button v-if="canGoForward"
+              @click="actionCallback"
+              class="iconify mdi--chevron-right-circle-outline text-lg text-neutral-500 hover:text-neutral-900 dark:hover:text-neutral-300"></button>
+      <div v-else class="iconify mdi--chevron-right-circle-outline text-lg text-neutral-200 dark:text-neutral-700"></div>
+    </template>
+
     <template #date="{ date }">
       <span class="formatted-date"
             :class="{
@@ -234,5 +293,4 @@ const disabledDates = (date) => {
       </span>
     </template>
   </PDatePicker>
-  <div v-if="showLegend" class="legend text-xs mt-2">Blue squares indicate free shifts</div>
 </template>

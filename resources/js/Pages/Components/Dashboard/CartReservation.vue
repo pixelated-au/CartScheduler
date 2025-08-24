@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { usePage } from "@inertiajs/vue3";
+import { isAxiosError } from "axios";
 import { format, isSameDay, parse } from "date-fns";
 import { computed, ref, watch } from "vue";
 import ComponentSpinner from "@/Components/ComponentSpinner.vue";
@@ -9,10 +10,12 @@ import Loading from "@/Components/Loading.vue";
 import useToast from "@/Composables/useToast";
 import useLocationFilter from "@/Pages/Admin/Locations/Composables/useLocationFilter";
 import DatePicker from "@/Pages/Components/Dashboard/DatePicker.vue";
+import type { EmittedDate } from "@/Pages/Components/Dashboard/DatePicker.vue";
+import type { AuthUser } from "@/shims";
 
-defineProps({
-  user: Object,
-});
+defineProps<{
+  user: AuthUser;
+}>();
 
 const toast = useToast();
 
@@ -38,7 +41,7 @@ const gridCols = {
 };
 
 const isReserving = ref(false);
-const toggleReservation = async (locationId, shiftId, toggleOn) => {
+const toggleReservation = async (locationId: number, shiftId: number, toggleOn: boolean) => {
   if (isReserving.value) {
     return;
   }
@@ -47,7 +50,7 @@ const toggleReservation = async (locationId, shiftId, toggleOn) => {
   try {
     isReserving.value = true;
 
-    const response = await axios.post("/reserve-shift", {
+    const response = await axios.post<string>("/reserve-shift", {
       location: locationId,
       shift: shiftId,
       do_reserve: toggleOn,
@@ -61,7 +64,10 @@ const toggleReservation = async (locationId, shiftId, toggleOn) => {
     await getShifts(false);
 
   } catch (e) {
-    toast.error(e.response.data.message, { timeout: 4000 });
+    if (!isAxiosError(e) || !e.response?.data) {
+      throw e;
+    }
+    toast.error(e.response.data.message, "Error!", { timeout: 4000 });
     if (e.response.data.error_code === 100) {
       await getShifts(false);
     }
@@ -72,31 +78,31 @@ const toggleReservation = async (locationId, shiftId, toggleOn) => {
   }
 };
 
-const locationsOnDays = ref([]);
+const locationsOnDays = ref<EmittedDate[]>([]);
 const flagDates = computed(() =>
   locationsOnDays.value.filter(
     (location) => isSameDay(location.date, date.value),
   ));
 
-const setLocationMarkers = (locations) => locationsOnDays.value = locations;
-const isMyShift = (location) => {
-  return flagDates.value?.findIndex((d) => d?.locations.includes(location.id)) >= 0;
+const setLocationMarkers = (locations: EmittedDate[]) => locationsOnDays.value = locations;
+const isMyShift = (location: App.Data.LocationData) => {
+  return flagDates.value?.findIndex((date) => date?.locations.includes(location.id)) >= 0;
 };
 
 const today = new Date();
-const formatTime = (time) => format(parse(time, "HH:mm:ss", today), "h:mm a");
+const formatTime = (time: string) => format(parse(time, "HH:mm:ss", today), "h:mm a");
 
 const isRestricted = computed(() => !usePage().props.isUnrestricted);
 
-const firstReservationForUser = ref(undefined);
-const locationLabel = ref({});
+const firstReservationForUser = ref<number | undefined>();
+const locationLabel = ref<Record<number, { classes: string[]; tooltip?: string }>>({});
 
 // Watcher to update locationLabel and firstReservationForUser when dependencies change
 watch(
   [locations, flagDates],
   () => {
     firstReservationForUser.value = undefined;
-    const labelData = {};
+    const labelData: Record<number, { classes: string[]; tooltip?: string }> = {};
     for (const location of locations.value) {
       const classes = [];
       let tooltip = undefined;
@@ -115,7 +121,7 @@ watch(
   },
 );
 
-const accordionExpandIndex = ref(undefined);
+const accordionExpandIndex = ref<number | undefined>(undefined);
 
 watch(firstReservationForUser, (val) => {
   if (val === undefined) {
@@ -133,7 +139,6 @@ watch(firstReservationForUser, (val) => {
       <ComponentSpinner :show="!locations">
         <DatePicker v-model:date="date"
                     :max-date="maxReservationDate"
-                    :locations="locations"
                     :free-shifts="freeShifts"
                     :user="user"
                     :marker-dates="serverDates"
@@ -163,6 +168,7 @@ watch(firstReservationForUser, (val) => {
             </div>
 
             <template #toggleicon="{ active }">
+              <!-- Note, the active slotProp exists but isn't documented -->
               <span class="iconify mdi--chevron-down text-2xl ml-auto transition-rotate duration-500 delay-100 ease-in-out"
                     :class="active ? 'rotate-180' : ''" />
             </template>
@@ -181,7 +187,7 @@ watch(firstReservationForUser, (val) => {
               <div v-html="location.description"
                    class="p-3 pt-0 w-full description dark:text-gray-100"></div>
               <div class="grid gap-x-2 gap-y-2 w-full sm:gap-y-4"
-                   :class="gridCols[location.max_volunteers]">
+                   :class="gridCols[location.max_volunteers as keyof typeof gridCols]">
                 <template v-for="shift in location.filterShifts" :key="shift.id">
                   <div class="self-center pt-4 pl-3 sm:pr-4 dark:text-gray-100">
                     {{ formatTime(shift.start_time) }} - {{ formatTime(shift.end_time) }}
@@ -190,7 +196,7 @@ watch(firstReservationForUser, (val) => {
                        :key="index"
                        class="justify-self-center self-center pt-4">
                     <template v-if="volunteer">
-                      <template v-if="volunteer.id === user.id">
+                      <template v-if="user?.id && volunteer.id === user.id">
                         <button v-if="!isRestricted"
                                 type="button"
                                 class="block"

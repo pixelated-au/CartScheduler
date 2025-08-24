@@ -17,6 +17,13 @@ declare global {
   const axios: Axios;
 }
 
+export type AuthUser = {
+  id: number;
+  name: string;
+  email: string;
+  gender: string;
+};
+
 declare module "vue" {
   const component: DefineComponent;
 
@@ -64,5 +71,27 @@ declare module "@inertiajs/vue3" {
     };
   };
 
-  export declare function usePage<SharedProps extends PageProps & FlashMessage>(): Page<SharedProps>;
+  export type InertiaProps = {
+    pagePermissions: {
+      canAdmin?: true;
+      canEditSettings?: true;
+    };
+    shiftAvailability: {
+      timezone: string;
+      duration: number;
+      period: App.Enums.DBPeriod;
+      releasedDaily: boolean;
+      weekDayRelease: "SUN" | "MON" | "TUE" | "WED" | "THU" | "FRI" | "SAT";
+      systemShiftStartHour: number;
+      systemShiftEndHour: number;
+    };
+    hasUpdate?: boolean;
+    enableUserAvailability?: boolean;
+    needsToUpdateAvailability?: boolean;
+    enableUserLocationChoices?: boolean;
+    isUnrestricted?: true;
+    user: AuthUser;
+  };
+
+  export declare function usePage<SharedProps extends PageProps & InertiaProps & FlashMessage>(): Page<SharedProps>;
 }

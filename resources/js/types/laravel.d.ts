@@ -21,6 +21,21 @@ declare namespace App.Data {
     num_sundays: number;
     comments?: string;
   };
+  export type AvailableShiftMetaData = {
+    volunteer_count: number;
+    max_allowed: number;
+    has_availability: boolean;
+  };
+  export type AvailableShiftMetaGroupedData = {
+    date: string;
+    shiftMeta: App.Data.AvailableShiftMetaData;
+  };
+  export type AvailableShiftsData = {
+    shifts: { [date: string]: { [shift_id: number]: App.Data.UserShiftData[] } };
+    freeShifts: { [date: string]: App.Data.AvailableShiftMetaData };
+    locations: Array<App.Data.LocationData>;
+    maxDateReservation: string;
+  };
   export type ExtendedUserData = {
     id: number;
     name: string;
@@ -74,11 +89,9 @@ declare namespace App.Data {
     id: number;
     name: string;
     description?: string;
-    min_volunteers?: number;
-    max_volunteers?: number;
+    min_volunteers: number;
+    max_volunteers: number;
     requires_brother: boolean;
-    latitude?: number;
-    longitude?: number;
     shifts?: Array<App.Data.ShiftData>;
   };
   export type ReportMetadataData = {
@@ -107,8 +120,8 @@ declare namespace App.Data {
     requests_count?: number;
     comments?: string;
     shift_was_cancelled: boolean;
-    tags?: Array<{ id: int; name: { [lang: string]: string }; slug: { [lang: string]: string } }>;
-    metadata?: Array<App.Data.ReportMetadataData>;
+    tags: Array<{ id: int; name: { [lang: string]: string }; slug: { [lang: string]: string } }>;
+    metadata?: App.Data.ReportMetadataData;
   };
   export type ShiftAdminData = {
     id?: number;
@@ -164,14 +177,26 @@ declare namespace App.Data {
   export type UserData = {
     name: string;
     id?: number;
-    gender?: string;
-    mobile_phone?: string;
+    gender: string;
+    mobile_phone: string;
     email?: string;
-    is_unrestricted?: boolean | null;
-    shift_id?: number;
-    shift_date?: string;
+    shift_id: number;
+    shift_date: string;
+    is_unrestricted?: boolean;
     last_shift_date?: string;
     last_shift_start_time?: string;
+  };
+  export type UserShiftData = {
+    volunteer_id: number;
+    location_id: number;
+    start_time: string;
+    max_volunteers: number;
+    available_from?: string;
+    available_to?: string;
+  };
+  export type UserShiftGroupedData = {
+    date: string;
+    shiftMeta: App.Data.UserShiftData;
   };
   export type UserVacationData = {
     id?: number;
