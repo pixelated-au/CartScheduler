@@ -7,14 +7,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <title inertia>{{ $settings->siteName }}</title>
-{{--    <title inertia>{{ config('app.name', 'Laravel') }}</title>--}}
-
-    <!-- Fonts -->
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap">
 
     <!-- Scripts -->
-{{--    @routes--}}
-    @vite('resources/js/app.js')
+    @routes
+    @vite('resources/js/main.ts')
     @inertiaHead
 
     <script>

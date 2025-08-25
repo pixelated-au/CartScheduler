@@ -10,7 +10,7 @@ import vueDevTools from "vite-plugin-vue-devtools";
 export default defineConfig({
   plugins: [
     laravel({
-      input: "resources/js/app.js",
+      input: "resources/js/main.ts",
       refresh: true,
     }),
     vue({
@@ -22,7 +22,7 @@ export default defineConfig({
       },
     }),
     vueDevTools({
-      appendTo: "resources/js/app.js",
+      appendTo: "resources/js/main.ts",
             // Set the editor by setting the env var on your $PATH: export LAUNCH_EDITOR=[your editor path or executable]
             // See: https://devtools.vuejs.org/getting-started/open-in-editor
             // and https://github.com/webfansplz/vite-plugin-vue-inspector?tab=readme-ov-file#--configuration-ide--editor
