@@ -9,9 +9,11 @@ import { createApp, h } from "vue";
 import Toast from "vue-toastification";
 import { ZiggyVue } from "ziggy-js";
 import PrimeVuePreset from "./primevue-customisations.js";
+import type { Plugin } from "@vue/runtime-core";
+import type { DefineComponent } from "vue";
 import "flowbite";
 import "vue-toastification/dist/index.css";
-import "../css/app.css";
+import "../css/main.css";
 import "./bootstrap";
 
 const appName = window.document.getElementsByTagName("title")[0]?.innerText || "Laravel";
@@ -32,7 +34,10 @@ if (bugsnagKey) {
  */
 createInertiaApp({
   title: (title) => `${title} - ${appName}`,
-  resolve: (name) => resolvePageComponent(`./Pages/${name}.vue`, import.meta.glob("./Pages/**/*.vue")),
+  resolve: (name) => resolvePageComponent(
+    `./Pages/${name}.vue`,
+    import.meta.glob<DefineComponent>("./Pages/**/*.vue"),
+  ),
   progress: {
     color: "#4B5563",
   },
@@ -59,7 +64,7 @@ createInertiaApp({
       .component("Link", Link);
 
     if (bugsnagKey) {
-      vueApp.use(Bugsnag.getPlugin("vue"));
+      vueApp.use(Bugsnag.getPlugin("vue") as Plugin);
     }
 
     vueApp.mount(el);
