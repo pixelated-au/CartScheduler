@@ -126,6 +126,23 @@ in your editor by setting the `LAUNCH_EDITOR` [environment variable](https://git
 LAUNCH_EDITOR=
 ```
 
+### TypeScript
+This project is now using TypeScript with Vue.
+
+### Ziggy
+For synchronicity between Laravel Routes and Vue, we use [Ziggy](https://github.com/tighten/ziggy).
+
+The Ziggy types can be generated via the composer script called `ziggy`:
+#### Laravel Sail:
+```bash
+sail composer ziggy
+```
+#### CLI:
+```bash
+php composer ziggy
+```
+
+
 ### Email Testing
 
 For development, the system uses [MailHog](https://github.com/mailhog/MailHog) that can be accessed
