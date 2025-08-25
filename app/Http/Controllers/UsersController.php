@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Data\UserAdminData;
 use App\Http\Requests\UserRequest;
-use App\Http\Resources\UserAdminResource;
 use App\Models\User;
 use App\Models\UserAvailability;
 use Illuminate\Http\RedirectResponse;
@@ -22,7 +22,7 @@ class UsersController extends Controller
     public function index(): Response
     {
         return Inertia::render('Admin/Users/List', [
-            'users' => UserAdminResource::collection(User::with('spouse')->get()),
+            'users' => UserAdminData::collect(User::with('spouse')->get()),
         ]);
     }
 
@@ -40,8 +40,8 @@ class UsersController extends Controller
         // The user model will automatically send a welcome email via the created event
         $user = User::unguarded(static fn() => User::create($data));
 
-        session()->flash('flash.banner', "$user->name was successfully created.");
-        session()->flash('flash.bannerStyle', 'success');
+        session()?->flash('flash.banner', "$user->name was successfully created.");
+        session()?->flash('flash.bannerStyle', 'success');
 
         return Redirect::route('admin.users.edit', $user);
     }
@@ -51,7 +51,7 @@ class UsersController extends Controller
         UserAvailability::where('user_id', $user->id)
             ->firstOr(fn() => UserAvailability::create(['user_id' => $user->id]));
         return Inertia::render('Admin/Users/Edit', [
-            'editUser' => UserAdminResource::make($user->load(['spouse', 'vacations', 'availability', 'rosterLocations'])),
+            'editUser' => UserAdminData::from($user->load(['spouse', 'vacations', 'availability', 'rosterLocations'])),
         ]);
     }
 
@@ -59,7 +59,7 @@ class UsersController extends Controller
     {
         $user->update($request->validated());
 
-        session()->flash('flash.banner', "$user->name was successfully modified.");
+        session()?->flash('flash.banner', "$user->name was successfully modified.");
         return Redirect::route('admin.users.edit', $user->fresh());
     }
 
@@ -68,8 +68,8 @@ class UsersController extends Controller
         $name = $user->name;
         $user->delete();
 
-        session()->flash('flash.banner', "$name was successfully deleted.");
-        session()->flash('flash.bannerStyle', 'warn');
+        session()?->flash('flash.banner', "$name was successfully deleted.");
+        session()?->flash('flash.bannerStyle', 'warn');
         return Redirect::route('admin.users.index');
     }
 }

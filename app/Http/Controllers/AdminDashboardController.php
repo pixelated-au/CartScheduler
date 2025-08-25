@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Actions\GetOutstandingReports;
 use App\Actions\GetShiftFilledData;
+use App\Data\FilledShiftData;
 use App\Enums\Role;
 use App\Models\Location;
 use App\Models\User;
@@ -19,8 +20,9 @@ class AdminDashboardController extends Controller
         return Inertia::render('Admin/Dashboard', [
             'totalUsers'         => User::all()->count(),
             'totalLocations'     => Location::all()->count(),
-            'shiftFilledData'    => $shiftFilledData->execute('fortnight'),
-            'outstandingReports' => $getOutstandingReports->execute(),
+            'shiftFilledData'    => FilledShiftData::collect($shiftFilledData->execute('fortnight')),
+            //TODO: Using this next function is superfluous for just a count. It needs to be fixed with a simplified query
+            'outstandingReports' => $getOutstandingReports->execute()->count(),
         ]);
     }
 }
