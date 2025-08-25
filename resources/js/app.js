@@ -9,7 +9,6 @@ import { createApp, h } from "vue";
 import Toast from "vue-toastification";
 import { ZiggyVue } from "ziggy-js";
 import PrimeVuePreset from "./primevue-customisations.js";
-import { Ziggy } from "./ziggy.js";
 import "flowbite";
 import "vue-toastification/dist/index.css";
 import "../css/app.css";
@@ -52,7 +51,7 @@ createInertiaApp({
         },
       })
       .use(plugin)
-      .use(ZiggyVue, Ziggy)
+      .use(ZiggyVue)
       .use(ConfirmationService)
       .use(ToastService)
       .use(Toast) // TODO delete the "old" toast
