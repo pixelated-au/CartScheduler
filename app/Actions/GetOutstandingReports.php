@@ -2,6 +2,7 @@
 
 namespace App\Actions;
 
+use App\Data\OutstandingReportsData;
 use App\Models\User;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Carbon;
@@ -10,9 +11,12 @@ use Illuminate\Support\Facades\DB;
 
 class GetOutstandingReports
 {
+    /**
+     * @return Collection<int, OutstandingReportsData>
+     */
     public function execute(?User $user = null): Collection
     {
-        return DB::query()
+        $reports = DB::query()
                  ->select([
                      'su.shift_id',
                      'su.shift_date',
@@ -42,5 +46,7 @@ class GetOutstandingReports
                  ->orderBy('shift_date')
                  ->orderBy('shifts.start_time')
                  ->get();
+
+        return OutstandingReportsData::collect($reports);
     }
 }
