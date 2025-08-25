@@ -35,7 +35,9 @@ declare module 'ziggy-js' {
         }
     ],
     "set.password.update": [],
+    "outstanding-reports": [],
     "save.report": [],
+    "get.report-tags": [],
     "set.viewed-availability": [],
     "user.availability": [],
     "update.user.availability": [],

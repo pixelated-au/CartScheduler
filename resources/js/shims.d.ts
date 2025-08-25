@@ -34,13 +34,12 @@ declare module "vue" {
     $headManager: ReturnType<typeof createHeadManager>;
   }
 
-  export interface InjectionKey<T> {
-    __brand: T;
-  }
+  // export interface InjectionKey<T> {
+  //   __brand: T;
+  // }
 
-  export function inject<T>(key: string | InjectionKey<T>): T | undefined;
-  export function inject<T>(key: string | InjectionKey<T>, defaultValue: T): T;
-
+  // export function inject<T>(key: string | InjectionKey<T>): T | undefined;
+  // export function inject<T>(key: string | InjectionKey<T>, defaultValue: T): T;
   export function inject(key: "route"): RouteFn;
 
   export default component;
