@@ -14,6 +14,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
  * @property mixed $latitude
  * @property mixed $longitude
  * @property mixed $shifts
+ * @deprecated 
  */
 class LocationResource extends JsonResource
 {

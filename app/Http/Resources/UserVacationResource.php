@@ -4,7 +4,10 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 
-/** @mixin \App\Models\UserVacation */
+/**
+ * @mixin \App\Models\UserVacation
+ * @deprecated  
+ */
 class UserVacationResource extends JsonResource
 {
     public function toArray($request): array

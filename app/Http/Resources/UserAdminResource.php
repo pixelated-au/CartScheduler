@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Data\AvailabilityData;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
@@ -24,6 +25,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
  * @property mixed $vacations
  * @property mixed $availability
  * @property mixed $rosterLocations
+ * @deprecated 
  */
 class UserAdminResource extends JsonResource
 {
@@ -47,7 +49,7 @@ class UserAdminResource extends JsonResource
             'responsible_brother' => $this->responsible_brother,
             'has_logged_in'       => $this->has_logged_in,
             'vacations'           => UserVacationResource::collection($this->whenLoaded('vacations')),
-            'availability'        => AvailabilityResource::make($this->whenLoaded('availability')),
+            'availability'        => AvailabilityData::from($this->whenLoaded('availability')),
             'selectedLocations'   => $this->whenLoaded('rosterLocations', fn() => $this->rosterLocations->pluck('id')),
         ];
     }

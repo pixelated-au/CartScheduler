@@ -19,6 +19,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
  * @property mixed available_to
  * @property mixed users
  * @property mixed is_enabled
+ * @deprecated
  */
 class ShiftResource extends JsonResource
 {

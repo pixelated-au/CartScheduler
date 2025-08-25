@@ -16,6 +16,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
  * @property boolean $shift_was_cancelled
  * @property mixed $tags
  * @property array $metadata
+ * @deprecated
  */
 class ReportsResource extends JsonResource
 {

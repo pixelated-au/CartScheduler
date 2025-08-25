@@ -17,6 +17,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
  * @property mixed $pivot
  * @property mixed $last_shift_date
  * @property mixed $last_shift_start_time
+ * @deprecated
  */
 class UserResource extends JsonResource
 {

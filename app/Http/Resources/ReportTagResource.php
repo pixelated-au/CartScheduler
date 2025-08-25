@@ -8,6 +8,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
  * @property mixed $id
  * @property mixed $name
  * @property mixed $order_column
+ * @deprecated 
  */
 class ReportTagResource extends JsonResource
 {

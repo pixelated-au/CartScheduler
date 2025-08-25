@@ -36,6 +36,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
  * @property mixed $filled_fridays
  * @property mixed $filled_saturdays
  * @property mixed $comments
+ * @deprecated
  */
 class ExtendedUserResource extends JsonResource
 {

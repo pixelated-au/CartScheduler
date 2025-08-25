@@ -16,6 +16,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
  * @property mixed $is_enabled
  * @property mixed $sort_order
  * @property mixed $shifts
+ * @deprecated 
  */
 class LocationAdminResource extends JsonResource
 {

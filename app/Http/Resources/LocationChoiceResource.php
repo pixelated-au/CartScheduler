@@ -7,6 +7,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 /**
  * @property mixed $id
  * @property mixed $name
+ * @deprecated 
  */
 class LocationChoiceResource extends JsonResource
 {
