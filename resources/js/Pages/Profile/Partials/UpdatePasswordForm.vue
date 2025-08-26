@@ -101,6 +101,7 @@ const updatePassword = () => form.submit({
         <JetLabel for="password_confirmation" value="Confirm Password" :form error-key="password_confirmation" />
         <PPassword input-id="password_confirmation"
                    toggle-mask
+                   :feedback="false"
                    v-model="form.password_confirmation"
                    :input-props="{ autocomplete: 'new-password' }"
                    class="block w-full"
