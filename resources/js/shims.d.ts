@@ -24,22 +24,22 @@ export type AuthUser = {
   gender: string;
 };
 
+declare module "@vue/runtime-core" {
+  interface ComponentCustomProperties {
+    // For some reason, Ziggy needs to be in @vue/runtime-core
+    route: typeof routeFn;
+  }
+}
+
 declare module "vue" {
   const component: DefineComponent;
 
   interface ComponentCustomProperties {
-    route: typeof route;
     $inertia: typeof Router;
     $page: Page;
     $headManager: ReturnType<typeof createHeadManager>;
   }
 
-  // export interface InjectionKey<T> {
-  //   __brand: T;
-  // }
-
-  // export function inject<T>(key: string | InjectionKey<T>): T | undefined;
-  // export function inject<T>(key: string | InjectionKey<T>, defaultValue: T): T;
   export function inject(key: "route"): RouteFn;
 
   export default component;
