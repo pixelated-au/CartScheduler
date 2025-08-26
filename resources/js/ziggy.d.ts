@@ -44,82 +44,7 @@ declare module 'ziggy-js' {
     "update.user.vacations": [],
     "user.location-choices": [],
     "update.user.location-choices": [],
-    "admin.dashboard": [],
-    "admin.users.import.show": [],
-    "admin.users.import.import": [],
-    "admin.users.get": [
-        {
-            "name": "user",
-            "required": true,
-            "binding": "id"
-        }
-    ],
-    "admin.users.index": [],
-    "admin.users.create": [],
-    "admin.users.store": [],
-    "admin.users.show": [
-        {
-            "name": "user",
-            "required": true
-        }
-    ],
-    "admin.users.edit": [
-        {
-            "name": "user",
-            "required": true,
-            "binding": "id"
-        }
-    ],
-    "admin.users.update": [
-        {
-            "name": "user",
-            "required": true,
-            "binding": "id"
-        }
-    ],
-    "admin.users.destroy": [
-        {
-            "name": "user",
-            "required": true,
-            "binding": "id"
-        }
-    ],
-    "admin.locations.sort-order": [],
-    "admin.locations.index": [],
-    "admin.locations.create": [],
-    "admin.locations.store": [],
-    "admin.locations.show": [
-        {
-            "name": "location",
-            "required": true
-        }
-    ],
-    "admin.locations.edit": [
-        {
-            "name": "location",
-            "required": true,
-            "binding": "id"
-        }
-    ],
-    "admin.locations.update": [
-        {
-            "name": "location",
-            "required": true,
-            "binding": "id"
-        }
-    ],
-    "admin.locations.destroy": [
-        {
-            "name": "location",
-            "required": true,
-            "binding": "id"
-        }
-    ],
-    "admin.reports.index": [],
-    "admin.reports.users-availability": [],
-    "admin.report-tags.index": [],
     "report-tags.create": [],
-    "admin.report-tags.store": [],
     "report-tags.show": [
         {
             "name": "tag",
@@ -131,37 +56,7 @@ declare module 'ziggy-js' {
             "name": "tag",
             "required": true
         }
-    ],
-    "admin.report-tags.update": [
-        {
-            "name": "tag",
-            "required": true,
-            "binding": "id"
-        }
-    ],
-    "admin.report-tags.destroy": [
-        {
-            "name": "tag",
-            "required": true,
-            "binding": "id"
-        }
-    ],
-    "admin.resend-welcome-email": [],
-    "admin.shifts.destroy": [
-        {
-            "name": "shift",
-            "required": true,
-            "binding": "id"
-        }
-    ],
-    "admin.settings": [],
-    "admin.general-settings.update": [],
-    "admin.allowed-settings-users.update": [],
-    "admin.admin-users.get": [],
-    "admin.check-update": [],
-    "admin.do-update": [],
-    "admin.users-as-spreadsheet": [],
-    "admin.user-import-template": []
+    ]
 }
 }
 export {};
