@@ -53,7 +53,6 @@ const submit = (setProcessing: (value: boolean) => void) => {
           <JetLabel for="password" value="Password" />
           <PPassword id="password"
                      v-model="form.password"
-                     type="password"
                      class="block mt-1 w-full"
                      required
                      :inputProps="{ autocomplete: 'new-password' }"/>
@@ -62,8 +61,8 @@ const submit = (setProcessing: (value: boolean) => void) => {
         <div class="mt-4">
           <JetLabel for="password_confirmation" value="Confirm Password" />
           <PPassword id="password_confirmation"
+                     :feedback="false"
                      v-model="form.password_confirmation"
-                     type="password"
                      class="block mt-1 w-full"
                      required
                      :inputProps="{ autocomplete: 'new-password' }"/>
