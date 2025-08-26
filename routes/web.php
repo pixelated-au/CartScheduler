@@ -70,10 +70,10 @@ Route::post('/set-password', [SetUserPasswordController::class, 'update'])->name
 Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified', 'user-enabled'])->group(function () {
     Route::get('/', static fn () => Inertia::render('Dashboard'))->name('dashboard');
     Route::get('/shifts/{shiftDate}', AvailableShiftsController::class)->where(['shiftDate' => '\d\d\d\d-\d\d-\d\d']);
-    Route::get('/outstanding-reports', MissingReportsForUserController::class);
+    Route::get('/outstanding-reports', MissingReportsForUserController::class)->name('outstanding-reports');
     Route::post('/reserve-shift', ToggleShiftReservationController::class);
     Route::post('/save-report', SaveShiftReportController::class)->name('save.report');
-    Route::get('/get-report-tags', GetReportTagsController::class);
+    Route::get('/get-report-tags', GetReportTagsController::class)->name('get.report-tags');
     Route::post('/set-viewed-availability', static function (Request $request) {
         $user = $request->user();
         if (! $user->availability) {
@@ -100,6 +100,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified',
             Route::get('/users/import', [UsersImportController::class, 'show'])->name('admin.users.import.show');
             Route::post('/users/import', [UsersImportController::class, 'import'])->name('admin.users.import.import');
 
+            //TODO This is for the new reporting part of the system
             Route::get('/users/get/{user}', UserDataController::class)->name('admin.users.get');
 
             Route::group(['middleware' => HandlePrecognitiveRequests::class], static function () {
