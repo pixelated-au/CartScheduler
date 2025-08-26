@@ -68,14 +68,11 @@ class SetUserPasswordController extends Controller
 
         abort_unless($this->checkHashedEmailAddress->execute($user, $data['hashed_email']), SymfonyResponse::HTTP_NOT_FOUND);
 
-
-//        if (!Hash::check($user->uuid . $user->email, base64_decode($data['hashed_email']))) {
-//            abort(404);
-//        }
         $user->update([
             'password' => Hash::make($data['password']),
         ]);
-        session()->flash('flash.setPassword', "Your password has been set. Please use it to log in.");
+
+        session()?->flash('flash.setPassword', "Your password has been set. Please use it to log in.");
         return Redirect::route('login');
     }
 }
