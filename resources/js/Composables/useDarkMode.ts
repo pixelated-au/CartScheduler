@@ -12,16 +12,26 @@ export function useDarkMode() {
 
   const isDarkMode = computed(() => colorMode.value === "dark");
 
-  const toggleDarkMode = (mode?: "light" | "dark") => {
-    document.startViewTransition(() => {
-      nextTick(() => {
-        if (mode) {
-          store.value = mode;
-          return;
-        }
-        store.value = isDarkMode.value ? "light" : "dark";
-      });
+  const setMode = (mode: string) => {
+    nextTick(() => {
+      if (mode) {
+        store.value = mode;
+        return;
+      }
+      store.value = isDarkMode.value ? "light" : "dark";
     });
+  };
+
+  const toggleDarkMode = (mode?: "light" | "dark") => {
+    if (!document.startViewTransition) {
+      setMode(mode);
+      return;
+    }
+
+    document.startViewTransition(() => {
+      setMode(mode);
+    });
+
   };
 
   return {
