@@ -180,7 +180,7 @@ export default defineConfigWithVueTs([
         2,
         {
           attribute: 2,
-          baseIndent: 1,
+          baseIndent: 0,
           closeBracket: 0,
           alignAttributesVertically: true,
           ignores: [],
@@ -200,7 +200,7 @@ export default defineConfigWithVueTs([
       "vue/multi-word-component-names": ["off"],
       "vue/no-multi-spaces": ["warn", { ignoreProperties: false }],
       "vue/object-curly-spacing": ["warn", "always"],
-      "vue/prefer-use-template-ref": ["warn"],
+      "vue/prefer-use-template-ref": ["error"],
       "vue/padding-line-between-blocks": ["warn", "always"],
       "vue/padding-line-between-tags": [
         "warn",
