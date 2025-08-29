@@ -1,26 +1,22 @@
-<script setup>
+<script setup lang="ts">
 import { BarChart } from "echarts/charts";
 import { GridComponent, LegendComponent, TitleComponent, TooltipComponent } from "echarts/components";
 import { use } from "echarts/core";
-import { CanvasRenderer } from "echarts/renderers";
-import { computed, inject, provide, watch } from "vue";
+import { SVGRenderer } from "echarts/renderers";
+import { computed, provide } from "vue";
 import VChart, { THEME_KEY } from "vue-echarts";
 import { useDarkMode } from "@/Composables/useDarkMode.js";
 import EChartsTheme from "@/lib/eChartsTheme.js";
 
-const props = defineProps({
-  shiftData: Array,
-});
+const props = defineProps<{
+  shiftData: App.Data.FilledShiftData[];
+}>();
 
-use([CanvasRenderer, TitleComponent, TooltipComponent, LegendComponent, BarChart, GridComponent]);
+use([SVGRenderer, TitleComponent, TooltipComponent, LegendComponent, BarChart, GridComponent]);
 
 const { isDarkMode } = useDarkMode();
 
 const theme = EChartsTheme(isDarkMode);
-
-watch(theme, () => {
-  console.log("theme changed");
-}, { deep: true });
 
 provide(THEME_KEY, theme);
 
@@ -57,5 +53,5 @@ const shiftsData = computed(() => ({
 </script>
 
 <template>
-  <VChart class="min-h-72" :option="shiftsData"/>
+  <VChart class="min-h-72" :option="shiftsData" />
 </template>
