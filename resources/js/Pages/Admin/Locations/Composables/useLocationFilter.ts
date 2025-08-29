@@ -1,7 +1,7 @@
-import { endOfDay, formatISO, isAfter, isBefore, parse, setHours } from "date-fns";
+import { endOfDay, formatISO, isAfter, isBefore, isSameDay, parse, setHours } from "date-fns";
 import { utcToZonedTime } from "date-fns-tz";
 import { cloneDeep } from "lodash";
-import { computed, onMounted, ref, shallowRef } from "vue";
+import { computed, onMounted, ref, shallowRef, watch } from "vue";
 import type { Ref } from "vue";
 
 export type Location = App.Data.AvailableShiftsData["locations"][number] & {
@@ -51,8 +51,7 @@ export default function(timezone: Ref<string>, canAdmin = false) {
   };
 
   onMounted(() => {
-    getShifts().then(() => {
-    });
+    void getShifts();
   });
 
   const formattedDate = computed(() =>
@@ -61,31 +60,15 @@ export default function(timezone: Ref<string>, canAdmin = false) {
       : "");
 
   /**
-   * This will ensure if the month goes forward, the date is set to the first day of the month
-   * and if the month goes backward, the date is set to the last day of the previous month
+   * Watch the date change and request shifts for the new dates
    */
-  // watch(date, async (newDate, previousDate) => {
-  //   const newMonth = getMonth(newDate);
-  //   const oldMonth = getMonth(previousDate);
-  //   if (newMonth === undefined || newMonth === null) {
-  //     return;
-  //   }
-  //
-  //   // going forward in time, set the date to the first day of the next month
-  //   // Both admin and non-admin users have a maxReservationDate
-  //   if (newMonth > oldMonth) {
-  //     date.value = setDate(newDate, 1);
-  //     return;
-  //   }
-  //
-  //   // going back in time, set the date to the last day of the previous month
-  //   if (newMonth < oldMonth) {
-  //     date.value = endOfMonth(newDate);
-  //     return;
-  //   }
-  //   getShifts().then(() => {
-  //   });
-  // });
+  watch(date, async (newDate, previousDate) => {
+    if (!newDate || isSameDay(newDate, previousDate)) {
+      return;
+    }
+
+    void getShifts();
+  });
 
   type EmptyShift = {
     startTime: Date;
