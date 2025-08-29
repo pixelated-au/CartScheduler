@@ -1,18 +1,19 @@
 <script setup lang="ts">
 import { router } from "@inertiajs/vue3";
-import { useSortable } from "@vueuse/integrations/useSortable";
-import { SortableEvent } from "sortablejs";
-import { inject, nextTick, onMounted, onUnmounted, ref, watch, useTemplateRef } from "vue";
+import { moveArrayElement, useSortable } from "@vueuse/integrations/useSortable";
+import { nextTick, onMounted, onUnmounted, ref, watch, useTemplateRef, toRef } from "vue";
 import DragDrop from "@/Components/Icons/DragDrop.vue";
 import useToast from "@/Composables/useToast.js";
 import AppLayout from "@/Layouts/AppLayout.vue";
+import type { SortableEvent } from "sortablejs";
 
-const { locations } = defineProps<{
+const props = defineProps<{
   locations: App.Data.LocationAdminData[];
 }>();
 
+const locations = toRef(props.locations);
+
 const toast = useToast();
-const route = inject("route");
 
 const onNewLocation = () => {
   if (isSortingMode.value) {
@@ -43,36 +44,26 @@ const storeSortOrder = async (locations: App.Data.LocationAdminData[]) => {
   return true;
 };
 
-const moveArrayElement = async (evt: SortableEvent) => {
-  const from = evt.oldIndex;
-  const to = evt.newIndex;
-
-  if (!from || !to || from === to) {
+const doSort = async (event: SortableEvent) => {
+  if (event.oldIndex === undefined || event.newIndex === undefined || event.oldIndex === event.newIndex) {
     return;
   }
 
-  const locationsArray = locations;
+  moveArrayElement(locations.value, event.oldIndex, event.newIndex, event);
+  await nextTick();
 
-  if (to >= 0 && to < locationsArray.length) {
-    const element = locationsArray.splice(from, 1)[0];
-    await nextTick(async () => {
-      locationsArray.splice(to, 0, element);
-      const success = await storeSortOrder(locationsArray);
-      if (!success) {
-        const element = locationsArray.splice(to, 1)[0];
-        locationsArray.splice(from, 0, element);
-        toast.error("There was an error while saving the sort order. The order has been reverted. Please try again.");
-        return;
-      }
-      toast.success("The sort order has been saved successfully");
-    });
+  const success = await storeSortOrder(locations.value);
+  if (!success) {
+    toast.error("There was an error while saving the sort order. The order has been reverted. Please try again.");
+    return;
   }
+  toast.success("The sort order has been saved successfully");
 };
 
 const { start, stop, option } = useSortable(locationsRef, locations, {
   animation: 250,
   disabled: true,
-  onUpdate: moveArrayElement,
+  onUpdate: doSort,
 });
 
 const pause = () => {
@@ -141,7 +132,8 @@ const transitionDelayStyle = (index: number) => `animation-delay: -${(index * 0.
   </AppLayout>
 </template>
 
-<style lang="scss">
+<style lang="postcss">
+@tailwind;
 @import 'vue3-easy-data-table/dist/style.css';
 
 .sortable-ghost {
