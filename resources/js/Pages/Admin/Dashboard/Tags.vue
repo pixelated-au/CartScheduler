@@ -1,12 +1,13 @@
 <script setup lang="ts">
+import { moveArrayElement, useSortable } from "@vueuse/integrations/useSortable";
 import axios from "axios";
 import { useConfirm } from "primevue";
-import { onMounted, ref } from "vue";
-import { HandleDirective as vHandle, SlickItem, SlickList } from "vue-slicksort";
+import { nextTick, onMounted, ref, useTemplateRef } from "vue";
 import useToast from "@/Composables/useToast";
 import ConfirmationModal from "@/Jetstream/ConfirmationModal.vue";
 import JetInput from "@/Jetstream/Input.vue";
 import JetLabel from "@/Jetstream/Label.vue";
+import type { SortableEvent } from "sortablejs";
 
 const allTags = ref<App.Data.ReportTagData[]>([]);
 
@@ -82,10 +83,30 @@ const deleteTag = async () => {
   await getAllTags();
 };
 
-const doSort = async () => {
+const el = useTemplateRef("tagParent");
+const doSort = async (event: SortableEvent) => {
+  console.log(event);
+  console.log(event.oldIndex, event.newIndex, allTags.value.map((tag) => tag.name));
+  if (event.oldIndex === undefined || event.newIndex === undefined) {
+    return;
+  }
+
+  console.log("bam");
+
+  moveArrayElement(allTags.value, event.oldIndex, event.newIndex, event);
+  await nextTick();
+  console.log("moved", allTags.value.map((tag) => tag.name));
+
   await axios.put(route("admin.report-tag.sort-order"), { ids: allTags.value.map((tag) => tag.id) });
   toast.success("The tags have been reordered", undefined, { group: "bottom" });
 };
+
+useSortable(el, allTags, {
+  handle: ".handle",
+  animation: 200,
+  onUpdate: doSort,
+
+});
 </script>
 
 <template>
@@ -97,20 +118,17 @@ const doSort = async () => {
       </h3>
       <p class="text-sm"><em>Used for quickly filling out reports.</em></p>
     </div>
-    <div v-if="allTags?.length" class="px-3">
-      <SlickList axis="xy" v-model:list="allTags" @sort-end="doSort">
-        <SlickItem v-for="(tag, i) in allTags"
-                   :key="tag.id"
-                   :index="i"
-                   class="inline-flex items-center mr-2 mb-2 border border-1 border-gray-400 dark:border-gray-500 rounded">
-          <div v-handle class="px-1 cursor-grab iconify mdi--dots-vertical"></div>
-          <button class="px-2 py-1 focus:outline-none focus:border-gray-900 dark:focus:border-gray-200 focus:ring focus:ring-gray-300 dark:focus:ring-gray-700 leading-none hover:bg-gray-600 active:bg-gray-900 dark:hover:bg-gray-400 dark:active:bg-gray-200"
-                  @click="selectTag(tag)">
-            {{ tag.name }}
-          </button>
-        </SlickItem>
-      </SlickList>
-    </div>
+    <ul ref="tagParent" class="px-3">
+      <li v-for="(tag) in allTags"
+          :key="tag.name + tag.id"
+          class="inline-flex items-center mr-2 mb-2 border border-1 border-gray-400 dark:border-gray-500 rounded">
+        <div class="handle px-1 cursor-grab select-none iconify mdi--dots-vertical"></div>
+        <button class="px-2 py-1 focus:outline-none focus:border-gray-900 dark:focus:border-gray-200 focus:ring focus:ring-gray-300 dark:focus:ring-gray-700 leading-none hover:bg-gray-600 active:bg-gray-900 dark:hover:bg-gray-400 dark:active:bg-gray-200"
+                @click="selectTag(tag)">
+          {{ tag.name }}
+        </button>
+      </li>
+    </ul>
     <div class="px-6">
       <h4 v-if="!currentTag?.id">Add a new Tag</h4>
       <h4 v-else>Edit Tag</h4>
