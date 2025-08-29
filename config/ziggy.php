@@ -1,4 +1,7 @@
 <?php
 return [
-    'except' => ['_debugbar.*','debugbar.*', '_ignition.*', 'ignition.*'],
+    'except' => ['admin.*','_debugbar.*','debugbar.*', '_ignition.*', 'ignition.*'],
+    'groups' => [
+        'admin' => ['admin.*', 'users.*'],
+    ],
 ];

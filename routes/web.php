@@ -69,9 +69,9 @@ Route::post('/set-password', [SetUserPasswordController::class, 'update'])->name
 
 Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified', 'user-enabled'])->group(function () {
     Route::get('/', static fn () => Inertia::render('Dashboard'))->name('dashboard');
-    Route::get('/shifts/{shiftDate}', AvailableShiftsController::class)->where(['shiftDate' => '\d\d\d\d-\d\d-\d\d']);
+    Route::get('/shifts/{shiftDate}', AvailableShiftsController::class)->where(['shiftDate' => '\d\d\d\d-\d\d-\d\d'])->name('shifts');
     Route::get('/outstanding-reports', MissingReportsForUserController::class)->name('outstanding-reports');
-    Route::post('/reserve-shift', ToggleShiftReservationController::class);
+    Route::post('/reserve-shift', ToggleShiftReservationController::class)->name('reserve.shift');
     Route::post('/save-report', SaveShiftReportController::class)->name('save.report');
     Route::get('/get-report-tags', GetReportTagsController::class)->name('get.report-tags');
     Route::post('/set-viewed-availability', static function (Request $request) {
@@ -142,7 +142,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified',
                 'update' => 'admin.report-tags.update',
                 'destroy' => 'admin.report-tags.destroy',
             ]);
-            Route::put('/report-tag-sort-order', ReportTagsSortOrderController::class);
+            Route::put('/report-tag-sort-order', ReportTagsSortOrderController::class)->name('admin.report-tag.sort-order');
             Route::post(
                 '/resend-welcome-email',
                 ResendWelcomeEmailController::class
@@ -151,11 +151,12 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified',
             Route::get(
                 '/assigned-shifts/{shiftDate}',
                 AdminAvailableShiftsController::class
-            )->where(['shiftDate' => '\d\d\d\d-\d\d-\d\d']);
+            )->where(['shiftDate' => '\d\d\d\d-\d\d-\d\d'])
+            ->name('admin.assigned-shifts');
 
             Route::delete('/shifts/{shift}', DeleteShiftsController::class)->name('admin.shifts.destroy');
 
-            Route::put('/move-volunteer-to-shift', MoveUserToNewShiftController::class);
+            Route::put('/move-volunteer-to-shift', MoveUserToNewShiftController::class)->name('admin.move-volunteer-to-shift');
 
             Route::get('/available-users-for-shift/{shift}', GetAvailableUsersForShiftController::class);
             Route::match(['put', 'delete'], '/toggle-shift-for-user', ToggleUserOntoShiftReservationController::class);
