@@ -1,5 +1,5 @@
 @inject('settings', 'App\Settings\GeneralSettings')
-<!DOCTYPE html>
+        <!DOCTYPE html>
 <!--suppress HtmlUnknownTarget -->
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
@@ -10,15 +10,18 @@
 
     <!-- Scripts -->
     @routes
+    @can('admin')
+        @routes('admin')
+    @endcan
     @vite('resources/js/main.ts')
     @inertiaHead
 
     <script>
-        if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-            document.documentElement.classList.add('dark')
-        } else {
-            document.documentElement.classList.remove('dark')
-        }
+      if (localStorage.getItem("color-theme") === "dark" || (!("color-theme" in localStorage) && window.matchMedia("(prefers-color-scheme: dark)").matches)) {
+        document.documentElement.classList.add("dark");
+      } else {
+        document.documentElement.classList.remove("dark");
+      }
     </script>
 
     <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png?v=1">
