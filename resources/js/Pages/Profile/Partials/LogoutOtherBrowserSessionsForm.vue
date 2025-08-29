@@ -1,34 +1,39 @@
-<script setup>
+<script setup lang="ts">
 import { useForm } from "@inertiajs/vue3";
-import { ref, inject, useTemplateRef } from "vue";
+import { ref } from "vue";
 import JetActionMessage from "@/Jetstream/ActionMessage.vue";
 import JetActionSection from "@/Jetstream/ActionSection.vue";
 import JetDialogModal from "@/Jetstream/DialogModal.vue";
-import JetInput from "@/Jetstream/Input.vue";
 import JetInputError from "@/Jetstream/InputError.vue";
 
-defineProps({
-  sessions: Array,
-});
+export interface InertiaSession {
+  "agent": {
+    "is_desktop": boolean;
+    "platform": string;
+    "browser": string;
+  };
+  "ip_address": string;
+  "is_current_device": boolean;
+  "last_active": string;
+}
+
+defineProps<{
+  sessions: InertiaSession[];
+}>();
 
 const confirmingLogout = ref(false);
-const passwordInput = useTemplateRef("passwordInput");
-
 const form = useForm({
   password: "",
 });
 
 const confirmLogout = () => {
   confirmingLogout.value = true;
-
-  setTimeout(() => passwordInput.value.focus(), 250);
 };
 
 const logoutOtherBrowserSessions = () => {
   form.delete(route("other-browser-sessions.destroy"), {
     preserveScroll: true,
     onSuccess: () => closeModal(),
-    onError: () => passwordInput.value.focus(),
     onFinish: () => form.reset(),
   });
 };
@@ -51,7 +56,7 @@ const closeModal = () => {
     </template>
 
     <template #content>
-      <div class="max-w-xl text-sm text-gray-600 dark:text-gray-100 bg-sub-panel dark:bg-sub-panel-dark p-3 rounded">
+      <div class="max-w-xl text-sm bg-sub-panel dark:bg-sub-panel-dark p-3 rounded">
         If necessary, you may log out of all of your other browser sessions across all of your devices. Some of
         your recent sessions are listed below; however, this list may not be exhaustive. If you feel your
         account has been compromised, you should also update your password.
@@ -61,42 +66,18 @@ const closeModal = () => {
       <div v-if="sessions.length > 0" class="mt-5 space-y-6">
         <div v-for="(session, i) in sessions" :key="i" class="flex items-center">
           <div>
-            <!-- TODO: swap these icons -->
-            <svg v-if="session.agent.is_desktop"
-                 fill="none"
-                 stroke-linecap="round"
-                 stroke-linejoin="round"
-                 stroke-width="2"
-                 viewBox="0 0 24 24"
-                 stroke="currentColor"
-                 class="w-8 h-8 text-gray-500 dark:text-gray-400">
-              <path
-                  d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
-            </svg>
-
-            <svg v-else
-                 xmlns="http://www.w3.org/2000/svg"
-                 viewBox="0 0 24 24"
-                 stroke-width="2"
-                 stroke="currentColor"
-                 fill="none"
-                 stroke-linecap="round"
-                 stroke-linejoin="round"
-                 class="w-8 h-8 text-gray-500 dark:text-gray-400">
-              <path d="M0 0h24v24H0z" stroke="none"/>
-              <rect x="7" y="4" width="10" height="16" rx="1"/>
-              <path d="M11 5h2M12 17v.01"/>
-            </svg>
+            <span v-if="session.agent.is_desktop" class="iconify mdi--laptop text-2xl"></span>
+            <span v-else class="iconify mdi--mobile-phone text-2xl"></span>
           </div>
 
           <div class="ml-3">
-            <div class="text-sm text-gray-600 dark:text-gray-400">
-              {{ session.agent.platform ? session.agent.platform : 'Unknown' }} -
-              {{ session.agent.browser ? session.agent.browser : 'Unknown' }}
+            <div class="text-sm">
+              {{ session.agent.platform ? session.agent.platform : "Unknown" }} -
+              {{ session.agent.browser ? session.agent.browser : "Unknown" }}
             </div>
 
             <div>
-              <div class="text-xs text-gray-500 dark:text-gray-400">
+              <div class="text-xs">
                 {{ session.ip_address }},
 
                 <span v-if="session.is_current_device"
@@ -131,14 +112,13 @@ const closeModal = () => {
           across all of your devices.
 
           <div class="mt-4">
-            <JetInput ref="passwordInput"
-                      v-model="form.password"
-                      type="password"
-                      class="mt-1 block w-3/4"
-                      placeholder="Password"
-                      @keyup.enter="logoutOtherBrowserSessions"/>
+            <PPassword v-model="form.password"
+                       :feedback="false"
+                       class="mt-1 block w-3/4"
+                       placeholder="Password"
+                       @keyup.enter="logoutOtherBrowserSessions" />
 
-            <JetInputError :message="form.errors.password" class="mt-2"/>
+            <JetInputError :message="form.errors.password" class="mt-2" />
           </div>
         </template>
 
