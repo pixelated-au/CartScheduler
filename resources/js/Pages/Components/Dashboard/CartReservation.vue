@@ -2,7 +2,7 @@
 import { usePage } from "@inertiajs/vue3";
 import { isAxiosError } from "axios";
 import { format, isSameDay, parse } from "date-fns";
-import { computed, ref, watch } from "vue";
+import { computed, nextTick, ref, watch } from "vue";
 import ComponentSpinner from "@/Components/ComponentSpinner.vue";
 import EmptySlot from "@/Components/Icons/EmptySlot.vue";
 import User from "@/Components/Icons/User.vue";
@@ -48,6 +48,7 @@ const toggleReservation = async (locationId: number, shiftId: number, toggleOn: 
   const timeoutId = setTimeout(() => isLoading.value = true, 1000);
 
   try {
+    reservationWatch.pause();
     isReserving.value = true;
 
     const response = await axios.post<string>(route("reserve.shift"), {
@@ -62,7 +63,6 @@ const toggleReservation = async (locationId: number, shiftId: number, toggleOn: 
       toast.warning(response.data);
     }
     await getShifts(false);
-
   } catch (e) {
     if (!isAxiosError(e) || !e.response?.data) {
       throw e;
@@ -75,6 +75,8 @@ const toggleReservation = async (locationId: number, shiftId: number, toggleOn: 
     isReserving.value = false;
     clearTimeout(timeoutId);
     isLoading.value = false;
+    reservationWatch.resume();
+    // await (() =>     reservationWatch.resume(), 300);
   }
 };
 
@@ -99,9 +101,9 @@ const locationLabel = ref<Record<number, { classes: string[]; tooltip?: string }
 
 // Watcher to update locationLabel and firstReservationForUser when dependencies change
 watch(
-  [locations, flagDates],
-  () => {
-    firstReservationForUser.value = undefined;
+  [date, locations, flagDates],
+  ([dVal], [oldDVal]) => {
+    let hasSetFirstReservationForUser = false;
     const labelData: Record<number, { classes: string[]; tooltip?: string }> = {};
     for (const location of locations.value) {
       const classes = [];
@@ -109,8 +111,9 @@ watch(
       if (isMyShift(location)) {
         classes.push(...["text-green-800", "dark:text-green-300", "border-b-2", "border-green-500"]);
         tooltip = "You have at least one shift";
-        if (firstReservationForUser.value === undefined) {
+        if (!hasSetFirstReservationForUser && !isSameDay(dVal, oldDVal)) {
           firstReservationForUser.value = location.id;
+          hasSetFirstReservationForUser = true;
         }
       } else {
         classes.push("dark:text-gray-200");
@@ -123,13 +126,12 @@ watch(
 
 const accordionExpandIndex = ref<number | undefined>(undefined);
 
-watch(firstReservationForUser, (val) => {
+const reservationWatch = watch(firstReservationForUser, (val) => {
   if (val === undefined) {
     accordionExpandIndex.value = undefined;
     return;
   }
   accordionExpandIndex.value = val;
-
 });
 </script>
 
