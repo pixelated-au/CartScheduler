@@ -4,7 +4,6 @@ import axios from "axios";
 import { useConfirm } from "primevue";
 import { nextTick, onMounted, ref, useTemplateRef } from "vue";
 import useToast from "@/Composables/useToast";
-import ConfirmationModal from "@/Jetstream/ConfirmationModal.vue";
 import JetInput from "@/Jetstream/Input.vue";
 import JetLabel from "@/Jetstream/Label.vue";
 import type { SortableEvent } from "sortablejs";
@@ -69,8 +68,6 @@ const confirmDelete = (event: Event) => {
   });
 };
 
-const showDeleteModal = ref(false);
-
 const deleteTag = async () => {
   if (!currentTag.value?.id) {
     return;
@@ -79,7 +76,6 @@ const deleteTag = async () => {
   toast.success("Tag deleted successfully", undefined, { group: "bottom" });
 
   currentTag.value = initTag();
-  showDeleteModal.value = false;
   await getAllTags();
 };
 
@@ -146,11 +142,11 @@ useSortable(el, allTags, {
             <PButton v-if="currentTag?.id"
                      class="mr-3"
                      type="button"
-                     style-type="primary"
+                     severity="primary"
                      @click.prevent="doSave">
               Save
             </PButton>
-            <PButton v-else class="" type="button" style-type="primary" @click.prevent="doSave">
+            <PButton v-else class="" type="button" severity="primary" @click.prevent="doSave">
               Add
             </PButton>
             <PButton v-if="currentTag?.id"
@@ -165,23 +161,4 @@ useSortable(el, allTags, {
     </div>
   </div>
   <PConfirmPopup />
-
-  <ConfirmationModal :show="showDeleteModal">
-    <template #title>
-      Delete Tag
-    </template>
-
-    <template #content>
-      <p>Are you sure you want to delete this tag?</p>
-    </template>
-
-    <template #footer>
-      <PButton class="mr-3" type="button" style-type="primary" @click.prevent="deleteTag">
-        Delete
-      </PButton>
-      <PButton outline type="button" style-type="secondary" @click.prevent="showDeleteModal = false">
-        Cancel
-      </PButton>
-    </template>
-  </ConfirmationModal>
 </template>
