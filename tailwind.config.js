@@ -100,7 +100,7 @@ export default {
     import("flowbite/plugin"),
     import("tailwindcss-primeui"),
     addIconSelectors({
-      prefixes: ["mdi"],
+      prefixes: ["mdi", "ri"],
       scale: 1.25,
     }),
   ],
