@@ -19,7 +19,6 @@ defineEmits([
   "cancel",
 ]);
 
-const route = inject("route");
 const extendedPrecognition = useExtendedPrecognition();
 const toast = useToast();
 

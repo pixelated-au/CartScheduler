@@ -1,15 +1,7 @@
-<script setup>
+<script setup lang="ts">
 import { router } from "@inertiajs/vue3";
-import { inject } from "vue";
 import AppLayout from "@/Layouts/AppLayout.vue";
 import UserProfileForm from "@/Pages/Admin/Users/Partials/UserProfileForm.vue";
-
-defineProps({
-  availableRoles: Array,
-  permissions: Object,
-});
-
-const route = inject("route");
 
 const listRouteAction = () => {
   router.visit(route("admin.users.index"));
@@ -21,7 +13,7 @@ const listRouteAction = () => {
     <template #header>
       <div class="flex justify-between">
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">New User</h2>
-        <BackButton class="mx-3" @click.prevent="listRouteAction"/>
+        <BackButton class="mx-3" @click.prevent="listRouteAction" />
       </div>
     </template>
 

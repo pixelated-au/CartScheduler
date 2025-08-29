@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { router } from "@inertiajs/vue3";
 import { inject, ref } from "vue";
 import JetHelpText from "@/Jetstream/HelpText.vue";
@@ -7,13 +7,10 @@ import JetLabel from "@/Jetstream/Label.vue";
 import AppLayout from "@/Layouts/AppLayout.vue";
 import headers from "./Lib/UserDataTableHeaders";
 
-defineProps({
-  users: Object,
-  availableRoles: Array,
-  permissions: Object,
-});
+const { users } = defineProps<{
+  users: App.Data.UserAdminData[];
+}>();
 
-const route = inject("route");
 const userSearch = ref("");
 
 const onNewUser = () => {
@@ -41,27 +38,35 @@ const handleSelection = (selection) => {
           Users
         </h2>
         <div class="w-full md:w-auto hidden sm:flex gap-4">
-          <PButton label="Import Users" icon="iconify mdi--account-arrow-up-outline" severity="help" variant="outlined" @click="onImportUsers"/>
-          <PButton label="Download Users" icon="iconify mdi--account-arrow-down-outline" severity="info" variant="outlined" @click="onDownloadUsers"/>
+          <PButton label="Import Users"
+                   icon="iconify mdi--account-arrow-up-outline"
+                   severity="help"
+                   variant="outlined"
+                   @click="onImportUsers" />
+          <PButton label="Download Users"
+                   icon="iconify mdi--account-arrow-down-outline"
+                   severity="info"
+                   variant="outlined"
+                   @click="onDownloadUsers" />
         </div>
       </div>
     </template>
 
     <div class="flex flex-col gap-4">
       <div class="grid grid-cols-[1fr_auto] grid-auto-rows gap-x-12 align-middle gap-y-1 py-3 sm:py-6 ">
-        <JetLabel for="search" value="Search for a user:"/>
+        <JetLabel for="search" value="Search for a user:" />
         <JetInput id="search"
                   v-model="userSearch"
                   type="text"
-                  class="row-start-2 mt-1 block w-full dark:bg-slate-700 sm:dark:bg-slate-800"/>
+                  class="row-start-2 mt-1 block w-full dark:bg-slate-700 sm:dark:bg-slate-800" />
         <JetHelpText class="row-start-3">Search on name, email, phone, role or any field</JetHelpText>
-        <PButton label="New User" icon="iconify mdi--user-add-outline" class="row-start-2" @click="onNewUser"/>
+        <PButton label="New User" icon="iconify mdi--user-add-outline" class="row-start-2" @click="onNewUser" />
       </div>
 
       <div class="">
         <div class="bg-panel dark:bg-panel-dark">
           <data-table :headers="headers"
-                      :items="users.data"
+                      :items="users"
                       :search-value="userSearch"
                       @click-row="handleSelection">
             <template #item-email="{ email }">

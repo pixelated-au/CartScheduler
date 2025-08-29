@@ -5,10 +5,6 @@ import FileUpload from "@/Components/Form/FileUpload.vue";
 import useToast from "@/Composables/useToast";
 import AppLayout from "@/Layouts/AppLayout.vue";
 
-defineProps({});
-
-const route = inject("route");
-
 const form = useForm<{ file: File | null }>({
   file: null,
 });
@@ -88,7 +84,7 @@ const label = computed(() => {
     <template #header>
       <div class="flex justify-between">
         <h2>Import Users</h2>
-        <PButton class="mx-3" type="button" style-type="secondary" outline @click.prevent="listRouteAction">
+        <PButton class="mx-3" type="button" severity="secondary" outline @click.prevent="listRouteAction">
           Back
         </PButton>
       </div>

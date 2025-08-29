@@ -11,8 +11,6 @@ defineProps<{
   editUser: App.Data.UserAdminData;
 }>();
 
-const route = inject("route");
-
 const listRouteAction = () => {
   router.visit(route("admin.users.index"));
 };
@@ -27,7 +25,7 @@ const canChooseLocations = !!usePage().props.enableUserLocationChoices;
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
           {{ editUser.name }}
         </h2>
-        <BackButton class="mx-3" @click.prevent="listRouteAction"/>
+        <BackButton class="mx-3" @click.prevent="listRouteAction" />
       </div>
     </template>
 
