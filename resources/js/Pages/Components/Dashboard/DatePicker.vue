@@ -9,14 +9,14 @@ import {
   isBefore,
   lastDayOfMonth,
   parseISO,
-  set, setDate,
+  set,
   setHours,
   startOfDay,
   startOfMonth,
   subMonths,
 } from "date-fns";
 import { utcToZonedTime } from "date-fns-tz";
-import { computed, defineEmits, defineProps, nextTick, ref, watchEffect } from "vue";
+import { computed, defineEmits, defineProps, ref, watchEffect } from "vue";
 import type { DatePickerDateSlotOptions, DatePickerMonthChangeEvent } from "primevue";
 import type { AuthUser } from "@/shims";
 
@@ -36,14 +36,14 @@ const {
   date,
   maxDate,
   markerDates,
-  user,
+  user=undefined,
   freeShifts,
   canViewHistorical = false,
 } = defineProps<{
   date: Date;
   maxDate?: Date;
   markerDates?: App.Data.AvailableShiftsData["shifts"];
-  user: AuthUser;
+  user?: AuthUser;
   freeShifts?: App.Data.AvailableShiftsData["freeShifts"];
   canViewHistorical?: boolean;
 }>();
@@ -270,10 +270,6 @@ const canGoForward = computed(() => {
               @click="actionCallback"
               class="iconify mdi--chevron-left-circle-outline text-lg text-neutral-500 hover:text-neutral-900 dark:hover:text-neutral-300"></button>
       <div v-else class="iconify mdi--chevron-left-circle-outline text-lg text-neutral-200 dark:text-neutral-700"></div>
-    </template>
-
-    <template #>
-      <div>hi there</div>
     </template>
 
     <template #nextbutton="{ actionCallback }">

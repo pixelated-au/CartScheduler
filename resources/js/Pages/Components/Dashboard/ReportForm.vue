@@ -18,7 +18,6 @@ const props = defineProps<{
 
 const emit = defineEmits(["saved"]);
 
-const route = inject("route");
 const tags = inject(ReportTagsKey);
 
 const formData = reactive({
@@ -79,8 +78,12 @@ const saveReport = async () => {
       throw e;
     }
 
-    errors.value = (e as AxiosError<LaravelValidationResponse>).response?.data.errors || {};
-    toast.error(e.response?.data.message);
+    if (e.status === 422) {
+      errors.value = (e as AxiosError<LaravelValidationResponse>).response?.data.errors || {};
+      toast.error(e.response?.data.message);
+    } else {
+      toast.error("An unexpected error occurred. This has been reported");
+    }
   } finally {
     isSaving.value = false;
   }

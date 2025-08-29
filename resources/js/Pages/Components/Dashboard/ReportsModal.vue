@@ -10,7 +10,6 @@ const show = defineModel({ required: true, type: Boolean });
 const emit = defineEmits(["has-outstanding-reports"]);
 
 const toast = useToast();
-const route = inject("route");
 
 const outstandingReports = ref<App.Data.OutstandingReportsData[]>([]);
 const tags = ref<App.Data.ReportTagData[]>([]);
@@ -59,7 +58,7 @@ const reportSaved = () => setTimeout(() =>getData(), 1000);
     </div>
 
     <template #footer>
-      <PButton type="button" style-type="secondary" @click="show = false">Close</PButton>
+      <PButton type="button" severity="secondary" @click="show = false">Close</PButton>
     </template>
   </PDialog>
 </template>
