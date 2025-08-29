@@ -2,7 +2,7 @@
 import Datepicker from "@vuepic/vue-datepicker";
 import { isAxiosError } from "axios";
 import { useConfirm } from "primevue";
-import { computed, defineProps } from "vue";
+import { computed, defineProps, useId } from "vue";
 import { useDarkMode } from "@/Composables/useDarkMode";
 import useToast from "@/Composables/useToast.js";
 import JetInputError from "@/Jetstream/InputError.vue";
@@ -73,14 +73,14 @@ const allDays = computed({
   },
 });
 
-const fieldUnique = computed(() => shift.value.id || Math.random().toString(36).substring(2, 9));
+const fieldUnique = useId();
 
 const toast = useToast();
 
 const deleteShift = async () => {
   if (shift.value.id) {
     try {
-      await axios.delete("/admin/shifts/" + shift.value.id);
+      await axios.delete(route("admin.shifts.destroy", shift.value.id));
       toast.success("Shift deleted successfully");
     } catch (e) {
       if (isAxiosError(e)) {

@@ -9,8 +9,6 @@ defineProps<{
   maxVolunteers: number;
 }>();
 
-const route = inject("route");
-
 const listRouteAction = () => {
   router.visit(route("admin.locations.index"));
 };
@@ -23,7 +21,7 @@ const listRouteAction = () => {
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
           Location {{ location.name }}
         </h2>
-        <PButton class="mx-3" type="button" style-type="secondary" outline @click.prevent="listRouteAction">
+        <PButton class="mx-3" type="button" severity="secondary" outline @click.prevent="listRouteAction">
           Back
         </PButton>
       </div>

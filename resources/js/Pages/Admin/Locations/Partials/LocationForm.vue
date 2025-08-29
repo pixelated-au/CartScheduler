@@ -16,7 +16,6 @@ const { location, maxVolunteers, action } = defineProps<{
 
 defineEmits(["cancel"]);
 
-const route = inject("route");
 const toast = useToast();
 
 const form = useForm<App.Data.LocationAdminData>({

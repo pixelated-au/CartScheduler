@@ -95,13 +95,13 @@ const transitionDelayStyle = (index: number) => `animation-delay: -${(index * 0.
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">Locations</h2>
         <div class="flex">
           <PButton outline
-                   :style-type="isSortingMode ? 'danger' : 'secondary'"
+                   :severity="isSortingMode ? 'danger' : 'secondary'"
                    class="mx-3"
                    @click="isSortingMode = !isSortingMode">
             <drag-drop color="currentColor" box="16" />
             <span class="ml-3">{{ isSortingMode ? "Stop sorting" : "Sort locations" }}</span>
           </PButton>
-          <PButton class="mx-3" style-type="primary" @click="onNewLocation">
+          <PButton class="mx-3" severity="primary" @click="onNewLocation">
             New Location
           </PButton>
         </div>
