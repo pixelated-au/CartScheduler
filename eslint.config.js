@@ -76,6 +76,7 @@ export default defineConfigWithVueTs([
         },
       ],
       "@typescript-eslint/no-empty-object-type": "warn",
+      "@typescript-eslint/no-floating-promises": ["warn", { ignoreVoid: true }],
       "@typescript-eslint/no-import-type-side-effects": "warn",
       "@typescript-eslint/no-unused-expressions": ["warn", { allowShortCircuit: true, allowTernary: true }],
       "@typescript-eslint/no-unused-vars": "warn",
