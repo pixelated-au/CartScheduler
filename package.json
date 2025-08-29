@@ -23,7 +23,7 @@
         "axios": "^1.8.1",
         "date-fns": "^2.29.1",
         "date-fns-tz": "^2.0.0",
-        "echarts": "^5.6.0",
+        "echarts": "^6.0.0",
         "floating-vue": "^5.2.2",
         "flowbite": "^1.8.1",
         "laravel-precognition-vue-inertia": "^0.7.2",
@@ -32,8 +32,7 @@
         "sortablejs": "^1.15.6",
         "vite-plugin-vue-devtools": "^7.7.5",
         "vue": "^3.5.19",
-        "vue-echarts": "^7.0.3",
-        "vue-slicksort": "^2.0.5",
+        "vue-echarts": "^8.0.0-beta.1",
         "vue-toastification": "^2.0.0-rc.5",
         "vue3-easy-data-table": "^1.5.47"
     },
