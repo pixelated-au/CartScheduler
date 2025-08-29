@@ -8,9 +8,9 @@ import useToast from "@/Composables/useToast";
 import vAutoScroll from "@/Directives/v-autoscroll.js";
 import JetFormSection from "@/Jetstream/FormSection.vue";
 
-const { settings } = defineProps({
-  settings: Object,
-});
+const { settings } = defineProps<{
+  settings: App.Settings.GeneralSettings;
+}>();
 
 const processing = ref(false);
 const betaCheck = ref(false);
@@ -122,7 +122,7 @@ const reloadSite = () => window.location.reload();
 
 const adminUsers = ref();
 onMounted(async () => {
-  const response = await axios.get("/admin/admin-users");
+  const response = await axios.get(route("admin.admin-users.get"));
   adminUsers.value = response.data.data;
 });
 </script>
@@ -182,7 +182,7 @@ onMounted(async () => {
         <PMessage :severity="betaCheck ? 'error' : 'secondary'"
                   class="col-span-12 text-gray-600 dark:text-gray-300 font-bold"
                   :class="{ 'animate-pulse': betaCheck }">
-          It's notrecommended to use the <em>Beta update</em> option unless instructed by your IT support.
+          It's not recommended to use the <em>Beta update</em> option unless instructed by your IT support.
         </PMessage>
       </template>
     </template>
@@ -203,7 +203,7 @@ onMounted(async () => {
         </label>
         <PButton label="Check for updates"
                  variant="outlined"
-                 style-type="danger"
+                 severity="danger"
                  :class="{ 'opacity-25': processing }"
                  class="mr-3"
                  :disabled="processing"

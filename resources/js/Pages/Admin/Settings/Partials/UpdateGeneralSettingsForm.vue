@@ -1,16 +1,16 @@
 <script setup lang="ts">
 import { useForm } from "@inertiajs/vue3";
 import PSelect from "primevue/select";
-import { inject, useTemplateRef } from "vue";
+import { useTemplateRef } from "vue";
 import useToast from "@/Composables/useToast.js";
 import JetActionMessage from "@/Jetstream/ActionMessage.vue";
 import JetFormSection from "@/Jetstream/FormSection.vue";
 import JetInputError from "@/Jetstream/InputError.vue";
 import JetLabel from "@/Jetstream/Label.vue";
 
-const { settings } = defineProps({
-  settings: Object,
-});
+const { settings } = defineProps<{
+  settings: App.Settings.GeneralSettings;
+}>();
 
 const form = useForm({
   siteName: settings.siteName,
@@ -20,7 +20,6 @@ const form = useForm({
   enableUserLocationChoices: settings.enableUserLocationChoices,
 });
 
-const route = inject("route");
 const toast = useToast();
 
 const updateGeneralSettings = () => {

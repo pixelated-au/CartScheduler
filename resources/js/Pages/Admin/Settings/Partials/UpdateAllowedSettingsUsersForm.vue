@@ -1,17 +1,16 @@
 <script setup lang="ts">
 import { useForm } from "@inertiajs/vue3";
 import axios from "axios";
-import { inject, onMounted, ref } from "vue";
+import { onMounted, ref } from "vue";
 import useToast from "@/Composables/useToast";
 import JetActionMessage from "@/Jetstream/ActionMessage.vue";
 import JetFormSection from "@/Jetstream/FormSection.vue";
 import JetInputError from "@/Jetstream/InputError.vue";
 
-const { settings } = defineProps({
-  settings: Object,
-});
+const { settings } = defineProps<{
+  settings: App.Settings.GeneralSettings;
+}>();
 
-const route = inject("route");
 const toast = useToast();
 
 const form = useForm({
@@ -37,7 +36,7 @@ const updateAllowedSettingsUsers = () => {
 
 const adminUsers = ref();
 onMounted(async () => {
-  const response = await axios.get<App.Data.AdminUserData>("/admin/admin-users");
+  const response = await axios.get<App.Data.AdminUserData>(route("admin.admin-users.get"));
   adminUsers.value = response.data;
 });
 </script>
