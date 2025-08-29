@@ -69,7 +69,7 @@ declare namespace App.Data {
     shifts_available: number;
   };
   export type LocationAdminData = {
-    id: number;
+    id?: number;
     name: string;
     description?: string;
     clean_description?: string;

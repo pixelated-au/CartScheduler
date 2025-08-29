@@ -4,13 +4,14 @@ namespace App\Data;
 
 use Illuminate\Support\Collection;
 use Spatie\LaravelData\Data;
+use Spatie\LaravelData\Optional;
 use Spatie\TypeScriptTransformer\Attributes\TypeScript;
 
 #[TypeScript]
 class LocationAdminData extends Data
 {
     public function __construct(
-        public int $id,
+        public int|Optional $id,
         public string $name,
         public ?string $description = null,
         public ?string $clean_description = null,
