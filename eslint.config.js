@@ -180,7 +180,7 @@ export default defineConfigWithVueTs([
         2,
         {
           attribute: 2,
-          baseIndent: 0,
+          baseIndent: 1,
           closeBracket: 0,
           alignAttributesVertically: true,
           ignores: [],
