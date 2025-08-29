@@ -16,8 +16,6 @@ const { availability, userId = null } = defineProps<{
   userId?: number | null;
 }>();
 
-const route = inject("route");
-
 const page = usePage();
 const toast = useToast();
 

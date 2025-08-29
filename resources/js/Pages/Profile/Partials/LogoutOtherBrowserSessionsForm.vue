@@ -11,8 +11,6 @@ defineProps({
   sessions: Array,
 });
 
-const route = inject("route");
-
 const confirmingLogout = ref(false);
 const passwordInput = useTemplateRef("passwordInput");
 
@@ -64,29 +62,27 @@ const closeModal = () => {
         <div v-for="(session, i) in sessions" :key="i" class="flex items-center">
           <div>
             <!-- TODO: swap these icons -->
-            <svg
-                v-if="session.agent.is_desktop"
-                fill="none"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                class="w-8 h-8 text-gray-500 dark:text-gray-400">
+            <svg v-if="session.agent.is_desktop"
+                 fill="none"
+                 stroke-linecap="round"
+                 stroke-linejoin="round"
+                 stroke-width="2"
+                 viewBox="0 0 24 24"
+                 stroke="currentColor"
+                 class="w-8 h-8 text-gray-500 dark:text-gray-400">
               <path
                   d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
             </svg>
 
-            <svg
-                v-else
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                stroke-width="2"
-                stroke="currentColor"
-                fill="none"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                class="w-8 h-8 text-gray-500 dark:text-gray-400">
+            <svg v-else
+                 xmlns="http://www.w3.org/2000/svg"
+                 viewBox="0 0 24 24"
+                 stroke-width="2"
+                 stroke="currentColor"
+                 fill="none"
+                 stroke-linecap="round"
+                 stroke-linejoin="round"
+                 class="w-8 h-8 text-gray-500 dark:text-gray-400">
               <path d="M0 0h24v24H0z" stroke="none"/>
               <rect x="7" y="4" width="10" height="16" rx="1"/>
               <path d="M11 5h2M12 17v.01"/>
@@ -103,9 +99,8 @@ const closeModal = () => {
               <div class="text-xs text-gray-500 dark:text-gray-400">
                 {{ session.ip_address }},
 
-                <span
-                    v-if="session.is_current_device"
-                    class="text-green-500 dark:text-green-400 font-semibold">
+                <span v-if="session.is_current_device"
+                      class="text-green-500 dark:text-green-400 font-semibold">
                   This device
                 </span>
                 <span v-else>Last active {{ session.last_active }}</span>
@@ -136,13 +131,12 @@ const closeModal = () => {
           across all of your devices.
 
           <div class="mt-4">
-            <JetInput
-                ref="passwordInput"
-                v-model="form.password"
-                type="password"
-                class="mt-1 block w-3/4"
-                placeholder="Password"
-                @keyup.enter="logoutOtherBrowserSessions"/>
+            <JetInput ref="passwordInput"
+                      v-model="form.password"
+                      type="password"
+                      class="mt-1 block w-3/4"
+                      placeholder="Password"
+                      @keyup.enter="logoutOtherBrowserSessions"/>
 
             <JetInputError :message="form.errors.password" class="mt-2"/>
           </div>
@@ -153,11 +147,10 @@ const closeModal = () => {
             Cancel
           </PButton>
 
-          <PButton
-              class="ml-3"
-              :class="{ 'opacity-25': form.processing }"
-              :disabled="form.processing"
-              @click="logoutOtherBrowserSessions">
+          <PButton class="ml-3"
+                   :class="{ 'opacity-25': form.processing }"
+                   :disabled="form.processing"
+                   @click="logoutOtherBrowserSessions">
             Log Out Other Browser Sessions
           </PButton>
         </template>

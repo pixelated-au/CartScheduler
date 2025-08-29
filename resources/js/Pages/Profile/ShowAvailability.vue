@@ -13,7 +13,6 @@ defineProps<{
   selectedLocations: Array<App.Data.LocationData["id"]>;
 }>();
 
-const route = inject("route");
 const canChooseLocations = !!usePage().props.enableUserLocationChoices;
 
 onMounted(() => {

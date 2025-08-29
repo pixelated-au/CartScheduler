@@ -17,7 +17,6 @@ const form = useForm({
   selectedLocations: selectedLocations || [],
 });
 
-const route = inject("route");
 const toast = useToast();
 
 const update = () => {
@@ -50,11 +49,11 @@ const resetForm = () => {
   form.clearErrors();
 };
 
-const locations = ref<Array<{ id: number; name: string }>>([]);
+const locations = ref<Array<App.Data.LocationChoiceData>>([]);
 
 onMounted(async () => {
-  const response = await axios.get(route("user.location-choices"));
-  locations.value = response.data.data;
+  const response = await axios.get<Array<App.Data.LocationChoiceData>>(route("user.location-choices"));
+  locations.value = response.data;
 });
 </script>
 
