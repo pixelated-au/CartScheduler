@@ -50,7 +50,7 @@ const toggleReservation = async (locationId: number, shiftId: number, toggleOn: 
   try {
     isReserving.value = true;
 
-    const response = await axios.post<string>("/reserve-shift", {
+    const response = await axios.post<string>(route("reserve.shift"), {
       location: locationId,
       shift: shiftId,
       do_reserve: toggleOn,
