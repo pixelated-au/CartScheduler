@@ -1,5 +1,6 @@
 <?php
 
+use App\Data\Transformers\LaravelSettingsTransformer;
 use Spatie\LaravelData\Support\TypeScriptTransformer;
 use Spatie\TypeScriptTransformer\Collectors;
 use Spatie\TypeScriptTransformer\Formatters;
@@ -36,6 +37,7 @@ return [
 //        Spatie\TypeScriptTransformer\Transformers\EnumTransformer::class,
         Transformers\EnumTransformer::class,
         TypeScriptTransformer\DataTypeScriptTransformer::class,
+        LaravelSettingsTransformer::class,
     ],
 
     /*
