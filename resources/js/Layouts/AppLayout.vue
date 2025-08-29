@@ -104,13 +104,7 @@ const checkLater = () => {
   <PToast class="z-[9999]" position="center" group="center" :auto-z-index="false" />
   <PToast class="z-[9999]" position="bottom-center" group="bottom" :auto-z-index="false" />
 
-  <ObtrusiveNotification :draggable="false"
-                         :close-on-escape="false"
-                         :closable="false"
-                         block-scroll
-                         full-screen-on-mobile
-                         v-model="showUpdateAvailabilityReminder"
-                         class="md:max-w-lg">
+  <ObtrusiveNotification full-screen-on-mobile v-model="showUpdateAvailabilityReminder" class="md:max-w-lg">
     <div class="p-6 text-center dark:text-gray-100">
       <p>
         It seems like you haven't updated your availability in a while. Please make sure your availability is up
@@ -132,6 +126,7 @@ const checkLater = () => {
   </ObtrusiveNotification>
 </template>
 
+<!--suppress CssUnusedSymbol -->
 <style>
 /* TODO, DELETE AFTER REMOVING POPPER.JS */
 .v-popper__popper .v-popper__wrapper {
