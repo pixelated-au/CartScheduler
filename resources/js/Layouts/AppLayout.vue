@@ -12,7 +12,7 @@ import "floating-vue/dist/style.css";
 
 const { title } = defineProps<{
   title: string;
-  fullWidth: boolean;
+  fullWidth?: boolean;
 }>();
 
 const page = usePage();
