@@ -1,20 +1,19 @@
-<script setup>
+<script setup lang="ts">
 import Bugsnag from "@bugsnag/js";
-import { router, usePage, Head  } from "@inertiajs/vue3";
+import { Head, router, usePage } from "@inertiajs/vue3";
 import { differenceInDays } from "date-fns";
-import { computed, inject, onMounted, provide, ref } from "vue";
+import { computed, onMounted, provide, ref } from "vue";
 import ObtrusiveNotification from "@/Components/ObtrusiveNotification.vue";
+import { useDarkMode } from "@/Composables/useDarkMode.js";
+import { EnableUserAvailability } from "@/lib/provide-inject-keys.js"; // TODO AFTER REMOVING FLOATING-VUE, DELETE
 import { useGlobalState } from "@/store";
 import "@vuepic/vue-datepicker/dist/main.css"; // FIXME AFTER REMOVING VUE-DATEPICKER, DELETE
 import "floating-vue/dist/style.css";
-import { useDarkMode } from "@/Composables/useDarkMode.js";
-import {  EnableUserAvailability } from "@/lib/provide-inject-keys.js"; // TODO AFTER REMOVING FLOATING-VUE, DELETE
 
-defineProps({
-  title: String,
-  user: Object,
-  fullWidth: { type: Boolean, default: false },
-});
+const { title } = defineProps<{
+  title: string;
+  fullWidth: boolean;
+}>();
 
 const page = usePage();
 
