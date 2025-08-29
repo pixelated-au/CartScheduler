@@ -1,7 +1,9 @@
-<script setup>
+<script setup lang="ts">
 import { Link, router, usePage } from "@inertiajs/vue3";
 import { breakpointsTailwind, useBreakpoints } from "@vueuse/core";
-import { computed, inject, onBeforeMount, useTemplateRef, onMounted } from "vue";
+import PMenu from "primevue/menu";
+import PMenubar from "primevue/menubar";
+import { computed, onBeforeMount, onMounted, useTemplateRef } from "vue";
 import JetApplicationMark from "@/Jetstream/ApplicationMark.vue";
 import DarkMode from "./DarkMode.vue";
 
