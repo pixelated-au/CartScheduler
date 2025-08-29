@@ -1,6 +1,6 @@
-import tailwindConfig from "@@/tailwind.config.js";
 import resolveConfig from "tailwindcss/resolveConfig";
 import { computed } from "vue";
+import tailwindConfig from "@@/tailwind.config.js";
 
 const twConfig = resolveConfig(tailwindConfig);
 const twColors = twConfig.theme.colors;

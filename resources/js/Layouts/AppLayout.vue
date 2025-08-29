@@ -7,7 +7,8 @@ import ObtrusiveNotification from "@/Components/ObtrusiveNotification.vue";
 import { useGlobalState } from "@/store";
 import "@vuepic/vue-datepicker/dist/main.css"; // FIXME AFTER REMOVING VUE-DATEPICKER, DELETE
 import "floating-vue/dist/style.css";
-import { useDarkMode } from "@/Composables/useDarkMode.js"; // TODO AFTER REMOVING FLOATING-VUE, DELETE
+import { useDarkMode } from "@/Composables/useDarkMode.js";
+import {  EnableUserAvailability } from "@/lib/provide-inject-keys.js"; // TODO AFTER REMOVING FLOATING-VUE, DELETE
 
 defineProps({
   title: String,
@@ -16,7 +17,6 @@ defineProps({
 });
 
 const page = usePage();
-const route = inject("route");
 
 const bugsnagKey = import.meta.env.VITE_BUGSNAG_FRONT_END_API_KEY;
 onMounted(() => {
@@ -30,10 +30,7 @@ onMounted(() => {
 
 const { isDarkMode } = useDarkMode();
 
-// const isDarkMode = ref(false);
-provide("darkMode", isDarkMode);
-
-provide("enableUserAvailability", !!page.props.enableUserAvailability || false);
+provide(EnableUserAvailability, !!page.props.enableUserAvailability || false);
 
 const state = useGlobalState();
 const showUpdateAvailabilityReminder = ref(false);
@@ -104,9 +101,9 @@ const checkLater = () => {
     </div>
   </div>
 
-  <PToast class="z-50" position="top-center" group="default" :auto-z-index="false" />
-  <PToast class="z-50" position="center" group="center" :auto-z-index="false" />
-  <PToast class="z-50" position="bottom-center" group="bottom" :auto-z-index="false" />
+  <PToast class="z-[9999]" position="top-center" group="default" :auto-z-index="false" />
+  <PToast class="z-[9999]" position="center" group="center" :auto-z-index="false" />
+  <PToast class="z-[9999]" position="bottom-center" group="bottom" :auto-z-index="false" />
 
   <ObtrusiveNotification :draggable="false"
                          :close-on-escape="false"

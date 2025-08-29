@@ -1,6 +1,6 @@
 <script setup>
 import { Dropdown } from "flowbite";
-import { computed, inject, onMounted, ref, useSlots } from "vue";
+import { computed, inject, onMounted, ref, useSlots, useId } from "vue";
 import { useDarkMode } from "@/Composables/useDarkMode.js";
 import JetCheckbox from "@/Jetstream/Checkbox.vue";
 
@@ -15,7 +15,7 @@ const props = defineProps({
 
 const emit = defineEmits(["update:modelValue"]);
 
-const fieldUnique = computed(() => Math.random().toString(36).substring(2, 9));
+const fieldUnique = useId();
 
 const model = computed({
   get: () => props.modelValue,

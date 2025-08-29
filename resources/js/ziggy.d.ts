@@ -35,7 +35,14 @@ declare module 'ziggy-js' {
         }
     ],
     "set.password.update": [],
+    "shifts": [
+        {
+            "name": "shiftDate",
+            "required": true
+        }
+    ],
     "outstanding-reports": [],
+    "reserve.shift": [],
     "save.report": [],
     "get.report-tags": [],
     "set.viewed-availability": [],

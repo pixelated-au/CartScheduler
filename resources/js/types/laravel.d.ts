@@ -26,10 +26,6 @@ declare namespace App.Data {
     max_allowed: number;
     has_availability: boolean;
   };
-  export type AvailableShiftMetaGroupedData = {
-    date: string;
-    shiftMeta: App.Data.AvailableShiftMetaData;
-  };
   export type AvailableShiftsData = {
     shifts: { [date: string]: { [shift_id: number]: App.Data.UserShiftData[] } };
     freeShifts: { [date: string]: App.Data.AvailableShiftMetaData };
@@ -67,6 +63,11 @@ declare namespace App.Data {
     filled_saturdays?: number;
     availability_comments?: string;
   };
+  export type FilledShiftData = {
+    date: IsoDate;
+    shifts_filled: number;
+    shifts_available: number;
+  };
   export type LocationAdminData = {
     id: number;
     name: string;
@@ -94,6 +95,20 @@ declare namespace App.Data {
     requires_brother: boolean;
     shifts?: Array<App.Data.ShiftData>;
   };
+  export type OutstandingReportsData = {
+    shift_id: number;
+    shift_date: IsoDate;
+    start_time: TwentyFourHourTime;
+    end_time: TwentyFourHourTime;
+    requires_brother: number;
+    location_name: string;
+    shift_was_cancelled?: boolean;
+    placements_count?: number;
+    videos_count?: number;
+    requests_count?: number;
+    comments?: string;
+    tags?: { [key: number]: number };
+  };
   export type ReportMetadataData = {
     shift_id: number;
     shift_time: string;
@@ -106,7 +121,7 @@ declare namespace App.Data {
     associates: { id:number;name:string };
   };
   export type ReportTagData = {
-    id: number;
+    id?: number;
     name: string;
     sort?: number;
   };
@@ -167,12 +182,8 @@ declare namespace App.Data {
     responsible_brother?: string;
     has_logged_in: boolean;
     vacations?: Array<App.Data.UserVacationData>;
-    availability: App.Data.AvailabilityData;
+    availability?: App.Data.AvailabilityData;
     selectedLocations?: { [key: number]: number };
-  };
-  export type UserAvailabilityData = {
-    created_at?: string;
-    updated_at?: string;
   };
   export type UserData = {
     name: string;
@@ -194,10 +205,6 @@ declare namespace App.Data {
     available_from?: string;
     available_to?: string;
   };
-  export type UserShiftGroupedData = {
-    date: string;
-    shiftMeta: App.Data.UserShiftData;
-  };
   export type UserVacationData = {
     id?: number;
     start_date: string;
@@ -213,4 +220,15 @@ declare namespace App.Enums {
   export type MaritalStatus = "single" | "married" | "separated" | "divorced" | "widowed";
   export type Role = "admin" | "user";
   export type ServingAs = "field missionary" | "special pioneer" | "bethel family member" | "circuit overseer" | "regular pioneer" | "publisher";
+}
+declare namespace App.Settings {
+  export type GeneralSettings = { siteName: string;
+    currentVersion: string;
+    availableVersion: string;
+    allowedSettingsUsers: Array<number>;
+    systemShiftStartHour: number;
+    systemShiftEndHour: number;
+    enableUserAvailability: boolean;
+    enableUserLocationChoices: boolean;
+  };
 }

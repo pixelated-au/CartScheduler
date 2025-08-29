@@ -6,7 +6,6 @@ import JetApplicationMark from "@/Jetstream/ApplicationMark.vue"; // Assuming th
 
 const page = usePage();
 const breakpoints = useBreakpoints(breakpointsTailwind);
-const route = inject("route");
 
 type Permissions = {
   canAdmin: boolean;

@@ -376,7 +376,7 @@ const accordionExpandIndex = ref<number | undefined>(undefined);
     <template #footer>
       <div class="flex justify-end">
         <PButton severity="secondary" @click="selectedRemoveUser = undefined">Cancel</PButton>
-        <PButton style-type="warning"
+        <PButton severity="warn"
                  @click="removeVolunteer()"
                  class="ml-2">
           Remove

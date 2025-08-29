@@ -16,7 +16,6 @@ export interface Settings {
  * and passes the provided inputs to the form instance.
  */
 export default function useExtendedPrecognition() {
-  const route = inject("route");
 
   return <Data extends Record<string, FormDataConvertible>>(settings: Settings, inputs: Data) => {
     const method = settings.method || (settings.id ? "put" : "post");
