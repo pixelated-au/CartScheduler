@@ -2,7 +2,7 @@
 import { usePage } from "@inertiajs/vue3";
 import { isAxiosError } from "axios";
 import { format, isSameDay, parse } from "date-fns";
-import { computed, nextTick, ref, watch } from "vue";
+import { computed, ref, watch } from "vue";
 import ComponentSpinner from "@/Components/ComponentSpinner.vue";
 import EmptySlot from "@/Components/Icons/EmptySlot.vue";
 import User from "@/Components/Icons/User.vue";
@@ -87,9 +87,9 @@ const flagDates = computed(() =>
   ));
 
 const setLocationMarkers = (locations: EmittedDate[]) => locationsOnDays.value = locations;
-const isMyShift = (location: App.Data.LocationData) => {
-  return flagDates.value?.findIndex((date) => date?.locations.includes(location.id)) >= 0;
-};
+const haveAShift = (location: App.Data.LocationData) => flagDates.value?.findIndex(
+  (date) => date?.locations.includes(location.id),
+) >= 0;
 
 const today = new Date();
 const formatTime = (time: string) => format(parse(time, "HH:mm:ss", today), "h:mm a");
@@ -108,7 +108,7 @@ watch(
     for (const location of locations.value) {
       const classes = [];
       let tooltip = undefined;
-      if (isMyShift(location)) {
+      if (haveAShift(location)) {
         classes.push(...["text-green-800", "dark:text-green-300", "border-b-2", "border-green-500"]);
         tooltip = "You have at least one shift";
         if (!hasSetFirstReservationForUser && !isSameDay(dVal, oldDVal)) {
