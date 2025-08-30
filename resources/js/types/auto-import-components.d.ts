@@ -54,9 +54,11 @@ declare module 'vue' {
     PDialog: typeof import('primevue/dialog')['default']
     PInputNumber: typeof import('primevue/inputnumber')['default']
     PInputText: typeof import('primevue/inputtext')['default']
+    PListbox: typeof import('primevue/listbox')['default']
     PListBox: typeof import('primevue/listbox')['default']
     PMessage: typeof import('primevue/message')['default']
     PPassword: typeof import('primevue/password')['default']
+    PPopover: typeof import('primevue/popover')['default']
     PSelect: typeof import('primevue/select')['default']
     PSelectButton: typeof import('primevue/selectbutton')['default']
     PTextarea: typeof import('primevue/textarea')['default']
@@ -74,6 +76,7 @@ declare module 'vue' {
     UserAdd: typeof import('./../Components/Icons/UserAdd.vue')['default']
     UserMove: typeof import('./../Components/Icons/UserMove.vue')['default']
     UserRemove: typeof import('./../Components/Icons/UserRemove.vue')['default']
+    UserTableOptionalFields: typeof import('./../Components/UserTableOptionalFields.vue')['default']
     VerticalRadioButtons: typeof import('./../Components/VerticalRadioButtons.vue')['default']
   }
   export interface GlobalDirectives {

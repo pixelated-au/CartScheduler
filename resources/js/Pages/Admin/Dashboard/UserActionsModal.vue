@@ -1,10 +1,9 @@
 <script setup lang="ts">
 import { format } from "date-fns";
 import { Menu as VMenu } from "floating-vue";
-import { computed, inject, onBeforeMount, reactive, ref, watch } from "vue";
-import CheckboxSelectField from "@/Components/CheckboxSelectField.vue";
+import { computed, inject, onBeforeMount, reactive, ref } from "vue";
 import QuestionCircle from "@/Components/Icons/QuestionCircle.vue";
-import JetDialogModal from "@/Jetstream/DialogModal.vue";
+import UserTableOptionalFields from "@/Components/UserTableOptionalFields.vue";
 import JetHelpText from "@/Jetstream/HelpText.vue";
 import JetInput from "@/Jetstream/Input.vue";
 import JetLabel from "@/Jetstream/Label.vue";
@@ -12,13 +11,14 @@ import JetSecondaryButton from "@/Jetstream/SecondaryButton.vue";
 import JetToggle from "@/Jetstream/Toggle.vue";
 import { EnableUserAvailability } from "@/lib/provide-inject-keys.js";
 import UserTable from "@/Pages/Admin/Dashboard/UserTable.vue";
+import { useGlobalState } from "@/store";
 import type { Location, Shift } from "@/Pages/Admin/Locations/Composables/useLocationFilter";
 
 const props = defineProps<{
   show: boolean;
   date: Date;
-  shift: Shift|null;
-  location: Location|null;
+  shift: Shift | null;
+  location: Location | null;
 }>();
 
 const emit = defineEmits(["assignVolunteer", "update:show"]);
@@ -40,37 +40,35 @@ const mainFilters = reactive({
   doShowOnlyMinisterialServants: false,
 });
 
-const columnFilters = reactive({
-  gender: { label: "Gender", value: false },
-  appointment: { label: "Appointment", value: false },
-  servingAs: { label: "Serving As", value: false },
-  maritalStatus: { label: "Marital Status", value: false },
-  birthYear: { label: "Birth Year", value: false },
-  responsibleBrother: { label: "Is Responsible Bro?", value: false },
-  mobilePhone: { label: "Phone", value: false },
-});
+const state = useGlobalState();
+
+const columnFilters = computed(() => state.value.columnFilters);
+
+// const columnFilters = reactive({
+//   gender: { label: "Gender", value: false },
+//   appointment: { label: "Appointment", value: false },
+//   servingAs: { label: "Serving As", value: false },
+//   maritalStatus: { label: "Marital Status", value: false },
+//   birthYear: { label: "Birth Year", value: false },
+//   responsibleBrother: { label: "Is Responsible Bro?", value: false },
+//   mobilePhone: { label: "Phone", value: false },
+// });
 
 type X = Partial<Record<keyof typeof columnFilters, { label: string; value: boolean }>>;
 
-watch(columnFilters, (val) => {
-  const col:X = {};
-  for (const [key, value] of Object.entries(val)) {
-    col[key] = value;
-  }
-
-  localStorage.setItem("admin-user-rostering-columns", JSON.stringify(col));
-}, { deep: true });
+// watch(columnFilters, (val) => {
+//   const col:X = {};
+//   for (const [key, value] of Object.entries(val)) {
+//     col[key] = value;
+//   }
+//
+//   localStorage.setItem("admin-user-rostering-columns", JSON.stringify(col));
+// }, { deep: true });
 
 onBeforeMount(() => {
   const c = localStorage.getItem("admin-user-rostering-columns");
   if (!c) {
     return;
-  }
-  const columns = JSON.parse(c);
-  for (const key in columnFilters) {
-    if (columns.hasOwnProperty(key)) {
-      columnFilters[key].value = columns[key];
-    }
   }
 });
 
@@ -85,16 +83,17 @@ const volunteerAssigned = function(data) {
 </script>
 
 <template>
-  <JetDialogModal :show="showModal" maxWidth="7xl" @close="closeModal">
-    <template #title>
-      Assign a volunteer to {{ location?.name }} on {{ format(props.date, 'MMM d, yyyy') }}
+  <PDialog maximizable v-model:visible="showModal" modal class="w-11/12">
+    <!--  <JetDialogModal :show="showModal" maxWidth="7xl" @close="closeModal"> -->
+    <template #header>
+      Assign a volunteer to {{ location?.name }} on {{ format(props.date, "MMM d, yyyy") }}
     </template>
 
-    <template #content>
+    <template #default>
       <div class="grid grid-cols-6 gap-x-1 max-w-7xl mx-auto pb-5">
         <div class="col-span-6 bg-white dark:bg-gray-900 shadow-xl sm:rounded-lg sm:p-6">
-          <JetLabel for="search" value="Search for a volunteer"/>
-          <JetInput id="search" v-model="volunteerSearch" type="text" class="mt-1 block w-full"/>
+          <JetLabel for="search" value="Search for a volunteer" />
+          <JetInput id="search" v-model="volunteerSearch" type="text" class="mt-1 block w-full" />
           <JetHelpText>Search on name</JetHelpText>
         </div>
         <div
@@ -104,7 +103,7 @@ const volunteerAssigned = function(data) {
               Extra Columns
             </div>
             <div>
-              <CheckboxSelectField v-model="columnFilters"/>
+              <UserTableOptionalFields />
             </div>
           </div>
         </div>
@@ -121,7 +120,7 @@ const volunteerAssigned = function(data) {
               <JetToggle v-model="mainFilters.doHidePublishers" class="text-center">
                 Pioneers
                 <v-menu class="ml-1 inline-block">
-                  <span><QuestionCircle/></span>
+                  <span><QuestionCircle /></span>
 
                   <template #popper>
                     <div class="max-w-[300px]">
@@ -152,7 +151,7 @@ const volunteerAssigned = function(data) {
               <JetToggle v-model="mainFilters.doShowFilteredVolunteers" class="text-center">
                 Available
                 <v-menu class="ml-1 inline-block">
-                  <span><QuestionCircle/></span>
+                  <span><QuestionCircle /></span>
 
                   <template #popper>
                     <div class="max-w-[300px]">
@@ -177,28 +176,29 @@ const volunteerAssigned = function(data) {
                  :text-filter="volunteerSearch"
                  :main-filters="mainFilters"
                  :column-filters="columnFilters"
-                 @assignVolunteer="volunteerAssigned"/>
+                 @assignVolunteer="volunteerAssigned" />
     </template>
 
     <template #footer>
-      <JetSecondaryButton @click="closeModal">
+      <PButton severity="secondary" class="mt-4" @click="closeModal">
         Close
-      </JetSecondaryButton>
+      </PButton>
     </template>
-  </JetDialogModal>
+    <!--  </JetDialogModal> -->
+  </PDialog>
 </template>
 
 <style lang="scss">
 .volunteers .data-table table {
-    border-spacing: 0 2px;
+  border-spacing: 0 2px;
 
-    td:first-child {
-        @apply rounded-l-lg;
-    }
+  td:first-child {
+    @apply rounded-l-lg;
+  }
 
-    td:last-child {
-        @apply rounded-r-lg;
-    }
+  td:last-child {
+    @apply rounded-r-lg;
+  }
 
 }
 </style>

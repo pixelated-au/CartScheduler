@@ -9,6 +9,7 @@ import UserAdd from "@/Components/Icons/UserAdd.vue";
 import useToast from "@/Composables/useToast";
 import { EnableUserAvailability } from "@/lib/provide-inject-keys";
 import FilledShiftsIndicator from "@/Pages/Admin/Dashboard/FilledShiftsIndicator.vue";
+import { useGlobalState } from "@/store";
 
 const props = defineProps({
   shift: {
@@ -37,14 +38,16 @@ const props = defineProps({
     type: Object,
     required: true,
   },
-  columnFilters: {
-    type: Object,
-    required: true,
-  },
+  // columnFilters: {
+  //   type: Object,
+  //   required: true,
+  // },
 });
 
 const emit = defineEmits(["assignVolunteer"]);
 
+const state = useGlobalState();
+const columnFilters = computed(() => state.value["columnFilters"]);
 const enableUserAvailability = inject(EnableUserAvailability);
 const volunteers = ref<App.Data.ExtendedUserData[]>([]);
 
@@ -62,49 +65,49 @@ const tableHeaders = computed(() => {
       sortable: true,
     },
   ];
-  if (props.columnFilters.responsibleBrother.value) {
+  if (columnFilters.value.responsibleBrother.value) {
     headers.push({
       text: "Resp?",
       value: "responsibleBrother",
       sortable: true,
     });
   }
-  if (props.columnFilters.gender.value) {
+  if (columnFilters.value.gender.value) {
     headers.push({
       text: "Gender",
       value: "gender",
       sortable: true,
     });
   }
-  if (props.columnFilters.appointment.value) {
+  if (columnFilters.value.appointment.value) {
     headers.push({
       text: "Appointment",
       value: "appointment",
       sortable: true,
     });
   }
-  if (props.columnFilters.servingAs.value) {
+  if (columnFilters.value.servingAs.value) {
     headers.push({
       text: "Serving As",
       value: "servingAs",
       sortable: true,
     });
   }
-  if (props.columnFilters.maritalStatus.value) {
+  if (columnFilters.value.maritalStatus.value) {
     headers.push({
       text: "Marital Status",
       value: "maritalStatus",
       sortable: true,
     });
   }
-  if (props.columnFilters.birthYear.value) {
+  if (columnFilters.value.birthYear.value) {
     headers.push({
       text: "Birth Year",
       value: "birthYear",
       sortable: true,
     });
   }
-  if (props.columnFilters.mobilePhone.value) {
+  if (columnFilters.value.mobilePhone.value) {
     headers.push({
       text: "Phone",
       value: "mobilePhone",

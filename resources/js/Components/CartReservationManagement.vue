@@ -14,6 +14,7 @@ import JetConfirmModal from "@/Jetstream/ConfirmationModal.vue";
 import UserActionsModal from "@/Pages/Admin/Dashboard/UserActionsModal.vue";
 import useLocationFilter from "@/Pages/Admin/Locations/Composables/useLocationFilter";
 import DatePicker from "@/Pages/Components/Dashboard/DatePicker.vue";
+import { useGlobalState } from "@/store";
 import type { Ref } from "vue";
 import type { Location, Shift } from "@/Pages/Admin/Locations/Composables/useLocationFilter";
 import type { LocationsOnDate } from "@/Pages/Components/Dashboard/DatePicker.vue";
@@ -205,9 +206,7 @@ const assignUserData = reactive<{ shift: Shift | null; location: Location | null
 
 const doShowAssignVolunteerModal = (shift: Shift, location: Location) => {
   assignUserData.shift = shift;
-
   assignUserData.location = location;
-
   showUserAddModal.value = true;
 };
 
@@ -229,6 +228,9 @@ const locationClasses = (location: Location) => location.freeShifts
   : "text-gray-400 dark:text-gray-500 border-gray-400 group-hover:bg-gray-400 group-hover:text-gray-50";
 
 const accordionExpandIndex = ref<number | undefined>(undefined);
+
+const state = useGlobalState();
+const columnFilters = computed(() => state.value["columnFilters"]);
 </script>
 
 <template>
