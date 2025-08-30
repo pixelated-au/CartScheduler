@@ -229,7 +229,7 @@ watchEffect(async () => {
     return;
   }
   try {
-    const response = await axios.get<App.Data.ExtendedUserData[]>(`/admin/available-users-for-shift/${props.shift.id}`, {
+    const response = await axios.get<App.Data.ExtendedUserData[]>(route("admin.available-users-for-shift", props.shift.id), {
       params: {
         date: format(props.date, "yyyy-MM-dd"),
         showAll: props.mainFilters.doShowFilteredVolunteers ? 0 : 1,

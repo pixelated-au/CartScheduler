@@ -158,7 +158,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified',
 
             Route::put('/move-volunteer-to-shift', MoveUserToNewShiftController::class)->name('admin.move-volunteer-to-shift');
 
-            Route::get('/available-users-for-shift/{shift}', GetAvailableUsersForShiftController::class);
+            Route::get('/available-users-for-shift/{shift}', GetAvailableUsersForShiftController::class)->name('admin.available-users-for-shift');
             Route::match(['put', 'delete'], '/toggle-shift-for-user', ToggleUserOntoShiftReservationController::class);
 
             Route::get('/settings', ShowGeneralSettingsController::class)->name('admin.settings');
