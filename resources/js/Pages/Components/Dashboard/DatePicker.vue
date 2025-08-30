@@ -27,7 +27,7 @@ export type DateMark = {
   locations: number[];
 };
 
-export type EmittedDate = {
+export type LocationsOnDate = {
   locations: DateMark["locations"];
   date: DateMark["date"];
 };
@@ -50,7 +50,7 @@ const {
 
 const emit = defineEmits<{
   "update:date": [Date];
-  "locations-for-day": [Array<EmittedDate>];
+  "locations-for-day": [Array<LocationsOnDate>];
 }>();
 
 const selectedDate = computed({
