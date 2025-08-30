@@ -15,7 +15,6 @@ const options = computed(() => Object.entries(state.value.columnFilters).map(([k
 const model = computed({
   get: () => options.value.filter((value) => value.value).map((value) => ({ ...value })),
   set: (val) => {
-    console.log(val);
     options.value.forEach((value) => {
       state.value.columnFilters[value.key as keyof LocalStore["columnFilters"]].value = !!val.find((item) => item.key === value.key);
     });
