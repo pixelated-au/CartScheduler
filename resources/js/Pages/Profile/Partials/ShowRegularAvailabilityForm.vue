@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useForm, usePage } from "@inertiajs/vue3";
-import { computed, inject, nextTick, reactive, watch } from "vue";
+import { computed, nextTick, reactive, watch } from "vue";
 import SubmitButton from "@/Components/Form/Buttons/SubmitButton.vue";
 import useAvailabilityActions, { days } from "@/Composables/useAvailabilityActions";
 import useToast from "@/Composables/useToast";
@@ -9,17 +9,17 @@ import JetFormSection from "@/Jetstream/FormSection.vue";
 import JetInputError from "@/Jetstream/InputError.vue";
 import JetLabel from "@/Jetstream/Label.vue";
 import DayOfWeekConfiguration from "@/Pages/Profile/Partials/DayOfWeekConfiguration.vue";
-import type { Availability, Day, DayOfMonthCount } from "@/Composables/useAvailabilityActions";
+import type { Day, DayOfMonthCount } from "@/Composables/useAvailabilityActions";
 
-const { availability, userId = null } = defineProps<{
+const { availability, userId = undefined } = defineProps<{
   availability: App.Data.AvailabilityData;
-  userId?: number | null;
+  userId?: number | undefined;
 }>();
 
 const page = usePage();
 const toast = useToast();
 
-const ranges = computed(() => ({
+const ranges = computed<{ start: App.Enums.AvailabilityHours; end: App.Enums.AvailabilityHours }>(() => ({
   start: page.props.shiftAvailability.systemShiftStartHour,
   end: page.props.shiftAvailability.systemShiftEndHour,
 }));
@@ -110,7 +110,7 @@ const commentsRemainingCharacters = computed(() => {
 
 watch(() => form.comments, (value, oldValue) => {
   if (value.length > maxCommentChars) {
-    nextTick(() => {
+    void nextTick(() => {
       form.comments = oldValue;
     });
   }
@@ -124,14 +124,14 @@ watch(() => form.comments, (value, oldValue) => {
     </template>
 
     <template #description>
-      Please indicate {{ userId ? 'this volunteers' : 'your' }} availability
+      Please indicate {{ userId ? "this volunteers" : "your" }} availability
     </template>
 
     <template #form>
       <div
           class="grid grid-cols-4 col-span-6 gap-y-px items-stretch p-3 text-gray-700 rounded border border-gray-200 lg:grid-cols-7 dark:text-gray-100 dark:border-gray-900 bg-sub-panel dark:bg-sub-panel-dark">
         <div class="col-span-4 font-bold lg:col-span-7">
-          {{ userId ? 'Volunteer is' : 'I am' }} available
+          {{ userId ? "Volunteer is" : "I am" }} available
           to be rostered:
         </div>
         <div v-for="roster in rosters"
