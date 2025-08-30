@@ -25,5 +25,8 @@ class LocationAdminData extends Data
         /** @var Collection<int, \App\Data\ShiftAdminData> */
         public Collection $shifts = new Collection,
     ) {
+        if ($this->description !== null) {
+            $this->clean_description = strip_tags($this->description);
+        }
     }
 }
