@@ -48,10 +48,10 @@ const {
   canViewHistorical?: boolean;
 }>();
 
-const emit = defineEmits([
-  "update:date",
-  "locations-for-day",
-]);
+const emit = defineEmits<{
+  "update:date": [Date];
+  "locations-for-day": [Array<EmittedDate>];
+}>();
 
 const selectedDate = computed({
   get: () => set(date, { hours: 12, minutes: 0, seconds: 0, milliseconds: 0 }),
