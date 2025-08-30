@@ -16,13 +16,13 @@ class ShiftData extends Data
         public int $id,
         public string $start_time,
         public string $end_time,
-        public ?string $available_from = null,
-        public ?string $available_to = null,
-        #[LiteralTypeScriptType('[boolean, boolean, boolean, boolean, boolean, boolean, boolean]')]
-        public array $js_days = [],
+        public string|Optional $available_from,
+        public string|Optional $available_to,
         /** @var Collection<int, \App\Data\UserData> */
         public Collection|Optional $volunteers,
         public LocationData|Optional $location,
+        #[LiteralTypeScriptType('[boolean, boolean, boolean, boolean, boolean, boolean, boolean]')]
+        public array $js_days = [],
     ) {
     }
 
@@ -33,8 +33,14 @@ class ShiftData extends Data
             id: $shift->id,
             start_time: $shift->start_time,
             end_time: $shift->end_time,
-            available_from: $shift->available_from,
-            available_to: $shift->available_to,
+            available_from: $shift->available_from ?? Optional::create(),
+            available_to: $shift->available_to ?? Optional::create(),
+            volunteers: $shift->relationLoaded('users')
+                ? UserData::collect($shift->users)
+                : Optional::create(),
+            location: $shift->relationLoaded('location')
+                ? LocationData::from($shift->location)
+                : Optional::create(),
             js_days: [ // These will map to JavaScript date() days
                        0 => $shift->day_sunday,
                        1 => $shift->day_monday,
@@ -44,12 +50,6 @@ class ShiftData extends Data
                        5 => $shift->day_friday,
                        6 => $shift->day_saturday,
             ],
-            volunteers: $shift->relationLoaded('users')
-                ? UserData::collect($shift->users)
-                : Optional::create(),
-            location: $shift->relationLoaded('location')
-                ? LocationData::from($shift->location)
-                : Optional::create(),
         );
     }
 }

@@ -34,12 +34,12 @@ declare namespace App.Data {
   export type ExtendedUserData = {
     id: number;
     name: string;
-    gender?: string;
+    gender?: male | female | undefined;
     mobile_phone?: string;
     email?: string;
     marital_status?: string;
-    appointment?: string;
-    serving_as?: string;
+    appointment?: App.Enums.Appointment;
+    serving_as?: App.Enums.ServingAs;
     responsible_brother?: string;
     birth_year?: number;
     shift_id?: number;
@@ -159,30 +159,30 @@ declare namespace App.Data {
     end_time: string;
     available_from?: string;
     available_to?: string;
-    js_days: [boolean, boolean, boolean, boolean, boolean, boolean, boolean];
     volunteers?: Array<App.Data.UserData>;
     location?: App.Data.LocationData;
+    js_days: [boolean, boolean, boolean, boolean, boolean, boolean, boolean];
   };
   export type UserAdminData = {
     id: number;
     name: string;
     email: string;
     role: string;
-    gender?: string;
+    gender?: male | female | undefined;
     mobile_phone?: string;
     year_of_birth?: number;
-    appointment?: string;
-    serving_as?: string;
-    marital_status?: string;
+    appointment?: App.Enums.Appointment;
+    serving_as?: App.Enums.ServingAs;
+    marital_status?: App.Enums.MaritalStatus;
     spouse_name?: string;
     spouse_id?: number;
-    is_enabled: boolean;
-    is_unrestricted: boolean;
     responsible_brother?: string;
-    has_logged_in: boolean;
     vacations?: Array<App.Data.UserVacationData>;
     availability?: App.Data.AvailabilityData;
     selectedLocations?: { [key: number]: number };
+    is_enabled: boolean;
+    is_unrestricted: boolean;
+    has_logged_in: boolean;
   };
   export type UserData = {
     name: string;
@@ -214,7 +214,6 @@ declare namespace App.Data {
 declare namespace App.Enums {
   export type Appointment = "elder" | "ministerial servant";
   export type AvailabilityHours = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 | 21 | 22 | 23;
-  export type AvailabilityPeriods = "morning" | "afternoon" | "evening" | "full-day" | "half-day" | "not-available";
   export type DBPeriod = "MONTH" | "MONTHS" | "WEEK" | "WEEKS";
   export type MaritalStatus = "single" | "married" | "separated" | "divorced" | "widowed";
   export type Role = "admin" | "user";

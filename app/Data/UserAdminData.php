@@ -2,9 +2,13 @@
 
 namespace App\Data;
 
+use App\Enums\Appointment;
+use App\Enums\MaritalStatus;
+use App\Enums\ServingAs;
 use Illuminate\Support\Collection;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Optional;
+use Spatie\TypeScriptTransformer\Attributes\LiteralTypeScriptType;
 use Spatie\TypeScriptTransformer\Attributes\TypeScript;
 
 #[TypeScript]
@@ -15,23 +19,24 @@ class UserAdminData extends Data
         public string $name,
         public string $email,
         public string $role,
-        public ?string $gender = null,
-        public ?string $mobile_phone = null,
-        public ?int $year_of_birth = null,
-        public ?string $appointment = null,
-        public ?string $serving_as = null,
-        public ?string $marital_status = null,
-        public ?string $spouse_name = null,
-        public ?int $spouse_id = null,
-        public bool $is_enabled = true,
-        public bool $is_unrestricted = false,
-        public ?string $responsible_brother = null,
-        public bool $has_logged_in = false,
+        #[LiteralTypeScriptType('male | female | undefined')]
+        public string|Optional $gender,
+        public string|Optional $mobile_phone,
+        public int|Optional $year_of_birth,
+        public Appointment|Optional $appointment,
+        public ServingAs|Optional $serving_as,
+        public MaritalStatus|Optional $marital_status,
+        public string|Optional $spouse_name,
+        public int|Optional $spouse_id,
+        public string|Optional $responsible_brother,
         /** @var Collection<int, \App\Data\UserVacationData> */
-        public ?Collection $vacations = null,
+        public Collection|Optional $vacations,
         public AvailabilityData|Optional $availability,
         /** @var Collection<int, int> */
-        public ?Collection $selectedLocations = null,
+        public Collection|Optional $selectedLocations,
+        public bool $is_enabled = true,
+        public bool $is_unrestricted = false,
+        public bool $has_logged_in = false,
     ) {
     }
 }
