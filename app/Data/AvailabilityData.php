@@ -12,20 +12,19 @@ use Spatie\TypeScriptTransformer\Attributes\TypeScript;
 class AvailabilityData extends Data
 {
     public function __construct(
-        public int $user_id,
-        /** @var Collection<int, \App\Enums\AvailabilityHours> */
+        /** @var Collection<\App\Enums\AvailabilityHours> */
         public ?Collection $day_monday = null,
-        /** @var Collection<int, \App\Enums\AvailabilityHours> */
+        /** @var Collection<\App\Enums\AvailabilityHours> */
         public ?Collection $day_tuesday = null,
-        /** @var Collection<int, \App\Enums\AvailabilityHours> */
+        /** @var Collection<\App\Enums\AvailabilityHours> */
         public ?Collection $day_wednesday = null,
-        /** @var Collection<int, \App\Enums\AvailabilityHours> */
+        /** @var Collection<\App\Enums\AvailabilityHours> */
         public ?Collection $day_thursday = null,
-        /** @var Collection<int, \App\Enums\AvailabilityHours> */
+        /** @var Collection<\App\Enums\AvailabilityHours> */
         public ?Collection $day_friday = null,
-        /** @var Collection<int, \App\Enums\AvailabilityHours> */
+        /** @var Collection<\App\Enums\AvailabilityHours> */
         public ?Collection $day_saturday = null,
-        /** @var Collection<int, \App\Enums\AvailabilityHours> */
+        /** @var Collection<\App\Enums\AvailabilityHours> */
         public ?Collection $day_sunday = null,
         public int $num_mondays = 0,
         public int $num_tuesdays = 0,
