@@ -37,7 +37,7 @@ declare namespace App.Data {
     gender?: male | female | undefined;
     mobile_phone?: string;
     email?: string;
-    marital_status?: string;
+    marital_status?: App.Enums.MaritalStatus;
     appointment?: App.Enums.Appointment;
     serving_as?: App.Enums.ServingAs;
     responsible_brother?: string;

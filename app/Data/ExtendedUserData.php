@@ -3,6 +3,7 @@
 namespace App\Data;
 
 use App\Enums\Appointment;
+use App\Enums\MaritalStatus;
 use App\Enums\ServingAs;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Optional;
@@ -19,7 +20,7 @@ class ExtendedUserData extends Data
         public string|Optional $gender,
         public string|Optional $mobile_phone,
         public string|Optional $email,
-        public string|Optional $marital_status,
+        public MaritalStatus|Optional $marital_status,
         public Appointment|Optional $appointment,
         public ServingAs|Optional $serving_as,
         public string|Optional $responsible_brother,
