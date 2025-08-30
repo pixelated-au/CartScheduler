@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { isAxiosError } from "axios";
-import { inject, onMounted, provide, ref } from "vue";
+import { onMounted, provide, ref } from "vue";
 import useToast from "@/Composables/useToast.js";
 import { ReportTags } from "@/lib/provide-inject-keys";
 import ReportForm from "@/Pages/Components/Dashboard/ReportForm.vue";
@@ -34,10 +34,10 @@ const getData = async () => {
 };
 
 onMounted(() => {
-  getData();
+  void getData();
 });
 
-const reportSaved = () => setTimeout(() =>getData(), 1000);
+const reportSaved = () => setTimeout(() => getData(), 1000);
 </script>
 
 <template>
