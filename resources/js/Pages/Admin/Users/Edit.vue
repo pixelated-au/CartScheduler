@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { router, usePage } from "@inertiajs/vue3";
-import { inject } from "vue";
 import AppLayout from "@/Layouts/AppLayout.vue";
 import UserProfileForm from "@/Pages/Admin/Users/Partials/UserProfileForm.vue";
 import ShowLocationAvailabilityForm from "@/Pages/Profile/Partials/ShowLocationAvailabilityForm.vue";
@@ -47,7 +46,7 @@ const canChooseLocations = !!usePage().props.enableUserLocationChoices;
         </div>
         <div class="max-w-7xl mx-auto pt-10 sm:px-6 lg:px-8">
           <ShowRegularAvailabilityForm :userId="editUser.id"
-                                       :availability="editUser.availability"
+                                       :availability="editUser.availability as App.Data.AvailabilityData"
                                        class="mt-10 sm:mt-0" />
         </div>
       </template>
