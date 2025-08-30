@@ -4,14 +4,13 @@ declare namespace App.Data {
     name: string;
   };
   export type AvailabilityData = {
-    user_id: number;
-    day_monday?: { [key: number]: App.Enums.AvailabilityHours };
-    day_tuesday?: { [key: number]: App.Enums.AvailabilityHours };
-    day_wednesday?: { [key: number]: App.Enums.AvailabilityHours };
-    day_thursday?: { [key: number]: App.Enums.AvailabilityHours };
-    day_friday?: { [key: number]: App.Enums.AvailabilityHours };
-    day_saturday?: { [key: number]: App.Enums.AvailabilityHours };
-    day_sunday?: { [key: number]: App.Enums.AvailabilityHours };
+    day_monday?: Array<App.Enums.AvailabilityHours>;
+    day_tuesday?: Array<App.Enums.AvailabilityHours>;
+    day_wednesday?: Array<App.Enums.AvailabilityHours>;
+    day_thursday?: Array<App.Enums.AvailabilityHours>;
+    day_friday?: Array<App.Enums.AvailabilityHours>;
+    day_saturday?: Array<App.Enums.AvailabilityHours>;
+    day_sunday?: Array<App.Enums.AvailabilityHours>;
     num_mondays: number;
     num_tuesdays: number;
     num_wednesdays: number;
