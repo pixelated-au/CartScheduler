@@ -122,7 +122,7 @@ declare namespace App.Data {
   export type ReportTagData = {
     id?: number;
     name: string;
-    sort?: number;
+    order_column?: number;
   };
   export type ReportsData = {
     id: number;
@@ -163,6 +163,10 @@ declare namespace App.Data {
     location?: App.Data.LocationData;
     js_days: [boolean, boolean, boolean, boolean, boolean, boolean, boolean];
   };
+  export type SpouseAdminData = {
+    id: number;
+    name: string;
+  };
   export type UserAdminData = {
     id: number;
     name: string;
@@ -174,12 +178,12 @@ declare namespace App.Data {
     appointment?: App.Enums.Appointment;
     serving_as?: App.Enums.ServingAs;
     marital_status?: App.Enums.MaritalStatus;
-    spouse_name?: string;
     spouse_id?: number;
     responsible_brother?: string;
     vacations?: Array<App.Data.UserVacationData>;
     availability?: App.Data.AvailabilityData;
     selectedLocations?: { [key: number]: number };
+    spouse?: App.Data.SpouseAdminData;
     is_enabled: boolean;
     is_unrestricted: boolean;
     has_logged_in: boolean;
