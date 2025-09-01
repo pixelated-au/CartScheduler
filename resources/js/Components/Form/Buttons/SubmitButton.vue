@@ -7,7 +7,7 @@ const { action, label, icon, success = false, failure = false, errors, processin
   icon?: string;
   success?: boolean;
   failure?: boolean;
-  errors?: string | string[] | Record<string, string>;
+  errors?: string | string[] | Record<string, string> | Partial<Record<string, string>>;
   processing?: boolean;
 }>();
 
