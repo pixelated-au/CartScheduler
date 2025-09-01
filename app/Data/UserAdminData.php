@@ -26,7 +26,6 @@ class UserAdminData extends Data
         public Appointment|Optional $appointment,
         public ServingAs|Optional $serving_as,
         public MaritalStatus|Optional $marital_status,
-        public string|Optional $spouse_name,
         public int|Optional $spouse_id,
         public string|Optional $responsible_brother,
         /** @var Collection<int, \App\Data\UserVacationData> */
@@ -34,6 +33,7 @@ class UserAdminData extends Data
         public AvailabilityData|Optional $availability,
         /** @var Collection<int, int> */
         public Collection|Optional $selectedLocations,
+        public SpouseAdminData|Optional $spouse,
         public bool $is_enabled = true,
         public bool $is_unrestricted = false,
         public bool $has_logged_in = false,
