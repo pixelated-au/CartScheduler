@@ -9,6 +9,7 @@ import JetConfirmationModal from "@/Jetstream/ConfirmationModal.vue";
 import JetFormSection from "@/Jetstream/FormSection.vue";
 import JetInputError from "@/Jetstream/InputError.vue";
 import JetLabel from "@/Jetstream/Label.vue";
+import blockNavigation from "@/lib/blockNavigation";
 
 const props = defineProps<{
   user: App.Data.UserAdminData;
@@ -40,6 +41,8 @@ const form = extendedPrecognition({
   is_enabled: props.user.is_enabled,
   is_unrestricted: props.user.is_unrestricted,
 });
+
+blockNavigation(form) ;
 
 const saveAction = () => {
   form.submit({
@@ -260,10 +263,12 @@ watch([() => form.gender, () => form.appointment], ([gender, appointment]) => {
                        { label: 'Divorced', value: 'divorced' },
                        { label: 'Widowed', value: 'widowed' },
                      ]" />
-            <Link :href="route('admin.users.edit', user.spouse.id)" class="text-sm" v-if="user.spouse?.name">
+            <span v-if="user.spouse?.name" class="text-sm">
               Spouse:
-              {{ user.spouse.name }}
-            </Link>
+              <Link :href="route('admin.users.edit', user.spouse.id)">
+                {{ user.spouse.name }}
+              </Link>
+            </span>
             <JetInputError :message="form.errors.marital_status" class="mt-2" />
           </div>
           <div class="mt-3 sm:col-span-2">
