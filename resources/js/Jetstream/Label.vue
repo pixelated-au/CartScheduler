@@ -1,20 +1,22 @@
-<script setup lang="ts">
+<script setup lang="ts" generic="Data extends Record<string, FormDataConvertible>">
 import { computed } from "vue";
 import LabelError from "@/Jetstream/LabelError.vue";
+import type { FormDataKeys, FormDataConvertible  } from "@inertiajs/core";
+import type { InertiaForm } from "@inertiajs/vue3";
 
-type Props<K extends string> = {
+const { value, isDisabled = false, errorKey, form, hasError } = defineProps<{
   value?: string;
   isDisabled?: boolean;
-  form?: {
-    errors: Record<K, string>;
-  };
-  errorKey?: K;
+  form?: InertiaForm<Data>;
+  errorKey?: FormDataKeys<Data>;
   hasError?: boolean;
-};
+}>();
 
-const { value, isDisabled = false, errorKey = "", form, hasError } = defineProps<Props<string>>();
-
-const invalid = computed(() => hasError || !!form?.errors[errorKey]);
+const invalid = computed(() => {
+  if (hasError) return true;
+  if (errorKey === undefined) return false;
+  return !!form?.errors[errorKey];
+});
 </script>
 
 <template>
