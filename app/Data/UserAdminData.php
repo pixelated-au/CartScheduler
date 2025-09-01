@@ -26,7 +26,6 @@ class UserAdminData extends Data
         public Appointment|Optional $appointment,
         public ServingAs|Optional $serving_as,
         public MaritalStatus|Optional $marital_status,
-        public int|Optional $spouse_id,
         public string|Optional $responsible_brother,
         /** @var Collection<int, \App\Data\UserVacationData> */
         public Collection|Optional $vacations,
