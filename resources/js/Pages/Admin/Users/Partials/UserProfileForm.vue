@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { router } from "@inertiajs/vue3";
+import { Link, router } from "@inertiajs/vue3";
 import { isAxiosError } from "axios";
-import { inject, ref, watch, nextTick } from "vue";
+import { nextTick, ref, watch } from "vue";
 import useExtendedPrecognition from "@/Composables/useExtendedPrecognition.js";
 import useToast from "@/Composables/useToast.js";
 import JetActionMessage from "@/Jetstream/ActionMessage.vue";
@@ -103,7 +103,7 @@ const performResendWelcomeAction = async () => {
 
 watch([() => form.is_unrestricted, () => form.role], ([isUnrestricted, role]) => {
   if (!isUnrestricted && role === "admin") {
-    nextTick(() => {
+    void nextTick(() => {
       form.role = "user";
       toast.warning(
         "Restricted users cannot be administrators. The role has been changed to a standard user.",
@@ -115,7 +115,7 @@ watch([() => form.is_unrestricted, () => form.role], ([isUnrestricted, role]) =>
 });
 watch([() => form.gender, () => form.appointment], ([gender, appointment]) => {
   if (appointment && gender === "female") {
-    nextTick(() => {
+    void nextTick(() => {
       form.appointment = undefined;
       toast.warning(
         "Sisters cannot be appointed. The appointment has been reset",
@@ -260,12 +260,11 @@ watch([() => form.gender, () => form.appointment], ([gender, appointment]) => {
                        { label: 'Divorced', value: 'divorced' },
                        { label: 'Widowed', value: 'widowed' },
                      ]" />
+            <Link :href="route('admin.users.edit', user.spouse.id)" class="text-sm" v-if="user.spouse?.name">
+              Spouse:
+              {{ user.spouse.name }}
+            </Link>
             <JetInputError :message="form.errors.marital_status" class="mt-2" />
-          </div>
-          <div v-if="user.spouse_name" class="self-center">
-            <strong>
-              Spouse: {{ user.spouse_name }}
-            </strong>
           </div>
           <div class="mt-3 sm:col-span-2">
             <!-- Responsible Brother -->
