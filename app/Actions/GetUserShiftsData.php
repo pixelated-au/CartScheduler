@@ -2,10 +2,8 @@
 
 namespace App\Actions;
 
-use App\Collections\UserShiftsCollection;
 use App\Data\UserShiftData;
 use App\Models\User;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use stdClass;
@@ -21,8 +19,8 @@ class GetUserShiftsData
      *
      * @param string $startDate YYYY-MM-DD
      * @param string $endDate YYYY-MM-DD
-     * @param \App\Models\User $user
-     * @return \Illuminate\Support\Collection
+     * @param User $user
+     * @return Collection<string, Collection<int, Collection<UserShiftData>>>
      */
     public function execute(string $startDate, string $endDate, User $user): Collection
     {
@@ -84,6 +82,7 @@ class GetUserShiftsData
                 return UserShiftData::from($shift);
             })
             ->filter(fn(UserShiftData $shift) => $shift->volunteer_id === $user->id)
+            // Group first by shift date and then by shift id: [[shift_date => [shift_id => UserShiftData]]]
             ->groupBy([
                 fn(UserShiftData $shift) => $shift->shift_date->format('Y-m-d'),
                 fn(UserShiftData $shift) => $shift->shift_id,
