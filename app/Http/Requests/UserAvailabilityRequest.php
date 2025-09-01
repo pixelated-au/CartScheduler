@@ -76,7 +76,7 @@ class UserAvailabilityRequest extends FormRequest
         ];
     }
 
-    public function passedValidation(): void
+    public function prepareForValidation(): void
     {
         $this->parseDay('monday');
         $this->parseDay('tuesday');
