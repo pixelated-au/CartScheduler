@@ -18,7 +18,7 @@
         "laravel/jetstream": "^v5.1.4",
         "laravel/sanctum": "^v4.0.2",
         "laravel/tinker": "^v2.9.0",
-        "maatwebsite/excel": "^3.1.57",
+        "maatwebsite/excel": "^3.1.67",
         "maennchen/zipstream-php": "^3.1",
         "pixelated-au/streamline": "dev-main",
         "psr/simple-cache": "^3.0.0",
