@@ -12,7 +12,7 @@ class ReportTagData extends Data
     public function __construct(
         public int|Optional $id,
         public string $name,
-        public ?int $sort = null,
+        public ?int $order_column = null,
     ) {
     }
 }

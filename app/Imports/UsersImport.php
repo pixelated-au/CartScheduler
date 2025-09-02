@@ -4,11 +4,13 @@ namespace App\Imports;
 
 use App\Actions\GetUserValidationUtils;
 use App\Enums\Role;
+use App\Mail\UserAccountCreated;
 use App\Models\User;
 use Exception;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\Validator;
@@ -72,8 +74,14 @@ class UsersImport implements
         } else {
             $data['uuid']     = Str::uuid();
             $data['password'] = null;
-            $user             = User::create($data);
+            // Create the user quietly (by default, User::create() sends a welcome email. Then, only send the welcome
+            // email after the transaction is committed.
+            $user             = User::createQuietly($data);
             $user->availability()->create();
+            DB::afterCommit(static function () use ($user) {
+                User::sendWelcomeEmail($user);
+                User::attachSpouse($user);
+            });
             ++$this->createCount;
         }
     }
@@ -84,10 +92,6 @@ class UsersImport implements
         $this->attachFailure(...$failures);
     }
 
-    /**
-     * @throws \Illuminate\Contracts\Container\BindingResolutionException
-     * @noinspection PhpUnusedParameterInspection
-     */
     public function prepareForValidation(array $data, int $index): array
     {
         $data['role'] = Role::User->value;
@@ -141,16 +145,17 @@ class UsersImport implements
      */
     public static function importUploadedFiles(UploadedFile $files): self
     {
+        /**
+         * We're handling transactions manually, so disable LaravelExcel transaction handler
+         * @link https://docs.laravel-excel.com/3.1/imports/validation.html#disable-transactions
+         */
+        Config::set('excel.transactions.handler', 'null');
         try {
-            Config::set('excel.transactions.handler', 'null');
             DB::beginTransaction();
-            /** @var UsersImport $import */
             $import = app()->make(__CLASS__);
             Excel::import($import, $files);
-
             if ($import->failures() && $import->failures()->count()) {
                 $failures = $import->failures();
-                DB::rollBack();
                 throw ValidationException::withMessages(
                     $failures->map(
                         fn(Failure $failure) => collect($failure->errors())
@@ -162,7 +167,6 @@ class UsersImport implements
             }
             DB::commit();
             return $import;
-
         } catch (Exception $exception) {
             DB::rollBack();
             throw $exception;

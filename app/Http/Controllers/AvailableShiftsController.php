@@ -47,14 +47,14 @@ class AvailableShiftsController extends Controller
 
         // Locations are the list of locations in the 'accordion' menu
         $locations = $this->getLocationsForShifts->execute(
-            $selectedDate->toDateString(),
-            $user,
-            [
-                'users.id',
-                'users.name',
-                'users.gender',
-                'users.mobile_phone',
-            ]
+            date: $selectedDate->toDateString(),
+            user: $user,
+            userFields: [
+                'uuid',
+                'name',
+                'gender',
+                'mobile_phone',
+            ],
         );
 
         $formattedStartDate = Carbon::today()->endOfDay()->format('Y-m-d');

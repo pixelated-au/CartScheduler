@@ -97,9 +97,8 @@ ORDER BY dates.date";
 
         $results = DB::select($query, $params);
         return collect($results)
-            ->keyBy(fn(stdClass $shift) => $shift->date);
-//            ->mapToGroups(fn(stdClass $shift) => [
-//                $shift->date => AvailableShiftMetaData::from($shift),
-//            ]);
+            ->keyBy(fn(stdClass $shift) => $shift->date)
+            ->map(fn(stdClass $shift) => AvailableShiftMetaData::from($shift))
+            ;
     }
 }

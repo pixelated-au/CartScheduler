@@ -22,7 +22,7 @@ class LocationAdminData extends Data
         public ?float $longitude = null,
         public bool $is_enabled = true,
         public ?int $sort_order = null,
-        /** @var Collection<int, \App\Data\ShiftAdminData> */
+        /** @var Collection<\App\Data\ShiftAdminData> */
         public Collection $shifts = new Collection,
     ) {
         if ($this->description !== null) {

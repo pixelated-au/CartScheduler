@@ -18,7 +18,7 @@ class ShiftData extends Data
         public string $end_time,
         public string|Optional $available_from,
         public string|Optional $available_to,
-        /** @var Collection<int, \App\Data\UserData> */
+        /** @var Collection<\App\Data\UserData> */
         public Collection|Optional $volunteers,
         public LocationData|Optional $location,
         #[LiteralTypeScriptType('[boolean, boolean, boolean, boolean, boolean, boolean, boolean]')]

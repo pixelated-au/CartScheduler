@@ -2,7 +2,6 @@
 
 namespace App\Data;
 
-use App\Collections\AvailableShiftsCollection;
 use Illuminate\Support\Collection;
 use Spatie\LaravelData\Data;
 use Spatie\TypeScriptTransformer\Attributes\LiteralTypeScriptType;
@@ -16,7 +15,7 @@ class AvailableShiftsData extends Data
         public Collection $shifts,
         #[LiteralTypeScriptType('{[date: string]: App.Data.AvailableShiftMetaData}')]
         public Collection $freeShifts,
-        /** @var Collection<int, \App\Data\LocationData> */
+        /** @var Collection<\App\Data\LocationData> */
         public Collection $locations,
         public string $maxDateReservation,
     ) {

@@ -90,7 +90,7 @@ class HandleInertiaRequests extends Middleware
             $custom['isUnrestricted'] = true;
         }
         // Gender is used for knowing if a shift can be reserved
-        $custom['user'] = static fn() => $user?->only(['id', 'name', 'email', 'gender']);
+        $custom['user'] = static fn() => $user?->only(['id', 'uuid', 'name', 'email', 'gender']);
 
         return array_merge(parent::share($request), $custom);
     }
