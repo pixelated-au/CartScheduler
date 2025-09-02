@@ -19,6 +19,7 @@ declare global {
 
 export type AuthUser = {
   id: number;
+  uuid: string;
   name: string;
   email: string;
   gender: string;

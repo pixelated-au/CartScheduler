@@ -278,7 +278,7 @@ const columnFilters = computed(() => state.value["columnFilters"]);
                 <div class="self-center pl-3 dark:text-gray-100">
                   {{ formatTime(shift.start_time) }} - {{ formatTime(shift.end_time) }}
                 </div>
-                <div v-for="(volunteer, index) in shift.filterVolunteers"
+                <div v-for="(volunteer, index) in shift.volunteers"
                      :key="index"
                      class="justify-self-center self-center">
                   <User status="male" v-if="volunteer?.gender === 'male'" v-tooltip="volunteer.name" />
@@ -288,7 +288,7 @@ const columnFilters = computed(() => state.value["columnFilters"]);
                 </div>
                 <div></div>
                 <div class="col-span-full dark:text-gray-50">
-                  <div v-for="(volunteer, index) in shift.filterVolunteers"
+                  <div v-for="(volunteer, index) in shift.volunteers"
                        :key="index"
                        class="p-2 border-b border-gray-400 transition duration-150 first:rounded-t-md last:rounded-b-md last:border-b-0 hover:ease-in"
                        :class="rowClass(volunteer?.gender)">

@@ -178,12 +178,11 @@ declare namespace App.Data {
     appointment?: App.Enums.Appointment;
     serving_as?: App.Enums.ServingAs;
     marital_status?: App.Enums.MaritalStatus;
-    spouse_id?: number;
     responsible_brother?: string;
     vacations?: Array<App.Data.UserVacationData>;
     availability?: App.Data.AvailabilityData;
-    selectedLocations?: { [key: number]: number };
     spouse?: App.Data.SpouseAdminData;
+    selectedLocations?: Array<number>;
     is_enabled: boolean;
     is_unrestricted: boolean;
     has_logged_in: boolean;
@@ -191,11 +190,12 @@ declare namespace App.Data {
   export type UserData = {
     name: string;
     id?: number;
+    uuid?: string;
     gender: string;
     mobile_phone: string;
     email?: string;
-    shift_id: number;
-    shift_date: string;
+    shift_id?: number;
+    shift_date?: string;
     is_unrestricted?: boolean;
     last_shift_date?: string;
     last_shift_start_time?: string;

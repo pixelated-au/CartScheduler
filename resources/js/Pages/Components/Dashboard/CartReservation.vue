@@ -198,11 +198,11 @@ const reservationWatch = watch(firstReservationForUser, (val) => {
                     <div class="self-center pt-4 pl-3 sm:pr-4 dark:text-gray-100">
                       {{ formatTime(shift.start_time) }} - {{ formatTime(shift.end_time) }}
                     </div>
-                    <div v-for="(volunteer, index) in shift.filterVolunteers"
+                    <div v-for="(volunteer, index) in shift.volunteers"
                          :key="index"
                          class="justify-self-center self-center pt-4">
                       <template v-if="volunteer">
-                        <template v-if="user?.id && volunteer.id === user.id">
+                        <template v-if="user.uuid && volunteer.uuid === user.uuid">
                           <button v-if="!isRestricted"
                                   type="button"
                                   class="block"
@@ -219,7 +219,7 @@ const reservationWatch = watch(firstReservationForUser, (val) => {
                       </template>
 
                       <EmptySlot v-else-if="isRestricted" v-tooltip="'You cannot reserve a shift'" />
-                      <EmptySlot v-else-if="index === shift.filterVolunteers.length - 1 && shift.maxedFemales && user.gender === 'female'"
+                      <EmptySlot v-else-if="index === shift.volunteers.length - 1 && shift.maxedFemales && user.gender === 'female'"
                                  color="#79B9ED"
                                  v-tooltip="'This slot can only be reserved by a brother'" />
                       <button v-else
@@ -231,7 +231,7 @@ const reservationWatch = watch(firstReservationForUser, (val) => {
                     </div>
                     <div class="col-span-full px-3 rounded bg-surface-200 dark:bg-surface-800 dark:text-gray-50 sm:py-2">
                       <ul>
-                        <li v-for="(volunteer, index) in shift.filterVolunteers"
+                        <li v-for="(volunteer, index) in shift.volunteers"
                             :key="index"
                             class="flex justify-between py-2 border-b border-gray-400 last:border-b-0">
                           <template v-if="volunteer">

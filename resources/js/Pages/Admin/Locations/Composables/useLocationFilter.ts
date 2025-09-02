@@ -9,8 +9,8 @@ export type Location = App.Data.AvailableShiftsData["locations"][number] & {
   filterShifts?: Shift[];
 };
 
-export type Shift = App.Data.ShiftData & {
-  filterVolunteers: App.Data.UserData[];
+export type Shift = Omit<App.Data.ShiftData, "volunteers"> & {
+  volunteers: App.Data.UserData[];
   maxedFemales?: boolean;
   freeShifts: number;
 };
@@ -86,13 +86,15 @@ export default function(timezone: Ref<string>, canAdmin = false) {
   const setReservations = (maxVolunteers: number, shift: Shift, location: App.Data.LocationData) => {
     shift.freeShifts = 0;
 
-    const volunteers = (shift.filterVolunteers as App.Data.UserData[]).sort((a, b) => {
+    const volunteers = (shift.volunteers as App.Data.UserData[]).sort((a, b) => {
       // First, compare genders
       if (a.gender !== b.gender) {
         return b.gender.localeCompare(a.gender);
       }
       // If genders are the same, compare shift_id
-      return a.shift_id - b.shift_id;
+      return a.shift_id && b.shift_id
+        ? a.shift_id - b.shift_id
+        : 0;
     });
 
     const length = maxVolunteers >= volunteers.length ? maxVolunteers - volunteers.length : maxVolunteers;
@@ -100,7 +102,7 @@ export default function(timezone: Ref<string>, canAdmin = false) {
     if (length) {
       shift.freeShifts = length;
       const nullArray = Array(length).fill(null);
-      shift.filterVolunteers = [...volunteers, ...nullArray];
+      shift.volunteers = [...volunteers, ...nullArray];
 
       emptyShiftsForTime.value.push({
         // no need to timezone here, because we are only extracting the time
@@ -167,6 +169,7 @@ export default function(timezone: Ref<string>, canAdmin = false) {
 
     const mappedLocations: App.Data.LocationData[] = [];
     let myLocations: Location[] | undefined = cloneDeep(serverLocations.value);
+
     emptyShiftsForTime.value = [];
 
     for (const location of myLocations) {
@@ -178,12 +181,13 @@ export default function(timezone: Ref<string>, canAdmin = false) {
       }
 
       for (const shift of location.shifts as Shift[]) {
-        const volunteers = shift.volunteers || [];
-        shift.filterVolunteers = volunteers.filter((volunteer) => volunteer.shift_date === formattedDate.value);
-        delete shift.volunteers;
+        // const volunteers = shift.volunteers || [];
+        // shift.filterVolunteers = volunteers;
+        // shift.filterVolunteers = volunteers.filter((volunteer) => volunteer.shift_date === formattedDate.value);
+        // delete shift.volunteers;
         if (location.requires_brother) {
           let femaleCount = 0;
-          for (const filVolunteer of shift.filterVolunteers) {
+          for (const filVolunteer of shift.volunteers) {
             if (filVolunteer.gender === "female") {
               femaleCount++;
             }

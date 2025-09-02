@@ -81,17 +81,12 @@ const deleteTag = async () => {
 
 const el = useTemplateRef("tagParent");
 const doSort = async (event: SortableEvent) => {
-  console.log(event);
-  console.log(event.oldIndex, event.newIndex, allTags.value.map((tag) => tag.name));
   if (event.oldIndex === undefined || event.newIndex === undefined) {
     return;
   }
 
-  console.log("bam");
-
   moveArrayElement(allTags.value, event.oldIndex, event.newIndex, event);
   await nextTick();
-  console.log("moved", allTags.value.map((tag) => tag.name));
 
   await axios.put(route("admin.report-tag.sort-order"), { ids: allTags.value.map((tag) => tag.id) });
   toast.success("The tags have been reordered", undefined, { group: "bottom" });
