@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\App;
 
+use App\Data\UserVacationData;
 use App\Enums\AvailabilityHours;
 use App\Http\Resources\UserVacationResource;
 use App\Models\Location;
@@ -84,15 +85,15 @@ class ProfileInformationTest extends TestCase
         $admin = User::factory()->enabled()->adminRoleUser()->create();
 
         $vacation1 = ['start_date' => '2023-01-01', 'end_date' => '2023-01-15', 'description' => 'Testing'];
-        $vacation = UserVacation::factory()
+        $vacation  = UserVacation::factory()
             ->state($vacation1)
             ->for($admin)
             ->create();
-        $resource = UserVacationResource::make($vacation);
+        $data      = UserVacationData::from($vacation);
 
         $vacationData = [
             'vacations' => [
-                $resource->resolve(),
+                $data->toArray(),
                 ['start_date' => '2023-02-01', 'end_date' => '2023-02-15', 'description' => 'Testing 2'],
             ],
         ];
@@ -151,7 +152,9 @@ class ProfileInformationTest extends TestCase
 
         $vacationData = [
             'vacations' => [
-                ['id' => $vacation->id, 'start_date' => '2024-01-01', 'end_date' => '2024-01-15', 'description' => 'Updated Testing'],
+                ['id'          => $vacation->id, 'start_date' => '2024-01-01', 'end_date' => '2024-01-15',
+                 'description' => 'Updated Testing'
+                ],
             ],
         ];
 
@@ -216,7 +219,6 @@ class ProfileInformationTest extends TestCase
                 ['id' => 5555],
             ],
         ];
-
 
         $this->actingAs($user)
             ->putJson("/user/vacations", $vacationData)
@@ -284,7 +286,7 @@ class ProfileInformationTest extends TestCase
         $this->actingAs($user)
             ->getJson("/user/available-locations")
             ->assertOk()
-            ->assertJsonCount(3, 'data')
+            ->assertJsonCount(3)
             ->assertJsonFragment(['id' => $locations[0]->id, 'name' => $locations[0]->name])
             ->assertJsonFragment(['id' => $locations[1]->id, 'name' => $locations[1]->name])
             ->assertJsonFragment(['id' => $locations[2]->id, 'name' => $locations[2]->name]);
@@ -333,10 +335,11 @@ class ProfileInformationTest extends TestCase
             ->assertUnauthorized();
     }
 
-
     public function test_user_cant_maintain_disabled_feature_of_user_regular_availability(): void
     {
         $user = User::factory()->enabled()->create();
+
+        GeneralSettings::fake(['enableUserAvailability' => false]);
 
         $this->actingAs($user)
             ->getJson("/user/availability")
@@ -378,8 +381,7 @@ class ProfileInformationTest extends TestCase
             ->get("/user/availability")
             ->assertInertia(fn(AssertableInertia $page) => $page
                 ->component('Profile/ShowAvailability')
-                ->has('availability.data', fn(AssertableInertia $data) => $data
-                    ->has('user_id')
+                ->has('availability', fn(AssertableInertia $data) => $data
                     ->where('day_monday', null)
                     ->where('day_tuesday', null)
                     ->where('day_wednesday', null)
@@ -422,8 +424,7 @@ class ProfileInformationTest extends TestCase
             ->get("/user/availability")
             ->assertInertia(fn(AssertableInertia $page) => $page
                 ->component('Profile/ShowAvailability')
-                ->has('availability.data', fn(AssertableInertia $data) => $data
-                    ->has('user_id')
+                ->has('availability', fn(AssertableInertia $data) => $data
                     ->where('day_monday', null)
                     ->where('day_tuesday', null)
                     ->where('day_wednesday.0', 7)
@@ -463,8 +464,13 @@ class ProfileInformationTest extends TestCase
 
         $this->actingAs($user)
             ->putJson("/user/availability", [
+                'day_monday'     => null,
+                'day_tuesday'    => null,
                 'day_wednesday'  => [10, 13],
                 'day_thursday'   => [10, 13],
+                'day_friday'     => null,
+                'day_saturday'   => null,
+                'day_sunday'     => null,
                 'num_mondays'    => 0,
                 'num_tuesdays'   => 0,
                 'num_wednesdays' => 1,
@@ -553,7 +559,7 @@ class ProfileInformationTest extends TestCase
             ])
             ->assertUnprocessable()
             ->assertInvalid([
-                'day_wednesday' => 'The day wednesday field must have at least 2 items',
+                'day_wednesday' => 'This field must have at least 2 items',
                 'day_friday.6'  => 'The day_friday.6 field must not be greater than 23.',
                 'num_mondays'   => 'The num mondays field must be an integer.',
                 'num_tuesdays'  => 'The num tuesdays field is required.',
@@ -561,7 +567,6 @@ class ProfileInformationTest extends TestCase
                 'num_sundays'   => 'The num sundays field must be an integer.',
                 'comments'      => 'The comments field must not be greater than 500 characters.',
             ]);
-
     }
 
     public function test_user_cannot_maintain_availability_for_other_users(): void
