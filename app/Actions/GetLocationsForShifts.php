@@ -3,7 +3,6 @@
 namespace App\Actions;
 
 use App\Models\Location;
-use App\Models\Shift;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -37,6 +36,15 @@ class GetLocationsForShifts
                                     WHEN DAYOFWEEK('$date') = 6 THEN shifts.day_friday
                                     WHEN DAYOFWEEK('$date') = 7 THEN shifts.day_saturday
                                     END = 1")
+                        ->when(
+                        // If the user is restricted, then...
+                            value: $user?->is_restricted,
+                            callback: fn(Builder $query) => $query
+                                // Exclude shifts that the user isn't rostered on to
+                                ->whereHas('users', fn(Builder $query) => $query
+                                    ->where('user_id', $user->id)
+                                    ->where('shift_date', $date))
+                        )
                         ->orderBy('shifts.start_time'),
                     'shifts.users' => fn(BelongsToMany $query) => $query
                         ->where('shift_user.shift_date', '=', $date)
@@ -51,35 +59,19 @@ class GetLocationsForShifts
                         )
                 ]
             )
-            ->where('locations.is_enabled', true)
-            ->get()
             ->when(
             // If the user is restricted, then...
                 value: $user?->is_restricted,
-                callback: fn(Collection $locations) => $locations
-                    // Filter out the locations that don't have a shift for the user
-                    ->filter(
-                        fn(Location $location) => $location->shifts->contains(
-                            fn(Shift $shift) => $shift->users->contains(
-                                fn(User $shiftUser) => $shiftUser->id === $user->id
-                            )
-                        )
-                    )
-                    // Filter out the shifts that the user isn't rostered on to
-                    ->each(
-                        fn(Location $location) => $location->shifts = $location->shifts->filter(
-                            fn(Shift $shift) => $shift->users->isNotEmpty()
-                                && $shift->users->contains(fn(User $shiftUser) => $shiftUser->id === $user->id)
-                        )
+                callback: fn(Builder $query) => $query
+                    // Exclude locations that don't have a shift for the user
+                    ->whereHas('shifts', fn(Builder $query) => $query
+                        ->whereHas('users', fn(Builder $query) => $query
+                            ->where('user_id', $user->id)
+                            ->where('shift_date', $date))
                     )
             )
-            ->each(
-                fn(Location $location) => $location->shifts->each(
-                    fn(Shift $shift) => $shift->users->map(
-                        fn(User $user) => $user->id = null
-                    )
-                )
-            );
+            ->where('locations.is_enabled', true)
+            ->get();
     }
 
     /**
@@ -87,18 +79,12 @@ class GetLocationsForShifts
      */
     protected function mapUserFields(array $userFields): array
     {
-        $mapped = Arr::map($userFields, static function (string $item) {
+        return Arr::map($userFields, static function (string $item) {
             if (Str::startsWith($item, 'users.')) {
                 return $item;
             }
 
             return "users.$item";
         });
-
-        if (!Arr::exists($mapped, 'users.id')) {
-            $mapped[] = 'users.id';
-        }
-
-        return $mapped;
     }
 }
