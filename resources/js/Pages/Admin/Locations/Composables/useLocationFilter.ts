@@ -181,10 +181,6 @@ export default function(timezone: Ref<string>, canAdmin = false) {
       }
 
       for (const shift of location.shifts as Shift[]) {
-        // const volunteers = shift.volunteers || [];
-        // shift.filterVolunteers = volunteers;
-        // shift.filterVolunteers = volunteers.filter((volunteer) => volunteer.shift_date === formattedDate.value);
-        // delete shift.volunteers;
         if (location.requires_brother) {
           let femaleCount = 0;
           for (const filVolunteer of shift.volunteers) {
