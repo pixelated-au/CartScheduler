@@ -7,6 +7,7 @@ import { configureVueProject, defineConfigWithVueTs, vueTsConfigs } from "@vue/e
 import { globalIgnores } from "eslint/config";
 import { createTypeScriptImportResolver } from "eslint-import-resolver-typescript";
 import { importX } from "eslint-plugin-import-x";
+import unusedImports from "eslint-plugin-unused-imports";
 import pluginVue from "eslint-plugin-vue";
 import globals from "globals";
 
@@ -58,6 +59,9 @@ export default defineConfigWithVueTs([
   {
     name: "eslint-ts",
     extends: [vueTsConfigs.recommended],
+    plugins: {
+      "unused-imports": unusedImports,
+    },
     files: ["./*.ts", "./resources/js/**/*.{ts,vue}"],
     languageOptions: {
       parserOptions: {
@@ -66,6 +70,7 @@ export default defineConfigWithVueTs([
       },
     },
     rules: {
+      "@typescript-eslint/no-unused-vars": "off", // Handled by eslint-plugin-unused-imports
       "@typescript-eslint/ban-ts-comment": ["warn", { "ts-nocheck": "allow-with-description" }],
       "@typescript-eslint/consistent-type-imports": [
         "warn",
@@ -80,6 +85,16 @@ export default defineConfigWithVueTs([
       "@typescript-eslint/no-import-type-side-effects": "warn",
       "@typescript-eslint/no-unused-expressions": ["warn", { allowShortCircuit: true, allowTernary: true }],
       "@typescript-eslint/no-unused-vars": "warn",
+      "unused-imports/no-unused-imports": "error",
+      "unused-imports/no-unused-vars": [
+        "warn",
+        {
+          "vars": "all",
+          "varsIgnorePattern": "^_",
+          "args": "after-used",
+          "argsIgnorePattern": "^_",
+        },
+      ],
     },
   },
   {
