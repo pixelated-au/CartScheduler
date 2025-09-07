@@ -5,10 +5,11 @@ import JetActionMessage from "@/Jetstream/ActionMessage.vue";
 import JetFormSection from "@/Jetstream/FormSection.vue";
 import JetInputError from "@/Jetstream/InputError.vue";
 import JetLabel from "@/Jetstream/Label.vue";
+import type { AuthUser } from "@/shims";
 
-const props = defineProps({
-  user: Object,
-});
+const { user } = defineProps<{
+  user: AuthUser;
+}>();
 
 const extendedPrecognition = useExtendedPrecognition();
 const toast = useToast();
@@ -17,8 +18,8 @@ const form = extendedPrecognition({
   routeName: "user-profile-information.update",
   method: "put",
 }, {
-  name: props.user.name,
-  email: props.user.email,
+  name: user.name,
+  email: user.email,
 });
 
 const updateProfileInformation = () => form.submit({

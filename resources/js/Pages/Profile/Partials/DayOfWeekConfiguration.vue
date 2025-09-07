@@ -2,10 +2,10 @@
 import Slider from "@vueform/slider";
 import { computed } from "vue";
 import { numberOfWeeks } from "@/Composables/useAvailabilityActions";
-import type { Hour, FormattedTooltip } from "@/Composables/useAvailabilityActions";
+import type { FormattedTooltip } from "@/Composables/useAvailabilityActions";
 
 const { hoursEachDay, numberOfDaysPerMonth, start, end, label, tooltipFormat } = defineProps<{
-  hoursEachDay: Hour[];
+  hoursEachDay: App.Enums.AvailabilityHours[];
   numberOfDaysPerMonth: number;
   start: number;
   end: number;
