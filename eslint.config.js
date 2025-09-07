@@ -84,7 +84,6 @@ export default defineConfigWithVueTs([
       "@typescript-eslint/no-floating-promises": ["warn", { ignoreVoid: true }],
       "@typescript-eslint/no-import-type-side-effects": "warn",
       "@typescript-eslint/no-unused-expressions": ["warn", { allowShortCircuit: true, allowTernary: true }],
-      "@typescript-eslint/no-unused-vars": "warn",
       "unused-imports/no-unused-imports": "error",
       "unused-imports/no-unused-vars": [
         "warn",
@@ -96,6 +95,18 @@ export default defineConfigWithVueTs([
         },
       ],
     },
+  },
+  {
+    name: "eslint-ts-testing",
+    files: ["./resources/js/**/*.test.ts"],
+    "@typescript-eslint/consistent-type-imports": [
+      "warn",
+      {
+        prefer: "type-imports",
+        fixStyle: "separate-type-imports",
+        disallowTypeAnnotations: false,
+      },
+    ],
   },
   {
     name: "eslint-import-x",
