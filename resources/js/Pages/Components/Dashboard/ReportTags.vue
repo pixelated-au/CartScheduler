@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { inject, ref } from "vue";
-import { ReportTags } from "@/lib/provide-inject-keys";
 import ReportTagButton from "@/Pages/Components/Dashboard/ReportTagButton.vue";
+import { ReportTags } from "@/Utils/provide-inject-keys";
 
 const emit = defineEmits(["toggled"]);
 

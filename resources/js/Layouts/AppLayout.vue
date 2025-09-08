@@ -5,8 +5,8 @@ import { differenceInDays } from "date-fns";
 import { computed, onMounted, provide, ref } from "vue";
 import ObtrusiveNotification from "@/Components/ObtrusiveNotification.vue";
 import { useDarkMode } from "@/Composables/useDarkMode.js";
-import { EnableUserAvailability } from "@/lib/provide-inject-keys.js"; // TODO AFTER REMOVING FLOATING-VUE, DELETE
 import { useGlobalState } from "@/store";
+import { EnableUserAvailability } from "@/Utils/provide-inject-keys.js"; // TODO AFTER REMOVING FLOATING-VUE, DELETE
 import "@vuepic/vue-datepicker/dist/main.css"; // FIXME AFTER REMOVING VUE-DATEPICKER, DELETE
 import "floating-vue/dist/style.css";
 

@@ -6,7 +6,7 @@ import JetActionMessage from "@/Jetstream/ActionMessage.vue";
 import JetFormSection from "@/Jetstream/FormSection.vue";
 import JetInputError from "@/Jetstream/InputError.vue";
 import JetLabel from "@/Jetstream/Label.vue";
-import precognitiveForm from "@/lib/precognitiveForm";
+import precognitiveForm from "@/Utils/precognitiveForm";
 
 const passwordInput = useTemplateRef("passwordInput");
 const currentPasswordInput = useTemplateRef("currentPasswordInput");

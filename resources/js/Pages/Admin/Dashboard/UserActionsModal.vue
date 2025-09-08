@@ -7,11 +7,10 @@ import UserTableOptionalFields from "@/Components/UserTableOptionalFields.vue";
 import JetHelpText from "@/Jetstream/HelpText.vue";
 import JetInput from "@/Jetstream/Input.vue";
 import JetLabel from "@/Jetstream/Label.vue";
-import JetSecondaryButton from "@/Jetstream/SecondaryButton.vue";
 import JetToggle from "@/Jetstream/Toggle.vue";
-import { EnableUserAvailability } from "@/lib/provide-inject-keys.js";
 import UserTable from "@/Pages/Admin/Dashboard/UserTable.vue";
 import { useGlobalState } from "@/store";
+import { EnableUserAvailability } from "@/Utils/provide-inject-keys.js";
 import type { Location, Shift } from "@/Pages/Admin/Locations/Composables/useLocationFilter";
 
 const props = defineProps<{

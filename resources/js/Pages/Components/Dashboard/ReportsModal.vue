@@ -2,8 +2,8 @@
 import { isAxiosError } from "axios";
 import { onMounted, provide, ref } from "vue";
 import useToast from "@/Composables/useToast.js";
-import { ReportTags } from "@/lib/provide-inject-keys";
 import ReportForm from "@/Pages/Components/Dashboard/ReportForm.vue";
+import { ReportTags } from "@/Utils/provide-inject-keys";
 
 const show = defineModel({ required: true, type: Boolean });
 

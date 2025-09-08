@@ -6,7 +6,7 @@ import { SVGRenderer } from "echarts/renderers";
 import { computed, provide } from "vue";
 import VChart, { THEME_KEY } from "vue-echarts";
 import { useDarkMode } from "@/Composables/useDarkMode.js";
-import EChartsTheme from "@/lib/eChartsTheme.js";
+import EChartsTheme from "@/Utils/eChartsTheme.js";
 
 const props = defineProps<{
   shiftData: App.Data.FilledShiftData[];

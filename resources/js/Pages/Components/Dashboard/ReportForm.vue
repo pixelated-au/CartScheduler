@@ -6,8 +6,8 @@ import SubmitButton from "@/Components/Form/Buttons/SubmitButton.vue";
 import useToast from "@/Composables/useToast.js";
 import JetInputError from "@/Jetstream/InputError.vue";
 import JetLabel from "@/Jetstream/Label.vue";
-import { ReportTags as ReportTagsKey } from "@/lib/provide-inject-keys";
 import ReportTags from "@/Pages/Components/Dashboard/ReportTags.vue";
+import { ReportTags as ReportTagsKey } from "@/Utils/provide-inject-keys";
 import type { AxiosError } from "axios";
 import type { ErrorBag, LaravelValidationResponse, TwentyFourHourTime } from "@/types/types";
 

@@ -8,7 +8,7 @@ import useToast from "@/Composables/useToast.js";
 import JetInputError from "@/Jetstream/InputError.vue";
 import JetLabel from "@/Jetstream/Label.vue";
 import JetSectionBorder from "@/Jetstream/SectionBorder.vue";
-import dateStringToDateObject from "@/lib/dateStringToDateObject";
+import dateStringToDateObject from "@/Utils/dateStringToDateObject";
 import type { FormErrors } from "@/types/types";
 // https://vue3datepicker.com/
 

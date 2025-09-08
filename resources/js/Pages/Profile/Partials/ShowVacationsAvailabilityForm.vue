@@ -9,8 +9,8 @@ import JetActionMessage from "@/Jetstream/ActionMessage.vue";
 import JetFormSection from "@/Jetstream/FormSection.vue";
 import JetInput from "@/Jetstream/Input.vue";
 import JetInputError from "@/Jetstream/InputError.vue";
-import precognitiveForm from "@/lib/precognitiveForm";
 import VacationDateRange from "@/Pages/Profile/Partials/VacationDateRange.vue";
+import precognitiveForm from "@/Utils/precognitiveForm";
 
 const { vacations = [], userId } = defineProps<{
   vacations?: Array<App.Data.UserVacationData>;

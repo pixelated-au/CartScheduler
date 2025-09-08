@@ -8,8 +8,8 @@ import JetConfirmationModal from "@/Jetstream/ConfirmationModal.vue";
 import JetFormSection from "@/Jetstream/FormSection.vue";
 import JetInputError from "@/Jetstream/InputError.vue";
 import JetLabel from "@/Jetstream/Label.vue";
-import blockNavigation from "@/lib/blockNavigation";
-import precognitiveForm from "@/lib/precognitiveForm.js";
+import blockNavigation from "@/Utils/blockNavigation";
+import precognitiveForm from "@/Utils/precognitiveForm.js";
 
 const props = defineProps<{
   user: App.Data.UserAdminData;

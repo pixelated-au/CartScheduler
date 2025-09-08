@@ -7,9 +7,9 @@ import Comment from "@/Components/Icons/Comment.vue";
 import QuestionCircle from "@/Components/Icons/QuestionCircle.vue";
 import UserAdd from "@/Components/Icons/UserAdd.vue";
 import useToast from "@/Composables/useToast";
-import { EnableUserAvailability } from "@/lib/provide-inject-keys";
 import FilledShiftsIndicator from "@/Pages/Admin/Dashboard/FilledShiftsIndicator.vue";
 import { useGlobalState } from "@/store";
+import { EnableUserAvailability } from "@/Utils/provide-inject-keys";
 
 const props = defineProps({
   shift: {
