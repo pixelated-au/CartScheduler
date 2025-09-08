@@ -42,12 +42,12 @@ const form = useForm({
   comments: availability.comments || "",
 });
 
-const { computedRange, toggleRosterDay, tooltipFormat } = useAvailabilityActions(form, ranges);
+const { computedRange, dayToggle, tooltipFormat } = useAvailabilityActions(form, ranges);
 
 const rosters = reactive(
   Object.entries(days).map(([name, label]) => ({
     label,
-    value: toggleRosterDay(name as Day),
+    value: dayToggle(name as Day),
   })),
 );
 
