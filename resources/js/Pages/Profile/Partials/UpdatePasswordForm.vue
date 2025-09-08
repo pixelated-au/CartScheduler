@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { nextTick, useTemplateRef } from "vue";
 import SubmitButton from "@/Components/Form/Buttons/SubmitButton.vue";
-import useExtendedPrecognition from "@/Composables/useExtendedPrecognition";
+import precognitiveForm from "@/Composables/precognitiveForm";
 import useToast from "@/Composables/useToast";
 import JetActionMessage from "@/Jetstream/ActionMessage.vue";
 import JetFormSection from "@/Jetstream/FormSection.vue";
@@ -11,10 +11,9 @@ import JetLabel from "@/Jetstream/Label.vue";
 const passwordInput = useTemplateRef("passwordInput");
 const currentPasswordInput = useTemplateRef("currentPasswordInput");
 
-const extendedPrecognition = useExtendedPrecognition();
 const toast = useToast();
 
-const form = extendedPrecognition({
+const form = precognitiveForm({
   routeName: "user-password.update",
   method: "put",
 }, {

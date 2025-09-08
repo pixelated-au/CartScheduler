@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import useExtendedPrecognition from "@/Composables/useExtendedPrecognition";
+import precognitiveForm from "@/Composables/precognitiveForm";
 import useToast from "@/Composables/useToast";
 import JetActionMessage from "@/Jetstream/ActionMessage.vue";
 import JetFormSection from "@/Jetstream/FormSection.vue";
@@ -11,10 +11,9 @@ const { user } = defineProps<{
   user: AuthUser;
 }>();
 
-const extendedPrecognition = useExtendedPrecognition();
 const toast = useToast();
 
-const form = extendedPrecognition({
+const form = precognitiveForm({
   routeName: "user-profile-information.update",
   method: "put",
 }, {

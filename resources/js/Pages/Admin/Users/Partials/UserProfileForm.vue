@@ -2,7 +2,7 @@
 import { Link, router } from "@inertiajs/vue3";
 import { isAxiosError } from "axios";
 import { nextTick, ref, watch } from "vue";
-import useExtendedPrecognition from "@/Composables/useExtendedPrecognition.js";
+import precognitiveForm from "@/Composables/precognitiveForm.js";
 import useToast from "@/Composables/useToast.js";
 import JetActionMessage from "@/Jetstream/ActionMessage.vue";
 import JetConfirmationModal from "@/Jetstream/ConfirmationModal.vue";
@@ -20,10 +20,9 @@ defineEmits([
   "cancel",
 ]);
 
-const extendedPrecognition = useExtendedPrecognition();
 const toast = useToast();
 
-const form = extendedPrecognition({
+const form = precognitiveForm({
   routeName: props.action === "edit" ? "admin.users.update" : "admin.users.store",
   id: props.user.id,
 }, {

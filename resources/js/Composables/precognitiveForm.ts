@@ -13,12 +13,9 @@ export interface Settings {
  * Uses HTTP PUT if an id is provided, otherwise uses POST. Automatically sets the route
  * and passes the provided inputs to the form instance.
  */
-export default function useExtendedPrecognition() {
-
-  return <Data extends Record<string, FormDataConvertible>>(settings: Settings, inputs: Data) => {
-    const method = settings.method || (settings.id ? "put" : "post");
-    return settings.id
-      ? useForm(method, route(settings.routeName, settings.id), inputs)
-      : useForm(method, route(settings.routeName), inputs);
-  };
+export default function precognitiveForm<Data extends Record<string, FormDataConvertible>>(settings: Settings, inputs: Data) {
+  const method = settings.method || (settings.id ? "put" : "post");
+  return settings.id
+    ? useForm(method, route(settings.routeName, settings.id), inputs)
+    : useForm(method, route(settings.routeName), inputs);
 }

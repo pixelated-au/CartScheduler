@@ -4,7 +4,7 @@ import SubmitButton from "@/Components/Form/Buttons/SubmitButton.vue";
 import CloseCircle from "@/Components/Icons/CloseCircle.vue";
 import QuestionCircle from "@/Components/Icons/QuestionCircle.vue";
 import InputTextEIPField from "@/Components/InputTextEIPField.vue";
-import useExtendedPrecognition from "@/Composables/useExtendedPrecognition";
+import precognitiveForm from "@/Composables/precognitiveForm";
 import useToast from "@/Composables/useToast";
 import JetActionMessage from "@/Jetstream/ActionMessage.vue";
 import JetFormSection from "@/Jetstream/FormSection.vue";
@@ -17,10 +17,9 @@ const { vacations = [], userId } = defineProps<{
   userId?: number;
 }>();
 
-const extendedPrecognition = useExtendedPrecognition();
 const toast = useToast();
 
-const form = extendedPrecognition({
+const form = precognitiveForm({
   routeName: "update.user.vacations",
   method: "put",
 }, {
