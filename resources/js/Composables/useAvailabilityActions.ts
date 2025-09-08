@@ -1,7 +1,7 @@
 import { computed } from "vue";
 import type { useForm } from "@inertiajs/vue3";
 import type { Number } from "ts-toolbelt";
-import type { ComputedRef, Ref } from "vue";
+import type { Ref, WritableComputedRef } from "vue";
 
 /**
  * Number.Range<n1, n2> returns a tuple. When appending [number], it acts as an index signature, retrieving the type of
@@ -37,8 +37,11 @@ export const numberOfWeeks = {
 };
 
 function tooltipFormat(value: App.Enums.AvailabilityHours): string {
-    // seems to be a rounding issue with the slider. Math.round resolves it.
+  // seems to be a rounding issue with the slider. Math.round resolves it.
   value = Math.round(value) as App.Enums.AvailabilityHours;
+  if (value === 0) {
+    return "12am";
+  }
   if (value < 12) {
     return `${value}am`;
   }
@@ -61,14 +64,16 @@ export default function useAvailabilityActions(
     return range;
   };
 
-  function toggleRosterDay(day: Day): ComputedRef<boolean> {
+  /** This is used by a modelValue */
+  function dayToggle(day: Day): WritableComputedRef<boolean> {
     return computed({
       get: () => (form[`num_${day}s`] as number) > 0,
       set: (value: boolean) => form[`num_${day}s`] = (value ? 1 : 0),
     });
   }
 
-  function computedRange(day: Day): ComputedRef<App.Enums.AvailabilityHours[]> {
+  /** This is used by a modelValue */
+  function computedRange(day: Day): WritableComputedRef<App.Enums.AvailabilityHours[]> {
     return computed({
       get: () => {
         const dayArray = form[`day_${day}`] as App.Enums.AvailabilityHours[];
@@ -84,7 +89,7 @@ export default function useAvailabilityActions(
 
   return {
     computedRange,
-    toggleRosterDay,
+    dayToggle,
     tooltipFormat,
   };
 }
