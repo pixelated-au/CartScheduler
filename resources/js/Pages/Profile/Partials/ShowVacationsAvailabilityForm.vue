@@ -4,12 +4,12 @@ import SubmitButton from "@/Components/Form/Buttons/SubmitButton.vue";
 import CloseCircle from "@/Components/Icons/CloseCircle.vue";
 import QuestionCircle from "@/Components/Icons/QuestionCircle.vue";
 import InputTextEIPField from "@/Components/InputTextEIPField.vue";
-import precognitiveForm from "@/Composables/precognitiveForm";
 import useToast from "@/Composables/useToast";
 import JetActionMessage from "@/Jetstream/ActionMessage.vue";
 import JetFormSection from "@/Jetstream/FormSection.vue";
 import JetInput from "@/Jetstream/Input.vue";
 import JetInputError from "@/Jetstream/InputError.vue";
+import precognitiveForm from "@/lib/precognitiveForm";
 import VacationDateRange from "@/Pages/Profile/Partials/VacationDateRange.vue";
 
 const { vacations = [], userId } = defineProps<{

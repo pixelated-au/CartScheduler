@@ -2,7 +2,6 @@
 import { Link, router } from "@inertiajs/vue3";
 import { isAxiosError } from "axios";
 import { nextTick, ref, watch } from "vue";
-import precognitiveForm from "@/Composables/precognitiveForm.js";
 import useToast from "@/Composables/useToast.js";
 import JetActionMessage from "@/Jetstream/ActionMessage.vue";
 import JetConfirmationModal from "@/Jetstream/ConfirmationModal.vue";
@@ -10,6 +9,7 @@ import JetFormSection from "@/Jetstream/FormSection.vue";
 import JetInputError from "@/Jetstream/InputError.vue";
 import JetLabel from "@/Jetstream/Label.vue";
 import blockNavigation from "@/lib/blockNavigation";
+import precognitiveForm from "@/lib/precognitiveForm.js";
 
 const props = defineProps<{
   user: App.Data.UserAdminData;

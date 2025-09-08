@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import precognitiveForm from "@/Composables/precognitiveForm";
 import useToast from "@/Composables/useToast";
 import JetActionMessage from "@/Jetstream/ActionMessage.vue";
 import JetFormSection from "@/Jetstream/FormSection.vue";
 import JetInputError from "@/Jetstream/InputError.vue";
 import JetLabel from "@/Jetstream/Label.vue";
+import precognitiveForm from "@/lib/precognitiveForm";
 import type { AuthUser } from "@/shims";
 
 const { user } = defineProps<{

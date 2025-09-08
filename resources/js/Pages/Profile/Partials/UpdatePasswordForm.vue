@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { nextTick, useTemplateRef } from "vue";
 import SubmitButton from "@/Components/Form/Buttons/SubmitButton.vue";
-import precognitiveForm from "@/Composables/precognitiveForm";
 import useToast from "@/Composables/useToast";
 import JetActionMessage from "@/Jetstream/ActionMessage.vue";
 import JetFormSection from "@/Jetstream/FormSection.vue";
 import JetInputError from "@/Jetstream/InputError.vue";
 import JetLabel from "@/Jetstream/Label.vue";
+import precognitiveForm from "@/lib/precognitiveForm";
 
 const passwordInput = useTemplateRef("passwordInput");
 const currentPasswordInput = useTemplateRef("currentPasswordInput");
