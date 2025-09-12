@@ -12,24 +12,23 @@ export function useDarkMode() {
 
   const isDarkMode = computed(() => colorMode.value === "dark");
 
-  const setMode = (mode: string) => {
-    nextTick(() => {
-      if (mode) {
-        store.value = mode;
-        return;
-      }
-      store.value = isDarkMode.value ? "light" : "dark";
-    });
+  const setMode = async (mode?: "dark" | "light" | "auto") => {
+    await nextTick();
+    if (mode) {
+      store.value = mode;
+      return;
+    }
+    store.value = isDarkMode.value ? "light" : "dark";
   };
 
   const toggleDarkMode = (mode?: "light" | "dark") => {
     if (!document.startViewTransition) {
-      setMode(mode);
+      void setMode(mode);
       return;
     }
 
     document.startViewTransition(() => {
-      setMode(mode);
+      void setMode(mode);
     });
 
   };
