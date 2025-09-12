@@ -1,4 +1,4 @@
-// noinspection NpmUsedModulesInstalled
+// noinspection NpmUsedModulesInstalled,JSUnresolvedReference
 
 import { resolve } from "node:path";
 import css from "@eslint/css";
@@ -98,7 +98,8 @@ export default defineConfigWithVueTs([
   },
   {
     name: "eslint-ts-testing",
-    files: ["./resources/js/**/*.test.ts"],
+    extends: [vueTsConfigs.recommended],
+    files: ["./resources/js/__tests__/*.test.ts"],
     "@typescript-eslint/consistent-type-imports": [
       "warn",
       {
