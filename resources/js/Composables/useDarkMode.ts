@@ -7,9 +7,7 @@ import { computed, nextTick } from "vue";
  */
 export function useDarkMode() {
   const { system, store } = useColorMode();
-
   const colorMode = computed(() => store.value === "auto" ? system.value : store.value);
-
   const isDarkMode = computed(() => colorMode.value === "dark");
 
   const setMode = async (mode?: "dark" | "light" | "auto") => {
@@ -21,9 +19,9 @@ export function useDarkMode() {
     store.value = isDarkMode.value ? "light" : "dark";
   };
 
-  const toggleDarkMode = (mode?: "light" | "dark") => {
+  const toggleDarkMode = async (mode?: "light" | "dark") => {
     if (!document.startViewTransition) {
-      void setMode(mode);
+      await setMode(mode);
       return;
     }
 
