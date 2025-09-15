@@ -16,7 +16,7 @@ import {
   subMonths,
 } from "date-fns";
 import { utcToZonedTime } from "date-fns-tz";
-import { computed, defineEmits, defineProps, ref, watchEffect } from "vue";
+import { computed, ref, watchEffect } from "vue";
 import type { DatePickerDateSlotOptions, DatePickerMonthChangeEvent } from "primevue";
 import type { AuthUser } from "@/shims";
 
