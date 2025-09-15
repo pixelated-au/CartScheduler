@@ -2,7 +2,7 @@
 import { usePage } from "@inertiajs/vue3";
 import { isAxiosError } from "axios";
 import { format, isSameDay, parse } from "date-fns";
-import { computed, ref, watch } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import ComponentSpinner from "@/Components/ComponentSpinner.vue";
 import EmptySlot from "@/Components/Icons/EmptySlot.vue";
 import User from "@/Components/Icons/User.vue";
@@ -136,6 +136,10 @@ const reservationWatch = watch(firstReservationForUser, (val) => {
     return;
   }
   accordionExpandIndex.value = val;
+});
+
+onMounted(() => {
+  void getShifts();
 });
 </script>
 

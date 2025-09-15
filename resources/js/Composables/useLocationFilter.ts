@@ -1,7 +1,8 @@
+import axios from "axios";
 import { endOfDay, formatISO, isAfter, isBefore, isSameDay, parse, setHours } from "date-fns";
 import { utcToZonedTime } from "date-fns-tz";
 import { cloneDeep } from "lodash";
-import { computed, onMounted, ref, shallowRef, watch } from "vue";
+import { computed, ref, shallowRef, watch } from "vue";
 import type { Ref } from "vue";
 
 export type Location = App.Data.AvailableShiftsData["locations"][number] & {
@@ -49,10 +50,6 @@ export default function(timezone: Ref<string>, canAdmin = false) {
       }
     }
   };
-
-  onMounted(() => {
-    void getShifts();
-  });
 
   const formattedDate = computed(() =>
     date.value

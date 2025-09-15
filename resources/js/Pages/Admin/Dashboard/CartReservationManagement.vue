@@ -2,7 +2,7 @@
 import { usePage } from "@inertiajs/vue3";
 import axios, { isAxiosError } from "axios";
 import { format, parse } from "date-fns";
-import { computed, reactive, ref } from "vue";
+import { computed, onMounted, reactive, ref } from "vue";
 import ComponentSpinner from "@/Components/ComponentSpinner.vue";
 import EmptySlot from "@/Components/Icons/EmptySlot.vue";
 import User from "@/Components/Icons/User.vue";
@@ -223,6 +223,10 @@ const locationClasses = (location: Location) => location.freeShifts
   : "text-gray-400 dark:text-gray-500 border-gray-400 group-hover:bg-gray-400 group-hover:text-gray-50";
 
 const accordionExpandIndex = ref<number | undefined>(undefined);
+
+onMounted(() => {
+  void getShifts();
+});
 </script>
 
 <template>
