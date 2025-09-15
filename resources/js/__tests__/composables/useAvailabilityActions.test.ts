@@ -1,7 +1,7 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
-import useAvailabilityActions from "@/Composables/useAvailabilityActions";
 import { useForm } from "@inertiajs/vue3";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { ref } from "vue";
+import useAvailabilityActions from "@/Composables/useAvailabilityActions";
 
 const getAvailabilityActions = (settings: Partial<App.Data.AvailabilityData> | undefined = {}) => {
   const form = useForm<App.Data.AvailabilityData>({
@@ -23,9 +23,8 @@ const getAvailabilityActions = (settings: Partial<App.Data.AvailabilityData> | u
 
   return {
     form,
-    useAvailabilityActions: useAvailabilityActions(form, ref({ start: 6, end: 22 })
-)
-};
+    useAvailabilityActions: useAvailabilityActions(form, ref({ start: 6, end: 22 })),
+  };
 };
 
 // Import the mocked useAvailabilityActions
@@ -37,7 +36,7 @@ describe("useAvailabilityActions", () => {
   it("formats the tooltip properly", () => {
     const { useAvailabilityActions } = getAvailabilityActions();
     const { tooltipFormat } = useAvailabilityActions;
-    
+
     expect(tooltipFormat(0)).toBe("12am");
     expect(tooltipFormat(3)).toBe("3am");
     expect(tooltipFormat(12)).toBe("12pm");
@@ -75,8 +74,8 @@ describe("useAvailabilityActions", () => {
     const day = dayToggle("saturday");
     expect(day.value).toBe(false);
     expect(form.num_saturdays).toBe(0);
-    day.value = true
+    day.value = true;
     expect(day.value).toBe(true);
     expect(form.num_saturdays).toBe(1);
-  })
+  });
 });
