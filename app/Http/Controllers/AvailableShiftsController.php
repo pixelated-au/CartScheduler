@@ -7,6 +7,7 @@ use App\Actions\GetLocationsForShifts;
 use App\Actions\GetMaxShiftReservationDateAllowed;
 use App\Actions\GetUserShiftsData;
 use App\Data\AvailableShiftsData;
+use App\Data\LocationData;
 use Bugsnag\BugsnagLaravel\Facades\Bugsnag;
 use Carbon\Carbon;
 use Carbon\Exceptions\InvalidFormatException;
@@ -64,7 +65,7 @@ class AvailableShiftsController extends Controller
             : [];
 
         return AvailableShiftsData::from([
-            'locations'          => $locations,
+            'locations'          => LocationData::collect($locations),
             'shifts'             => $shifts,
             'freeShifts'         => $freeShiftsCount,
             'maxDateReservation' => $formattedEndDate,
