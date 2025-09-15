@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { usePage } from "@inertiajs/vue3";
-import { isAxiosError } from "axios";
+import axios, { isAxiosError } from "axios";
 import { format, parse } from "date-fns";
 import { computed, reactive, ref } from "vue";
 import ComponentSpinner from "@/Components/ComponentSpinner.vue";
@@ -9,14 +9,13 @@ import User from "@/Components/Icons/User.vue";
 import UserAdd from "@/Components/Icons/UserAdd.vue";
 import UserRemove from "@/Components/Icons/UserRemove.vue";
 import MoveUserSelectField from "@/Components/MoveUserSelectField.vue";
+import useLocationFilter from "@/Composables/useLocationFilter";
 import useToast from "@/Composables/useToast";
 import JetConfirmModal from "@/Jetstream/ConfirmationModal.vue";
 import UserActionsModal from "@/Pages/Admin/Dashboard/UserActionsModal.vue";
-import useLocationFilter from "@/Pages/Admin/Locations/Composables/useLocationFilter";
 import DatePicker from "@/Pages/Components/Dashboard/DatePicker.vue";
-import { useGlobalState } from "@/store";
 import type { Ref } from "vue";
-import type { Location, Shift } from "@/Pages/Admin/Locations/Composables/useLocationFilter";
+import type { Location, Shift } from "@/Composables/useLocationFilter";
 import type { LocationsOnDate } from "@/Pages/Components/Dashboard/DatePicker.vue";
 
 const toast = useToast();
@@ -84,8 +83,6 @@ const moveVolunteer = async () => {
 
   const timeoutId = setTimeout(() => isLoading.value = true, 1000);
 
-  selectedMoveUser.value = undefined;
-
   try {
     await axios.put(route("admin.move-volunteer-to-shift"), {
       user_id: volunteerId,
@@ -103,6 +100,7 @@ const moveVolunteer = async () => {
       throw e;
     }
   } finally {
+    selectedMoveUser.value = undefined;
     await getShifts(false);
     clearTimeout(timeoutId);
     isLoading.value = false;
@@ -137,9 +135,7 @@ const assignVolunteer = async ({ volunteerId, volunteerName, location, shift }: 
     }
   } finally {
     await getShifts(false);
-
     clearTimeout(timeoutId);
-
     isLoading.value = false;
   }
 };
@@ -166,8 +162,6 @@ const removeVolunteer = async () => {
     });
 
     toast.warning(`${selectedRemoveUser.value!.volunteer.name} was removed from ${selectedRemoveUser.value!.location.name} at ${selectedRemoveUser.value!.shift.start_time}`);
-
-    selectedRemoveUser.value = undefined;
   } catch (e) {
     if (isAxiosError(e) && e.response?.data?.message) {
       toast.error(e.response.data.message);
@@ -175,6 +169,7 @@ const removeVolunteer = async () => {
       throw e;
     }
   } finally {
+    selectedRemoveUser.value = undefined;
     await getShifts(false);
 
     clearTimeout(timeoutId);
@@ -228,9 +223,6 @@ const locationClasses = (location: Location) => location.freeShifts
   : "text-gray-400 dark:text-gray-500 border-gray-400 group-hover:bg-gray-400 group-hover:text-gray-50";
 
 const accordionExpandIndex = ref<number | undefined>(undefined);
-
-const state = useGlobalState();
-const columnFilters = computed(() => state.value["columnFilters"]);
 </script>
 
 <template>
@@ -246,14 +238,14 @@ const columnFilters = computed(() => state.value["columnFilters"]);
       </ComponentSpinner>
     </div>
     <ComponentSpinner :show="isLoading" class="min-h-[200px] sm:min-h-full">
-      <PAccordion v-if="!isLoading" v-model:value="accordionExpandIndex" class="border border-std rounded border-b-0">
+      <PAccordion v-if="!isLoading" v-model:value="accordionExpandIndex" class="rounded border border-b-0 border-std">
         <PAccordionPanel v-for="location in locations" :key="location.id" :value="location.id" class="group">
           <PAccordionHeader class="relative after:absolute after:bottom-2 after:left-0 after:right-0 group-[.p-accordionpanel-active]:after:block after:h-px after:hidden after:bg-gradient-to-r after:from-transparent after:from-20% after:via-surface-500/70 after:to-transparent after:to-80%">
             <div class="flex items-center dark:text-gray-200">
               <span class="dark:text-gray-200">
                 {{ location.name }}
               </span>
-              <div class="flex items-center py-1.5 ml-1 group font-bold">
+              <div class="flex items-center py-1.5 ml-1 font-bold group">
                 <div :class="locationClasses(location)"
                      class="flex justify-center items-center mr-2 ml-1 w-5 h-5 text-xs leading-none rounded-full border transition-colors">
                   {{ location.freeShifts }}
@@ -267,7 +259,7 @@ const columnFilters = computed(() => state.value["columnFilters"]);
             </div>
 
             <template #toggleicon="{ active }">
-              <span class="iconify mdi--chevron-down text-2xl ml-auto transition-rotate duration-500 delay-100 ease-in-out"
+              <span class="ml-auto text-2xl duration-500 ease-in-out delay-100 iconify mdi--chevron-down transition-rotate"
                     :class="active ? 'rotate-180' : ''" />
             </template>
           </PAccordionHeader>
