@@ -15,7 +15,7 @@ declare module 'vue' {
     Bell: typeof import('./../Components/Icons/Bell.vue')['default']
     BoldButton: typeof import('./../Components/EditorToolbar/BoldButton.vue')['default']
     CancelButton: typeof import('./../Components/Form/Buttons/CancelButton.vue')['default']
-    CartReservationManagement: typeof import('./../Components/CartReservationManagement.vue')['default']
+    CartReservationManagement: typeof import('../Pages/Admin/Dashboard/CartReservationManagement.vue')['default']
     CheckboxSelectField: typeof import('./../Components/CheckboxSelectField.vue')['default']
     CloseCircle: typeof import('./../Components/Icons/CloseCircle.vue')['default']
     Comment: typeof import('./../Components/Icons/Comment.vue')['default']
