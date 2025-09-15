@@ -16,8 +16,8 @@ class ShiftData extends Data
         public int $id,
         public string $start_time,
         public string $end_time,
-        public string|Optional $available_from,
-        public string|Optional $available_to,
+        public ?string $available_from,
+        public ?string $available_to,
         /** @var Collection<\App\Data\UserData> */
         public Collection|Optional $volunteers,
         public LocationData|Optional $location,
@@ -33,8 +33,8 @@ class ShiftData extends Data
             id: $shift->id,
             start_time: $shift->start_time,
             end_time: $shift->end_time,
-            available_from: $shift->available_from ?? Optional::create(),
-            available_to: $shift->available_to ?? Optional::create(),
+            available_from: $shift->available_from,
+            available_to: $shift->available_to,
             volunteers: $shift->relationLoaded('users')
                 ? UserData::collect($shift->users)
                 : Optional::create(),
