@@ -11,7 +11,7 @@ export type Location = App.Data.AvailableShiftsData["locations"][number] & {
 };
 
 export type Shift = Omit<App.Data.ShiftData, "volunteers"> & {
-  volunteers: App.Data.UserData[];
+  volunteers: Array<App.Data.UserData | null>;
   maxedFemales?: boolean;
   freeShifts: number;
 };
@@ -83,20 +83,18 @@ export default function(timezone: Ref<string>, canAdmin = false) {
   const setReservations = (maxVolunteers: number, shift: Shift, location: App.Data.LocationData) => {
     shift.freeShifts = 0;
 
-    const volunteers = (shift.volunteers as App.Data.UserData[]).sort((a, b) => {
-      // First, compare genders
-      if (a.gender !== b.gender) {
-        return b.gender.localeCompare(a.gender);
+    const volunteers = (shift.volunteers as Array<App.Data.UserData>).sort((a, b) => {
+      if (a.gender === b.gender) {
+        return 0;
       }
-      // If genders are the same, compare shift_id
-      return a.shift_id && b.shift_id
-        ? a.shift_id - b.shift_id
-        : 0;
+
+      return b.gender.localeCompare(a.gender);
     });
 
     const length = maxVolunteers >= volunteers.length ? maxVolunteers - volunteers.length : maxVolunteers;
 
     if (length) {
+      // Add nulls to the end of the array to indicate empty slots
       shift.freeShifts = length;
       const nullArray = Array(length).fill(null);
       shift.volunteers = [...volunteers, ...nullArray];
@@ -181,7 +179,7 @@ export default function(timezone: Ref<string>, canAdmin = false) {
         if (location.requires_brother) {
           let femaleCount = 0;
           for (const filVolunteer of shift.volunteers) {
-            if (filVolunteer.gender === "female") {
+            if (filVolunteer?.gender === "female") {
               femaleCount++;
             }
           }
@@ -192,7 +190,7 @@ export default function(timezone: Ref<string>, canAdmin = false) {
         freeShifts += shift.freeShifts;
         const dayOfWeek = date.value.getDay();
         const mappedDay = shift.js_days[dayOfWeek];
-        if (mappedDay === true) {
+        if (mappedDay) {
           addLocation(mappedLocations, location, shift);
         }
       }
