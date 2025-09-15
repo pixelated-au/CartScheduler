@@ -1,3 +1,6 @@
+/**
+ * This function will block navigation if an InertiaJS form is dirty.
+ */
 export default function blockNavigation<F extends { isDirty: boolean }>(form: F) {
   window.onbeforeunload = (event) => {
     if (form.isDirty) {
