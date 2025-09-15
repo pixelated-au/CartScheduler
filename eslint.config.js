@@ -16,6 +16,45 @@ configureVueProject({
   rootDir: resolve(import.meta.dirname),
 });
 
+const baseTsConfig = {
+  extends: [vueTsConfigs.recommended],
+  plugins: {
+    "unused-imports": unusedImports,
+  },
+  languageOptions: {
+    parserOptions: {
+      projectService: true,
+      tsconfigRootDir: import.meta.dirname,
+    },
+  },
+  rules: {
+    "@typescript-eslint/no-unused-vars": "off", // Handled by eslint-plugin-unused-imports
+    "@typescript-eslint/ban-ts-comment": ["warn", { "ts-nocheck": "allow-with-description" }],
+    "@typescript-eslint/consistent-type-imports": [
+      "warn",
+      {
+        prefer: "type-imports",
+        fixStyle: "separate-type-imports",
+        disallowTypeAnnotations: true,
+      },
+    ],
+    "@typescript-eslint/no-empty-object-type": "warn",
+    "@typescript-eslint/no-floating-promises": ["warn", { ignoreVoid: true }],
+    "@typescript-eslint/no-import-type-side-effects": "warn",
+    "@typescript-eslint/no-unused-expressions": ["warn", { allowShortCircuit: true, allowTernary: true }],
+    "unused-imports/no-unused-imports": "error",
+    "unused-imports/no-unused-vars": [
+      "warn",
+      {
+        "vars": "all",
+        "varsIgnorePattern": "^_",
+        "args": "after-used",
+        "argsIgnorePattern": "^_",
+      },
+    ],
+  },
+};
+
 export default defineConfigWithVueTs([
   importX.flatConfigs.recommended,
   importX.flatConfigs.typescript,
@@ -58,56 +97,24 @@ export default defineConfigWithVueTs([
   },
   {
     name: "eslint-ts",
-    extends: [vueTsConfigs.recommended],
-    plugins: {
-      "unused-imports": unusedImports,
-    },
+    ...baseTsConfig,
     files: ["./*.ts", "./resources/js/**/*.{ts,vue}"],
-    languageOptions: {
-      parserOptions: {
-        projectService: true,
-        tsconfigRootDir: import.meta.dirname,
-      },
-    },
+    ignores: ["./resources/js/__tests__/**/*.test.{ts,js}"],
+  },
+  {
+    name: "eslint-ts-testing",
+    ...baseTsConfig,
+    files: ["./resources/js/__tests__/**/*.test.{ts,js}"],
     rules: {
-      "@typescript-eslint/no-unused-vars": "off", // Handled by eslint-plugin-unused-imports
-      "@typescript-eslint/ban-ts-comment": ["warn", { "ts-nocheck": "allow-with-description" }],
       "@typescript-eslint/consistent-type-imports": [
         "warn",
         {
           prefer: "type-imports",
           fixStyle: "separate-type-imports",
-          disallowTypeAnnotations: true,
-        },
-      ],
-      "@typescript-eslint/no-empty-object-type": "warn",
-      "@typescript-eslint/no-floating-promises": ["warn", { ignoreVoid: true }],
-      "@typescript-eslint/no-import-type-side-effects": "warn",
-      "@typescript-eslint/no-unused-expressions": ["warn", { allowShortCircuit: true, allowTernary: true }],
-      "unused-imports/no-unused-imports": "error",
-      "unused-imports/no-unused-vars": [
-        "warn",
-        {
-          "vars": "all",
-          "varsIgnorePattern": "^_",
-          "args": "after-used",
-          "argsIgnorePattern": "^_",
+          disallowTypeAnnotations: false,
         },
       ],
     },
-  },
-  {
-    name: "eslint-ts-testing",
-    extends: [vueTsConfigs.recommended],
-    files: ["./resources/js/__tests__/*.test.ts"],
-    "@typescript-eslint/consistent-type-imports": [
-      "warn",
-      {
-        prefer: "type-imports",
-        fixStyle: "separate-type-imports",
-        disallowTypeAnnotations: false,
-      },
-    ],
   },
   {
     name: "eslint-import-x",
@@ -260,7 +267,10 @@ export default defineConfigWithVueTs([
   },
   {
     name: "eslint-stylistic",
-    files: ["./*.{ts,js}", "./resources/js/**/*.{ts,js,vue}"],
+    files: [
+      "./*.{ts,js}",
+      "./resources/js/**/*.{ts,js,vue}",
+    ],
     plugins: { "@stylistic": stylistic },
     rules: {
       "@stylistic/array-bracket-newline": ["off"],
