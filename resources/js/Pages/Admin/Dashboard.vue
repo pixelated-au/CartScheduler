@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Link } from "@inertiajs/vue3";
-import CartReservationManagement from "@/Components/CartReservationManagement.vue";
 import AppLayout from "@/Layouts/AppLayout.vue";
+import CartReservationManagement from "@/Pages/Admin/Dashboard/CartReservationManagement.vue";
 import FilledShiftsChart from "@/Pages/Admin/Dashboard/FilledShiftsChart.vue";
 import Tags from "@/Pages/Admin/Dashboard/Tags.vue";
 
