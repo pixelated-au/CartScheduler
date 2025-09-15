@@ -23,9 +23,9 @@ export default defineConfig({
     }),
     vueDevTools({
       appendTo: "resources/js/main.ts",
-            // Set the editor by setting the env var on your $PATH: export LAUNCH_EDITOR=[your editor path or executable]
-            // See: https://devtools.vuejs.org/getting-started/open-in-editor
-            // and https://github.com/webfansplz/vite-plugin-vue-inspector?tab=readme-ov-file#--configuration-ide--editor
+        // Set the editor by setting the env var on your $PATH: export LAUNCH_EDITOR=[your editor path or executable]
+        // See: https://devtools.vuejs.org/getting-started/open-in-editor
+        // and https://github.com/webfansplz/vite-plugin-vue-inspector?tab=readme-ov-file#--configuration-ide--editor
     }),
     Components({
       globs: [
@@ -41,7 +41,10 @@ export default defineConfig({
     }),
   ],
   server: {
-    host: "0.0.0.0",
+      // host: "0.0.0.0",
+    watch: {
+      ignored: ["node_modules", "vendor", path.resolve("./resources/js/__*__/**")],
+    },
   },
   resolve: {
     alias: {
