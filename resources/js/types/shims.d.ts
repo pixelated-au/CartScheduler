@@ -9,72 +9,13 @@ import type {
   ComponentCustomProperties as VueComponentCustomProperties,
   DefineComponent,
 } from "vue";
-import type { ToastSeverity } from "@/Composables/useToast";
 import type { route as routeFn } from "ziggy-js";
+import type { AppPageProps } from "./laravel-request-helpers";
 
 declare global {
   const route: typeof routeFn;
   const axios: Axios;
 }
-
-export type AuthUser = {
-  id: number;
-  uuid: string;
-  name: string;
-  email: string;
-  gender: string;
-};
-
-export type InertiaProps = {
-  pagePermissions: {
-    canAdmin?: true;
-    canEditSettings?: true;
-  };
-  shiftAvailability: {
-    timezone: string;
-    duration: number;
-    period: App.Enums.DBPeriod;
-    releasedDaily: boolean;
-    weekDayRelease: "SUN" | "MON" | "TUE" | "WED" | "THU" | "FRI" | "SAT";
-    systemShiftStartHour: number;
-    systemShiftEndHour: number;
-  };
-  hasUpdate?: boolean;
-  enableUserAvailability?: boolean;
-  needsToUpdateAvailability?: boolean;
-  enableUserLocationChoices?: boolean;
-  isUnrestricted?: true;
-  user: AuthUser;
-};
-
-interface Flash {
-  title?: string;
-  message?: string | undefined;
-  position?: "top" | "bottom" | "center";
-  /* @deprecated - Use message instead */
-  banner?: string;
-  /* @deprecated - Only use for 'success' messages */
-  bannerStyle?: ToastSeverity extends string ? ToastSeverity : undefined;
-}
-
-interface Jetstream {
-  jetstream: {
-    flash: Flash;
-    canCreateTeams: boolean;
-    canUpdateProfileInformation: boolean;
-    canUpdatePassword: boolean;
-    canManageTwoFactorAuthentication: boolean;
-    hasAccountDeletionFeatures: boolean;
-    hasApiFeatures: boolean;
-    hasTeamFeatures: boolean;
-    managesProfilePhotos: boolean;
-    hasEmailVerification: boolean;
-  };
-}
-
-export type AppPageProps<
-  T extends Record<string, unknown> | unknown[] = Record<string, unknown> | unknown[],
-> = InertiaProps & Jetstream & FlashMessage & T;
 
 declare module "vue" {
   const component: DefineComponent;
@@ -104,7 +45,8 @@ declare module "@vue/runtime-core" {
 }
 
 declare module "@inertiajs/core" {
-  interface PageProps extends InertiaPageProps, AppPageProps {}
+  interface PageProps extends InertiaPageProps, AppPageProps {
+  }
 }
 
 declare module "@inertiajs/vue3" {
