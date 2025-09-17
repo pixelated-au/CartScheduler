@@ -1,5 +1,6 @@
 import { useForm } from "laravel-precognition-vue-inertia";
 import type { FormDataConvertible } from "@inertiajs/core";
+import type { Form } from "@/types/shims";
 import type { ValidRouteName } from "ziggy-js";
 
 export interface Settings {
@@ -13,7 +14,7 @@ export interface Settings {
  * Uses HTTP PUT if an id is provided, otherwise uses POST. Automatically sets the route
  * and passes the provided inputs to the form instance.
  */
-export default function precognitiveForm<Data extends Record<string, FormDataConvertible>>(settings: Settings, inputs: Data) {
+export default function precognitiveForm<Data extends Record<string, FormDataConvertible>>(settings: Settings, inputs: Data):Form<Data> {
   const method = settings.method || (settings.id ? "put" : "post");
   return settings.id
     ? useForm(method, route(settings.routeName, settings.id), inputs)
