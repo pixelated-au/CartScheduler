@@ -10,7 +10,7 @@ import useLocationFilter from "@/Composables/useLocationFilter";
 import useToast from "@/Composables/useToast";
 import DatePicker from "@/Pages/Components/Dashboard/DatePicker.vue";
 import type { LocationsOnDate } from "@/Pages/Components/Dashboard/DatePicker.vue";
-import type { AuthUser } from "@/shims";
+import type { AuthUser } from "@/types/laravel-request-helpers";
 
 defineProps<{
   user: AuthUser;

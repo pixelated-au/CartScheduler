@@ -18,7 +18,7 @@ import {
 import { utcToZonedTime } from "date-fns-tz";
 import { computed, ref, watchEffect } from "vue";
 import type { DatePickerDateSlotOptions, DatePickerMonthChangeEvent } from "primevue";
-import type { AuthUser } from "@/shims";
+import type { AuthUser } from "@/types/laravel-request-helpers";
 
 export type DateMark = {
   date: Date;
