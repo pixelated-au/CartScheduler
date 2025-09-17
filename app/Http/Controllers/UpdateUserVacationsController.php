@@ -49,8 +49,8 @@ class UpdateUserVacationsController extends Controller
             $userVacation->delete();
         }
 
-        session()->flash('flash.banner', $isAdminEdit ? 'Volunteer holidays have been updated.' : 'Your holidays have been updated.');
-        session()->flash('flash.bannerStyle', 'success');
+        session()?->flash('flash.banner', $isAdminEdit ? 'Volunteer holidays have been updated.' : 'Your holidays have been updated.');
+        session()?->flash('flash.bannerStyle', 'success');
 
         if ($isAdminEdit) {
             return Redirect::route('admin.users.edit', $user);
