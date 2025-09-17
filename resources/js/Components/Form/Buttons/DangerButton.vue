@@ -6,7 +6,7 @@ const { processing = false } = defineProps<{
 
 <template>
   <PButton v-bind="$attrs"
-           severity="error"
+           severity="danger"
            variant="outlined"
            icon="iconify mdi--warning-circle-outline"
            :disabled="processing"/>
