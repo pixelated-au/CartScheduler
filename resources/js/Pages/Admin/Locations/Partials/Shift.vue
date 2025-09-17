@@ -9,7 +9,7 @@ import JetInputError from "@/Jetstream/InputError.vue";
 import JetLabel from "@/Jetstream/Label.vue";
 import JetSectionBorder from "@/Jetstream/SectionBorder.vue";
 import dateStringToDateObject from "@/Utils/dateStringToDateObject";
-import type { FormErrors } from "@/types/types";
+import type { FormErrors } from "@/types/shims";
 // https://vue3datepicker.com/
 
 export type DayKey = Extract<keyof App.Data.ShiftAdminData, `day_${string}`>;
@@ -20,7 +20,7 @@ const props = defineProps<{
     value: DayKey;
   }>;
   index: number;
-  errors: FormErrors;
+  errors: FormErrors<App.Data.LocationAdminData>;
 }>();
 
 const shift = defineModel<App.Data.ShiftAdminData>({ required: true });
