@@ -42,7 +42,7 @@ export default defineConfig({
     }),
     codecovVitePlugin({
       enableBundleAnalysis: process.env.CODECOV_TOKEN !== undefined,
-      bundleName: "CartScheduler Front-end",
+      bundleName: "front-end",
       uploadToken: process.env.CODECOV_TOKEN,
     }),
   ],
