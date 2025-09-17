@@ -3,7 +3,7 @@ import { computed, ref } from "vue";
 import AppLayout from "@/Layouts/AppLayout.vue";
 import CartReservation from "@/Pages/Components/Dashboard/CartReservation.vue";
 import ReportsModal from "@/Pages/Components/Dashboard/ReportsModal.vue";
-import type { AuthUser } from "@/shims";
+import type { AuthUser } from "@/types/laravel-request-helpers";
 
 defineProps<{
   user: AuthUser;
