@@ -127,7 +127,9 @@ class ProfileInformationTest extends TestCase
 
         $this->actingAs($user)
             ->putJson("/user/vacations", $vacationData)
-            ->assertUnprocessable();
+            ->assertInvalid([
+                'user_id'
+            ]);
 
         $this->assertDatabaseCount('user_vacations', 0);
     }
@@ -152,8 +154,9 @@ class ProfileInformationTest extends TestCase
 
         $vacationData = [
             'vacations' => [
-                ['id'          => $vacation->id, 'start_date' => '2024-01-01', 'end_date' => '2024-01-15',
-                 'description' => 'Updated Testing'
+                [
+                    'id'          => $vacation->id, 'start_date' => '2024-01-01', 'end_date' => '2024-01-15',
+                    'description' => 'Updated Testing'
                 ],
             ],
         ];
@@ -229,6 +232,31 @@ class ProfileInformationTest extends TestCase
                 'vacations.1.end_date',
                 'vacations.2.description',
                 'deletedVacations.0.id',
+            ]);
+    }
+
+    public function test_user_vacations_dates_cannot_be_in_wrong_order(): void
+    {
+        $settings                         = app()->make(GeneralSettings::class);
+        $settings->enableUserAvailability = true;
+        $settings->save();
+
+        $user = User::factory()->enabled()->create();
+
+        $vacationData = [
+            'vacations' => [
+                ['start_date' => '2023-01-01', 'end_date' => '2023-01-15', 'description' => 'Valid'],
+                ['start_date' => '2023-02-28', 'end_date' => '2023-02-15', 'description' => 'Invalid'],
+            ],
+        ];
+
+        $this->actingAs($user)
+            ->putJson("/user/vacations", $vacationData)
+            ->assertUnprocessable()
+            ->assertValid('vacations.0')
+            ->assertInvalid([
+                'vacations.1.start_date',
+                'vacations.1.end_date',
             ]);
     }
 
@@ -312,7 +340,7 @@ class ProfileInformationTest extends TestCase
             ->assertInvalid(['featureDisabled']);
     }
 
-    public function test_non_admin_cannot_update_another_users_location_choices_or_vacations(): void
+    public function test_non_admin_cannot_retrieve_another_users_location_choices_or_vacations(): void
     {
         $settings                            = app()->make(GeneralSettings::class);
         $settings->enableUserLocationChoices = true;
