@@ -7,7 +7,7 @@ import useToast from "@/Composables/useToast";
 import JetAuthenticationCardLogo from "@/Jetstream/AuthenticationCardLogo.vue";
 import JetLabel from "@/Jetstream/Label.vue";
 import AuthLayout from "@/Layouts/AuthLayout.vue";
-import type { AppPageProps } from "@/shims";
+import type { AppPageProps } from "@/types/laravel-request-helpers";
 
 type PageProps = {
   jetstream: {
