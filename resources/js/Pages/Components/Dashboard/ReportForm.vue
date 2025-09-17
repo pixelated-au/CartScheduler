@@ -58,7 +58,7 @@ watch(hasErrors, (val) => {
   }
 
   wasSuccessful.value = true;
-  timeout = setTimeout(() => wasSuccessful.value = false, 1000);
+  timeout = window.setTimeout(() => wasSuccessful.value = false, 1000);
 });
 
 const toast = useToast();
@@ -103,7 +103,7 @@ const commentsRemainingCharacters = computed(() => {
 
 watch(() => formData.comments, (value, oldValue) => {
   if (value && value.length > maxCommentChars) {
-    nextTick(() => {
+    void nextTick(() => {
       formData.comments = oldValue;
     });
   }

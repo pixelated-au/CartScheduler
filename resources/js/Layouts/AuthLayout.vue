@@ -47,7 +47,7 @@ const setProcessing = (value: boolean) => {
   isProcessing.value = value;
 
   if (value) {
-    timeoutId = setTimeout(() => showProcessing.value = true, 1000);
+    timeoutId = window.setTimeout(() => showProcessing.value = true, 1000);
     return;
   }
 
