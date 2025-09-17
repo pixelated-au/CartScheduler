@@ -5,7 +5,7 @@ import JetFormSection from "@/Jetstream/FormSection.vue";
 import JetInputError from "@/Jetstream/InputError.vue";
 import JetLabel from "@/Jetstream/Label.vue";
 import precognitiveForm from "@/Utils/precognitiveForm";
-import type { AuthUser } from "@/shims";
+import type { AuthUser } from "@/types/laravel-request-helpers";
 
 const { user } = defineProps<{
   user: AuthUser;
