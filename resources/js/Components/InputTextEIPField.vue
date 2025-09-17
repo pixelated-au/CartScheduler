@@ -31,7 +31,7 @@ const hideDescription = () => doEditDescription.value = false;
   <PInputText v-else
               v-model="myModel"
               autofocus
-              maxlength="maxlength"
+              :maxlength
               class="px-2 py-1"
               :class="inputClass"
               @blur="hideDescription"
