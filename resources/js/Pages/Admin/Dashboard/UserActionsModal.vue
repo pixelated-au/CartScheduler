@@ -11,7 +11,7 @@ import JetToggle from "@/Jetstream/Toggle.vue";
 import UserTable from "@/Pages/Admin/Dashboard/UserTable.vue";
 import { useGlobalState } from "@/store";
 import { EnableUserAvailability } from "@/Utils/provide-inject-keys.js";
-import type { Location, Shift } from "@/Pages/Admin/Locations/Composables/useLocationFilter";
+import type { Location, Shift } from "@/Composables/useLocationFilter";
 
 const props = defineProps<{
   show: boolean;
