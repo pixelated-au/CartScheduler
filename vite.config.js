@@ -1,4 +1,5 @@
 import * as path from "node:path";
+import { codecovVitePlugin } from "@codecov/vite-plugin";
 import { PrimeVueResolver } from "@primevue/auto-import-resolver";
 import vue from "@vitejs/plugin-vue";
 import laravel from "laravel-vite-plugin";
@@ -23,9 +24,9 @@ export default defineConfig({
     }),
     vueDevTools({
       appendTo: "resources/js/main.ts",
-        // Set the editor by setting the env var on your $PATH: export LAUNCH_EDITOR=[your editor path or executable]
-        // See: https://devtools.vuejs.org/getting-started/open-in-editor
-        // and https://github.com/webfansplz/vite-plugin-vue-inspector?tab=readme-ov-file#--configuration-ide--editor
+      // Set the editor by setting the env var on your $PATH: export LAUNCH_EDITOR=[your editor path or executable]
+      // See: https://devtools.vuejs.org/getting-started/open-in-editor
+      // and https://github.com/webfansplz/vite-plugin-vue-inspector?tab=readme-ov-file#--configuration-ide--editor
     }),
     Components({
       globs: [
@@ -39,9 +40,14 @@ export default defineConfig({
         IconsResolver(),
       ],
     }),
+    codecovVitePlugin({
+      enableBundleAnalysis: process.env.CODECOV_TOKEN !== undefined,
+      bundleName: "CartScheduler Front-end",
+      uploadToken: process.env.CODECOV_TOKEN,
+    }),
   ],
   server: {
-      // host: "0.0.0.0",
+    // host: "0.0.0.0",
     watch: {
       ignored: ["node_modules", "vendor", path.resolve("./resources/js/__*__/**")],
     },
