@@ -86,8 +86,8 @@ const deleteVacation = (idx: number) => form.deletedVacations = [...form.deleted
             </PButton>
             <vacation-date-range v-model:start-date="vacation.start_date"
                                  v-model:end-date="vacation.end_date"
-                                 :start-error="form.errors['vacations.' + idx + '.start_date']"
-                                 :end-error="form.errors['vacations.' + idx + '.end_date']" />
+                                 :start-error="form.errors[`vacations.${idx}.start_date`]"
+                                 :end-error="form.errors[`vacations.${idx}.end_date`]" />
             <div class="mt-2 sm:mt-0">
               <div class="flex items-center">
                 <span class="font-bold">Comment</span>
@@ -111,7 +111,7 @@ const deleteVacation = (idx: number) => form.deletedVacations = [...form.deleted
                                  :maxlength="250"
                                  empty-value="No comment set" />
               <div class="text-sm italic text-gray-500 dark:text-gray-400">This is for your reference only</div>
-              <JetInputError :message="form.errors['vacations.' + idx + '.description']" />
+              <JetInputError :message="form.errors[`vacations.${idx}.description`]" />
             </div>
           </div>
         </div>
