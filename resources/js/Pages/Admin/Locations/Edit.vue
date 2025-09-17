@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { router } from "@inertiajs/vue3";
-import { inject } from "vue";
 import AppLayout from "@/Layouts/AppLayout.vue";
 import LocationForm from "@/Pages/Admin/Locations/Partials/LocationForm.vue";
 
@@ -27,7 +26,6 @@ const listRouteAction = () => {
       </div>
     </template>
 
-    <h1>  MAKE USER VACATTIONS SUPPORT LONGER FIELD LENGTHS AND PUT A LIMIT ON THE VACATIONS FORM DESCRIPTION LENGTH</h1>
     <div>
       <div class="max-w-7xl mx-auto py-10 sm:px-6 lg:px-8">
         <LocationForm :location="location" :max-volunteers="maxVolunteers" action="edit"/>
