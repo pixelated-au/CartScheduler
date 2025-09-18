@@ -41,7 +41,7 @@ const form = precognitiveForm({
   is_unrestricted: props.user.is_unrestricted,
 });
 
-blockNavigation(form);
+const { resetNavigationBlock } = blockNavigation(form);
 
 const saveAction = () => {
   form.submit({
@@ -61,7 +61,9 @@ const saveAction = () => {
 };
 
 const listRouteAction = () => {
-  router.visit(route("admin.users.index"));
+  router.visit(route("admin.users.index"), {
+    onSuccess: () => resetNavigationBlock(),
+  });
 };
 
 const confirmCancel = (event: Event) => {
