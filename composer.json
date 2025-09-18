@@ -37,6 +37,7 @@
         "driftingly/rector-laravel": "^1.2.1",
         "ergebnis/phpunit-slow-test-detector": "^2.19",
         "fakerphp/faker": "^v1.23.1",
+        "laravel/boost": "^1.0",
         "laravel/pint": "^v1.17.2",
         "laravel/sail": "^v1.31.1",
         "league/csv": "^9.16",
