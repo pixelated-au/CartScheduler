@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { router, useForm, usePage } from "@inertiajs/vue3";
-import { computed, nextTick, watch } from "vue";
+import { computed, watch } from "vue";
 import FileUpload from "@/Components/Form/FileUpload.vue";
+import useSessionFlash from "@/Composables/useSessionFlash";
 import useToast from "@/Composables/useToast";
 import AppLayout from "@/Layouts/AppLayout.vue";
 
@@ -11,6 +12,7 @@ const form = useForm<{ file: File | null }>({
 
 const toast = useToast();
 const page = usePage();
+const flash = useSessionFlash();
 
 watch(() => form.wasSuccessful, (value, oldValue) => {
   if (oldValue && !value) {
@@ -34,14 +36,12 @@ const uploadFile = () => {
 };
 
 watch(() => page.props.jetstream, (value) => {
-  if (!value?.flash?.message) return;
-  toast.success(
-    value.flash.message,
-    "Success!",
-    { group: "center" },
-  );
 
-  void nextTick(() => page.props.jetstream.flash = {});
+  flash(
+    page.props.jetstream,
+    page.props.jetstream.flash.bannerTitle || "Success!",
+    page.props.jetstream.flash.bannerStyle || undefined,
+  );
 }, { deep: true });
 
 const listRouteAction = () => {

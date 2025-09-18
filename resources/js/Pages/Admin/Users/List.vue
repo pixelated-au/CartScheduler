@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { router } from "@inertiajs/vue3";
-import { inject, ref } from "vue";
+import { router, usePage } from "@inertiajs/vue3";
+import { onMounted, ref } from "vue";
+import useSessionFlash from "@/Composables/useSessionFlash";
 import JetHelpText from "@/Jetstream/HelpText.vue";
 import JetInput from "@/Jetstream/Input.vue";
 import JetLabel from "@/Jetstream/Label.vue";
@@ -10,6 +11,9 @@ import headers from "./Lib/UserDataTableHeaders";
 const { users } = defineProps<{
   users: App.Data.UserAdminData[];
 }>();
+
+const page = usePage();
+const flash = useSessionFlash();
 
 const userSearch = ref("");
 
@@ -25,9 +29,19 @@ const onDownloadUsers = async () => {
   window.location.href = route("admin.users-as-spreadsheet");
 };
 
-const handleSelection = (selection) => {
+const handleSelection = (selection: { id: number }) => {
   router.visit(route("admin.users.edit", selection.id));
 };
+
+onMounted(() => {
+  if (!page.props.jetstream.flash.message) return;
+
+  flash(
+    page.props.jetstream,
+    page.props.jetstream.flash.bannerTitle || undefined,
+    page.props.jetstream.flash.bannerStyle || "success",
+  );
+});
 </script>
 
 <template>

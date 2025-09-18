@@ -35,6 +35,10 @@ export default function useToast() {
     makeToast("warn", message, title, itemOptions);
   };
 
+  const message = (severity: ToastSeverity, message: string, title?: string, itemOptions?: ToastOptions) => {
+    makeToast(severity, message, title, itemOptions);
+  };
+
   const makeToast = (
     severity: ToastSeverity,
     message: string,
@@ -43,6 +47,7 @@ export default function useToast() {
   ) => {
     const summary = title ? { summary: title } : { summary: "Notice" };
     const overrides = itemOptions ? itemOptions : {};
+
     toast.add({ ...summary, ...options, ...overrides, severity, detail: message });
   };
 
@@ -50,6 +55,6 @@ export default function useToast() {
     error,
     success,
     warning,
-    message: makeToast,
+    message,
   };
 }
