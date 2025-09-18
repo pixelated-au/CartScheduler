@@ -1,10 +1,9 @@
 <script setup lang="ts">
 import { Link, router } from "@inertiajs/vue3";
 import { isAxiosError } from "axios";
-import { nextTick, ref, watch } from "vue";
+import { useConfirm } from "primevue";
+import { nextTick, watch } from "vue";
 import useToast from "@/Composables/useToast.js";
-import JetActionMessage from "@/Jetstream/ActionMessage.vue";
-import JetConfirmationModal from "@/Jetstream/ConfirmationModal.vue";
 import JetFormSection from "@/Jetstream/FormSection.vue";
 import JetInputError from "@/Jetstream/InputError.vue";
 import JetLabel from "@/Jetstream/Label.vue";
@@ -21,6 +20,7 @@ defineEmits([
 ]);
 
 const toast = useToast();
+const confirm = useConfirm();
 
 const form = precognitiveForm({
   routeName: props.action === "edit" ? "admin.users.update" : "admin.users.store",
@@ -41,7 +41,7 @@ const form = precognitiveForm({
   is_unrestricted: props.user.is_unrestricted,
 });
 
-blockNavigation(form) ;
+blockNavigation(form);
 
 const saveAction = () => {
   form.submit({
@@ -64,32 +64,51 @@ const listRouteAction = () => {
   router.visit(route("admin.users.index"));
 };
 
-const showConfirmationModal = ref(false);
-const modalDeleteAction = ref(false);
-const confirmCancel = () => {
-  modalDeleteAction.value = false;
-  if (form.isDirty) {
-    showConfirmationModal.value = true;
-  } else {
+const confirmCancel = (event: Event) => {
+  if (!form.isDirty) {
     listRouteAction();
+    return;
   }
+
+  confirm.require({
+    target: event.currentTarget as HTMLElement,
+    message: "Are you sure you wish to cancel? All of your changes will be discarded!",
+    header: "Confirm",
+    icon: "iconify mdi--alert-circle-outline text-xl",
+    acceptProps: {
+      label: "Yes",
+      severity: "warn",
+      variant: "outlined",
+    },
+    rejectProps: {
+      label: "No",
+    },
+    accept: () => listRouteAction(),
+  });
+
 };
 
-const onDelete = () => {
-  modalDeleteAction.value = true;
-  showConfirmationModal.value = true;
+const onDelete = (event: Event) => {
+  confirm.require({
+    target: event.currentTarget as HTMLElement,
+    message: "Are you sure you want to permanently delete this user?",
+    header: "Confirm Deletion",
+    icon: "iconify mdi--alert-circle-outline text-xl",
+    acceptProps: {
+      label: "Yes",
+      severity: "warn",
+      variant: "outlined",
+    },
+    rejectProps: {
+      label: "No",
+      severity: "primary",
+    },
+    accept: () => doDeleteAction(),
+  });
 };
 
 const doDeleteAction = () => {
   router.delete(route("admin.users.destroy", props.user.id));
-};
-
-const performConfirmationAction = () => {
-  if (modalDeleteAction.value) {
-    doDeleteAction();
-  } else {
-    listRouteAction();
-  }
 };
 
 const performResendWelcomeAction = async () => {
@@ -363,7 +382,7 @@ watch([() => form.gender, () => form.appointment], ([gender, appointment]) => {
                     :disabled="form.processing"
                     @click.prevent="onDelete" />
 
-      <CancelButton :processing="form.processing" @click.prevent="confirmCancel" />
+      <CancelButton :processing="form.processing" :is-dirty="form.isDirty" @click.prevent="confirmCancel" />
       <SubmitButton :action
                     :processing="form.processing"
                     :success="form.wasSuccessful"
@@ -371,24 +390,7 @@ watch([() => form.gender, () => form.appointment], ([gender, appointment]) => {
                     :errors="form.errors"
                     @click.prevent="saveAction" />
     </template>
-
-    <JetActionMessage :on="form.recentlySuccessful" class="mr-3">
-      Success: User Saved.
-    </JetActionMessage>
   </JetFormSection>
 
-  <JetConfirmationModal :show="showConfirmationModal">
-    <template #title>Danger!</template>
-
-    <template #content>
-      <template v-if="modalDeleteAction">Are you sure you wish to delete this user?</template>
-
-      <template v-else>Are you sure you wish to return? Your changes will be lost!</template>
-    </template>
-
-    <template #footer>
-      <PButton label="Cancel" severity="secondary" variant="outlined" @click="showConfirmationModal = false" />
-      <PButton severity="danger" label="Ok" @click="performConfirmationAction" />
-    </template>
-  </JetConfirmationModal>
+  <PConfirmPopup />
 </template>
