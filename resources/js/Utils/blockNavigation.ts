@@ -3,6 +3,7 @@
  */
 export default function blockNavigation<F extends { isDirty: boolean }>(form: F) {
   window.onbeforeunload = (event) => {
+    console.log("calling onbeforeunload", event);
     if (form.isDirty) {
       event.preventDefault();
       // Included for legacy support, e.g. Chrome/Edge < 119
@@ -10,5 +11,13 @@ export default function blockNavigation<F extends { isDirty: boolean }>(form: F)
       event.returnValue = true;
       return false;
     }
+  };
+
+  const resetNavigationBlock = () => {
+    window.onbeforeunload = null;
+  };
+
+  return {
+    resetNavigationBlock,
   };
 }
