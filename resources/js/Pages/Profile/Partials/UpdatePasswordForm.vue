@@ -43,7 +43,6 @@ const updatePassword = () => form.submit({
     let hasFocus = false;
     if (form.errors.password) {
       form.reset("password", "password_confirmation");
-      console.log("here");
 
       await nextTick();
       passwordInput.value?.$el.focus();

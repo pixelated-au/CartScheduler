@@ -52,7 +52,6 @@ describe("useLocationFilter", () => {
     await getShifts();
     // eslint-disable-next-line @typescript-eslint/no-unused-expressions
     locations.value; // to trigger the computed value. Probably a code smell
-    // console.log(locations.value);
     const shifts = emptyShiftsForTime.value;
 
     expect(shifts).toMatchSnapshot(); // Update snapshot `vitest -u` or `npm run test:snapshots`
@@ -74,7 +73,6 @@ describe("useLocationFilter", () => {
 
     await getShifts();
     const locations = _locations.value;
-    // console.log("locations", locations);
     const loc1Shift = (locations[0].filterShifts as Shift[])[0];
     expect(locations).toMatchSnapshot(); // Update snapshot `vitest -u` or `npm run test:snapshots`
 

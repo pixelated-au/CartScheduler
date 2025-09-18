@@ -103,7 +103,7 @@ class UsersTest extends TestCase
         $this->actingAs($admin)
             ->postJson("/admin/users/", $userData)
             ->assertRedirect()
-            ->assertSessionHas('flash.banner', "$user->name was successfully created.");
+            ->assertSessionHas('flash.message', "$user->name was successfully created.");
         Mail::assertSent(UserAccountCreated::class, 1);
 
         $this->assertDatabaseCount('users', 2);
@@ -198,7 +198,7 @@ class UsersTest extends TestCase
         $this->actingAs($admin)
             ->putJson("/admin/users/{$user->getKey()}", $userData)
             ->assertRedirect("/admin/users/{$user->getKey()}/edit")
-            ->assertSessionHas('flash.banner', "$user->name was successfully modified.");
+            ->assertSessionHas('flash.message', "$user->name was successfully modified.");
 
         $this->assertEquals($newEmail, $user->fresh()->email);
     }
@@ -212,7 +212,7 @@ class UsersTest extends TestCase
         $this->actingAs($admin)
             ->deleteJson("/admin/users/{$user->getKey()}")
             ->assertRedirect()
-            ->assertSessionHas('flash.banner', "$user->name was successfully deleted.");
+            ->assertSessionHas('flash.message', "$user->name was successfully deleted.");
         $this->assertDatabaseCount('users', 1);
 
         $this->actingAs($admin)
@@ -399,7 +399,7 @@ class UsersTest extends TestCase
         $this->actingAs($admin)
             ->putJson("/admin/users/{$user->getKey()}", $userData)
             ->assertRedirect("/admin/users/{$user->getKey()}/edit")
-            ->assertSessionHas('flash.banner', "$user->name was successfully modified.");
+            ->assertSessionHas('flash.message', "$user->name was successfully modified.");
 
         $storedDbValue = DB::table('users')->where('id', $user->id)->value('mobile_phone');
         $this->assertEquals('0412345678', $storedDbValue);

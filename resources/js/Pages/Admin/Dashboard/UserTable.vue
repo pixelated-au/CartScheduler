@@ -241,7 +241,7 @@ watchEffect(async () => {
     });
     volunteers.value = response.data;
   } catch (e) {
-    console.log(e);
+    console.error(e);
     toast.error("Unable to load volunteers, a critical error has occurred.");
   }
 });

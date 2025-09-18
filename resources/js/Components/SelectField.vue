@@ -1,6 +1,6 @@
 <script setup>
 import { Dropdown } from "flowbite";
-import { computed, inject, onMounted, ref, useSlots, useId } from "vue";
+import { computed, onMounted, ref, useSlots, useId } from "vue";
 import { useDarkMode } from "@/Composables/useDarkMode.js";
 
 const props = defineProps({
@@ -67,7 +67,6 @@ const onSelect = (selection) => {
 
   if (props.returnObjectValue) {
     // We're not returning the whole object, just the value
-    console.log("selection value", selection.value);
     model.value = selection.value;
     return;
   }
