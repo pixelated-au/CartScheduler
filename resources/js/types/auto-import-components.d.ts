@@ -56,6 +56,7 @@ declare module 'vue' {
     PInputText: typeof import('primevue/inputtext')['default']
     PListbox: typeof import('primevue/listbox')['default']
     PListBox: typeof import('primevue/listbox')['default']
+    PMenu: typeof import('primevue/menu')['default']
     PMessage: typeof import('primevue/message')['default']
     PPassword: typeof import('primevue/password')['default']
     PPopover: typeof import('primevue/popover')['default']
