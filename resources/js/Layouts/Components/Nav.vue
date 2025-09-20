@@ -1,25 +1,16 @@
 <script setup lang="ts">
 import { Link, router, usePage } from "@inertiajs/vue3";
 import { breakpointsTailwind, useBreakpoints } from "@vueuse/core";
-import { computed, inject, nextTick, onBeforeMount, onMounted, onUnmounted, ref, useTemplateRef, watch } from "vue";
-import JetApplicationMark from "@/Jetstream/ApplicationMark.vue"; // Assuming this is your logo component
+import { computed, nextTick, onBeforeMount, onMounted, onUnmounted, ref, watch } from "vue";
+import JetApplicationMark from "@/Jetstream/ApplicationMark.vue";
+import type{ Item } from "@/Layouts/Components/NavMenuItem.vue";
 
 const page = usePage();
 const breakpoints = useBreakpoints(breakpointsTailwind);
 
 type Permissions = {
-  canAdmin: boolean;
-  canEditSettings: boolean;
-};
-
-type Item = {
-  label: string;
-  routeName?: string | undefined;
-  href?: string;
-  isDropdown?: boolean;
-  submenu?: Item[];
-  command?: () => void;
-  hasUpdate?: boolean;
+  canAdmin?: boolean;
+  canEditSettings?: boolean;
 };
 
 let permissions: Permissions;
@@ -36,40 +27,34 @@ const desktopAdminDropdownOpen = ref(false);
 const desktopUserDropdownOpen = ref(false);
 const openMobileSubmenus = ref<Record<string, boolean>>({}); // E.g., { 'Administration': false }
 
-const adminDropdownRef = useTemplateRef("adminDropdownRef");
-const userDropdownRef = useTemplateRef("userDropdownRef");
-const mobileNavRef = useTemplateRef("mobileNavRef");
-const mobileUserMenuRef = useTemplateRef("mobileUserMenuRef");
-
 const hasUpdate = computed(() => page.props.hasUpdate as boolean); // Keep if used for update indicators
 
 const mainMenuItems = computed(() => {
-  if (!permissions) return [];
   const items: Item[] = [{ label: "Dashboard", routeName: "dashboard", href: route("dashboard") }];
 
-  if (permissions.canAdmin) {
-    const adminSubmenu: Item[] = [
-      { label: "Admin Dashboard", routeName: "admin.dashboard", href: route("admin.dashboard") },
-      { label: "Users", routeName: "admin.users.index", href: route("admin.users.index") },
-      { label: "Locations", routeName: "admin.locations.index", href: route("admin.locations.index") },
-      { label: "Reports", routeName: "admin.reports.index", href: route("admin.reports.index") },
-    ];
-    if (permissions.canEditSettings) {
-      adminSubmenu.push({
-        label: "Settings",
-        routeName: "admin.settings",
-        href: route("admin.settings"),
-        hasUpdate: hasUpdate.value,
-      });
-    }
-    items.push({
-      label: "Administration",
-      routeName: undefined,
-      hasUpdate: hasUpdate.value, // Example if an entire section can have an update
-      isDropdown: true,
-      submenu: adminSubmenu,
+  if (!permissions?.canAdmin) return items;
+
+  const adminSubmenu: Item[] = [
+    { label: "Admin Dashboard", routeName: "admin.dashboard", href: route("admin.dashboard") },
+    { label: "Users", routeName: "admin.users.index", href: route("admin.users.index") },
+    { label: "Locations", routeName: "admin.locations.index", href: route("admin.locations.index") },
+    { label: "Reports", routeName: "admin.reports.index", href: route("admin.reports.index") },
+  ];
+  if (permissions.canEditSettings) {
+    adminSubmenu.push({
+      label: "Settings",
+      routeName: "admin.settings",
+      href: route("admin.settings"),
+      hasUpdate: hasUpdate.value,
     });
   }
+  items.push({
+    label: "Administration",
+    routeName: undefined,
+    hasUpdate: hasUpdate.value, // Example if an entire section can have an update
+    isDropdown: true,
+    submenu: adminSubmenu,
+  });
   return items;
 });
 
@@ -134,8 +119,8 @@ const onBeforeEnter = (el: Element) => {
   style.opacity = "0";
   style.maxHeight = "0px";
 };
-const onEnter = (el: Element, done: () => void) => {
-  nextTick(() => {
+const onEnter = async (el: Element, done: () => void) => {
+  await nextTick(() => {
     const style = (el as HTMLElement).style;
     style.transitionProperty = "max-height, opacity";
     style.transitionDuration = "300ms";
@@ -161,8 +146,8 @@ const onBeforeLeave = (el: Element) => {
   style.maxHeight = (el as HTMLElement).scrollHeight + "px";
   style.opacity = "1"; // Start fully visible
 };
-const onLeave = (el: Element, done: () => void) => {
-  nextTick(() => {
+const onLeave = async (el: Element, done: () => void) => {
+  await nextTick(() => {
     const style = (el as HTMLElement).style;
     style.maxHeight = "0px";
     style.opacity = "0";
@@ -194,7 +179,7 @@ const handleEscapeKey = (event: KeyboardEvent) => {
   }
 };
 
-const handleClickOutside = (event: MouseEvent) => {
+const handleClickOutside = () => {
   if (desktopAdminDropdownOpen.value) {
     desktopAdminDropdownOpen.value = false;
   }
@@ -341,9 +326,7 @@ const isActive = (routeName: string | undefined) => route().current() === routeN
                 <span v-else
                       class="inline-flex justify-center items-center w-8 h-8 rounded-full bg-neutral-300 dark:bg-neutral-600">
                   <span class="font-medium leading-none !text-current">
-                    {{
-                      page.props.auth.user?.name?.charAt(0) || 'U'
-                    }}
+                    {{ page.props.auth.user?.name?.charAt(0) || 'U' }}
                   </span>
                 </span>
               </button>
@@ -457,55 +440,10 @@ const isActive = (routeName: string | undefined) => route().current() === routeN
         <div class="px-2 pt-2 pb-3 space-y-1">
           <template v-for="item in mainMenuItems" :key="'mobile-main-' + item.label">
             <!-- Regular Mobile Link -->
-            <Link v-if="!item.isDropdown && item.href"
-                  :href="item.href"
-                  class="block px-3 py-2 text-base font-medium rounded-md transition-colors duration-150 ease-in-out !text-current"
-                  :class="[
-                    isActive(item.routeName)
-                      ? '!font-bold underline underline-offset-4 decoration-dashed'
-                      : 'hover:bg-neutral-200 dark:hover:bg-neutral-700'
-                  ]"
-                  @click="mobileNavOpen = false">
-              <span v-if="isActive(item.routeName)" class="-ml-4 iconify mdi--chevron-right"></span>
-              {{ item.label }}
-            </Link>
+            <NavMenuItem :item="item" @click="mobileNavOpen = false" />
 
-            <!-- Mobile Dropdown (Administration) -->
-            <div v-if="item.isDropdown && item.label === 'Administration'">
-              <button @click="toggleMobileSubmenu(item.label)"
-                      type="button"
-                      class="flex justify-between items-center px-3 py-2 w-full font-medium rounded-md transition-colors duration-150 ease-in-out hover:ring-1 ring-black/25 dark:ring-white/25"
-                      :aria-expanded="openMobileSubmenus[item.label] ? 'true' : 'false'"
-                      :aria-controls="'mobile-submenu-' + item.label">
-                <span>{{ item.label }}</span>
-                <span class="text-2xl duration-500 ease-in-out delay-100 iconify mdi--chevron-down transition-rotate"
-                      :class="{ 'rotate-180': openMobileSubmenus[item.label] }"></span>
-              </button>
-              <transition @before-enter="onBeforeEnter"
-                          @enter="onEnter"
-                          @after-enter="onAfterEnter"
-                          @before-leave="onBeforeLeave"
-                          @leave="onLeave"
-                          @after-leave="onAfterLeave">
-                <div v-show="openMobileSubmenus[item.label]"
-                     :id="'mobile-submenu-' + item.label"
-                     class="overflow-hidden gap-2 pl-4 mt-3">
-                  <Link v-for="subItem in item.submenu"
-                        :key="'mobile-sub-' + subItem.label"
-                        :href="subItem.href as string"
-                        class="flex items-center px-3 py-2 text-base font-medium rounded-md transition-colors duration-150 ease-in-out !text-current"
-                        :class="[
-                          isActive(subItem.routeName)
-                            ? '!font-bold underline underline-offset-4 decoration-dashed'
-                            : 'dark: hover:bg-neutral-200 dark:hover:bg-neutral-700'
-                        ]"
-                        @click="() => { mobileNavOpen = false; openMobileSubmenus[item.label] = false; }">
-                    <span v-if="isActive(subItem.routeName)" class="-ml-4 iconify mdi--chevron-right"></span>
-                    {{ subItem.label }}
-                  </Link>
-                </div>
-              </transition>
-            </div>
+            <!-- Mobile Dropdown -->
+            <NavMenuDropdown :item="item" @click="toggleMobileSubmenu($event)" />
           </template>
         </div>
       </div>
