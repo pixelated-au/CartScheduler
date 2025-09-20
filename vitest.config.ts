@@ -14,6 +14,9 @@ export default defineConfig({
       reportsDirectory: "./resources/js/__coverage__",
       provider: "v8",
       reporter: ["text", "json", "html"],
+      include: [
+        "**/resources/js/**",
+      ],
       exclude: [
         'coverage/**',
         'dist/**',
@@ -36,7 +39,7 @@ export default defineConfig({
       ],
     },
     include: [
-      "**/resources/js/**/*.{test,spec}.{js,ts,jsx,tsx}",
+      "./resources/js/**/*.{test,spec}.{js,ts,jsx,tsx}",
     ],
     typecheck: {
       tsconfig: "./tsconfig.test.json",
