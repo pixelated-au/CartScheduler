@@ -58,7 +58,7 @@ const baseTsConfig = {
 export default defineConfigWithVueTs([
   importX.flatConfigs.recommended,
   importX.flatConfigs.typescript,
-  globalIgnores(["node_modules", "vendor", "public", "resources/js/types/*.d.ts"]),
+  globalIgnores(["node_modules", "vendor", "public", "resources/js/ziggy.d.ts", "resources/js/types/*.d.ts"]),
   {
     name: "eslint-defaults",
     ignores: ["*.d.ts"],
