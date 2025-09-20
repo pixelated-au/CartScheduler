@@ -10,6 +10,7 @@ declare module 'vue' {
   export interface GlobalComponents {
     Alert: typeof import('./../Components/Alert.vue')['default']
     AlignButton: typeof import('./../Components/EditorToolbar/AlignButton.vue')['default']
+    AvailabilityReminder: typeof import('./../Layouts/Components/AvailabilityReminder.vue')['default']
     BackButton: typeof import('./../Components/Form/Buttons/BackButton.vue')['default']
     BaseButton: typeof import('./../Components/EditorToolbar/BaseButton.vue')['default']
     Bell: typeof import('./../Components/Icons/Bell.vue')['default']
