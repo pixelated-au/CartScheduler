@@ -126,6 +126,23 @@ describe("useLocationFilter", () => {
     expect(axios.get).toBeCalledTimes(2);
   });
 
+  it("has a null value for empty slots in a roster", async () => {
+    const { locations, getShifts } = useLocationFilter(timezone);
+
+    await getShifts();
+
+    const rawVolunteers = shifts.locations[2].shifts[0].volunteers;
+    const transformedVolunteers = locations.value[2].filterShifts?.[0].volunteers as Array<App.Data.UserData | null>;
+
+    expect(rawVolunteers).length(4);
+    expect(transformedVolunteers).length(5);
+    expect(transformedVolunteers.at(0)).not.toBeNull();
+    expect(transformedVolunteers.at(1)).not.toBeNull();
+    expect(transformedVolunteers.at(2)).not.toBeNull();
+    expect(transformedVolunteers.at(3)).not.toBeNull();
+    expect(transformedVolunteers.at(4)).toBeNull();
+  });
+
   it("ignores vue watcher when the date doesn't change", async () => {
     vi.setSystemTime(new Date("2025-09-15"));
 
@@ -152,9 +169,9 @@ describe("useLocationFilter", () => {
     await getShifts();
 
     const rawVolunteers = shifts.locations[0].shifts[1].volunteers;
-    const transformedVolunteers = locations.value[0].filterShifts?.[1].volunteers as Array<App.Data.UserData | null>;
+    const transformedVolunteers = locations.value[0].filterShifts?.[0].volunteers as Array<App.Data.UserData | null>;
 
-    // Start with the mix of genders
+    // First, confirm the "original" data from the server contains a mix of genders
     expect(rawVolunteers.map((volunteer) => volunteer.gender)).toMatchObject([
       "female",
       "male",
@@ -162,7 +179,9 @@ describe("useLocationFilter", () => {
       "male",
     ]);
 
-    // End male sorted first
+    // After processing, the volunteers should be sorted with male first and undefined last
+    // Note: undefined is in there because the server provides 4 volunteers and the system has 5 slots; it pads missing
+    // volunteers with null - making the last gender undefined in this case
     expect(transformedVolunteers.map((volunteer) => volunteer?.gender)).toMatchObject([
       "male",
       "male",
@@ -170,7 +189,6 @@ describe("useLocationFilter", () => {
       "female",
       undefined,
     ]);
-
   });
 
 });
