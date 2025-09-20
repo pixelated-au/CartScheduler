@@ -37,6 +37,7 @@ const submit = async (setProcessing: (value: boolean) => void) => {
   hasErrors.value = false;
   try {
     await axios.post(route("login"), form);
+    // Instead of doing an Inertia visit, we do a window.location.href to reload the entire page to ensure the new routes load
     window.location.href = "/";
   } catch (e) {
     console.error(e);
