@@ -3,6 +3,7 @@ import colors from "tailwindcss/colors";
 import defaultTheme from "tailwindcss/defaultTheme";
 import { formatColor, parseColor } from "tailwindcss/lib/util/color";
 
+// noinspection JSUnusedGlobalSymbols
 /** @type {import("tailwindcss").Config} */
 export default {
   darkMode: ["class"],
@@ -100,7 +101,7 @@ export default {
     import("flowbite/plugin"),
     import("tailwindcss-primeui"),
     addIconSelectors({
-      prefixes: ["mdi", "ri"],
+      prefixes: ["mdi"],
       scale: 1.25,
     }),
   ],
