@@ -1,5 +1,5 @@
 @inject('settings', 'App\Settings\GeneralSettings')
-        <!DOCTYPE html>
+<!DOCTYPE html>
 <!--suppress HtmlUnknownTarget -->
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
