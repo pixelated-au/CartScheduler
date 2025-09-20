@@ -52,19 +52,6 @@ declare module 'ziggy-js' {
     "update.user.vacations": [],
     "user.location-choices": [],
     "update.user.location-choices": [],
-    "report-tags.create": [],
-    "report-tags.show": [
-        {
-            "name": "tag",
-            "required": true
-        }
-    ],
-    "report-tags.edit": [
-        {
-            "name": "tag",
-            "required": true
-        }
-    ],
     "storage.local": [
         {
             "name": "path",
