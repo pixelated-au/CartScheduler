@@ -41,19 +41,22 @@ export interface Flash {
   bannerStyle?: ToastSeverity extends string ? ToastSeverity : undefined;
 }
 
+export interface JetstreamProps {
+  flash: Flash;
+  canCreateTeams: boolean;
+  canUpdateProfileInformation: boolean;
+  canUpdatePassword: boolean;
+  canManageTwoFactorAuthentication: boolean;
+  hasAccountDeletionFeatures: boolean;
+  hasApiFeatures: boolean;
+  hasTeamFeatures: boolean;
+  managesProfilePhotos: boolean;
+  hasEmailVerification: boolean;
+}
+
+
 export interface Jetstream {
-  jetstream: {
-    flash: Flash;
-    canCreateTeams: boolean;
-    canUpdateProfileInformation: boolean;
-    canUpdatePassword: boolean;
-    canManageTwoFactorAuthentication: boolean;
-    hasAccountDeletionFeatures: boolean;
-    hasApiFeatures: boolean;
-    hasTeamFeatures: boolean;
-    managesProfilePhotos: boolean;
-    hasEmailVerification: boolean;
-  };
+  jetstream: JetstreamProps;
 }
 
 export type AppPageProps<
