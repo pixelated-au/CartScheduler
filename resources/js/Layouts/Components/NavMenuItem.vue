@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import useNavEvents from "@/Layouts/Components/Composables/useNavEvents";
+
 export type Item = {
   label: string;
   routeName?: string | undefined;
@@ -17,6 +19,8 @@ defineEmits<{
   "click": Event;
 }>();
 
+const { closeMobileNav } = useNavEvents();
+
 const isActive = (routeName: string | undefined) => route().current() === routeName;
 </script>
 
@@ -29,7 +33,7 @@ const isActive = (routeName: string | undefined) => route().current() === routeN
             ? '!font-bold underline underline-offset-4 decoration-dashed'
             : 'hover:bg-neutral-200 dark:hover:bg-neutral-700'
         ]"
-        @click="$emit('click')">
+        @click="closeMobileNav()">
     <span v-if="isActive(item.routeName)" class="-ml-4 iconify mdi--chevron-right"></span>
     {{ item.label }}
   </Link>

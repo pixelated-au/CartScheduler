@@ -1,12 +1,11 @@
 <script setup lang="ts">
 import { Link, router, usePage } from "@inertiajs/vue3";
-import { breakpointsTailwind, useBreakpoints } from "@vueuse/core";
-import { computed, nextTick, onBeforeMount, onMounted, onUnmounted, ref, watch } from "vue";
+import { computed, onBeforeMount, ref } from "vue";
 import JetApplicationMark from "@/Jetstream/ApplicationMark.vue";
+import useNavEvents from "@/Layouts/Components/Composables/useNavEvents";
 import type{ Item } from "@/Layouts/Components/NavMenuItem.vue";
 
 const page = usePage();
-const breakpoints = useBreakpoints(breakpointsTailwind);
 
 type Permissions = {
   canAdmin?: boolean;
@@ -19,13 +18,8 @@ onBeforeMount(() => {
   permissions = page.props.pagePermissions as Permissions;
 });
 
-const isMobile = breakpoints.smaller("sm");
-
-const mobileNavOpen = ref(false);
-const mobileUserMenuOpen = ref(false);
 const desktopAdminDropdownOpen = ref(false);
 const desktopUserDropdownOpen = ref(false);
-const openMobileSubmenus = ref<Record<string, boolean>>({}); // E.g., { 'Administration': false }
 
 const hasUpdate = computed(() => page.props.hasUpdate as boolean); // Keep if used for update indicators
 
@@ -70,11 +64,20 @@ const userNavMenuItems = computed(() => {
   return items;
 });
 
+const {
+  closeAllNav,
+  toggleMobileNav,
+  toggleMobileUserMenu,
+  closeMobileUserMenu,
+  mobileNavOpen,
+  mobileUserMenuOpen,
+} = useNavEvents();
+
 const logout = () => {
   router.post(route("logout"), {}, {
     onFinish: () => {
-      mobileNavOpen.value = false;
-      mobileUserMenuOpen.value = false;
+      closeAllNav();
+
       desktopAdminDropdownOpen.value = false;
       desktopUserDropdownOpen.value = false;
     },
@@ -82,15 +85,6 @@ const logout = () => {
 };
 
 // --- Toggle Functions ---
-const toggleMobileNav = () => {
-  mobileNavOpen.value = !mobileNavOpen.value;
-  if (mobileNavOpen.value) mobileUserMenuOpen.value = false;
-};
-const toggleMobileUserMenu = () => {
-  mobileUserMenuOpen.value = !mobileUserMenuOpen.value;
-  if (mobileUserMenuOpen.value) mobileNavOpen.value = false;
-};
-
 const toggleDesktopAdminDropdown = () => {
   desktopAdminDropdownOpen.value = !desktopAdminDropdownOpen.value;
   if (desktopAdminDropdownOpen.value) desktopUserDropdownOpen.value = false;
@@ -99,104 +93,6 @@ const toggleDesktopUserDropdown = () => {
   desktopUserDropdownOpen.value = !desktopUserDropdownOpen.value;
   if (desktopUserDropdownOpen.value) desktopAdminDropdownOpen.value = false;
 };
-
-const toggleMobileSubmenu = (label: string) => {
-  openMobileSubmenus.value[label] = !openMobileSubmenus.value[label];
-};
-
-// Close all menus when route changes
-watch(() => page.url, () => {
-  mobileNavOpen.value = false;
-  mobileUserMenuOpen.value = false;
-  desktopAdminDropdownOpen.value = false;
-  desktopUserDropdownOpen.value = false;
-  Object.keys(openMobileSubmenus.value).forEach((key) => openMobileSubmenus.value[key] = false);
-});
-
-// --- Animation Hooks (Tailwind doesn't need JS for simple opacity/transform, but height needs it) ---
-const onBeforeEnter = (el: Element) => {
-  const style = (el as HTMLElement).style;
-  style.opacity = "0";
-  style.maxHeight = "0px";
-};
-const onEnter = async (el: Element, done: () => void) => {
-  await nextTick(() => {
-    const style = (el as HTMLElement).style;
-    style.transitionProperty = "max-height, opacity";
-    style.transitionDuration = "300ms";
-    style.transitionTimingFunction = "ease-out";
-    style.opacity = "1";
-    style.maxHeight = (el as HTMLElement).scrollHeight + "px";
-  });
-  // Call done when transition finishes
-  el.addEventListener("transitionend", done, { once: true });
-};
-const onAfterEnter = (el: Element) => {
-  const style = (el as HTMLElement).style;
-  style.maxHeight = ""; // Use 'auto' or remove for content to dictate height
-  style.transitionProperty = "";
-  style.transitionDuration = "";
-  style.transitionTimingFunction = "";
-};
-const onBeforeLeave = (el: Element) => {
-  const style = (el as HTMLElement).style;
-  style.transitionProperty = "max-height, opacity";
-  style.transitionDuration = "300ms";
-  style.transitionTimingFunction = "ease-in";
-  style.maxHeight = (el as HTMLElement).scrollHeight + "px";
-  style.opacity = "1"; // Start fully visible
-};
-const onLeave = async (el: Element, done: () => void) => {
-  await nextTick(() => {
-    const style = (el as HTMLElement).style;
-    style.maxHeight = "0px";
-    style.opacity = "0";
-  });
-  el.addEventListener("transitionend", done, { once: true });
-};
-const onAfterLeave = (el: Element) => {
-  const style = (el as HTMLElement).style;
-  style.maxHeight = "";
-  style.opacity = "";
-  style.transitionProperty = "";
-  style.transitionDuration = "";
-  style.transitionTimingFunction = "";
-};
-
-// --- Event Handlers for Closing Menus ---
-const handleEscapeKey = (event: KeyboardEvent) => {
-  if (event.key === "Escape") {
-    if (isMobile.value) {
-      if (mobileNavOpen.value) mobileNavOpen.value = false;
-      if (mobileUserMenuOpen.value) mobileUserMenuOpen.value = false;
-      // Consider closing active mobile submenu
-      const openSub = Object.keys(openMobileSubmenus.value).find((key) => openMobileSubmenus.value[key]);
-      if (openSub) openMobileSubmenus.value[openSub] = false;
-    } else {
-      if (desktopAdminDropdownOpen.value) desktopAdminDropdownOpen.value = false;
-      if (desktopUserDropdownOpen.value) desktopUserDropdownOpen.value = false;
-    }
-  }
-};
-
-const handleClickOutside = () => {
-  if (desktopAdminDropdownOpen.value) {
-    desktopAdminDropdownOpen.value = false;
-  }
-  if (desktopUserDropdownOpen.value) {
-    desktopUserDropdownOpen.value = false;
-  }
-};
-
-onMounted(() => {
-  document.addEventListener("keydown", handleEscapeKey);
-  document.addEventListener("click", handleClickOutside, true); // Capture phase for reliability
-});
-
-onUnmounted(() => {
-  document.removeEventListener("keydown", handleEscapeKey);
-  document.removeEventListener("click", handleClickOutside, true);
-});
 
 const isActive = (routeName: string | undefined) => route().current() === routeName;
 </script>
@@ -247,12 +143,7 @@ const isActive = (routeName: string | undefined) => route().current() === routeN
                   <span class="text-lg duration-500 ease-in-out delay-100 iconify mdi--chevron-down transition-rotate"
                         :class="{ 'rotate-180 !delay-0 !duration-300': desktopAdminDropdownOpen }"></span>
                 </button>
-                <transition @before-enter="onBeforeEnter"
-                            @enter="onEnter"
-                            @after-enter="onAfterEnter"
-                            @before-leave="onBeforeLeave"
-                            @leave="onLeave"
-                            @after-leave="onAfterLeave">
+                <NavMenuTransition>
                   <div v-show="desktopAdminDropdownOpen"
                        id="desktop-admin-menu"
                        class="overflow-hidden absolute right-0 z-50 py-1 mt-2 w-48 bg-white rounded-md ring-1 ring-black ring-opacity-5 shadow-lg origin-top-right dark:bg-neutral-700 focus:outline-none"
@@ -282,7 +173,7 @@ const isActive = (routeName: string | undefined) => route().current() === routeN
                       </span>
                     </Link>
                   </div>
-                </transition>
+                </NavMenuTransition>
               </div>
             </template>
           </div>
@@ -330,12 +221,7 @@ const isActive = (routeName: string | undefined) => route().current() === routeN
                   </span>
                 </span>
               </button>
-              <transition @before-enter="onBeforeEnter"
-                          @enter="onEnter"
-                          @after-enter="onAfterEnter"
-                          @before-leave="onBeforeLeave"
-                          @leave="onLeave"
-                          @after-leave="onAfterLeave">
+              <NavMenuTransition>
                 <div v-show="desktopUserDropdownOpen"
                      class="overflow-hidden absolute right-0 z-50 py-1 mt-2 w-48 bg-white rounded-md ring-1 ring-black ring-opacity-5 shadow-lg origin-top-right dark:bg-neutral-700 focus:outline-none"
                      role="menu"
@@ -358,7 +244,7 @@ const isActive = (routeName: string | undefined) => route().current() === routeN
                     </div>
                   </template>
                 </div>
-              </transition>
+              </NavMenuTransition>
             </div>
           </div>
 
@@ -393,12 +279,7 @@ const isActive = (routeName: string | undefined) => route().current() === routeN
     </div>
 
     <!-- Mobile User Menu (collapsible, appears above main mobile nav) -->
-    <transition @before-enter="onBeforeEnter"
-                @enter="onEnter"
-                @after-enter="onAfterEnter"
-                @before-leave="onBeforeLeave"
-                @leave="onLeave"
-                @after-leave="onAfterLeave">
+    <NavMenuTransition>
       <div v-show="mobileUserMenuOpen"
            class="overflow-hidden bg-neutral-50 sm:hidden dark:bg-neutral-700"
            id="mobile-user-menu"
@@ -413,26 +294,21 @@ const isActive = (routeName: string | undefined) => route().current() === routeN
                       ? 'bg-neutral-500 dark:bg-neutral-600'
                       : 'hover:bg-neutral-200 dark:hover:bg-neutral-700'
                   ]"
-                  @click="mobileUserMenuOpen = false">
+                  @click="closeMobileUserMenu()">
               {{ userItem.label }}
             </Link>
             <button v-if="userItem.command"
-                    @click="() => { userItem.command && userItem.command(); mobileUserMenuOpen = false; }"
+                    @click="() => { userItem.command && userItem.command(); closeMobileUserMenu(); }"
                     class="block px-3 py-2 w-full text-base font-medium !text-current rounded-md transition-colors duration-150 ease-in-out hover:bg-neutral-200 dark:hover:bg-neutral-700">
               {{ userItem.label }}
             </button>
           </template>
         </div>
       </div>
-    </transition>
+    </NavMenuTransition>
 
     <!-- Mobile Main Navigation (collapsible) -->
-    <transition @before-enter="onBeforeEnter"
-                @enter="onEnter"
-                @after-enter="onAfterEnter"
-                @before-leave="onBeforeLeave"
-                @leave="onLeave"
-                @after-leave="onAfterLeave">
+    <NavMenuTransition>
       <div v-show="mobileNavOpen"
            class="overflow-hidden sm:hidden bg-neutral-50 dark:bg-sub-panel-dark"
            id="mobile-main-menu"
@@ -440,13 +316,13 @@ const isActive = (routeName: string | undefined) => route().current() === routeN
         <div class="px-2 pt-2 pb-3 space-y-1">
           <template v-for="item in mainMenuItems" :key="'mobile-main-' + item.label">
             <!-- Regular Mobile Link -->
-            <NavMenuItem :item="item" @click="mobileNavOpen = false" />
+            <NavMenuItem :item="item" />
 
             <!-- Mobile Dropdown -->
-            <NavMenuDropdown :item="item" @click="toggleMobileSubmenu($event)" />
+            <NavMenuDropdown :item="item" />
           </template>
         </div>
       </div>
-    </transition>
+    </NavMenuTransition>
   </nav>
 </template>
