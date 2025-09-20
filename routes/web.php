@@ -141,7 +141,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified',
                 'store' => 'admin.report-tags.store',
                 'update' => 'admin.report-tags.update',
                 'destroy' => 'admin.report-tags.destroy',
-            ]);
+            ])->except(['show', 'edit', 'create']);
             Route::put('/report-tag-sort-order', ReportTagsSortOrderController::class)->name('admin.report-tag.sort-order');
             Route::post(
                 '/resend-welcome-email',
