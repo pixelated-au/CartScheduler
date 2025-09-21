@@ -44,6 +44,7 @@ export function useDarkMode() {
     }
 
     document.startViewTransition(() => {
+      // this feature is not used right now
       void setMode(mode);
     });
 
