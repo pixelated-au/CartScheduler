@@ -8,8 +8,6 @@ const emit = defineEmits<{
 
 const state = useGlobalState();
 
-console.log("feef");
-
 const checkAvailability = () => {
   checkLater();
   router.get(route("user.availability"));
