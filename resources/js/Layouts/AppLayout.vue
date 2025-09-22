@@ -58,7 +58,7 @@ onMounted(() => {
     <Head :title="title" />
 
     <div class="flex flex-col content-start min-h-dvh w-dvw max-w-full-dvw justify-stretch">
-      <Nav class="grid grid-cols-page justify-center px-4 xl:px-0  border-b border-neutral-300 dark:border-neutral-700/85"
+      <Nav class="border-b border-neutral-300 dark:border-neutral-700/85"
            @toggle-dark-mode="isDarkMode = $event" />
 
       <!-- Page Heading -->
