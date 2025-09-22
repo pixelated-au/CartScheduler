@@ -31,7 +31,7 @@ const isActive = (routeName: string | undefined) => route().current() === routeN
   </Link>
   <button v-else
           @click="() => { item.command && item.command(); $emit('command') }"
-          class="flex items-center gap-1  px-3 py-2 w-full text-base font-medium text-left !text-current rounded-md transition-colors duration-150 ease-in-out hover:bg-neutral-200 dark:hover:bg-neutral-700">
+          class="flex items-center gap-1 px-3 py-2 w-full text-base font-medium text-left !text-current rounded-md transition-colors duration-150 ease-in-out hover:bg-neutral-200 dark:hover:bg-neutral-700">
     <span v-if="item.icon" :class="item.icon" class="text-xs"/>
     {{ item.label }}
   </button>
