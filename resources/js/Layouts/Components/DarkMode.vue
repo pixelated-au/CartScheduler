@@ -19,8 +19,7 @@ watch(clip, (val) => {
   <button id="theme-toggle"
           ref="themeToggle"
           type="button"
-          class="hover:bg-neutral-100 dark:hover:bg-neutral-700 focus:outline-none
-          focus:ring-1 focus:ring-neutral-300 dark:focus:ring-neutral-700 rounded-full p-2 dark:bg-panel-dark"
+          class="focus:outline-none focus:ring-1 focus:ring-neutral-300 dark:focus:ring-neutral-700 rounded-full p-2 dark:bg-panel-dark"
           aria-label="Toggle dark mode"
           @click="toggleDarkMode()">
     <DarkModeLabel :show="colorMode === 'dark'" label="dark theme" icon="iconify mdi--moon-and-stars" />
