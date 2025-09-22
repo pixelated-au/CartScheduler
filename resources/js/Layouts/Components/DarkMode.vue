@@ -19,15 +19,17 @@ watch(clip, (val) => {
   <button id="theme-toggle"
           ref="themeToggle"
           type="button"
-          class="focus:outline-none focus:ring-1 focus:ring-neutral-300 dark:focus:ring-neutral-700 rounded-full p-2 dark:bg-panel-dark"
+          class="flex focus:outline-none focus:ring-1 focus:ring-neutral-300 dark:focus:ring-neutral-700 rounded-full p-2 dark:bg-panel-dark"
           aria-label="Toggle dark mode"
           @click="toggleDarkMode()">
-    <DarkModeLabel :show="colorMode === 'dark'" label="dark theme" icon="iconify mdi--moon-and-stars" />
-    <DarkModeLabel :show="colorMode === 'light'" label="light theme" icon="iconify mdi--weather-sunny" />
-    <DarkModeLabel :show="colorMode === 'auto'"
-                   label="system theme"
-                   icon="iconify mdi--sun-moon-stars"
-                   class="text-neutral-400 dark:text-neutral-400" />
+    <div class="flex justify-center items-center size-6">
+      <DarkModeLabel :show="colorMode === 'dark'" label="dark theme" icon="iconify mdi--moon-and-stars" />
+      <DarkModeLabel :show="colorMode === 'light'" label="light theme" icon="iconify mdi--weather-sunny" />
+      <DarkModeLabel :show="colorMode === 'auto'"
+                     label="system theme"
+                     icon="iconify mdi--sun-moon-stars"
+                     class="text-neutral-400 dark:text-neutral-400" />
+    </div>
   </button>
 </template>
 
