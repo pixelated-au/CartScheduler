@@ -2,12 +2,13 @@ import { usePage } from "@inertiajs/vue3";
 import { breakpointsTailwind, useBreakpoints } from "@vueuse/core";
 import { computed, onMounted, onUnmounted, ref, watch } from "vue";
 
-export type Item = {
+export type MenuItem = {
   label: string;
+  icon?: string;
   routeName?: string | undefined;
   href?: string;
   isDropdown?: boolean;
-  submenu?: Item[];
+  submenu?: MenuItem[];
   command?: () => void;
   hasUpdate?: boolean;
 };
@@ -17,7 +18,7 @@ export default function() {
   const mobileUserMenuOpen = ref(false);
   const desktopAdminDropdownOpen = ref(false);
   const desktopUserDropdownOpen = ref(false);
-  const openMobileSubmenus = ref<Record<Item["label"], boolean>>({}); // E.g., { 'Administration': false }
+  const openMobileSubmenus = ref<Record<MenuItem["label"], boolean>>({}); // E.g., { 'Administration': false }
 
   const page = usePage();
   const breakpoints = useBreakpoints(breakpointsTailwind);
@@ -31,7 +32,7 @@ export default function() {
     Object.keys(openMobileSubmenus.value).forEach((key) => openMobileSubmenus.value[key] = false);
   });
 
-  const closeMobileNav = (label?: Item["label"]) => {
+  const closeMobileNav = (label?: MenuItem["label"]) => {
     mobileNavOpen.value = false;
 
     if (label) {
@@ -49,7 +50,7 @@ export default function() {
     if (mobileNavOpen.value) mobileUserMenuOpen.value = false;
   };
 
-  const toggleMobileSubmenu = (label: Item["label"]) => {
+  const toggleMobileSubmenu = (label: MenuItem["label"]) => {
     openMobileSubmenus.value[label] = !openMobileSubmenus.value[label];
   };
 
