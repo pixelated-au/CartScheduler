@@ -53,7 +53,7 @@ const defaultAccept = "application/vnd.ms-excel, application/vnd.openxmlformats-
              type="file"
              :accept="accept || defaultAccept"
              @change="handleFileChange">
-      <transition name="fade">
+      <FadeTransition>
         <PButton v-if="modelValue"
                  type="button"
                  class="absolute inset-y-0 right-0 z-1"
@@ -61,20 +61,8 @@ const defaultAccept = "application/vnd.ms-excel, application/vnd.openxmlformats-
                  variant="text"
                  icon="iconify mdi--close"
                  @click="clearFileInput" />
-      </transition>
+      </FadeTransition>
     </div>
     <slot name="footer"></slot>
   </div>
 </template>
-
-<style lang="scss" scoped>
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.5s ease;
-}
-
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
-}
-</style>
