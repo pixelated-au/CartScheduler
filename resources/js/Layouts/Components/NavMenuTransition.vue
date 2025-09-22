@@ -1,10 +1,15 @@
 <script setup lang="ts">
 import { nextTick } from "vue";
 
+const emit = defineEmits<{
+  visibility: [boolean];
+}>();
+
 const onBeforeEnter = (el: Element) => {
   const style = (el as HTMLElement).style;
   style.opacity = "0";
   style.maxHeight = "0px";
+  emit("visibility", true);
 };
 const onEnter = async (el: Element, done: () => void) => {
   await nextTick(() => {
@@ -48,6 +53,7 @@ const onAfterLeave = (el: Element) => {
   style.transitionProperty = "";
   style.transitionDuration = "";
   style.transitionTimingFunction = "";
+  emit("visibility", false);
 };
 </script>
 
