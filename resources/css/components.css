@@ -54,8 +54,9 @@
         @apply list-decimal;
     }
 
-    .grid-cols-page {
-        grid-template-areas:
-        "left content right";
+    .page-grid {
+        display: grid;
+        grid-template-columns: minmax(0, theme(screens.xl));
+        justify-content: center;
     }
 }
