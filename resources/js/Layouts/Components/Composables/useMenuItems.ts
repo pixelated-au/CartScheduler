@@ -1,6 +1,5 @@
 import { router, usePage } from "@inertiajs/vue3";
 import { computed, onBeforeMount } from "vue";
-import useNavEvents from "@/Layouts/Components/Composables/useNavEvents";
 import type { MenuItem } from "@/Layouts/Components/Composables/useNavEvents";
 
 export default () => {
@@ -11,7 +10,6 @@ export default () => {
   };
 
   const page = usePage();
-  const { closeAllNav } = useNavEvents();
 
   const hasAdminMenu = computed(() => page.props.pagePermissions.canAdmin);
   const hasUpdate = computed(() => page.props.hasUpdate as boolean); // For update indicators
@@ -22,12 +20,9 @@ export default () => {
   });
 
   const logout = () => {
-    router.post(route("logout"), {}, {
-      onFinish: () => {
-        closeAllNav();
-      },
-    });
+    router.post(route("logout"));
   };
+
   const mainMenuItems = computed(() => {
     const items: MenuItem[] = [{
       label: "Dashboard",

@@ -1,6 +1,6 @@
 import { usePage } from "@inertiajs/vue3";
-import { breakpointsTailwind, useBreakpoints } from "@vueuse/core";
-import { computed, onMounted, onUnmounted, ref, watch } from "vue";
+import { computed, reactive, ref, watch } from "vue";
+import type { Ref } from "vue";
 
 export type MenuItem = {
   label: string;
@@ -15,100 +15,60 @@ export type MenuItem = {
 
 export default function() {
   const mobileNavOpen = ref(false);
-  const mobileUserMenuOpen = ref(false);
-  const desktopAdminDropdownOpen = ref(false);
-  const desktopUserDropdownOpen = ref(false);
-  const openMobileSubmenus = ref<Record<MenuItem["label"], boolean>>({}); // E.g., { 'Administration': false }
+  const openSubmenus = ref<Record<MenuItem["label"], boolean>>({}); // E.g., { 'Administration': false }
 
   const page = usePage();
-  const breakpoints = useBreakpoints(breakpointsTailwind);
-  const isMobile = breakpoints.smaller("sm");
 
   watch(() => page.url, () => {
     mobileNavOpen.value = false;
-    mobileUserMenuOpen.value = false;
-    desktopAdminDropdownOpen.value = false;
-    desktopUserDropdownOpen.value = false;
-    Object.keys(openMobileSubmenus.value).forEach((key) => openMobileSubmenus.value[key] = false);
+    Object.keys(openSubmenus.value).forEach((key) => openSubmenus.value[key] = false);
   });
 
-  const closeMobileNav = (label?: MenuItem["label"]) => {
-    mobileNavOpen.value = false;
-
+  const closeNav = (label?: MenuItem["label"]) => {
     if (label) {
-      openMobileSubmenus.value[label] = false;
+      openSubmenus.value[label] = false;
     }
-  };
-
-  const closeAllNav = () => {
-    mobileNavOpen.value = false;
-    mobileUserMenuOpen.value = false;
   };
 
   const toggleMobileNav = () => {
     mobileNavOpen.value = !mobileNavOpen.value;
-    if (mobileNavOpen.value) mobileUserMenuOpen.value = false;
   };
 
-  const toggleMobileSubmenu = (label: MenuItem["label"]) => {
-    openMobileSubmenus.value[label] = !openMobileSubmenus.value[label];
+  const closeMobileNav = () => {
+    mobileNavOpen.value = false;
   };
 
-  const mobileSubmenuOpen = (label: MenuItem["label"]) => {
-    return openMobileSubmenus.value[label];
+  const toggleSubmenu = (label: MenuItem["label"]) => {
+    openSubmenus.value[label] = !openSubmenus.value[label];
   };
 
-  const toggleMobileUserMenu = () => {
-    mobileUserMenuOpen.value = !mobileUserMenuOpen.value;
-    if (mobileUserMenuOpen.value) mobileNavOpen.value = false;
-  };
-
-  const closeMobileUserMenu = () => {
-    mobileUserMenuOpen.value = !mobileUserMenuOpen.value;
-    if (mobileUserMenuOpen.value) mobileNavOpen.value = false;
-  };
-
-  const handleEscapeKey = (event: KeyboardEvent) => {
-    if (event.key === "Escape") {
-      if (isMobile.value) {
-        if (mobileNavOpen.value) mobileNavOpen.value = false;
-        if (mobileUserMenuOpen.value) mobileUserMenuOpen.value = false;
-        // Consider closing active mobile submenu
-        const openSub = Object.keys(openMobileSubmenus.value).find((key) => openMobileSubmenus.value[key]);
-        if (openSub) openMobileSubmenus.value[openSub] = false;
-      }
-    }
-  };
-
-  const handleClickOutside = () => {
-    if (desktopAdminDropdownOpen.value) {
-      desktopAdminDropdownOpen.value = false;
-    }
-    if (desktopUserDropdownOpen.value) {
-      desktopUserDropdownOpen.value = false;
-    }
-  };
-
-  onMounted(() => {
-    document.addEventListener("keydown", handleEscapeKey);
-    document.addEventListener("click", handleClickOutside, true); // Capture phase for reliability
+  const submenuOpen = (label: Ref<MenuItem["label"]>) => computed(() => {
+    return openSubmenus.value[label.value];
   });
 
-  onUnmounted(() => {
-    document.removeEventListener("keydown", handleEscapeKey);
-    document.removeEventListener("click", handleClickOutside, true);
-  });
+  type EscapeHandler = (event: KeyboardEvent) => void;
+  const escapeHandlers = reactive<Record<string, EscapeHandler>>({});
+  const addEscapeHandler = (key: string, handler: EscapeHandler) => {
+    document.addEventListener("keydown", handler);
+    escapeHandlers[key] = handler;
+  };
+
+  const removeEscapeHandler = (key: string) => {
+    if (escapeHandlers[key]) {
+      document.removeEventListener("keydown", escapeHandlers[key]);
+      delete escapeHandlers[key];
+    }
+  };
 
   return {
-    mobileNavOpen: computed(() => mobileNavOpen.value),
-    mobileUserMenuOpen: computed(() => mobileUserMenuOpen.value),
-    openMobileSubmenus,
-    closeMobileUserMenu,
-    closeMobileNav,
-    closeAllNav,
-    mobileSubmenuOpen,
+    mobileNavOpen: mobileNavOpen as Readonly<typeof mobileNavOpen>,
+    openSubmenus,
+    closeNav,
+    submenuOpen,
     toggleMobileNav,
-    toggleMobileSubmenu,
-    toggleMobileUserMenu,
+    closeMobileNav,
+    toggleSubmenu,
+    addEscapeHandler,
+    removeEscapeHandler,
   };
 }

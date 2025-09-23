@@ -11,7 +11,7 @@ defineEmits<{
   "command": Event;
 }>();
 
-const { closeMobileNav } = useNavEvents();
+const { closeNav } = useNavEvents();
 
 const isActive = (routeName: string | undefined) => route().current() === routeName;
 </script>
@@ -25,7 +25,7 @@ const isActive = (routeName: string | undefined) => route().current() === routeN
             ? '!font-bold underline underline-offset-4 decoration-dashed after:iconify after:mdi--chevron-left'
             : 'hover:bg-neutral-200 dark:hover:bg-neutral-700'
         ]"
-        @click="closeMobileNav()">
+        @click="closeNav()">
     <span v-if="item.icon" :class="item.icon" class="text-xs me-1"/>
     {{ item.label }}
   </Link>
