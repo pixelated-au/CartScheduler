@@ -45,18 +45,16 @@ const mobileMenuToggle = (isVisible: boolean) => {
         <JetApplicationMark class="block w-auto h-9" />
       </Link>
 
-      <DarkMode v-if="mobileNavIsShowing" class="me-2" />
+      <!-- todo      NOW fix the desktop mode menu -->
+
+      <DarkMode v-show="mobileNavIsShowing" class="me-2" />
 
       <!-- Mobile Main Menu Toggle (Hamburger) -->
       <div class="flex items-center sm:hidden">
-        <button @click="toggleMobileNav"
-                type="button"
-                class="flex focus:outline-none focus:ring-1 focus:ring-neutral-300 dark:focus:ring-neutral-700 rounded-full p-2 me-2"
-                aria-controls="mobile-main-menu"
-                :aria-expanded="mobileNavIsShowing ? 'true' : 'false'">
-          <span v-if="mobileNavIsShowing" aria-label="Close menu" class="iconify mdi--close text-xl" />
-          <span v-else aria-label="Openmenu" class="iconify mdi--hamburger-menu text-xl" />
-        </button>
+        <!--        <NavHamburgerButton /> -->
+        <NavHamburgerButton :is-active="mobileNavIsShowing"
+                            :aria-expanded="mobileNavIsShowing ? 'true' : 'false'"
+                            @click="toggleMobileNav"/>
       </div>
     </div>
 

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useElementBounding } from "@vueuse/core";
-import { computed, useTemplateRef, watch } from "vue";
+import { computed, ref, useTemplateRef, watch } from "vue";
 import { useDarkMode } from "@/Composables/useDarkMode.js";
 
 const { colorMode, toggleDarkMode } = useDarkMode();
@@ -13,6 +13,8 @@ const clip = computed(() => `circle(0% at ${left.value + (width.value / 2)}px ${
 watch(clip, (val) => {
   document.documentElement.style.setProperty("--clip", val);
 });
+
+const isLabelShowing = ref(false);
 </script>
 
 <template>
@@ -22,18 +24,32 @@ watch(clip, (val) => {
           class="flex focus:outline-none focus:ring-1 focus:ring-neutral-300 dark:focus:ring-neutral-700 rounded-full p-2 dark:bg-panel-dark"
           aria-label="Toggle dark mode"
           @click="toggleDarkMode()">
-    <div class="flex justify-center items-center size-6">
-      <DarkModeLabel :show="colorMode === 'dark'" label="dark theme" icon="iconify mdi--moon-and-stars" />
-      <DarkModeLabel :show="colorMode === 'light'" label="light theme" icon="iconify mdi--weather-sunny" />
-      <DarkModeLabel :show="colorMode === 'auto'"
-                     label="system theme"
-                     icon="iconify mdi--sun-moon-stars"
-                     class="text-neutral-400 dark:text-neutral-400" />
-    </div>
+    <transition name="slide-up" mode="out-in">
+      <div class="node" v-if="colorMode === 'dark'"><DarkModeLabel v-model="isLabelShowing" label="dark theme" icon="iconify mdi--moon-and-stars" /></div>
+      <div class="node" v-else-if="colorMode === 'light'"><DarkModeLabel v-model="isLabelShowing" label="light theme" icon="iconify mdi--weather-sunny" /></div>
+      <div class="node" v-else><DarkModeLabel v-model="isLabelShowing" label="system theme" icon="iconify mdi--sun-moon-stars" class="text-neutral-400 dark:text-neutral-400" /></div>
+    </transition>
   </button>
 </template>
 
-<style lang="css">
+<!--suppress CssUnusedSymbol -->
+<style scoped>
+.node {
+    transition: all 0.25s ease;
+}
+
+.slide-up-enter-from {
+    opacity: 0;
+    transform: translateY(30px);
+}
+
+.slide-up-leave-to {
+    opacity: 0;
+    transform: translateY(-30px);
+}
+</style>
+
+<style>
 :root {
     @media (prefers-color-scheme: light) {
         color-scheme: light;
@@ -48,6 +64,7 @@ html {
     color-scheme: light;
 
     /*noinspection ALL*/
+
     &.dark {
         color-scheme: dark;
     }
