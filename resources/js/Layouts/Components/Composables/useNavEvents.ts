@@ -54,6 +54,10 @@ export default function() {
     openMobileSubmenus.value[label] = !openMobileSubmenus.value[label];
   };
 
+  const mobileSubmenuOpen = (label: MenuItem["label"]) => {
+    return openMobileSubmenus.value[label];
+  };
+
   const toggleMobileUserMenu = () => {
     mobileUserMenuOpen.value = !mobileUserMenuOpen.value;
     if (mobileUserMenuOpen.value) mobileNavOpen.value = false;
@@ -102,6 +106,7 @@ export default function() {
     closeMobileUserMenu,
     closeMobileNav,
     closeAllNav,
+    mobileSubmenuOpen,
     toggleMobileNav,
     toggleMobileSubmenu,
     toggleMobileUserMenu,
