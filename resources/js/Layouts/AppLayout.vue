@@ -58,33 +58,35 @@ onMounted(() => {
     <Head :title="title" />
 
     <div class="flex flex-col content-start min-h-dvh w-dvw max-w-full-dvw justify-stretch">
-      <Nav class="border-b border-neutral-300 dark:border-neutral-700/85"
+      <Nav class="border-b page-grid border-neutral-300 dark:border-neutral-700/85"
            @toggle-dark-mode="isDarkMode = $event" />
 
       <!-- Page Heading -->
       <header v-if="$slots.header"
-              class="grid grid-cols-page px-4 xl:px-0 justify-center border-b border-neutral-200 w-dvw dark:text-gray-100 dark:border-b dark:border-neutral-700/85">
+              class="page-grid
+                px-4 xl:px-0
+                border-b border-neutral-200 text-neutral-900 dark:text-neutral-100 dark:border-b dark:border-neutral-700/85">
         <div class="py-6">
           <slot name="header" />
         </div>
       </header>
 
-      <main class="flex flex-col flex-1 gap-0 justify-self-center main-content w-dvw grid-cols-page">
+      <main>
         <!-- Page Top -->
-        <section v-if="$slots['page-top']" class="col-span-3 w-full dark:text-gray-100">
+        <section v-if="$slots['page-top']" class="page-grid text-neutral-900 dark:text-neutral-100">
           <slot name="page-top" />
         </section>
 
         <!-- Page Content -->
-        <section class="w-dvw grid grid-cols-page flex-1 justify-center items-start col-span-3 gap-0 sm:col-span-1 sm:col-start-2">
-          <div class="grid grid-cols-1 justify-items-stretch justify-stretch pt-4 sm:pb-6 px-4 sm:px-4 bg-panel dark:bg-panel-dark overflow-hidden border border-t-0 std-border sm:rounded-b-md sm:mb-5">
+        <section class="w-dvw page-grid">
+          <div class="pt-4 sm:pb-6 px-4 sm:px-4 bg-panel dark:bg-panel-dark overflow-hidden border border-t-0 std-border sm:rounded-b-md sm:mb-5">
             <slot />
           </div>
         </section>
       </main>
 
       <!-- Page Bottom -->
-      <section v-if="$slots['page-bottom']" class="px-4 py-6 w-7xl sm:px-6 lg:px-8 dark:text-gray-100">
+      <section v-if="$slots['page-bottom']" class="px-4 py-6 w-7xl sm:px-6 lg:px-8 text-neutral-900 dark:text-neutral-100">
         <slot name="page-bottom" />
       </section>
     </div>
@@ -95,7 +97,7 @@ onMounted(() => {
   <PToast class="z-[9999]" position="bottom-center" group="bottom" :auto-z-index="false" />
 
   <ObtrusiveNotification full-screen-on-mobile v-model="showUpdateAvailabilityReminder" class="md:max-w-lg">
-    <AvailabilityReminder @check-later="showUpdateAvailabilityReminder = false"/>
+    <AvailabilityReminder @check-later="showUpdateAvailabilityReminder = false" />
   </ObtrusiveNotification>
 </template>
 
