@@ -16,6 +16,18 @@ export type Shift = Omit<App.Data.ShiftData, "volunteers"> & {
   freeShifts: number;
 };
 
+export interface EmptyShift {
+  startTime: Date;
+  endTime: Date;
+  location: string;
+  locationId: number;
+  shiftId: number;
+  currentVolunteers: App.Data.UserData[];
+  days: [boolean, boolean, boolean, boolean, boolean, boolean, boolean];
+  available_from: string | undefined;
+  available_to: string | undefined;
+}
+
 export default function(timezone: Ref<string>, canAdmin = false) {
 
   const date = ref(setHours(utcToZonedTime(new Date(), timezone.value), 12));
@@ -67,17 +79,6 @@ export default function(timezone: Ref<string>, canAdmin = false) {
     void getShifts();
   });
 
-  type EmptyShift = {
-    startTime: Date;
-    endTime: Date;
-    location: string;
-    locationId: number;
-    shiftId: number;
-    currentVolunteers: App.Data.UserData[];
-    days: [boolean, boolean, boolean, boolean, boolean, boolean, boolean];
-    available_from: string | undefined;
-    available_to: string | undefined;
-  };
   const emptyShiftsForTime = ref<EmptyShift[]>([]);
 
   const setReservations = (maxVolunteers: number, shift: Shift, location: App.Data.LocationData) => {
