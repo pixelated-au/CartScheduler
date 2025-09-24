@@ -70,6 +70,7 @@ export default () => {
     }
     items.push({
       label: "Administration",
+      icon: "iconify mdi--administrator",
       hasUpdate: hasUpdate.value,
       isDropdown: true,
       submenu: adminSubmenu,

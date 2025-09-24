@@ -5,10 +5,11 @@ import { computed, onMounted, onUnmounted, ref, useId } from "vue";
 import useNavEvents from "./Composables/useNavEvents";
 import type { MenuItem } from "./Composables/useNavEvents";
 
-const { item, items, label, showAsInline = false } = defineProps<{
+const { item, items, label, icon, showAsInline = false } = defineProps<{
   item?: MenuItem;
   items?: MenuItem[];
   label?: string;
+  icon?: string;
   showAsInline?: boolean;
   position: "start" | "end";
 }>();
@@ -38,12 +39,25 @@ const myLabel = computed(() => {
   throw new Error("Label not set");
 });
 
-const isSubmenuOpen = submenuOpen(myLabel);
+const myIcon = computed(() => {
+  if (icon) {
+    return icon;
+  }
+  if (item?.icon) {
+    return item.icon;
+  }
+  throw new Error("Label not set");
+});
+
+const isSubmenuOpen = computed(() => {
+  return !!submenuOpen(myLabel).value;
+});
 const isSubmenuItemActive = computed(() => submenu.value && submenu.value.some((subItem) => isActive(subItem.routeName)));
 
 const toggle = () => {
-  // if (cancel) cancel();
-  toggleSubmenu(myLabel.value);
+  if (!isSubmenuOpen.value) {
+    toggleSubmenu(myLabel.value);
+  }
 };
 
 onMounted(() => {
@@ -60,8 +74,10 @@ onUnmounted(() => {
 
 const target = ref();
 
-onClickOutside(target, () => {
+onClickOutside(target, (event) => {
   if (!isSubmenuOpen.value) return;
+
+  event.stopPropagation();
 
   closeNav(myLabel.value);
 });
@@ -69,7 +85,7 @@ onClickOutside(target, () => {
 
 <template>
   <div class="relative">
-    <button v-if="!showAsInline"
+    <button ref="submenuTrigger"
             @click="toggle"
             type="button"
             class="flex justify-between items-center w-full font-medium rounded-md transition-colors duration-150 ease-in-out hover:ring-1 ring-black/25 dark:ring-white/25"
@@ -81,6 +97,7 @@ onClickOutside(target, () => {
             :aria-expanded="openSubmenus[myLabel] ? 'true' : 'false'"
             :aria-controls="id">
       <template v-if="!$slots.button">
+        <span v-if="myIcon" :class="myIcon" class="text-xs me-1" />
         <span>{{ myLabel }}</span>
         <span class="duration-500 ease-in-out delay-100 iconify mdi--chevron-down transition-rotate"
               :class="{ 'rotate-180': isSubmenuOpen }"></span>
@@ -93,7 +110,7 @@ onClickOutside(target, () => {
       <div v-if="showAsInline || isSubmenuOpen"
            :ref="(el) => target = el"
            :id
-           class="overflow-hidden gap-2 ps-4 sm:ps-1 sm:py-1 sm:mt-2 sm:min-w-48 sm:z-50 sm:bg-white sm:rounded-md sm:ring-1 sm:ring-black sm:ring-opacity-5 sm:shadow-lg sm:origin-top-right sm:dark:bg-neutral-700 sm:focus:outline-none"
+           class="overflow-hidden gap-2 ps-4 sm:ps-1 sm:py-1 sm:mt-2 sm:min-w-48 sm:z-50 sm:bg-white sm:rounded-md sm:ring-1 sm:ring-black sm:ring-opacity-5 sm:shadow-md sm:origin-top-right sm:dark:bg-neutral-700/60 sm:backdrop-blur-sm sm:focus:outline-none"
            :class="[
              position === 'start' ? 'sm:absolute sm:left-0' : 'sm:absolute sm:right-0'
            ]">
@@ -107,7 +124,6 @@ onClickOutside(target, () => {
                     ? '!font-bold underline underline-offset-4 decoration-dashed after:iconify after:mdi--chevron-left'
                     : 'dark: hover:bg-neutral-200 dark:hover:bg-neutral-700'
                 ]">
-            <!--                @click=""> -->
             <span v-if="subItem.icon" :class="subItem.icon" class="text-xs me-1" />
             {{ subItem.label }}
           </Link>
