@@ -28,7 +28,6 @@ onMounted(() => {
 </script>
 
 <template>
-  <!--  <div v-if="show" -->
   <div class="flex items-center"
        :class="[ showLabel ? '' : 'delay-[300ms]' ]">
     <span class="grid items-center font-medium transition-[grid-template-columns] duration-300 relative"
