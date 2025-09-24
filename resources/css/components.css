@@ -1,4 +1,9 @@
 @layer overrides {
+    .p-datepicker-day {
+        /*noinspection CssUnresolvedCustomProperty*/
+        transition: background var(--p-datepicker-transition-duration);
+    }
+
     .std-border {
         @apply  border-neutral-300/75 dark:border-neutral-700/75;
     }

@@ -2,21 +2,23 @@
 import { usePage } from "@inertiajs/vue3";
 import axios, { isAxiosError } from "axios";
 import { format, parse } from "date-fns";
+import { useConfirm } from "primevue";
 import { computed, onMounted, reactive, ref } from "vue";
 import ComponentSpinner from "@/Components/ComponentSpinner.vue";
 import EmptySlot from "@/Components/Icons/EmptySlot.vue";
 import User from "@/Components/Icons/User.vue";
 import useLocationFilter from "@/Composables/useLocationFilter";
 import useToast from "@/Composables/useToast";
-import JetConfirmModal from "@/Jetstream/ConfirmationModal.vue";
 import MoveUserField from "@/Pages/Admin/Dashboard/MoveUserField.vue";
 import UserActionsModal from "@/Pages/Admin/Dashboard/UserActionsModal.vue";
 import DatePicker from "@/Pages/Components/Dashboard/DatePicker.vue";
 import type { Ref } from "vue";
 import type { Location, Shift } from "@/Composables/useLocationFilter";
+import type { Selection } from "@/Pages/Admin/Dashboard/MoveUserField.vue";
 import type { LocationsOnDate } from "@/Pages/Components/Dashboard/DatePicker.vue";
 
 const toast = useToast();
+const confirm = useConfirm();
 
 const timezone = computed<string>(() => usePage().props.shiftAvailability.timezone);
 
@@ -45,7 +47,7 @@ const setLocationMarkers = (locations: LocationsOnDate[]) => locationsOnDays.val
 
 type MoveSelection = {
   label: string;
-  volunteers: string[];
+  volunteers?: App.Data.UserData[];
   newLocationId: number;
   newShiftId: number;
 };
@@ -58,16 +60,60 @@ type SelectedMoveUser = {
 
 const selectedMoveUser = ref<SelectedMoveUser>();
 
-/** Note this is a get/set computed property so we can set it to null when the modal is closed **/
-const showMoveUserModal = computed<boolean>({
-  get: () => !!selectedMoveUser.value,
-  set: (value) => selectedMoveUser.value = value ? selectedMoveUser.value : undefined,
-});
+const promptMoveVolunteer = ({ target, selection }: { target: HTMLElement; selection: Selection }, volunteer: App.Data.UserData, shift: Shift) => {
+  console.log("selection", target, selection);
+  selectedMoveUser.value = {
+    selection,
+    volunteer,
+    shift,
+  };
+  confirmMove(target);
+};
 
-const promptMoveVolunteer = (selection: MoveSelection, volunteer: App.Data.UserData, shift: Shift) => selectedMoveUser.value = {
-  selection,
-  volunteer,
-  shift,
+const promptRemoveVolunteer = (volunteer: App.Data.UserData, shift:Shift, location:Location, date:Date) => {
+  selectedRemoveUser.value = { volunteer, shift, location, date };
+  confirmRemove();
+};
+
+const confirmMove = (target: HTMLElement) => {
+  confirm.require({
+    target: target,
+    group: "manage-volunteer",
+    header: "Confirmation",
+    message: `Are you sure you want to move ${selectedMoveUser.value?.volunteer.name} to ${ selectedMoveUser.value?.selection.label }?`,
+    icon: "iconify mdi--warning-outline",
+    rejectProps: {
+      label: "Cancel",
+      severity: "secondary",
+      outlined: true,
+    },
+    acceptProps: {
+      label: "Move",
+    },
+    accept: () => {
+      void moveVolunteer();
+    },
+  });
+};
+
+const confirmRemove = () => {
+  confirm.require({
+    header: "Confirmation",
+    group: "manage-volunteer",
+    message: `Are you sure you want to remove ${selectedRemoveUser.value?.volunteer.name} from ${ selectedRemoveUser.value?.location.name }?`,
+    icon: "iconify mdi--warning-outline",
+    rejectProps: {
+      label: "Cancel",
+      severity: "secondary",
+      outlined: true,
+    },
+    acceptProps: {
+      label: "Remove",
+    },
+    accept: () => {
+      void removeVolunteer();
+    },
+  });
 };
 
 const moveVolunteer = async () => {
@@ -205,15 +251,6 @@ const doShowAssignVolunteerModal = (shift: Shift, location: Location) => {
 
 const selectedRemoveUser = ref<SelectedRemoveUser | undefined>(undefined);
 
-const setRemoveUser = (volunteer: App.Data.UserData, shift: Shift, location: Location, date: Date) =>
-  selectedRemoveUser.value = { volunteer, shift, location, date };
-
-/** Note this is a get/set computed property so we can set it to null when the modal is closed **/
-const showRemoveVolunteerModal = computed<boolean>({
-  get: () => !!selectedRemoveUser.value,
-  set: (value) => selectedRemoveUser.value = value ? selectedRemoveUser.value : undefined,
-});
-
 const removeTooltip = (name: string) => `Remove ${name} from this shift`;
 
 const locationClasses = (location: Location) => location.freeShifts
@@ -304,21 +341,18 @@ onMounted(() => {
                                        :shift="shift"
                                        :location-id="location.id"
                                        :empty-shifts-for-time="emptyShiftsForTime"
-                                       @update:modelValue="promptMoveVolunteer($event, volunteer, shift)" />
+                                       @update="promptMoveVolunteer($event, volunteer, shift)" />
                         <div class="text-right">
                           <PButton severity="danger"
+                                   label="Remove"
+                                   icon="iconify mdi--account-cancel"
                                    v-tooltip="removeTooltip(volunteer.name)"
-                                   @click="setRemoveUser(volunteer, shift, location, date)">
-                            <span class="iconify mdi--account-cancel"/>
-                          </PButton>
+                                   @click="promptRemoveVolunteer(volunteer, shift, location, date)"/>
                         </div>
                       </div>
                     </div>
                     <div v-else>
-                      <PButton @click="doShowAssignVolunteerModal(shift, location)">
-                        <span class="iconify mdi--user-add"/>
-                        <span class="ml-3">Add Volunteer</span>
-                      </PButton>
+                      <PButton icon="iconify mdi--user-add" label="Add Volunteer" @click="doShowAssignVolunteerModal(shift, location)"/>
                     </div>
                   </div>
                 </div>
@@ -330,54 +364,11 @@ onMounted(() => {
     </ComponentSpinner>
   </div>
 
+  <PConfirmDialog group="manage-volunteer" pt:root="max-w-lg"/>
+
   <UserActionsModal v-model:show="showUserAddModal"
                     :date="date"
                     :shift="assignUserData.shift"
                     :location="assignUserData.location"
                     @assignVolunteer="assignVolunteer" />
-  <JetConfirmModal v-if="selectedMoveUser" v-model:show="showMoveUserModal">
-    <template #title>
-      <h2 class="text-lg font-medium text-gray-900">Move user</h2>
-    </template>
-
-    <template #content>
-      <div>
-        Are you sure you want to move {{ selectedMoveUser.volunteer.name }} to
-        {{ selectedMoveUser.selection.label }}?
-      </div>
-    </template>
-
-    <template #footer>
-      <div class="flex justify-end">
-        <PButton severity="secondary" @click="selectedMoveUser = undefined">Cancel</PButton>
-        <PButton @click="moveVolunteer()"
-                 class="ml-2">
-          Move
-        </PButton>
-      </div>
-    </template>
-  </JetConfirmModal>
-  <JetConfirmModal v-model:show="showRemoveVolunteerModal">
-    <template #title>
-      <h2 class="text-lg font-medium text-gray-900">Remove user</h2>
-    </template>
-
-    <template #content>
-      <div v-if="selectedRemoveUser">
-        Are you sure you want to remove {{ selectedRemoveUser.volunteer.name }} from
-        {{ selectedRemoveUser.location.name }}?
-      </div>
-    </template>
-
-    <template #footer>
-      <div class="flex justify-end">
-        <PButton severity="secondary" @click="selectedRemoveUser = undefined">Cancel</PButton>
-        <PButton severity="warn"
-                 @click="removeVolunteer()"
-                 class="ml-2">
-          Remove
-        </PButton>
-      </div>
-    </template>
-  </JetConfirmModal>
 </template>

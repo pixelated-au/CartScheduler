@@ -1,24 +1,37 @@
 <script setup lang="ts">
 import { templateRef } from "@vueuse/core";
 import { addMinutes, areIntervalsOverlapping, format, getDay, parse, subMinutes } from "date-fns";
-import { computed } from "vue";
-import type { EmptyShift } from "@/Composables/useLocationFilter";
+import { computed, ref, useId } from "vue";
+import type { EmptyShift, Shift } from "@/Composables/useLocationFilter";
 
-interface Option {
-  id: number;
-  value: string | number;
+export interface Selection {
   label: string;
+  volunteers?: App.Data.UserData[];
+  newLocationId: number;
+  newShiftId: number;
 }
 
 const props = defineProps<{
   volunteer: App.Data.UserData;
   date: Date;
-  shift: App.Data.ShiftData;
+  shift: Shift;
   locationId: number;
   emptyShiftsForTime: Array<EmptyShift>;
 }>();
 
-const model = defineModel<Option | number | string>();
+const emit = defineEmits<{
+  update: [{ target: HTMLElement; selection: Selection }];
+}>();
+
+const model = ref<Selection>();
+
+// const model = defineModel<Option>({ required: true });
+
+// watch(model, (val) => {
+//   console.log("watch", { ...val });
+//   if (!val) return;
+//   emit("update", val);
+// });
 
 const shiftStart = computed(() => parse(props.shift.start_time, "HH:mm:ss", props.date));
 const dayOfWeek = computed(() => getDay(props.date));
@@ -58,26 +71,36 @@ const moveTooltip = computed(() => shiftsForTime.value?.length === 0
 
 const movePopover = templateRef("movePop");
 const toggle = (e: Event) => movePopover.value && movePopover.value.toggle(e);
-const hide = () => movePopover.value && movePopover.value.hide();
+
+const id = useId();
+const moveButton = templateRef("moveButton");
+const select = () => {
+  if (!model.value) return;
+  emit("update", { target: (moveButton.value as HTMLElement), selection: model.value as Selection });
+
+  movePopover.value && movePopover.value.hide();
+};
 </script>
 
 <template>
   <div class="relative">
-    <PButton v-tooltip="moveTooltip"
-             label="Move"
-             icon="iconify mdi--account-arrow-right"
-             type="button"
-             severity="warn"
-             @click="toggle"/>
+    <button ref="moveButton"
+            :id
+            v-tooltip="moveTooltip"
+            type="button"
+            class="p-button p-component p-button-warn"
+            @click="toggle">
+      <span class="iconify mdi--account-arrow-right"/>
+      Move
+    </button>
 
     <PPopover ref="movePop">
-      <PListbox multiple
-                v-model="model"
+      <PListbox v-model="model"
                 :options="shiftsForTime"
                 optionLabel="label"
                 class="relative after:absolute after:w-full after:h-16 after:z-10 after:bottom-0 after:bg-gradient-to-t after:from-[var(--p-popover-background)] after:to-transparent after:pointer-events-none"
                 listStyle="max-height:300px"
-                @click="hide">
+                @click="select">
         <template #option="{ option }">
           <div class="flex flex-col text-sm">
             <div class="font-bold">{{ option.label }}</div>
