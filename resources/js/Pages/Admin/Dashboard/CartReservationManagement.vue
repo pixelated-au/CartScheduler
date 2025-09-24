@@ -6,8 +6,6 @@ import { computed, onMounted, reactive, ref } from "vue";
 import ComponentSpinner from "@/Components/ComponentSpinner.vue";
 import EmptySlot from "@/Components/Icons/EmptySlot.vue";
 import User from "@/Components/Icons/User.vue";
-import UserAdd from "@/Components/Icons/UserAdd.vue";
-import UserRemove from "@/Components/Icons/UserRemove.vue";
 import MoveUserSelectField from "@/Components/MoveUserSelectField.vue";
 import useLocationFilter from "@/Composables/useLocationFilter";
 import useToast from "@/Composables/useToast";
@@ -311,7 +309,7 @@ onMounted(() => {
                           <PButton severity="error"
                                    v-tooltip="removeTooltip(volunteer.name)"
                                    @click="setRemoveUser(volunteer, shift, location, date)">
-                            <UserRemove color="#000" />
+                            <span class="iconify mdi--account-cancel"/>
                           </PButton>
                         </div>
                       </div>
@@ -319,7 +317,7 @@ onMounted(() => {
                     <div v-else>
                       <PButton severity="info"
                                @click="doShowAssignVolunteerModal(shift, location)">
-                        <UserAdd color="#fff" />
+                        <span class="iconify mdi--user-add"/>
                         <span class="ml-3">Add Volunteer</span>
                       </PButton>
                     </div>

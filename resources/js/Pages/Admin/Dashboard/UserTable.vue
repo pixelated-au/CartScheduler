@@ -5,7 +5,6 @@ import { computed, inject, ref, watchEffect } from "vue";
 import DataTable from "@/Components/DataTable.vue";
 import Comment from "@/Components/Icons/Comment.vue";
 import QuestionCircle from "@/Components/Icons/QuestionCircle.vue";
-import UserAdd from "@/Components/Icons/UserAdd.vue";
 import useToast from "@/Composables/useToast";
 import FilledShiftsIndicator from "@/Pages/Admin/Dashboard/FilledShiftsIndicator.vue";
 import { useGlobalState } from "@/store";
@@ -386,7 +385,7 @@ const hasDaysAvailable = (daysAvailable) => Object.values(daysAvailable).some((d
 
       <template #item-action="{ id, name }">
         <PButton severity="info" @click="assignVolunteer(id, name)">
-          <UserAdd color="#fff" />
+          <span class="iconify mdi--user-add"/>
         </PButton>
       </template>
     </data-table>

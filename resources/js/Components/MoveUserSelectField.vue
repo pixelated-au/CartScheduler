@@ -1,7 +1,6 @@
 <script setup>
 import { addMinutes, areIntervalsOverlapping, format, getDay, parse, subMinutes } from "date-fns";
-import { computed, inject } from "vue";
-import UserMove from "@/Components/Icons/UserMove.vue";
+import { computed } from "vue";
 import SelectField from "@/Components/SelectField.vue";
 import { useDarkMode } from "@/Composables/useDarkMode.js";
 
@@ -66,8 +65,8 @@ const moveTooltip = computed(() => shiftsForTime.value?.length === 0
                v-tooltip="moveTooltip"
                emptyNote="No other locations available"
                @update:modelValue="$emit('update:modelValue', $event)">
-    <template #label="{ option }">
-      <UserMove :color="iconColor"/>
+    <template #label>
+      <span class="iconify mdi--account-arrow-right"/>
     </template>
 
     <template #extra="{ option }">
