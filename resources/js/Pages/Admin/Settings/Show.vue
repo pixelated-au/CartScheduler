@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import AppLayout from "@/Layouts/AppLayout.vue";
-import SoftwareUpdateForm from "@/Pages/Admin/Settings/Partials/SoftwareUpdateForm.vue";
-import UpdateAllowedSettingsUsersForm from "@/Pages/Admin/Settings/Partials/UpdateAllowedSettingsUsersForm.vue";
-import UpdateGeneralSettingsForm from "@/Pages/Admin/Settings/Partials/UpdateGeneralSettingsForm.vue";
+import SoftwareUpdateForm from "./Partials/SoftwareUpdateForm.vue";
+import UpdateAllowedSettingsUsersForm from "./Partials/UpdateAllowedSettingsUsersForm.vue";
+import UpdateGeneralSettingsForm from "./Partials/UpdateGeneralSettingsForm.vue";
 
-defineProps({
-  settings: App.Settings.GeneralSettings,
-});
+defineProps<{
+  settings: App.Settings.GeneralSettings;
+}>();
 </script>
 
 <template>
