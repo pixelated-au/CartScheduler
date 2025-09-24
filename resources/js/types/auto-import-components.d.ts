@@ -42,7 +42,7 @@ declare module 'vue' {
     Loading: typeof import('./../Components/Loading.vue')['default']
     LocationAccordion: typeof import('./../Components/LocationAccordion.vue')['default']
     Menu: typeof import('./../Layouts/Components/Menu.vue')['default']
-    MoveUserSelectField: typeof import('./../Components/MoveUserSelectField.vue')['default']
+    MoveUserField: typeof import('../Pages/Admin/Dashboard/MoveUserField.vue')['default']
     Nav: typeof import('./../Layouts/Components/Nav.vue')['default']
     NavCurrentUser: typeof import('./../Layouts/Components/NavCurrentUser.vue')['default']
     NavDesktopMain: typeof import('./../Layouts/Components/NavDesktopMain.vue')['default']

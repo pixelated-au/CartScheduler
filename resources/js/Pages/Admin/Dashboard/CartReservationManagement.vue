@@ -6,10 +6,10 @@ import { computed, onMounted, reactive, ref } from "vue";
 import ComponentSpinner from "@/Components/ComponentSpinner.vue";
 import EmptySlot from "@/Components/Icons/EmptySlot.vue";
 import User from "@/Components/Icons/User.vue";
-import MoveUserSelectField from "@/Components/MoveUserSelectField.vue";
 import useLocationFilter from "@/Composables/useLocationFilter";
 import useToast from "@/Composables/useToast";
 import JetConfirmModal from "@/Jetstream/ConfirmationModal.vue";
+import MoveUserField from "@/Pages/Admin/Dashboard/MoveUserField.vue";
 import UserActionsModal from "@/Pages/Admin/Dashboard/UserActionsModal.vue";
 import DatePicker from "@/Pages/Components/Dashboard/DatePicker.vue";
 import type { Ref } from "vue";
@@ -298,15 +298,15 @@ onMounted(() => {
                         </a>
                       </div>
                       <div class="grid grid-cols-2 col-span-2 gap-1.5 lg:flex lg:gap-3">
-                        <MoveUserSelectField class="inline-block"
-                                             :volunteer="volunteer"
-                                             :date="date"
-                                             :shift="shift"
-                                             :location-id="location.id"
-                                             :empty-shifts-for-time="emptyShiftsForTime"
-                                             @update:modelValue="promptMoveVolunteer($event, volunteer, shift)" />
+                        <MoveUserField class="inline-block"
+                                       :volunteer="volunteer"
+                                       :date="date"
+                                       :shift="shift"
+                                       :location-id="location.id"
+                                       :empty-shifts-for-time="emptyShiftsForTime"
+                                       @update:modelValue="promptMoveVolunteer($event, volunteer, shift)" />
                         <div class="text-right">
-                          <PButton severity="error"
+                          <PButton severity="danger"
                                    v-tooltip="removeTooltip(volunteer.name)"
                                    @click="setRemoveUser(volunteer, shift, location, date)">
                             <span class="iconify mdi--account-cancel"/>
@@ -315,8 +315,7 @@ onMounted(() => {
                       </div>
                     </div>
                     <div v-else>
-                      <PButton severity="info"
-                               @click="doShowAssignVolunteerModal(shift, location)">
+                      <PButton @click="doShowAssignVolunteerModal(shift, location)">
                         <span class="iconify mdi--user-add"/>
                         <span class="ml-3">Add Volunteer</span>
                       </PButton>
