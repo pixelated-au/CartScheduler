@@ -43,7 +43,3 @@ const mobileMenuToggled = (isVisible: boolean) => {
     </div>
   </NavMenuTransition>
 </template>
-
-<style scoped lang="scss">
-
-</style>

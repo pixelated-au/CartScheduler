@@ -13,11 +13,12 @@ export type MenuItem = {
   hasUpdate?: boolean;
 };
 
-export default function() {
-  const mobileNavOpen = ref(false);
-  const openSubmenus = ref<Record<MenuItem["label"], boolean>>({}); // E.g., { 'Administration': false }
+const mobileNavOpen = ref(false);
+const openSubmenus = ref<Record<MenuItem["label"], boolean>>({}); // E.g., { 'Administration': false }
 
-  const page = usePage();
+const page = usePage();
+
+export default function() {
 
   watch(() => page.url, () => {
     mobileNavOpen.value = false;

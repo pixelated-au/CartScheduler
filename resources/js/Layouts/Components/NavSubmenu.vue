@@ -2,8 +2,8 @@
 import { Link } from "@inertiajs/vue3";
 import { onClickOutside } from "@vueuse/core";
 import { computed, onMounted, onUnmounted, ref, useId } from "vue";
-import useNavEvents from "@/Layouts/Components/Composables/useNavEvents";
-import type { MenuItem } from "@/Layouts/Components/Composables/useNavEvents";
+import useNavEvents from "./Composables/useNavEvents";
+import type { MenuItem } from "./Composables/useNavEvents";
 
 const { item, items, label, showAsInline = false } = defineProps<{
   item?: MenuItem;
