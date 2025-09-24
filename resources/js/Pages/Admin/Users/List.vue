@@ -53,12 +53,12 @@ onMounted(() => {
         </h2>
         <div class="w-full md:w-auto hidden sm:flex gap-4">
           <PButton label="Import Users"
-                   icon="iconify mdi--account-arrow-up-outline"
+                   icon="iconify mdi--account-arrow-up"
                    severity="help"
                    variant="outlined"
                    @click="onImportUsers" />
           <PButton label="Download Users"
-                   icon="iconify mdi--account-arrow-down-outline"
+                   icon="iconify mdi--account-arrow-down"
                    severity="info"
                    variant="outlined"
                    @click="onDownloadUsers" />
@@ -74,7 +74,7 @@ onMounted(() => {
                   type="text"
                   class="row-start-2 mt-1 block w-full dark:bg-slate-700 sm:dark:bg-slate-800" />
         <JetHelpText class="row-start-3">Search on name, email, phone, role or any field</JetHelpText>
-        <PButton label="New User" icon="iconify mdi--user-add-outline" class="row-start-2" @click="onNewUser" />
+        <PButton label="New User" icon="iconify mdi--user-add" class="row-start-2" @click="onNewUser" />
       </div>
 
       <div class="">
