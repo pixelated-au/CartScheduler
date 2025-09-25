@@ -74,10 +74,8 @@ onUnmounted(() => {
 
 const target = ref();
 
-onClickOutside(target, (event) => {
+onClickOutside(target, (_: Event) => {
   if (!isSubmenuOpen.value) return;
-
-  event.stopPropagation();
 
   closeNav(myLabel.value);
 });
