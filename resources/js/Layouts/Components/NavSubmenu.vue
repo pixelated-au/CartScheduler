@@ -11,7 +11,7 @@ const { item, items, label, icon, showAsInline = false } = defineProps<{
   label?: string;
   icon?: string;
   showAsInline?: boolean;
-  position: "start" | "end";
+  popUpPosition: "start" | "end";
 }>();
 
 const { submenuOpen, toggleSubmenu, openSubmenus, closeNav, addEscapeHandler, removeEscapeHandler } = useNavEvents();
@@ -84,22 +84,23 @@ onClickOutside(target, (event) => {
 </script>
 
 <template>
-  <div class="relative">
+  <li class="relative">
     <button ref="submenuTrigger"
             @click="toggle"
             type="button"
-            class="flex justify-between items-center w-full font-medium rounded-md transition-colors duration-150 ease-in-out hover:ring-1 ring-black/25 dark:ring-white/25"
+            class="flex justify-between items-center px-3 py-2 ease-in-out delay-100 w-full font-medium rounded-md transition-colors duration-150"
             :class="[
               isSubmenuOpen || isSubmenuItemActive
                 ? '!font-bold underline underline-offset-4 decoration-dotted'
                 : 'hover:bg-neutral-200 dark:hover:bg-neutral-700'
             ]"
+            :aria-label="`${myLabel} menu`"
             :aria-expanded="openSubmenus[myLabel] ? 'true' : 'false'"
             :aria-controls="id">
       <template v-if="!$slots.button">
         <span v-if="myIcon" :class="myIcon" class="text-xs me-1" />
         <span>{{ myLabel }}</span>
-        <span class="duration-500 ease-in-out delay-100 iconify mdi--chevron-down transition-rotate"
+        <span class="duration-500 iconify mdi--chevron-down esee-in-out transition-rotate"
               :class="{ 'rotate-180': isSubmenuOpen }"></span>
       </template>
 
@@ -107,14 +108,15 @@ onClickOutside(target, (event) => {
     </button>
 
     <NavMenuTransition>
-      <div v-if="showAsInline || isSubmenuOpen"
-           :ref="(el) => target = el"
-           :id
-           class="overflow-hidden gap-2 ps-4 sm:ps-1 sm:py-1 sm:mt-2 sm:min-w-48 sm:z-50 sm:bg-white sm:rounded-md sm:ring-1 sm:ring-black sm:ring-opacity-5 sm:shadow-md sm:origin-top-right sm:dark:bg-neutral-700/60 sm:backdrop-blur-sm sm:focus:outline-none"
-           :class="[
-             position === 'start' ? 'sm:absolute sm:left-0' : 'sm:absolute sm:right-0'
-           ]">
-        <template v-for="subItem in submenu" :key="subItem.label">
+      <ul v-if="showAsInline || isSubmenuOpen"
+          :ref="el => target = el"
+          :id
+          :class="[
+            popUpPosition === 'start' ? 'sm:absolute sm:left-0' : 'sm:absolute sm:right-0'
+          ]"
+          class="overflow-hidden gap-2 ps-4 sm:ps-1 sm:py-1 sm:mt-2 sm:min-w-48 sm:z-50 sm:bg-white sm:rounded-md sm:ring-1 sm:ring-black sm:ring-opacity-5 sm:shadow-md sm:origin-top-right sm:dark:bg-neutral-700/60 sm:backdrop-blur-sm sm:focus:outline-none">
+        <li v-for="subItem in submenu"
+            :key="subItem.label">
           <Link v-if="subItem.href"
                 :href="subItem.href as string"
                 class="flex items-center py-2 text-base font-medium rounded-md transition-colors duration-150 ease-in-out !text-current text-nowrap"
@@ -133,8 +135,8 @@ onClickOutside(target, (event) => {
                role="menuitem">
             {{ subItem.label }}
           </div>
-        </template>
-      </div>
+        </li>
+      </ul>
     </NavMenuTransition>
-  </div>
+  </li>
 </template>

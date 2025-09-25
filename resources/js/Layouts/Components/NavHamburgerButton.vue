@@ -12,7 +12,6 @@ defineEmits<{
   <button type="button"
           class="btn focus:outline-none focus:ring-1 focus:ring-neutral-300 dark:focus:ring-neutral-700 rounded-full p-1 me-2"
           :class="{ active: isActive }"
-          aria-label="Toggle Menu"
           @click="$emit('click')">
     <svg class="icon size-8 select-none"
          viewBox="0 0 100 100">

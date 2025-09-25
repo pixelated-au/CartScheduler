@@ -7,7 +7,7 @@ const page = usePage();
 </script>
 
 <template>
-  <NavSubmenu :items="userNavMenuItems" label="desktop-user-menu" position="end">
+  <NavSubmenu :items="userNavMenuItems" label="desktop-user-menu" pop-up-position="end">
     <template #button>
       <img v-if="page.props.auth.user?.profile_photo_url"
            class="w-8 h-8 rounded-full"
