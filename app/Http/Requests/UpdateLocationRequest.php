@@ -36,10 +36,10 @@ class UpdateLocationRequest extends FormRequest
     {
         $maxVolunteers = config('cart-scheduler.max_volunteers_per_location');
         return [
-            'name'                    => ['required', 'string', 'max:255'],
+            'name'                    => ['required', 'string', 'max:190'],
             'description'             => ['required', 'string', 'max:4000000000'],
-            'min_volunteers'          => ['required', 'integer', 'min:0'],
-            'max_volunteers'          => ['required', 'integer', "max:$maxVolunteers"],
+            'min_volunteers'          => ['required', 'integer', 'lte:max_volunteers', 'min:0'],
+            'max_volunteers'          => ['required', 'integer', 'gte:min_volunteers', "max:$maxVolunteers"],
             'requires_brother'        => ['boolean'],
             'latitude'                => ['nullable', 'numeric', 'min:-90', 'max:90.999999999999'],
             'longitude'               => ['nullable', 'numeric', 'min:-180', 'max:180.999999999999'],
