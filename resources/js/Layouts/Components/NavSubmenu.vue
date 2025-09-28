@@ -1,14 +1,13 @@
 <script setup lang="ts">
 import { Link } from "@inertiajs/vue3";
-import { onClickOutside } from "@vueuse/core";
-import { computed, onMounted, onUnmounted, ref, useId } from "vue";
+import { onClickOutside, useFocusWithin } from "@vueuse/core";
+import { computed, onMounted, onUnmounted, useId, useTemplateRef } from "vue";
 import useNavEvents from "./Composables/useNavEvents";
 import type { MenuItem } from "./Composables/useNavEvents";
 
-const { item, items, label, icon, showAsInline = false } = defineProps<{
+const { item, items, icon, showAsInline = false } = defineProps<{
   item?: MenuItem;
   items?: MenuItem[];
-  label?: string;
   icon?: string;
   showAsInline?: boolean;
   popUpPosition: "start" | "end";
@@ -16,7 +15,7 @@ const { item, items, label, icon, showAsInline = false } = defineProps<{
 
 const { submenuOpen, toggleSubmenu, openSubmenus, closeNav, addEscapeHandler, removeEscapeHandler } = useNavEvents();
 
-const submenu = computed(() => {
+const submenuItems = computed(() => {
   if (item) {
     return item.submenu;
   }
@@ -29,14 +28,11 @@ const submenu = computed(() => {
 const isActive = (routeName: string | undefined) => route().current() === routeName;
 const id = useId();
 
-const myLabel = computed(() => {
-  if (label) {
-    return label;
-  }
+const label = computed(() => {
   if (item?.label) {
     return item.label;
   }
-  throw new Error("Label not set");
+  return useId();
 });
 
 const myIcon = computed(() => {
@@ -49,14 +45,12 @@ const myIcon = computed(() => {
   throw new Error("Label not set");
 });
 
-const isSubmenuOpen = computed(() => {
-  return !!submenuOpen(myLabel).value;
-});
-const isSubmenuItemActive = computed(() => submenu.value && submenu.value.some((subItem) => isActive(subItem.routeName)));
+const isSubmenuOpen = computed(() => !!submenuOpen(label).value);
+const isSubmenuItemActive = computed(() => submenuItems.value && submenuItems.value.some((subItem) => isActive(subItem.routeName)));
 
 const toggle = () => {
   if (!isSubmenuOpen.value) {
-    toggleSubmenu(myLabel.value);
+    toggleSubmenu(label.value);
   }
 };
 
@@ -64,7 +58,7 @@ onMounted(() => {
   addEscapeHandler("mobile-nav", (event: KeyboardEvent) => {
     if (!isSubmenuOpen.value) return;
     event.preventDefault();
-    closeNav(myLabel.value);
+    closeNav(label.value);
   });
 });
 
@@ -72,18 +66,27 @@ onUnmounted(() => {
   removeEscapeHandler("mobile-nav");
 });
 
-const target = ref();
+const target = useTemplateRef("submenu");
+const toggleButton = useTemplateRef("toggleButton");
 
-onClickOutside(target, (_: Event) => {
-  if (!isSubmenuOpen.value) return;
+const { focused } = useFocusWithin(toggleButton);
+onClickOutside(target, async (event: Event) => {
+  if (!isSubmenuOpen.value) {
+    return;
+  }
 
-  closeNav(myLabel.value);
+  if (focused.value) {
+    event.stopPropagation();
+  }
+
+  closeNav(label.value);
 });
 </script>
 
 <template>
   <li class="relative">
-    <button ref="submenuTrigger"
+    <button v-if="!showAsInline"
+            ref="toggleButton"
             @click="toggle"
             type="button"
             class="flex justify-between items-center px-3 py-2 ease-in-out delay-100 w-full font-medium rounded-md transition-colors duration-150"
@@ -92,12 +95,12 @@ onClickOutside(target, (_: Event) => {
                 ? '!font-bold underline underline-offset-4 decoration-dotted'
                 : 'hover:bg-neutral-200 dark:hover:bg-neutral-700'
             ]"
-            :aria-label="`${myLabel} menu`"
-            :aria-expanded="openSubmenus[myLabel] ? 'true' : 'false'"
+            :aria-label="`${label} menu`"
+            :aria-expanded="openSubmenus[label] ? 'true' : 'false'"
             :aria-controls="id">
       <template v-if="!$slots.button">
         <span v-if="myIcon" :class="myIcon" class="text-xs me-1" />
-        <span>{{ myLabel }}</span>
+        <span>{{ label }}</span>
         <span class="duration-500 iconify mdi--chevron-down esee-in-out transition-rotate"
               :class="{ 'rotate-180': isSubmenuOpen }"></span>
       </template>
@@ -107,13 +110,11 @@ onClickOutside(target, (_: Event) => {
 
     <NavMenuTransition>
       <ul v-if="showAsInline || isSubmenuOpen"
-          :ref="el => target = el"
+          ref="submenu"
           :id
-          :class="[
-            popUpPosition === 'start' ? 'sm:absolute sm:left-0' : 'sm:absolute sm:right-0'
-          ]"
+          :class="[ popUpPosition === 'start' ? 'sm:absolute sm:left-0' : 'sm:absolute sm:right-0' ]"
           class="overflow-hidden gap-2 ps-4 sm:ps-1 sm:py-1 sm:mt-2 sm:min-w-48 sm:z-50 sm:bg-white sm:rounded-md sm:ring-1 sm:ring-black sm:ring-opacity-5 sm:shadow-md sm:origin-top-right sm:dark:bg-neutral-700/60 sm:backdrop-blur-sm sm:focus:outline-none">
-        <li v-for="subItem in submenu"
+        <li v-for="subItem in submenuItems"
             :key="subItem.label">
           <Link v-if="subItem.href"
                 :href="subItem.href as string"

@@ -14,7 +14,7 @@ const page = usePage();
            :src="page.props.auth.user.profile_photo_url"
            :alt="page.props.auth.user?.name || 'User Avatar'">
       <span v-else
-            class="inline-flex justify-center items-center w-8 h-8 rounded-full bg-neutral-300 dark:bg-neutral-600">
+            class="inline-flex justify-center items-center size-10 rounded-full bg-neutral-300 dark:bg-neutral-600">
         <span class="font-medium leading-none !text-current">
           {{ page.props.auth.user?.name?.charAt(0) || "U" }}
         </span>
