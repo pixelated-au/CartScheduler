@@ -3,6 +3,7 @@ import { Link } from "@inertiajs/vue3";
 import { onClickOutside, useFocusWithin } from "@vueuse/core";
 import { computed, onMounted, onUnmounted, useId, useTemplateRef } from "vue";
 import useNavEvents from "./Composables/useNavEvents";
+import type { CssClass } from "@/types/types";
 import type { MenuItem } from "./Composables/useNavEvents";
 
 const { item, items, icon, showAsInline = false } = defineProps<{
@@ -11,6 +12,7 @@ const { item, items, icon, showAsInline = false } = defineProps<{
   icon?: string;
   showAsInline?: boolean;
   popUpPosition: "start" | "end";
+  buttonClasses?: CssClass;
 }>();
 
 const { submenuOpen, toggleSubmenu, openSubmenus, closeNav, addEscapeHandler, removeEscapeHandler } = useNavEvents();
@@ -91,9 +93,12 @@ onClickOutside(target, async (event: Event) => {
             type="button"
             class="flex justify-between items-center px-3 py-2 ease-in-out delay-100 w-full font-medium rounded-md transition-colors duration-150"
             :class="[
-              isSubmenuOpen || isSubmenuItemActive
-                ? '!font-bold underline underline-offset-4 decoration-dotted'
-                : 'hover:bg-neutral-200 dark:hover:bg-neutral-700'
+              [
+                isSubmenuOpen || isSubmenuItemActive
+                  ? '!font-bold underline underline-offset-4 decoration-dotted'
+                  : 'hover:bg-neutral-200 dark:hover:bg-neutral-700'
+              ],
+              buttonClasses,
             ]"
             :aria-label="`${label} menu`"
             :aria-expanded="openSubmenus[label] ? 'true' : 'false'"
