@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { router } from "@inertiajs/vue3";
-import AppLayout from "@/Layouts/AppLayout.vue";
 import LocationForm from "@/Pages/Admin/Locations/Partials/LocationForm.vue";
 
 defineProps<{
@@ -14,22 +13,19 @@ const listRouteAction = () => {
 </script>
 
 <template>
-  <AppLayout :title="`Location: ${location.name}`">
-    <template #header>
-      <div class="flex justify-between">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-          Location {{ location.name }}
-        </h2>
-        <PButton class="mx-3" type="button" severity="secondary" outline @click.prevent="listRouteAction">
-          Back
-        </PButton>
-      </div>
-    </template>
-
-    <div>
-      <div class="max-w-7xl mx-auto py-10 sm:px-6 lg:px-8">
-        <LocationForm :location="location" :max-volunteers="maxVolunteers" action="edit"/>
-      </div>
+  <PageHeader :title="`Location: ${location.name}`">
+    <div class="flex justify-between">
+      <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
+        Location {{ location.name }}
+      </h2>
+      <PButton class="mx-3" type="button" severity="secondary" outline @click.prevent="listRouteAction">
+        Back
+      </PButton>
     </div>
-  </AppLayout>
+  </PageHeader>
+  <div>
+    <div class="max-w-7xl mx-auto py-10 sm:px-6 lg:px-8">
+      <LocationForm :location="location" :max-volunteers="maxVolunteers" action="edit"/>
+    </div>
+  </div>
 </template>

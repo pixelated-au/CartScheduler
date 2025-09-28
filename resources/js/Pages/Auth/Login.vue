@@ -1,12 +1,11 @@
 <script setup lang="ts">
 import { Link, usePage } from "@inertiajs/vue3";
-import axios, { isAxiosError } from "axios";
+import { isAxiosError } from "axios";
 import { computed, onMounted, reactive, ref } from "vue";
 import Alert from "@/Components/Alert.vue";
+import useGlobalSpinner from "@/Composables/useGlobalSpinner";
 import useToast from "@/Composables/useToast";
-import JetAuthenticationCardLogo from "@/Jetstream/AuthenticationCardLogo.vue";
 import JetLabel from "@/Jetstream/Label.vue";
-import AuthLayout from "@/Layouts/AuthLayout.vue";
 import type { AppPageProps } from "@/types/laravel-request-helpers";
 
 type PageProps = {
@@ -31,8 +30,9 @@ const form = reactive({
 const hasErrors = ref(false);
 
 const toast = useToast();
+const { processing, setProcessing } = useGlobalSpinner();
 
-const submit = async (setProcessing: (value: boolean) => void) => {
+const submit = async () => {
   setProcessing(true);
   hasErrors.value = false;
   try {
@@ -69,67 +69,61 @@ if (import.meta.env.DEV) {
 </script>
 
 <template>
-  <AuthLayout title="Log in">
-    <template #logo>
-      <JetAuthenticationCardLogo />
-    </template>
+  <Head title="Log in" />
 
-    <template #default="{ processing, setProcessing }">
-      <div v-if="hasErrors">
-        <div class="font-medium my-3 text-center text-red-600">
-          Whoops! Please check your details and try again.
-        </div>
+  <div v-if="hasErrors">
+    <div class="font-medium my-3 text-center text-red-600">
+      Whoops! Please check your details and try again.
+    </div>
+  </div>
+
+  <Alert v-if="setPasswordSuccess || status">
+    {{ setPasswordSuccess || status }}
+  </Alert>
+
+  <form @submit.prevent="submit()">
+    <div class="flex flex-col gap-3 [&>div]:flex [&>div]:flex-col [&>div]:gap-1">
+      <div>
+        <JetLabel for="email" value="Email" />
+        <PInputText id="email"
+                    v-model="form.email"
+                    type="email"
+                    class="block mt-1 w-full"
+                    required
+                    autocomplete="username"
+                    autofocus />
       </div>
 
-      <Alert v-if="setPasswordSuccess || status">
-        {{ setPasswordSuccess || status }}
-      </Alert>
+      <div>
+        <JetLabel for="password" value="Password" />
+        <PPassword input-id="password"
+                   v-model="form.password"
+                   :feedback="false"
+                   toggle-mask
+                   input-class="w-full"
+                   required
+                   :inputProps="{ autocomplete: 'current-password' }" />
+      </div>
 
-      <form @submit.prevent="submit(setProcessing)">
-        <div class="flex flex-col gap-3 [&>div]:flex [&>div]:flex-col [&>div]:gap-1">
-          <div>
-            <JetLabel for="email" value="Email" />
-            <PInputText id="email"
-                        v-model="form.email"
-                        type="email"
-                        class="block mt-1 w-full"
-                        required
-                        autocomplete="username"
-                        autofocus />
-          </div>
+      <div class="mt-4 flex w-full !flex-row items-center">
+        <PCheckbox binary input-id="remember" v-model="form.remember" name="remember" />
+        <JetLabel for="remember">Remember me</JetLabel>
+      </div>
+    </div>
 
-          <div>
-            <JetLabel for="password" value="Password" />
-            <PPassword input-id="password"
-                       v-model="form.password"
-                       :feedback="false"
-                       toggle-mask
-                       input-class="w-full"
-                       required
-                       :inputProps="{ autocomplete: 'current-password' }"/>
-          </div>
+    <div class="flex gap-4 justify-end items-center mt-4">
+      <Link v-if="props.canResetPassword"
+            :href="route('password.request')"
+            class="text-gray-600 underline hover:text-gray-900 dark:text-gray-200 dark:hover-text-gray-500">
+        Forgot your password?
+      </Link>
 
-          <div class="mt-4 flex w-full !flex-row items-center">
-            <PCheckbox binary input-id="remember" v-model="form.remember" name="remember" />
-            <JetLabel for="remember">Remember me</JetLabel>
-          </div>
-        </div>
-
-        <div class="flex gap-4 justify-end items-center mt-4">
-          <Link v-if="props.canResetPassword"
-                :href="route('password.request')"
-                class="text-gray-600 underline hover:text-gray-900 dark:text-gray-200 dark:hover-text-gray-500">
-            Forgot your password?
-          </Link>
-
-          <PButton label="Log in"
-                   icon="iconify mdi--login"
-                   icon-pos="right"
-                   :class="{ 'opacity-25': processing }"
-                   :disabled="processing"
-                   type="submit" />
-        </div>
-      </form>
-    </template>
-  </AuthLayout>
+      <PButton label="Log in"
+               icon="iconify mdi--login"
+               icon-pos="right"
+               :class="{ 'opacity-25': processing }"
+               :disabled="processing"
+               type="submit" />
+    </div>
+  </form>
 </template>

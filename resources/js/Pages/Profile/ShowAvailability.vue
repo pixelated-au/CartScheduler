@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { usePage } from "@inertiajs/vue3";
-import { onMounted, inject } from "vue";
+import { onMounted } from "vue";
 import JetSectionBorder from "@/Jetstream/SectionBorder.vue";
-import AppLayout from "@/Layouts/AppLayout.vue";
 import ShowLocationAvailabilityForm from "@/Pages/Profile/Partials/ShowLocationAvailabilityForm.vue";
 import ShowRegularAvailabilityForm from "@/Pages/Profile/Partials/ShowRegularAvailabilityForm.vue";
 import ShowVacationsAvailabilityForm from "@/Pages/Profile/Partials/ShowVacationsAvailabilityForm.vue";
@@ -21,27 +20,24 @@ onMounted(() => {
 </script>
 
 <template>
-  <AppLayout title="Profile">
-    <template #header>
-      <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-        Profile
-      </h2>
-    </template>
+  <PageHeader title="Profile">
+    <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
+      Profile
+    </h2>
+  </PageHeader>
+  <div>
+    <div class="max-w-7xl mx-auto py-10 sm:px-6 lg:px-8">
+      <div>
+        <ShowVacationsAvailabilityForm :vacations="vacations" class="mt-10 sm:mt-0"/>
 
-    <div>
-      <div class="max-w-7xl mx-auto py-10 sm:px-6 lg:px-8">
-        <div>
-          <ShowVacationsAvailabilityForm :vacations="vacations" class="mt-10 sm:mt-0"/>
-
-          <template v-if="canChooseLocations">
-            <JetSectionBorder/>
-            <ShowLocationAvailabilityForm :selected-locations="selectedLocations" class="mt-10 sm:mt-0"/>
-          </template>
-
+        <template v-if="canChooseLocations">
           <JetSectionBorder/>
-          <ShowRegularAvailabilityForm :availability="availability" class="mt-10 sm:mt-0"/>
-        </div>
+          <ShowLocationAvailabilityForm :selected-locations="selectedLocations" class="mt-10 sm:mt-0"/>
+        </template>
+
+        <JetSectionBorder/>
+        <ShowRegularAvailabilityForm :availability="availability" class="mt-10 sm:mt-0"/>
       </div>
     </div>
-  </AppLayout>
+  </div>
 </template>

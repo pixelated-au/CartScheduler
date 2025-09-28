@@ -4,7 +4,6 @@ import { moveArrayElement, useSortable } from "@vueuse/integrations/useSortable"
 import { nextTick, onMounted, onUnmounted, ref, watch, useTemplateRef, toRef } from "vue";
 import DragDrop from "@/Components/Icons/DragDrop.vue";
 import useToast from "@/Composables/useToast.js";
-import AppLayout from "@/Layouts/AppLayout.vue";
 import type { SortableEvent } from "sortablejs";
 
 const props = defineProps<{
@@ -89,47 +88,44 @@ const transitionDelayStyle = (index: number) => `animation-delay: -${(index * 0.
 </script>
 
 <template>
-  <AppLayout title="Locations">
-    <template #header>
-      <div class="flex justify-between">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">Locations</h2>
-        <div class="flex">
-          <PButton outline
-                   :severity="isSortingMode ? 'danger' : 'secondary'"
-                   class="mx-3"
-                   @click="isSortingMode = !isSortingMode">
-            <drag-drop color="currentColor" box="16" />
-            <span class="ml-3">{{ isSortingMode ? "Stop sorting" : "Sort locations" }}</span>
-          </PButton>
-          <PButton class="mx-3" severity="primary" @click="onNewLocation">
-            New Location
-          </PButton>
-        </div>
+  <PageHeader title="Locations">
+    <div class="flex justify-between">
+      <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">Locations</h2>
+      <div class="flex">
+        <PButton outline
+                 :severity="isSortingMode ? 'danger' : 'secondary'"
+                 class="mx-3"
+                 @click="isSortingMode = !isSortingMode">
+          <drag-drop color="currentColor" box="16" />
+          <span class="ml-3">{{ isSortingMode ? "Stop sorting" : "Sort locations" }}</span>
+        </PButton>
+        <PButton class="mx-3" severity="primary" @click="onNewLocation">
+          New Location
+        </PButton>
       </div>
-    </template>
-
-    <div ref="locationsRef"
-         class="max-w-7xl mx-auto py-10 sm:px-6 grid grid-cols-1 content-start sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"
-         :class="{ '!gap-4': isSortingMode }">
-      <div v-for="(location, idx) in locations"
-           :key="location.id"
-           class="shadow-sm card subtle-zoom action cursor-pointer duration-500 scale-[.98] transition-all"
-           :class="{ 'is-sorting-mode !scale-100': isSortingMode }"
-           :style="transitionDelayStyle(idx)"
-           @click="locationClicked(location)">
-        <div class="flex items-start gap-8 h-full dark:text-gray-100">
-          <div>
-            <h4 class="font-semibold">{{ location.name }}</h4>
-            <div class="line-clamp-3">{{ location.clean_description }}</div>
-          </div>
-          <div>
-            <h5 class="font-semibold text-center">Shifts</h5>
-            <div class="text-center text-6xl">{{ location.shifts?.length }}</div>
-          </div>
+    </div>
+  </PageHeader>
+  <div ref="locationsRef"
+       class="max-w-7xl mx-auto py-10 sm:px-6 grid grid-cols-1 content-start sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"
+       :class="{ '!gap-4': isSortingMode }">
+    <div v-for="(location, idx) in locations"
+         :key="location.id"
+         class="shadow-sm card subtle-zoom action cursor-pointer duration-500 scale-[.98] transition-all"
+         :class="{ 'is-sorting-mode !scale-100': isSortingMode }"
+         :style="transitionDelayStyle(idx)"
+         @click="locationClicked(location)">
+      <div class="flex items-start gap-8 h-full dark:text-gray-100">
+        <div>
+          <h4 class="font-semibold">{{ location.name }}</h4>
+          <div class="line-clamp-3">{{ location.clean_description }}</div>
+        </div>
+        <div>
+          <h5 class="font-semibold text-center">Shifts</h5>
+          <div class="text-center text-6xl">{{ location.shifts?.length }}</div>
         </div>
       </div>
     </div>
-  </AppLayout>
+  </div>
 </template>
 
 <style lang="postcss">

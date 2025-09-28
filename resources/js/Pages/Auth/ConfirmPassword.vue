@@ -1,8 +1,6 @@
 <script setup>
 import { useForm } from "@inertiajs/vue3";
 import { ref } from "vue";
-import AuthLayout from "@/Layouts/AuthLayout.vue";
-import JetAuthenticationCardLogo from "@/Jetstream/AuthenticationCardLogo.vue";
 import JetInput from "@/Jetstream/Input.vue";
 import JetLabel from "@/Jetstream/Label.vue";
 import JetValidationErrors from "@/Jetstream/ValidationErrors.vue";
@@ -10,27 +8,24 @@ import JetValidationErrors from "@/Jetstream/ValidationErrors.vue";
 throw new Error("Not implemented");
 /* eslint no-unreachable: "off" */
 const form = useForm({
-    password: "",
+  password: "",
 });
 
 const passwordInput = ref(null);
 
 const submit = () => {
-    form.post(route("password.confirm"), {
-        onFinish: () => {
-            form.reset();
+  form.post(route("password.confirm"), {
+    onFinish: () => {
+      form.reset();
 
-            passwordInput.value.focus();
-        },
-    });
+      passwordInput.value.focus();
+    },
+  });
 };
 </script>
 
 <template>
-<AuthLayout title="Secure Area">
-  <template #logo>
-    <JetAuthenticationCardLogo />
-  </template>
+  <Head title="Secure Area" />
 
   <div class="mb-4 text-sm text-gray-600">
     This is a secure area of the application. Please confirm your password before continuing.
@@ -57,5 +52,4 @@ const submit = () => {
       </PButton>
     </div>
   </form>
-</AuthLayout>
 </template>

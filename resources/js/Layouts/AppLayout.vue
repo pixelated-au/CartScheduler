@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import Bugsnag from "@bugsnag/js";
-import { Head, usePage } from "@inertiajs/vue3";
+import { usePage } from "@inertiajs/vue3";
 import { differenceInDays } from "date-fns";
 import { computed, onMounted, provide, ref } from "vue";
 import ObtrusiveNotification from "@/Components/ObtrusiveNotification.vue";
@@ -10,8 +10,7 @@ import { EnableUserAvailability } from "@/Utils/provide-inject-keys.js"; // TODO
 import "@vuepic/vue-datepicker/dist/main.css"; // FIXME AFTER REMOVING VUE-DATEPICKER, DELETE
 import "floating-vue/dist/style.css";
 
-const { title } = defineProps<{
-  title: string;
+defineProps<{
   fullWidth?: boolean;
 }>();
 
@@ -48,6 +47,7 @@ const availabilityReminderPrompt = () => {
   }
 };
 
+// const header = useHeader();
 onMounted(() => {
   availabilityReminderPrompt();
 });
@@ -55,20 +55,16 @@ onMounted(() => {
 
 <template>
   <div class="text-neutral-900 dark:text-neutral-100 bg-gradient-to-b from-page  to-neutral-50 dark:bg-page-dark dark:bg-gradient-to-b dark:from-page-dark dark:to-neutral-950">
-    <Head :title="title" />
-
     <div class="flex flex-col content-start min-h-dvh w-dvw max-w-full-dvw justify-stretch">
       <Nav class="border-b page-grid border-neutral-300 dark:border-neutral-700/85"
            @toggle-dark-mode="isDarkMode = $event" />
 
       <!-- Page Heading -->
-      <header v-if="$slots.header"
+      <header id="page-header"
               class="page-grid
-                px-4 xl:px-0
-                border-b border-neutral-200 text-neutral-900 dark:text-neutral-100 dark:border-b dark:border-neutral-700/85">
-        <div class="py-6">
-          <slot name="header" />
-        </div>
+                      px-4 xl:px-0 py-6
+                      border-b border-neutral-200 text-neutral-900 dark:text-neutral-100 dark:border-b dark:border-neutral-700/85">
+        <slot name="header" />
       </header>
 
       <main>

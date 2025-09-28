@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { router } from "@inertiajs/vue3";
-import AppLayout from "@/Layouts/AppLayout.vue";
 import LocationForm from "@/Pages/Admin/Locations/Partials/LocationForm.vue";
 
 defineProps<{
@@ -22,20 +21,17 @@ const newLocation: App.Data.LocationAdminData = {
 </script>
 
 <template>
-  <AppLayout title="Create a new Location">
-    <template #header>
-      <div class="flex justify-between">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">New Location</h2>
-        <PButton class="mx-3" type="button" severity="secondary" outline @click.prevent="listRouteAction">
-          Back
-        </PButton>
-      </div>
-    </template>
-
-    <div>
-      <div class="max-w-7xl mx-auto py-10 sm:px-6 lg:px-8">
-        <LocationForm :location="newLocation" action="add" :max-volunteers="maxVolunteers" />
-      </div>
+  <PageHeader title="Create a new Location">
+    <div class="flex justify-between">
+      <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">New Location</h2>
+      <PButton class="mx-3" type="button" severity="secondary" outline @click.prevent="listRouteAction">
+        Back
+      </PButton>
     </div>
-  </AppLayout>
+  </PageHeader>
+  <div>
+    <div class="max-w-7xl mx-auto py-10 sm:px-6 lg:px-8">
+      <LocationForm :location="newLocation" action="add" :max-volunteers="maxVolunteers" />
+    </div>
+  </div>
 </template>

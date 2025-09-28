@@ -18,3 +18,5 @@ export type LaravelValidationResponse = {
   message: string;
   errors: ErrorBag;
 }
+
+export type CssClass = string | Record<string, boolean> | Array<CssClass>;

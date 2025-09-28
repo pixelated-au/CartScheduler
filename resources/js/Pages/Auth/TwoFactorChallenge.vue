@@ -1,8 +1,6 @@
 <script setup>
 import { useForm } from "@inertiajs/vue3";
 import { nextTick, ref } from "vue";
-import AuthLayout from "@/Layouts/AuthLayout.vue";
-import JetAuthenticationCardLogo from "@/Jetstream/AuthenticationCardLogo.vue";
 import JetInput from "@/Jetstream/Input.vue";
 import JetLabel from "@/Jetstream/Label.vue";
 import JetValidationErrors from "@/Jetstream/ValidationErrors.vue";
@@ -10,37 +8,34 @@ import JetValidationErrors from "@/Jetstream/ValidationErrors.vue";
 const recovery = ref(false);
 
 const form = useForm({
-    code: "",
-    recovery_code: "",
+  code: "",
+  recovery_code: "",
 });
 
 const recoveryCodeInput = ref(null);
 const codeInput = ref(null);
 
 const toggleRecovery = async () => {
-    recovery.value ^= true;
+  recovery.value ^= true;
 
-    await nextTick();
+  await nextTick();
 
-    if (recovery.value) {
-        recoveryCodeInput.value.focus();
-        form.code = "";
-    } else {
-        codeInput.value.focus();
-        form.recovery_code = "";
-    }
+  if (recovery.value) {
+    recoveryCodeInput.value.focus();
+    form.code = "";
+  } else {
+    codeInput.value.focus();
+    form.recovery_code = "";
+  }
 };
 
 const submit = () => {
-    form.post(route("two-factor.login"));
+  form.post(route("two-factor.login"));
 };
 </script>
 
 <template>
-<AuthLayout title="Two-factor Authentication">
-  <template #logo>
-    <JetAuthenticationCardLogo />
-  </template>
+  <Head title="Two-factor Authentication" />
 
   <div class="mb-4 text-sm text-gray-600">
     <template v-if="!recovery">
@@ -96,5 +91,4 @@ const submit = () => {
       </PButton>
     </div>
   </form>
-</AuthLayout>
 </template>

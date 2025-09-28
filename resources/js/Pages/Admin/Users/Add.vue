@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { router } from "@inertiajs/vue3";
-import AppLayout from "@/Layouts/AppLayout.vue";
 import UserProfileForm from "@/Pages/Admin/Users/Partials/UserProfileForm.vue";
 
 const listRouteAction = () => {
@@ -9,20 +8,17 @@ const listRouteAction = () => {
 </script>
 
 <template>
-  <AppLayout title="Create a new User">
-    <template #header>
-      <div class="flex justify-between">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">New User</h2>
-        <BackButton class="mx-3" @click.prevent="listRouteAction" />
-      </div>
-    </template>
-
-    <div>
-      <div class="max-w-7xl mx-auto py-10 sm:px-6 lg:px-8">
-        <UserProfileForm :user="{ role: 'user', is_unrestricted: false, is_enabled: false }" action="add" />
-      </div>
+  <PageHeader title="Create a new User">
+    <div class="flex justify-between">
+      <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">New User</h2>
+      <BackButton class="mx-3" @click.prevent="listRouteAction" />
     </div>
-  </AppLayout>
+  </PageHeader>
+  <div>
+    <div class="max-w-7xl mx-auto py-10 sm:px-6 lg:px-8">
+      <UserProfileForm :user="{ role: 'user', is_unrestricted: false, is_enabled: false }" action="add" />
+    </div>
+  </div>
 </template>
 
 <style lang="scss">

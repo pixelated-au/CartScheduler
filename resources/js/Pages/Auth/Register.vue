@@ -1,7 +1,5 @@
 <script setup>
 import { Link, useForm } from "@inertiajs/vue3";
-import AuthLayout from "@/Layouts/AuthLayout.vue";
-import JetAuthenticationCardLogo from "@/Jetstream/AuthenticationCardLogo.vue";
 import JetCheckbox from "@/Jetstream/Checkbox.vue";
 import JetInput from "@/Jetstream/Input.vue";
 import JetLabel from "@/Jetstream/Label.vue";
@@ -10,26 +8,23 @@ import JetValidationErrors from "@/Jetstream/ValidationErrors.vue";
 throw new Error("Not implemented");
 /* eslint no-unreachable: "off" */
 const form = useForm({
-    name: "",
-    email: "",
-    mobile_phone: "",
-    password: "",
-    password_confirmation: "",
-    terms: false,
+  name: "",
+  email: "",
+  mobile_phone: "",
+  password: "",
+  password_confirmation: "",
+  terms: false,
 });
 
 const submit = () => {
-    form.post(route("register"), {
-        onFinish: () => form.reset("password", "password_confirmation"),
-    });
+  form.post(route("register"), {
+    onFinish: () => form.reset("password", "password_confirmation"),
+  });
 };
 </script>
 
 <template>
-<AuthLayout title="Register">
-  <template #logo>
-    <JetAuthenticationCardLogo />
-  </template>
+  <Head title="Register" />
 
   <JetValidationErrors class="mb-4" />
 
@@ -108,5 +103,4 @@ const submit = () => {
       </PButton>
     </div>
   </form>
-</AuthLayout>
 </template>

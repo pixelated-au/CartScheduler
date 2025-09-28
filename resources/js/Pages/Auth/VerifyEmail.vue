@@ -1,27 +1,22 @@
 <script setup>
 import { Head, Link, useForm } from "@inertiajs/vue3";
 import { computed } from "vue";
-import AuthLayout from "@/Layouts/AuthLayout.vue";
-import JetAuthenticationCardLogo from "@/Jetstream/AuthenticationCardLogo.vue";
 
 const props = defineProps({
-    status: String,
+  status: String,
 });
 
 const form = useForm();
 
 const submit = () => {
-    form.post(route("verification.send"));
+  form.post(route("verification.send"));
 };
 
 const verificationLinkSent = computed(() => props.status === "verification-link-sent");
 </script>
 
 <template>
-<AuthLayout title="Email Verification">
-  <template #logo>
-    <JetAuthenticationCardLogo/>
-  </template>
+  <Head title="Email Verification" />
 
   <div class="mb-4 text-sm text-gray-600">
     Before continuing, could you verify your email address by clicking on the link we just emailed to you? If
@@ -53,5 +48,4 @@ const verificationLinkSent = computed(() => props.status === "verification-link-
       </div>
     </div>
   </form>
-</AuthLayout>
 </template>

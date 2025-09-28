@@ -1,12 +1,13 @@
 import Bugsnag from "@bugsnag/js";
 import BugsnagPluginVue from "@bugsnag/plugin-vue";
 import { createInertiaApp, Head, Link } from "@inertiajs/vue3";
-import { resolvePageComponent } from "laravel-vite-plugin/inertia-helpers";
 import PrimeVue from "primevue/config";
 import ConfirmationService from "primevue/confirmationservice";
 import ToastService from "primevue/toastservice";
 import { createApp, h } from "vue";
 import Toast from "vue-toastification";
+import AppLayout from "@/Layouts/AppLayout.vue";
+import AuthLayout from "@/Layouts/AuthLayout.vue";
 import { ZiggyVue } from "ziggy-js";
 import PrimeVuePreset from "./primevue-customisations.js";
 import type { Plugin } from "@vue/runtime-core";
@@ -34,10 +35,12 @@ if (bugsnagKey) {
  */
 createInertiaApp({
   title: (title) => `${title} - ${appName}`,
-  resolve: (name) => resolvePageComponent(
-    `./Pages/${name}.vue`,
-    import.meta.glob<DefineComponent>("./Pages/**/*.vue"),
-  ),
+  resolve: (name) => {
+    const pages = import.meta.glob<DefineComponent>("./Pages/**/*.vue", { eager: true });
+    const page = pages[`./Pages/${name}.vue`];
+    page.default.layout = name.startsWith("Auth/") ? AuthLayout : AppLayout;
+    return page;
+  },
   progress: {
     color: "#4B5563",
   },
