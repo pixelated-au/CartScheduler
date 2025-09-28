@@ -21,20 +21,30 @@ const isLabelShowing = ref(false);
   <button id="theme-toggle"
           ref="themeToggle"
           type="button"
-          class="flex focus:outline-none focus:ring-1 focus:ring-neutral-300 dark:focus:ring-neutral-700 rounded-full p-2 dark:bg-panel-dark"
+          class="toggle flex focus:outline-none focus:ring-1 focus:ring-neutral-300 dark:focus:ring-neutral-700 rounded-full p-2 dark:bg-panel-dark"
           aria-label="Toggle dark mode"
           @click="toggleDarkMode()">
     <transition name="slide-up" mode="out-in">
-      <div class="node" v-if="colorMode === 'dark'"><DarkModeLabel v-model="isLabelShowing" label="dark theme" icon="iconify mdi--moon-and-stars" /></div>
-      <div class="node" v-else-if="colorMode === 'light'"><DarkModeLabel v-model="isLabelShowing" label="light theme" icon="iconify mdi--weather-sunny" /></div>
-      <div class="node" v-else><DarkModeLabel v-model="isLabelShowing" label="system theme" icon="iconify mdi--sun-moon-stars" class="text-neutral-400 dark:text-neutral-400" /></div>
+      <DarkModeLabel v-if="colorMode === 'dark'"
+                     v-model="isLabelShowing"
+                     label="dark theme"
+                     icon="iconify mdi--moon-and-stars" />
+      <DarkModeLabel v-else-if="colorMode === 'light'"
+                     v-model="isLabelShowing"
+                     label="light theme"
+                     icon="iconify mdi--weather-sunny" />
+      <DarkModeLabel v-else
+                     v-model="isLabelShowing"
+                     label="system theme"
+                     icon="iconify mdi--cellphone iconify sm:mdi--computer"
+                     class="text-neutral-400 dark:text-neutral-400" />
     </transition>
   </button>
 </template>
 
 <!--suppress CssUnusedSymbol -->
 <style scoped>
-.node {
+.toggle {
     transition: all 0.25s ease;
 }
 
