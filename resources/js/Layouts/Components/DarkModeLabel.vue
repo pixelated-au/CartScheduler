@@ -7,20 +7,13 @@ const { classes = "" } = defineProps<{
   classes?: string;
 }>();
 
-const show = defineModel<boolean>();
-
-const showLabel = ref(false);
+const showLabel = ref(true);
 
 onMounted(() => {
-  if (show.value) {
-    showLabel.value = true;
-  }
   setTimeout(() => {
-    show.value = true;
     showLabel.value = true;
 
     setTimeout(() => {
-      show.value = false;
       showLabel.value = false;
     }, 3000);
   }, 200);
@@ -28,15 +21,14 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="flex items-center"
-       :class="[ showLabel ? '' : 'delay-[300ms]' ]">
-    <span class="grid items-center font-medium transition-[grid-template-columns] duration-300 relative"
-          :class="[showLabel ? 'grid-cols-[1fr] delay-0' : 'grid-cols-[0] delay-150' ]">
-      <span class="flex items-center overflow-hidden transition-transform duration-300 z-10 text-sm origin-right whitespace-nowrap"
-            :class="[showLabel ? 'scale-x-100 px-1 delay-0 ease-bounce-in' : 'scale-x-0 delay-0']">
+  <div class="flex items-center">
+    <div class="grid items-center font-medium transition-[grid-template-columns,padding] duration-300 delay-200"
+         :class="[showLabel ? 'grid-cols-[1fr] px-1' : 'grid-cols-[0fr]' ]">
+      <div class="flex items-center overflow-hidden transition-transform duration-300 text-sm origin-right whitespace-nowrap"
+           :class="[showLabel ? 'scale-x-100 ease-bounce-in' : 'scale-x-0']">
         {{ label }}
-      </span>
-    </span>
-    <span class="size-6" :class="[ icon, classes ]" />
+      </div>
+    </div>
+    <div class="icon size-6" :class="[ icon, classes ]" />
   </div>
 </template>
