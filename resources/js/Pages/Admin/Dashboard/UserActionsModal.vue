@@ -90,7 +90,7 @@ const volunteerAssigned = function(data) {
 
     <template #default>
       <div class="grid grid-cols-6 gap-x-1 max-w-7xl mx-auto pb-5">
-        <div class="col-span-6 bg-white dark:bg-gray-900 shadow-xl sm:rounded-lg sm:p-6">
+        <div class="col-span-6 bg-white dark:bg-gray-900 shadow-md sm:rounded-lg sm:p-6">
           <JetLabel for="search" value="Search for a volunteer" />
           <JetInput id="search" v-model="volunteerSearch" type="text" class="mt-1 block w-full" />
           <JetHelpText>Search on name</JetHelpText>
