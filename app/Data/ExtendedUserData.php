@@ -5,6 +5,7 @@ namespace App\Data;
 use App\Enums\Appointment;
 use App\Enums\MaritalStatus;
 use App\Enums\ServingAs;
+use Spatie\LaravelData\Attributes\MapInputName;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Optional;
 use Spatie\TypeScriptTransformer\Attributes\LiteralTypeScriptType;
@@ -43,6 +44,7 @@ class ExtendedUserData extends Data
         public int|Optional $filled_thursdays,
         public int|Optional $filled_fridays,
         public int|Optional $filled_saturdays,
+        #[MapInputName('comments')]
         public string|Optional $availability_comments,
     ) {
     }
