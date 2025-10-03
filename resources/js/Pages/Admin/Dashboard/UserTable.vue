@@ -308,7 +308,7 @@ const hasDaysAvailable = (daysAvailable) => Object.values(daysAvailable).some((d
 
       <template #item-name="{ name, comment }">
         {{ name }}
-        <div class="ms-0.5 text-xs italic">
+        <div class="ms-0.5 text-xs italic text-neutral-900 dark:text-neutral-200">
           <div>{{ comment }}</div>
         </div>
       </template>

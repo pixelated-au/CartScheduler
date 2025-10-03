@@ -37,7 +37,7 @@ const rowHoverColor = computed(() => props.showHover ? "var(--tw-bg-200)" : "tra
   </EasyDataTable>
 </template>
 
-<style lang="scss">
+<style lang="postcss">
 @import 'vue3-easy-data-table/dist/style.css';
 
 .data-table {
