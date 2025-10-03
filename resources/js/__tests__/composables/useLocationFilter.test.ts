@@ -127,12 +127,14 @@ describe("useLocationFilter", () => {
   });
 
   it("has a null value for empty slots in a roster", async () => {
+    vi.setSystemTime(new Date("2025-09-15"));
+
     const { locations, getShifts } = useLocationFilter(timezone);
 
     await getShifts();
 
     const rawVolunteers = shifts.locations[2].shifts[0].volunteers;
-    const transformedVolunteers = locations.value[1].filterShifts?.[0].volunteers as Array<App.Data.UserData | null>;
+    const transformedVolunteers = locations.value[2].filterShifts?.[0].volunteers as Array<App.Data.UserData | null>;
 
     expect(rawVolunteers).length(4);
     expect(transformedVolunteers).length(5);
@@ -141,6 +143,12 @@ describe("useLocationFilter", () => {
     expect(transformedVolunteers.at(2)).not.toBeNull();
     expect(transformedVolunteers.at(3)).not.toBeNull();
     expect(transformedVolunteers.at(4)).toBeNull();
+
+    // Confirm we're looking at the same shift users. Note that indexes 1,2 are swapped due to gender sorting
+    expect(transformedVolunteers.at(0)?.uuid).toBe(rawVolunteers.at(0)?.uuid);
+    expect(transformedVolunteers.at(1)?.uuid).toBe(rawVolunteers.at(2)?.uuid);
+    expect(transformedVolunteers.at(2)?.uuid).toBe(rawVolunteers.at(1)?.uuid);
+    expect(transformedVolunteers.at(3)?.uuid).toBe(rawVolunteers.at(3)?.uuid);
   });
 
   it("ignores vue watcher when the date doesn't change", async () => {
