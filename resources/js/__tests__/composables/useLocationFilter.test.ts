@@ -132,7 +132,7 @@ describe("useLocationFilter", () => {
     await getShifts();
 
     const rawVolunteers = shifts.locations[2].shifts[0].volunteers;
-    const transformedVolunteers = locations.value[2].filterShifts?.[0].volunteers as Array<App.Data.UserData | null>;
+    const transformedVolunteers = locations.value[1].filterShifts?.[0].volunteers as Array<App.Data.UserData | null>;
 
     expect(rawVolunteers).length(4);
     expect(transformedVolunteers).length(5);
