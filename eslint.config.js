@@ -6,6 +6,7 @@ import stylistic from "@stylistic/eslint-plugin";
 import { configureVueProject, defineConfigWithVueTs, vueTsConfigs } from "@vue/eslint-config-typescript";
 import { globalIgnores } from "eslint/config";
 import { createTypeScriptImportResolver } from "eslint-import-resolver-typescript";
+import depend from "eslint-plugin-depend";
 import { importX } from "eslint-plugin-import-x";
 import unusedImports from "eslint-plugin-unused-imports";
 import pluginVue from "eslint-plugin-vue";
@@ -87,8 +88,21 @@ export default defineConfigWithVueTs([
     },
   },
   {
+    name: "eslint-depend",
+    files: ["./*.{ts,js}", "./resources/js/**/*.{ts,js,vue}"],
+    plugins: {
+      depend,
+    },
+    rules: {
+      "depend/ban-dependencies": ["error", {
+        "presets": ["native", "microutilities", "preferred"],
+        "allowed": ["axios"]
+      }],
+    },
+  },
+  {
     name: "eslint-js",
-    files: ["./*.js", "./resources/js/**/*.js,vue"],
+    files: ["./*.js", "./resources/js/**/*.{js,vue}"],
     rules: {
       "no-empty": ["warn", { allowEmptyCatch: true }],
       "no-unused-expressions": ["warn", { allowShortCircuit: true, allowTernary: true }],
