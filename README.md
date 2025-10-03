@@ -129,6 +129,10 @@ LAUNCH_EDITOR=
 ### TypeScript
 This project is now using TypeScript with Vue.
 
+### Frontend Packages Size
+To ensure the project doesn't get out of control, utilise `npx vite-bundle-visualizer` to visualise the size of the
+frontend packages and see if there's anything that can be removed. 
+
 ### Ziggy
 For synchronicity between Laravel Routes and Vue, we use [Ziggy](https://github.com/tighten/ziggy).
 
