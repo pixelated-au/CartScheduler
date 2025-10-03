@@ -1,7 +1,6 @@
 import axios from "axios";
 import { endOfDay, formatISO, isAfter, isBefore, isSameDay, parse, setHours } from "date-fns";
 import { utcToZonedTime } from "date-fns-tz";
-import { cloneDeep } from "lodash";
 import { computed, ref, shallowRef, watch } from "vue";
 import type { Ref } from "vue";
 
@@ -164,8 +163,7 @@ export default function(timezone: Ref<string>, canAdmin = false) {
     }
 
     const mappedLocations: App.Data.LocationData[] = [];
-    let myLocations: Location[] | undefined = cloneDeep(serverLocations.value);
-
+    let myLocations: Location[] | undefined = structuredClone(serverLocations.value);
     emptyShiftsForTime.value = [];
 
     for (const location of myLocations) {
