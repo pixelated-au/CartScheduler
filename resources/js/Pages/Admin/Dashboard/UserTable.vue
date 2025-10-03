@@ -3,7 +3,6 @@ import { format, parse } from "date-fns";
 import { Menu as VMenu } from "floating-vue";
 import { computed, inject, ref, watchEffect } from "vue";
 import DataTable from "@/Components/DataTable.vue";
-import Comment from "@/Components/Icons/Comment.vue";
 import QuestionCircle from "@/Components/Icons/QuestionCircle.vue";
 import useToast from "@/Composables/useToast";
 import FilledShiftsIndicator from "@/Pages/Admin/Dashboard/FilledShiftsIndicator.vue";
@@ -309,18 +308,9 @@ const hasDaysAvailable = (daysAvailable) => Object.values(daysAvailable).some((d
 
       <template #item-name="{ name, comment }">
         {{ name }}
-        <template v-if="comment">
-          <v-menu class="mr-2 inline-block">
-            <span><Comment /></span>
-
-            <template #popper>
-              <div>
-                <h6>{{ name }} comments:</h6>
-                <div>{{ comment }}</div>
-              </div>
-            </template>
-          </v-menu>
-        </template>
+        <div class="ms-0.5 text-xs italic">
+          <div>{{ comment }}</div>
+        </div>
       </template>
 
       <template #item-responsibleBrother="{ responsibleBrother }">
