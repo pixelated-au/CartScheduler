@@ -78,7 +78,8 @@ class Shift extends Model
     protected function startHour(): Attribute
     {
         return Attribute::make(
-            get: static fn(?string $value, array $attributes) => Str::of($attributes['start_time'])->before(':')->toInteger(),
+            get: static fn(?string $value, array $attributes) => Str::of($attributes['start_time'])
+                ->before(':')->toInteger(),
         );
     }
 
@@ -86,7 +87,27 @@ class Shift extends Model
     protected function endHour(): Attribute
     {
         return Attribute::make(
-            get: static fn(?string $value, array $attributes) => Str::of($attributes['end_time'])->before(':')->toInteger(),
+            get: static fn(?string $value, array $attributes) => Str::of($attributes['end_time'])
+                ->before(':')
+                ->toInteger(),
+        );
+    }
+
+    /** @noinspection PhpUnused */
+    protected function startTime12Hr(): Attribute
+    {
+        return Attribute::make(
+            get: static fn(?string $value, array $attributes) => Carbon::parse($attributes['start_time'])
+                ->format('h:i A'),
+        );
+    }
+
+    /** @noinspection PhpUnused */
+    protected function endTime12Hr(): Attribute
+    {
+        return Attribute::make(
+            get: static fn(?string $value, array $attributes) => Carbon::parse($attributes['end_time'])
+                ->format('h:i A'),
         );
     }
 
@@ -106,8 +127,8 @@ class Shift extends Model
     }
 
     /**
-     * @param \Illuminate\Support\Collection<int, \App\Models\User|int> $users
-     * @param \Illuminate\Support\Carbon|string $date
+     * @param  \Illuminate\Support\Collection<int, \App\Models\User|int>  $users
+     * @param  \Illuminate\Support\Carbon|string  $date
      * @return \Illuminate\Support\Collection
      */
     public function attachUsersOnDate(Collection $users, Carbon|string $date): Collection

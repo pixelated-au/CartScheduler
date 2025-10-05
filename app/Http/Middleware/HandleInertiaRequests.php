@@ -69,6 +69,7 @@ class HandleInertiaRequests extends Middleware
                 'weekDayRelease'       => (int) config('cart-scheduler.release_weekly_shifts_on_day'),
                 'systemShiftStartHour' => $this->settings->systemShiftStartHour,
                 'systemShiftEndHour'   => $this->settings->systemShiftEndHour,
+                'emailReminderTime'    => config('cart-scheduler.email_reminder_time'), //TODO: replace with SQL query
             ],
         ];
 

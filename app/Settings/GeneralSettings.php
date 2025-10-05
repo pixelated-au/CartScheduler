@@ -16,6 +16,7 @@ class GeneralSettings extends Settings
     public int $systemShiftStartHour;
     public int $systemShiftEndHour;
     public bool $enableUserAvailability;
+    public string $emailReminderTime;
     /** @var bool allow the volunteer to choose which locations they wish to be rostered onto */
     public bool $enableUserLocationChoices;
 

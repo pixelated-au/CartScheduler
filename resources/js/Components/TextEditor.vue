@@ -1,43 +1,62 @@
 <script setup lang="ts">
-import Link from "@tiptap/extension-link";
-import TextAlign from "@tiptap/extension-text-align";
-import StarterKit from "@tiptap/starter-kit";
-import { EditorContent, useEditor } from "@tiptap/vue-3";
-import { provide, watch } from "vue";
-import AlignButton from "@/Components/EditorToolbar/AlignButton.vue";
-import BoldButton from "@/Components/EditorToolbar/BoldButton.vue";
-import HeadingButton from "@/Components/EditorToolbar/HeadingButton.vue";
-import ItalicButton from "@/Components/EditorToolbar/ItalicButton.vue";
-import LinkSetButton from "@/Components/EditorToolbar/LinkSetButton.vue";
-import LinkUnsetButton from "@/Components/EditorToolbar/LinkUnsetButton.vue";
-import ListButton from "@/Components/EditorToolbar/ListButton.vue";
-import ParagraphButton from "@/Components/EditorToolbar/ParagraphButton.vue";
-import StrikethroughButton from "@/Components/EditorToolbar/StrikethroughButton.vue";
+import AlignButton from '@/Components/EditorToolbar/AlignButton.vue';
+import BoldButton from '@/Components/EditorToolbar/BoldButton.vue';
+import HeadingButton from '@/Components/EditorToolbar/HeadingButton.vue';
+import ItalicButton from '@/Components/EditorToolbar/ItalicButton.vue';
+import LinkSetButton from '@/Components/EditorToolbar/LinkSetButton.vue';
+import LinkUnsetButton from '@/Components/EditorToolbar/LinkUnsetButton.vue';
+import ListButton from '@/Components/EditorToolbar/ListButton.vue';
+import ParagraphButton from '@/Components/EditorToolbar/ParagraphButton.vue';
+import StrikethroughButton from '@/Components/EditorToolbar/StrikethroughButton.vue';
+import { SyntaxHighlight } from '@/Components/TextEditorSyntaxHighlighter';
+import Link from '@tiptap/extension-link';
+import TextAlign from '@tiptap/extension-text-align';
+import StarterKit from '@tiptap/starter-kit';
+import {EditorContent, useEditor} from '@tiptap/vue-3';
+import {provide, watch} from 'vue';
+import { serialize, deserialize } from "./TextEditorMarkdown"
 
-const { modelValue = "" } = defineProps<{
-  modelValue: string;
+const props = defineProps<{
+    modelValue: {
+        default: '',
+    },
+    highlightSyntax: {
+        default: false,
+    },
 }>();
 
 const emit = defineEmits(["update:modelValue"]);
 
+let editor_extensions = [
+    StarterKit.configure({heading: {levels: [3, 4, 5, 6]}}),
+    Link.configure({autolink: true, linkOnPaste: true, protocols: ['mailto'], openOnClick: false}),
+    TextAlign.configure({types: ['paragraph']}),
+]
+
+if (props.highlightSyntax)
+    editor_extensions.push(SyntaxHighlight)
+
 const editor = useEditor({
-  content: modelValue,
-  extensions: [
-    StarterKit.configure({ heading: { levels: [3, 4, 5, 6] } }),
-    Link.configure({ autolink: true, linkOnPaste: true, protocols: ["mailto"], openOnClick: false }),
-    TextAlign.configure({ types: ["paragraph"] }),
-  ],
-  editable: true,
-  onUpdate: (event) => {
-    emit("update:modelValue", event.editor.getHTML());
-  },
+    content: deserialize("", props.modelValue),
+    extensions: editor_extensions,
+    editable: true,
+    onUpdate: (event) => {
+        emit('update:modelValue', serialize(editor.value.view.state.schema, editor.value.getJSON()));
+    },
+    onCreate: (event) => {
+        event.editor.content = deserialize(event.editor.schema, props.modelValue)
+        //let markdown = serialize(editor.value.view.state.schema, editor.value.getJSON());
+    }
 });
 
-watch(() => modelValue, (value) => {
-  if (!editor?.value || value === editor?.value?.getHTML()) {
-    return;
-  }
-  editor.value.commands.setContent(value, false);
+watch(() => props.modelValue, (value) => {
+    if (!editor?.value || value === editor?.value) {
+        return;
+    }
+    //let new_html = deserialize(editor.value.view.state.schema, value)
+    //editor.value.commands.setContent(new_html, false);
+    //let markdown = serialize(editor.value.view.state.schema, editor.value.getJSON())
+    //editor.value.commands.setContent(markdown, false);
 });
 
 provide("editor", editor);
@@ -97,8 +116,13 @@ provide("editor", editor);
     @apply list-decimal;
   }
 
-  strong {
-    @apply font-bold
-  }
+    strong {
+      @apply font-bold
+    }
+
+    .syntax-highlight {
+        color: red;
+        font-style: italic;
+    }
 }
 </style>

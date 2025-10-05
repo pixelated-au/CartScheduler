@@ -24,6 +24,7 @@ use App\Http\Controllers\ReportTagsSortOrderController;
 use App\Http\Controllers\ResendWelcomeEmailController;
 use App\Http\Controllers\SaveShiftReportController;
 use App\Http\Controllers\SetUserPasswordController;
+use App\Http\Controllers\EmailSettingsController;
 use App\Http\Controllers\ShowGeneralSettingsController;
 use App\Http\Controllers\ShowUserAvailabilityController;
 use App\Http\Controllers\ToggleShiftReservationController;
@@ -184,6 +185,8 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified',
             )->name('admin.user-import-template');
 
             // Route::get('/', static fn() => Inertia::render('Admin/Dashboard'))->name('admin.dashboard');
+            Route::get('/email-settings', EmailSettingsController::class)->name('admin.emailsettings');
+            Route::put('/email-settings-edit', [EmailSettingsController::class, "edit"])->name('admin.emailsettings.edit');
 
             // Route::resource('locations', 'Admin\LocationsController');
             // Route::resource('users', 'Admin\UsersController');

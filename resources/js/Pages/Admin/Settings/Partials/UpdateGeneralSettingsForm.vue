@@ -7,17 +7,25 @@ import JetActionMessage from "@/Jetstream/ActionMessage.vue";
 import JetFormSection from "@/Jetstream/FormSection.vue";
 import JetInputError from "@/Jetstream/InputError.vue";
 import JetLabel from "@/Jetstream/Label.vue";
+import SelectField from "@/Components/SelectField.vue";
+import TextEditor from '@/Components/TextEditor.vue';
+import JetButton from '@/Jetstream/Button.vue';
+import JetCheckbox from '@/Jetstream/Checkbox.vue';
+import JetInput from '@/Jetstream/Input.vue';
+import {computed} from "vue";
 
 const { settings } = defineProps<{
   settings: App.Settings.GeneralSettings;
 }>();
 
 const form = useForm({
-  siteName: settings.siteName,
-  systemShiftStartHour: settings.systemShiftStartHour,
-  systemShiftEndHour: settings.systemShiftEndHour,
-  enableUserAvailability: settings.enableUserAvailability,
-  enableUserLocationChoices: settings.enableUserLocationChoices,
+    _method: 'PUT',
+    siteName: props.settings.siteName,
+    systemShiftStartHour: props.settings.systemShiftStartHour,
+    systemShiftEndHour: props.settings.systemShiftEndHour,
+    enableUserAvailability: props.settings.enableUserAvailability,
+    enableUserLocationChoices: props.settings.enableUserLocationChoices,
+    emailReminderTime: props.settings.emailReminderTime,
 });
 
 const toast = useToast();
@@ -129,7 +137,6 @@ const endHour = useTemplateRef<{ $el: HTMLElement }>("systemShiftEndHour");
           </em>
         </div>
       </div>
-
       <div class="col-span-6 flex items-center flex-wrap">
         <PCheckbox binary
                    input-id="enable_user_location_choices"
@@ -146,8 +153,23 @@ const endHour = useTemplateRef<{ $el: HTMLElement }>("systemShiftEndHour");
           </em>
         </div>
       </div>
+      <div class="col-span-6 flex items-center flex-wrap">
+          <div class = "flex flex-col pb-2">
+              <JetLabel for="change_shift_reminders_time" value="Shift Reminder Notifications"/>
+              <JetInput id="change_shift_reminders_time" v-model="form.emailReminderTime" type="number" step="0.5" class="mt-1 block w-1/2"/>
+          </div>
+          <JetInputError :message="form.errors.emailReminderTime" class="mt-2"/>
+          <div class="col-span-2 ml-1 text-sm text-gray-600 dark:text-gray-300 w-full">
+              How many hours before the shift do you want publishers to receive the reminder?
+          </div>
+          <!-- Name -->
+          <div class="col-span-6 sm:col-span-4">
+              <JetLabel for="name" value="Name"/>
+              <JetInput id="name" v-model="form.name" type="text" class="mt-1 block w-full" autocomplete="name"/>
+              <JetInputError :message="form.errors.name" class="mt-2"/>
+          </div>
+      </div>
     </template>
-
     <template #actions>
       <JetActionMessage :on="form.recentlySuccessful" class="mr-3">
         Saved.

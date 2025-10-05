@@ -18,6 +18,7 @@ class UpdateGeneralSettingsRequest extends FormRequest
             // TODO: add test for lt and gt rules
             'systemShiftStartHour' => ['required', 'integer', 'min:0', 'max:23', 'lt:systemShiftEndHour'],
             'systemShiftEndHour' => ['required', 'integer', 'min:0', 'max:23', 'gt:systemShiftStartHour'],
+            'emailReminderTime' => ['required', 'string', 'max:3'],
         ];
     }
 

@@ -20,8 +20,6 @@ class UpdateLocationRequest extends FormRequest
         $locationId = $this->route('location')->id;
         $shifts     = collect($this->get('shifts', []));
         $shifts     = $shifts->map(function (array $shift) use ($locationId) {
-            $shift['location_id'] = $locationId;
-            return $shift;
         });
         $this->merge(['shifts' => $shifts->toArray()]);
     }

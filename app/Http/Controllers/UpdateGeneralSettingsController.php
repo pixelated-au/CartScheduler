@@ -13,11 +13,12 @@ class UpdateGeneralSettingsController extends Controller
 
     public function __invoke(UpdateGeneralSettingsRequest $request)
     {
-        $this->settings->siteName                  = $request->input('siteName');
-        $this->settings->systemShiftStartHour      = $request->input('systemShiftStartHour');
-        $this->settings->systemShiftEndHour        = $request->input('systemShiftEndHour');
-        $this->settings->enableUserAvailability    = $request->input('enableUserAvailability');
-        $this->settings->enableUserLocationChoices = $request->input('enableUserLocationChoices');
+        $this->settings->siteName                   = $request->input('siteName');
+        $this->settings->systemShiftStartHour       = $request->input('systemShiftStartHour');
+        $this->settings->systemShiftEndHour         = $request->input('systemShiftEndHour');
+        $this->settings->enableUserAvailability     = $request->input('enableUserAvailability');
+        $this->settings->enableUserLocationChoices  = $request->input('enableUserLocationChoices');
+        $this->settings->emailReminderTime          = $request->input('emailReminderTime');
         $this->settings->save();
 
         return to_route('admin.settings');
