@@ -129,9 +129,10 @@ const transitionDelayStyle = (index: number) => `animation-delay: -${(index * 0.
 </template>
 
 <style lang="postcss">
-@tailwind;
 @import 'vue3-easy-data-table/dist/style.css';
+@tailwind;
 
+/*noinspection CssUnusedSymbol*/
 .sortable-ghost {
   @apply opacity-40 border-dashed border-2 border-gray-700 dark:border-slate-300;
 }
