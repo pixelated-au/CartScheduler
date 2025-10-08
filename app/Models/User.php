@@ -30,8 +30,6 @@ class User extends Authenticatable
 {
     use HasApiTokens;
     use HasFactory;
-
-//    use HasProfilePhoto;
     use Notifiable;
     use TwoFactorAuthenticatable;
     use LogsActivity;
@@ -62,8 +60,6 @@ class User extends Authenticatable
 
     /**
      * The attributes that are mass assignable.
-     *
-     * @var string[]
      */
     protected $fillable = [
         'uuid',
@@ -84,25 +80,20 @@ class User extends Authenticatable
         'role',
     ];
     /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var array
+     * The only attributes that should be visible for serialization when calling toArray().
      */
-    protected $hidden = [
-        'deleted_at',
-        'password',
-        'remember_token',
-        'two_factor_recovery_codes',
-        'two_factor_secret',
+    protected $visible = [
+        'id',
+        'uuid',
+        'name',
+        'email',
+        'gender',
     ];
     /**
      * The accessors to append to the model's array form.
-     *
-     * @var array
      */
     protected $appends = [
         'has_logged_in', // Used to determine if the user has logged in before by checking the password field
-        //        'profile_photo_url',
     ];
 
     /** @noinspection PhpUnused */
