@@ -28,7 +28,9 @@ export type InertiaProps = {
   needsToUpdateAvailability?: boolean;
   enableUserLocationChoices?: boolean;
   isUnrestricted?: true;
-  user: AuthUser;
+  auth: {
+    user: AuthUser;
+  }
 };
 
 export interface Flash {
