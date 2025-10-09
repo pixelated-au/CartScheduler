@@ -42,7 +42,7 @@ const didHideAvailabilityReminderOverOneDayAgo = computed(() => {
 });
 
 const availabilityReminderPrompt = () => {
-  if (page.props.user && page.props.needsToUpdateAvailability && didHideAvailabilityReminderOverOneDayAgo.value) {
+  if (page.props.auth.user && page.props.needsToUpdateAvailability && didHideAvailabilityReminderOverOneDayAgo.value) {
     showUpdateAvailabilityReminder.value = true;
   }
 };

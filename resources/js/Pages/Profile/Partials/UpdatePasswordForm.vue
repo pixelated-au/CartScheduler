@@ -8,8 +8,8 @@ import JetInputError from "@/Jetstream/InputError.vue";
 import JetLabel from "@/Jetstream/Label.vue";
 import precognitiveForm from "@/Utils/precognitiveForm";
 
-const passwordInput = useTemplateRef("passwordInput");
-const currentPasswordInput = useTemplateRef("currentPasswordInput");
+const passwordInput = useTemplateRef<{ $el: HTMLInputElement }>("passwordInput");
+const currentPasswordInput = useTemplateRef<{ $el: HTMLInputElement }>("currentPasswordInput");
 
 const toast = useToast();
 
@@ -70,7 +70,7 @@ const updatePassword = () => form.submit({
     </template>
 
     <template #form>
-      <input style="display: none" type="email" name="email" :value="$page.props.user.email" autocomplete="username" />
+      <input style="display: none" type="email" name="email" :value="$page.props.auth.user.email" autocomplete="username" />
       <div class="col-span-6 sm:col-span-4">
         <JetLabel for="current_password" value="Current Password" :form error-key="current_password" />
         <PPassword input-id="current_password"
