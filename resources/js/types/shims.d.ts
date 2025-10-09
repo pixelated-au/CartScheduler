@@ -2,7 +2,7 @@
 // noinspection JSUnusedGlobalSymbols
 
 import "vite/client";
-import { FormDataKeys as InertiaFormDataKeys, Page, PageProps as InertiaPageProps } from "@inertiajs/core";
+import { Page, PageProps as InertiaPageProps } from "@inertiajs/core";
 import type { Form as PrecognitiveForm } from "laravel-precognition-vue-inertia";
 import type { Axios } from "axios";
 import type {
@@ -54,8 +54,17 @@ declare module "@inertiajs/vue3" {
   export declare function usePage<T extends AppPageProps>(): Page<T>;
 }
 
-export type FormDataKeys<T> = InertiaFormDataKeys<T> & T extends T ? keyof T extends infer Key extends Extract<keyof T, string> ? `${Key}.${number}.${string}` : never : never;
-export type FormErrors<T> = Partial<Record<FormDataKeys<T>, string>>;
+export type FormDataKeys<T extends Record<string, unknown>> = T extends T
+  ? keyof T extends infer Key extends Extract<keyof T, string>
+    ? T[Key] extends T
+      ? `${Key}.${FormDataKeys<T[Key]>}` | Key
+      : T[Key] extends Array<infer X extends Record<string, unknown>>
+        ? `${Key}.${number}.${Extract<keyof X, string>}`
+        : Key
+    : never
+  : never;
+
+export type FormErrors<T> = Record<FormDataKeys<T>, string>;
 
 export interface Form<Data extends Record<string, unknown>> extends PrecognitiveForm<Data> {
   errors: FormErrors<Data>;
