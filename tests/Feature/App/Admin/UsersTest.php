@@ -97,7 +97,7 @@ class UsersTest extends TestCase
         $user = User::factory()->enabled()->makeOne();
         $this->assertDatabaseCount('users', 1);
 
-        $userData = $user->toArray();
+        $userData = $user->makeVisible('role', 'mobile_phone')->toArray();
 
         Mail::fake();
         $this->actingAs($admin)
@@ -184,7 +184,7 @@ class UsersTest extends TestCase
         $user     = User::factory()->enabled()->state(['email' => $oldEmail])->create();
         $this->assertEquals($oldEmail, $user->fresh()->email);
 
-        $userData          = $user->toArray();
+        $userData          = $user->makeVisible('role', 'mobile_phone')->toArray();
         $newEmail          = 'invalid email';
         $userData['email'] = $newEmail;
 
@@ -364,7 +364,7 @@ class UsersTest extends TestCase
         $admin = User::factory()->adminRoleUser()->state(['is_enabled' => true])->create();
         $user  = User::factory()->enabled()->makeOne();
 
-        $userData                 = $user->toArray();
+        $userData                 = $user->makeVisible('role')->toArray();
         $userData['mobile_phone'] = '1 234 4567 89 ';
 
         $this->actingAs($admin)
@@ -385,7 +385,7 @@ class UsersTest extends TestCase
         $admin = User::factory()->adminRoleUser()->state(['is_enabled' => true])->create();
         $user  = User::factory()->enabled()->state(['mobile_phone' => '1111111111'])->create();
 
-        $userData                 = $user->toArray();
+        $userData                 = $user->makeVisible('role')->toArray();
         $userData['mobile_phone'] = '1 234 4567 89 ';
 
         $this->actingAs($admin)
