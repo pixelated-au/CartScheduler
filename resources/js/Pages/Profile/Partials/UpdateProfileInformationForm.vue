@@ -1,15 +1,15 @@
 <script setup lang="ts">
+import { usePage } from "@inertiajs/vue3";
+import { computed } from "vue";
 import useToast from "@/Composables/useToast";
 import JetActionMessage from "@/Jetstream/ActionMessage.vue";
 import JetFormSection from "@/Jetstream/FormSection.vue";
 import JetInputError from "@/Jetstream/InputError.vue";
 import JetLabel from "@/Jetstream/Label.vue";
 import precognitiveForm from "@/Utils/precognitiveForm";
-import type { AuthUser } from "@/types/laravel-request-helpers";
 
-const { user } = defineProps<{
-  user: AuthUser;
-}>();
+const page = usePage();
+const user = computed(() => page.props.auth.user);
 
 const toast = useToast();
 
@@ -17,8 +17,8 @@ const form = precognitiveForm({
   routeName: "user-profile-information.update",
   method: "put",
 }, {
-  name: user.name,
-  email: user.email,
+  name: user.value.name,
+  email: user.value.email,
 });
 
 const updateProfileInformation = () => form.submit({

@@ -1,12 +1,11 @@
 <script setup lang="ts">
+import { usePage } from "@inertiajs/vue3";
 import { computed, ref } from "vue";
 import CartReservation from "@/Pages/Components/Dashboard/CartReservation.vue";
 import ReportsModal from "@/Pages/Components/Dashboard/ReportsModal.vue";
-import type { AuthUser } from "@/types/laravel-request-helpers";
 
-defineProps<{
-  user: AuthUser;
-}>();
+const page = usePage();
+const user = computed(() => page.props.auth.user);
 
 const outstandingReportCount = ref(0);
 

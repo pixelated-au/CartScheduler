@@ -10,11 +10,9 @@ import useLocationFilter from "@/Composables/useLocationFilter";
 import useToast from "@/Composables/useToast";
 import DatePicker from "@/Pages/Components/Dashboard/DatePicker.vue";
 import type { LocationsOnDate } from "@/Pages/Components/Dashboard/DatePicker.vue";
-import type { AuthUser } from "@/types/laravel-request-helpers";
 
-defineProps<{
-  user: AuthUser;
-}>();
+const page = usePage();
+const user = computed(() => page.props.auth.user);
 
 const toast = useToast();
 
