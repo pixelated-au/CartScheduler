@@ -25,14 +25,6 @@ const emit = defineEmits<{
 
 const model = ref<Selection>();
 
-// const model = defineModel<Option>({ required: true });
-
-// watch(model, (val) => {
-//   console.log("watch", { ...val });
-//   if (!val) return;
-//   emit("update", val);
-// });
-
 const shiftStart = computed(() => parse(props.shift.start_time, "HH:mm:ss", props.date));
 const dayOfWeek = computed(() => getDay(props.date));
 const formattedDate = computed(() => format(props.date, "yyyy-MM-dd"));

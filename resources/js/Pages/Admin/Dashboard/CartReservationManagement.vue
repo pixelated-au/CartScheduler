@@ -61,7 +61,6 @@ type SelectedMoveUser = {
 const selectedMoveUser = ref<SelectedMoveUser>();
 
 const promptMoveVolunteer = ({ target, selection }: { target: HTMLElement; selection: Selection }, volunteer: App.Data.UserData, shift: Shift) => {
-  console.log("selection", target, selection);
   selectedMoveUser.value = {
     selection,
     volunteer,
