@@ -16,7 +16,9 @@ export interface Settings {
  */
 export default function precognitiveForm<Data extends Record<string, FormDataConvertible>>(settings: Settings, inputs: Data):Form<Data> {
   const method = settings.method || (settings.id ? "put" : "post");
-  return settings.id
-    ? useForm(method, route(settings.routeName, settings.id), inputs)
-    : useForm(method, route(settings.routeName), inputs);
+  return (
+    settings.id
+      ? useForm(method, route(settings.routeName, settings.id), inputs)
+      : useForm(method, route(settings.routeName), inputs)
+  ) as Form<Data>;
 }
