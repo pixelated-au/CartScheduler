@@ -42,7 +42,7 @@ class GetUserShiftsData
                        shifts.available_from,
                        shifts.available_to,
                        locations.max_volunteers,
-                       locations.name
+                       locations.name AS location_name
 
                 FROM dates
                          INNER JOIN shift_user ON shift_user.shift_date = dates.date
