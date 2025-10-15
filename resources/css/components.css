@@ -12,6 +12,11 @@
         @apply hover:scale-[102%];
     }
 
+    .scroll-gradient {
+        @apply after:absolute after:w-full after:h-24 after:z-10 after:bottom-0 after:pointer-events-none;
+        @apply after:bg-gradient-to-t after:from-white after:dark:from-sub-panel-dark after:to-transparent;
+    }
+
     .card {
         @apply border std-border p-4 rounded text-neutral-600 dark:text-neutral-300;
 
