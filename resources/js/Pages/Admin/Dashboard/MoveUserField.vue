@@ -90,7 +90,7 @@ const select = () => {
       <PListbox v-model="model"
                 :options="shiftsForTime"
                 optionLabel="label"
-                class="relative after:absolute after:w-full after:h-16 after:z-10 after:bottom-0 after:bg-gradient-to-t after:from-[var(--p-popover-background)] after:to-transparent after:pointer-events-none"
+                class="relative scroll-gradient after:from-[var(--p-popover-background)] after:dark:from-[var(--p-popover-background)]"
                 listStyle="max-height:300px"
                 @click="select">
         <template #option="{ option }">
