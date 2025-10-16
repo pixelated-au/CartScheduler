@@ -8,6 +8,8 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    Accordion: typeof import('./../Components/Accordion.vue')['default']
+    AccordionPanel: typeof import('./../Components/AccordionPanel.vue')['default']
     Alert: typeof import('./../Components/Alert.vue')['default']
     AlignButton: typeof import('./../Components/EditorToolbar/AlignButton.vue')['default']
     AnimatedBell: typeof import('./../Components/Icons/AnimatedBell.vue')['default']

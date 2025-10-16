@@ -203,6 +203,7 @@ declare namespace App.Data {
   export type UserShiftData = {
     volunteer_id: number;
     location_id: number;
+    location_name: string;
     start_time: string;
     max_volunteers: number;
     available_from?: string;

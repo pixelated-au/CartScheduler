@@ -1,21 +1,26 @@
 <script setup lang="ts">
 import { usePage } from "@inertiajs/vue3";
+import { breakpointsTailwind, useBreakpoints } from "@vueuse/core";
 import { isAxiosError } from "axios";
 import { format, isSameDay, parse } from "date-fns";
 import { computed, onMounted, ref, watch } from "vue";
+import Accordion from "@/Components/Accordion.vue";
+import AccordionPanel from "@/Components/AccordionPanel.vue";
 import ComponentSpinner from "@/Components/ComponentSpinner.vue";
 import EmptySlot from "@/Components/Icons/EmptySlot.vue";
 import User from "@/Components/Icons/User.vue";
 import useLocationFilter from "@/Composables/useLocationFilter";
 import useToast from "@/Composables/useToast";
 import DatePicker from "@/Pages/Components/Dashboard/DatePicker.vue";
+import ShiftList from "@/Pages/Components/Dashboard/ShiftList.vue";
+import relativeDateToNow from "@/Utils/relativeDateToNow";
 import type { LocationsOnDate } from "@/Pages/Components/Dashboard/DatePicker.vue";
+import type { ShiftItem as SelectedShift } from "@/Pages/Components/Dashboard/ShiftList.vue";
 
 const page = usePage();
-const user = computed(() => page.props.auth.user);
-
 const toast = useToast();
 
+const user = computed(() => page.props.auth.user);
 const timezone = computed(() => usePage().props.shiftAvailability.timezone);
 
 const {
@@ -73,7 +78,6 @@ const toggleReservation = async (locationId: number, shiftId: number, toggleOn: 
     clearTimeout(timeoutId);
     isLoading.value = false;
     reservationWatch.resume();
-    // await (() =>     reservationWatch.resume(), 300);
   }
 };
 
@@ -84,7 +88,9 @@ const locationsForSelectedDate = computed(() => {
   );
 });
 
-const setLocationMarkers = (locations: LocationsOnDate[]) => locationsOnDates.value = locations;
+const setLocationMarkers = (locations: LocationsOnDate[]) => {
+  locationsOnDates.value = locations;
+};
 const hasShift = (location: App.Data.LocationData) => locationsForSelectedDate.value?.findIndex(
   (date) => date?.locations.includes(location.id),
 ) >= 0;
@@ -108,7 +114,7 @@ const markRosteredLocations = () => {
       classes.push(...["text-green-800", "dark:text-green-300", "border-b-2", "border-green-500"]);
       tooltip = "You have at least one shift";
       if (!hasSetFirstReservationForUser) {
-        firstReservationForUser.value = location.id;
+        firstReservationForUser.value = selectedShift.value?.locationId || location.id;
         hasSetFirstReservationForUser = true;
       }
     } else {
@@ -136,6 +142,34 @@ const reservationWatch = watch(firstReservationForUser, (val) => {
   accordionExpandIndex.value = val;
 });
 
+const selectedShift = ref<SelectedShift | undefined>(undefined);
+
+watch(selectedShift, (val) => {
+
+  if (!val) {
+    return;
+  }
+  date.value = val.date;
+
+});
+
+const locationRefs = ref<Record<App.Data.LocationData["id"], HTMLElement>>({});
+const setLocationRef = (id: App.Data.LocationData["id"], el: HTMLElement) => {
+  locationRefs.value[id] = el;
+};
+
+const breakpoints = useBreakpoints(breakpointsTailwind);
+const isNotMobile = breakpoints.greaterOrEqual("sm");
+
+const scrollToLocation = async (itemKey: App.Data.LocationData["id"]) => {
+  if (isNotMobile.value) {
+    return;
+  }
+  const element = locationRefs.value[itemKey];
+
+  element.scrollIntoView({ behavior: "smooth" });
+};
+
 onMounted(() => {
   void getShifts();
 });
@@ -143,8 +177,11 @@ onMounted(() => {
 
 <template>
   <div class="grid gap-3 grid-cols-1 sm:grid-cols-[20rem_3fr] sm:items-stretch">
-    <div class="pb-3">
-      <ComponentSpinner :show="!locations">
+    <div class="py-3 sm:py-0">
+      <ComponentSpinner :show="!locations" class="flex flex-col gap-0 pt-3 sm:pt-0">
+        <ShiftList v-model="selectedShift"
+                   :marker-dates="serverDates"
+                   @clicked="scrollToLocation($event.locationId)" />
         <DatePicker v-model:date="date"
                     :max-date="maxReservationDate"
                     :free-shifts="freeShifts"
@@ -156,10 +193,11 @@ onMounted(() => {
     </div>
     <div>
       <ComponentSpinner :show="isLoading" class="min-h-[200px] sm:min-h-full">
-        <PAccordion v-model:value="accordionExpandIndex" class="border std-border rounded border-b-0">
-          <PAccordionPanel v-for="location in locations" :key="location.id" :value="location.id" class="group">
-            <PAccordionHeader class="relative after:absolute after:bottom-2 after:left-0 after:right-0 group-[.p-accordionpanel-active]:after:block after:h-px after:hidden after:bg-gradient-to-r after:from-transparent after:from-20% after:via-surface-500/70 after:to-transparent after:to-80%">
-              <div class="flex items-center text-base font-bold">
+        <Accordion v-model="accordionExpandIndex" class="border std-border rounded border-b-0">
+          <AccordionPanel v-for="location in locations" :key="location.id" :value="location.id">
+            <template #title>
+              <div :ref="(el) => setLocationRef(location.id,el as HTMLElement)"
+                   class="flex items-center text-base font-bold p-2 bg-">
                 <span :class="locationLabel[location.id].classes"
                       v-tooltip="locationLabel[location.id].tooltip">
                   {{ location.name }}
@@ -174,94 +212,88 @@ onMounted(() => {
                   </div>
                 </div>
               </div>
+            </template>
 
-              <template #toggleicon="{ active }">
-                <!-- Note, the active slotProp exists but isn't documented -->
-                <span class="iconify mdi--chevron-down text-2xl ml-auto transition-rotate duration-500 delay-100 ease-in-out"
-                      :class="active ? 'rotate-180' : ''" />
-              </template>
-            </PAccordionHeader>
-            <PAccordionContent>
-              <div class="w-full">
-                <div v-if="!isRestricted && location.freeShifts" class="flex mb-2 ml-3 sm:hidden group">
-                  <div class="flex items-center px-2 py-0.5 rounded-full border border-amber-500 dark:border-amber-600">
-                    <div class="mr-1 w-2 h-2 bg-amber-500 rounded-full"></div>
-                    <div class="text-sm text-amber-600 dark:text-amber-500">
-                      free shifts still available at this location
-                    </div>
+            <div class="w-full">
+              <div v-if="!isRestricted && location.freeShifts" class="flex mb-2 ml-3 sm:hidden group">
+                <div class="flex items-center px-2 py-0.5 rounded-full border border-amber-500 dark:border-amber-600">
+                  <div class="mr-1 w-2 h-2 bg-amber-500 rounded-full"></div>
+                  <div class="text-sm text-amber-600 dark:text-amber-500">
+                    free shifts still available at this location
                   </div>
                 </div>
+              </div>
 
-                <div v-html="location.description"
-                     class="p-3 pt-0 w-full description dark:text-gray-100"></div>
-                <div class="grid gap-x-2 gap-y-2 w-full sm:gap-y-4"
-                     :class="gridCols[location.max_volunteers as keyof typeof gridCols]">
-                  <template v-for="shift in location.filterShifts" :key="shift.id">
-                    <div class="self-center pt-4 pl-3 sm:pr-4 dark:text-gray-100">
-                      {{ formatTime(shift.start_time) }} - {{ formatTime(shift.end_time) }}
-                    </div>
-                    <div v-for="(volunteer, index) in shift.volunteers"
-                         :key="index"
-                         class="justify-self-center self-center pt-4">
-                      <template v-if="volunteer">
-                        <template v-if="user.uuid && volunteer.uuid === user.uuid">
-                          <button v-if="!isRestricted"
-                                  type="button"
-                                  class="block"
-                                  @click="toggleReservation(location.id, shift.id, false)">
-                            <User status="reserved" v-tooltip="`${volunteer.name}: Tap to un-reserve this shift`" />
-                          </button>
-                          <User status="reserved" v-else />
-                        </template>
-
-                        <User status="male" v-else-if="volunteer.gender === 'male'" v-tooltip="volunteer.name" />
-                        <User status="female"
-                              v-else-if="volunteer.gender === 'female'"
-                              v-tooltip="volunteer.name" />
+              <div v-html="location.description"
+                   class="p-3 pt-0 w-full description dark:text-gray-100"></div>
+              <div class="grid gap-x-2 gap-y-2 w-full sm:gap-y-4"
+                   :class="gridCols[location.max_volunteers as keyof typeof gridCols]">
+                <template v-for="shift in location.filterShifts" :key="shift.id">
+                  <div class="self-center pt-4 pl-3 sm:pr-4 dark:text-gray-100 flex flex-col">
+                    <span>{{ formatTime(shift.start_time) }} - {{ formatTime(shift.end_time) }}</span>
+                    <span class="text-xs">{{ relativeDateToNow(date, new Date()) }}</span>
+                  </div>
+                  <div v-for="(volunteer, index) in shift.volunteers"
+                       :key="index"
+                       class="justify-self-center self-center pt-4">
+                    <template v-if="volunteer">
+                      <template v-if="user.uuid && volunteer.uuid === user.uuid">
+                        <button v-if="!isRestricted"
+                                type="button"
+                                class="block"
+                                @click="toggleReservation(location.id, shift.id, false)">
+                          <User status="reserved" v-tooltip="`${volunteer.name}: Tap to un-reserve this shift`" />
+                        </button>
+                        <User status="reserved" v-else />
                       </template>
 
-                      <EmptySlot v-else-if="isRestricted" v-tooltip="'You cannot reserve a shift'" />
-                      <EmptySlot v-else-if="index === shift.volunteers.length - 1 && shift.maxedFemales && user.gender === 'female'"
-                                 color="#79B9ED"
-                                 v-tooltip="'This slot can only be reserved by a brother'" />
-                      <button v-else
-                              type="button"
-                              class="block"
-                              @click="toggleReservation(location.id, shift.id, true)">
-                        <EmptySlot v-tooltip="'Tap to reserve this shift'" />
-                      </button>
-                    </div>
-                    <div class="col-span-full px-3 rounded bg-surface-200 dark:bg-surface-800 dark:text-gray-50 sm:py-2">
-                      <ul>
-                        <li v-for="(volunteer, index) in shift.volunteers"
-                            :key="index"
-                            class="flex justify-between py-2 border-b border-gray-400 last:border-b-0">
-                          <template v-if="volunteer">
-                            <div>{{ volunteer.name }}</div>
-                            <div>
-                              Ph:
-                              <a :href="`tel:${volunteer.mobile_phone}`">{{ volunteer.mobile_phone }}</a>
-                            </div>
-                          </template>
+                      <User status="male" v-else-if="volunteer.gender === 'male'" v-tooltip="volunteer.name" />
+                      <User status="female"
+                            v-else-if="volunteer.gender === 'female'"
+                            v-tooltip="volunteer.name" />
+                    </template>
 
-                          <template v-else>
-                            <div>—</div>
-                          </template>
-                        </li>
-                      </ul>
-                    </div>
-                  </template>
-                </div>
+                    <EmptySlot v-else-if="isRestricted" v-tooltip="'You cannot reserve a shift'" />
+                    <EmptySlot v-else-if="index === shift.volunteers.length - 1 && shift.maxedFemales && user.gender === 'female'"
+                               color="#79B9ED"
+                               v-tooltip="'This slot can only be reserved by a brother'" />
+                    <button v-else
+                            type="button"
+                            class="block"
+                            @click="toggleReservation(location.id, shift.id, true)">
+                      <EmptySlot v-tooltip="'Tap to reserve this shift'" />
+                    </button>
+                  </div>
+                  <div class="col-span-full px-3 rounded bg-surface-200 dark:bg-surface-800 dark:text-gray-50 sm:py-2">
+                    <ul>
+                      <li v-for="(volunteer, index) in shift.volunteers"
+                          :key="index"
+                          class="flex justify-between py-2 border-b border-gray-400 last:border-b-0">
+                        <template v-if="volunteer">
+                          <div>{{ volunteer.name }}</div>
+                          <div>
+                            Ph:
+                            <a :href="`tel:${volunteer.mobile_phone}`">{{ volunteer.mobile_phone }}</a>
+                          </div>
+                        </template>
+
+                        <template v-else>
+                          <div>—</div>
+                        </template>
+                      </li>
+                    </ul>
+                  </div>
+                </template>
               </div>
-            </PAccordionContent>
-          </PAccordionPanel>
-        </PAccordion>
+            </div>
+          </AccordionPanel>
+        </Accordion>
       </ComponentSpinner>
     </div>
   </div>
 </template>
 
-<style>
+<style scoped>
 .description {
     p {
         @apply mb-3;
