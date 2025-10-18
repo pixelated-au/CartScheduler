@@ -1,7 +1,7 @@
-import { differenceInDays, format } from "date-fns";
+import { differenceInCalendarDays, format } from "date-fns";
 
 export default function(date: Date, baseDate: Date) {
-  const diff = Math.abs(differenceInDays(date, baseDate));
+  const diff = Math.abs(differenceInCalendarDays(date, baseDate));
   if (diff === 0) {
     return "Today";
   }
