@@ -70,7 +70,7 @@ const shifts = computed<Map<string, Array<ShiftItem>>>(() => {
     const shiftDate = utcToZonedTime(date.date, shiftAvailability.value.timezone);
 
     map.set(
-      relativeDateToNow(shiftDate, now),
+      [relativeDateToNow(shiftDate, now), format(shiftDate, "eo"), format(shiftDate, "MMM")],
       parseShiftsOnDate(date.shiftGroup, shiftDate),
     );
   }
@@ -187,29 +187,34 @@ const firstDate = computed(() => shifts.value.keys().next().value);
                 @after-leave="resetStyle">
       <div ref="list"
            v-show="showList"
-           class="pt-12 pl-3 md:overflow-y-auto bg-white dark:bg-sub-panel-dark border std-border rounded justify-start overflow-hidden"
+           class="pt-12 p-0 overflow-hidden md:overflow-y-hidden bg-white dark:bg-sub-panel-dark border std-border rounded justify-start"
            :class="[[ fullHeightList ? desktopListHeight : 'md:h-96' ],
                     {
-                      'md:scroll-gradient' : isNotMobile && !fullHeightList,
+                      'relative md:scroll-gradient' : isNotMobile && !fullHeightList,
                     }]">
-        <dl class="flex flex-col gap-3 relative pl-8
-                    before:absolute before:left-4 before:top-0 before:bottom-0 before:border-l before:border-l-neutral-400 before:border-dashed">
+        <dl class="flex flex-col gap-3 relative pl-12
+                    before:absolute before:left-11 before:top-0 before:bottom-0 before:border-l before:border-l-neutral-400 before:border-dashed">
           <template v-for="[date, shiftsForDate] of shifts"
                     :key="date">
-            <dt class="font-bold relative pl-2 [&:not(:first-child)]:mt-6
-                        before:-ml-1 before:rounded-full before:absolute before:-left-6 before:top-0 before:border before:border-neutral-400 before:size-6 before:bg-white"
+            <dt class="flex items-center h-12 font-semibold text-lg sm:text-md relative pl-8 size [&:not(:first-child)]:mt-6"
                 :class="[{ 'before:bg-neutral-200 dark:before:bg-neutral-800': date === firstDate }]">
-              {{ date }}
+              {{ date[0] }}
+              <div class="absolute -ml-1 -left-6 top-0 size-12 flex flex-col items-center justify-center before:rounded-full before:absolute before:inset-0 before:border before:border-neutral-400 before:bg-white before:-z-10 z-0">
+                <div class="text-center leading-none text-s">{{ date[1] }}</div>
+                <div class="text-center leading-none  text-xs text-gray-500">{{ date[2] }}</div>
+              </div>
             </dt>
             <dd v-for="(shift, idx) in shiftsForDate"
                 :key="idx"
-                class="pl-3">
+                class="p-3">
               <div role="button"
-                   class="group cursor-pointer rounded-s p-2 pb-1 flex flex-col items-start border-b border-dashed border-neutral-300 dark:border-neutral-700
+                   class="group cursor-pointer rounded-s p-2 pb-1 flex flex-col items-start
                     md:hover:bg-neutral-100 dark:md:hover:bg-neutral-800 md:transition-[background-color,padding] md:duration-300 md:hover:font-bold md:hover:pl-3"
                    @click="selectShift(shift)">
-                <span class="text-sm group-hover:font-medium transition-[font-weight] duration-300">{{ shift.time }}</span>
-                <span class="uppercase text-gray-500 font-light group-hover:font-medium transition-[font-weight] duration-300">{{ shift.location }}</span>
+                <span class="text-md group-hover:font-medium transition-[font-weight] duration-300">{{ shift.time }}</span>
+                <span class="text-xl sm:text-lg uppercase text-gray-500 font-light group-hover:font-medium transition-[font-weight] duration-300 underline underline-offset-4 decoration-neutral-500 decoration-dotted sm:no-underline">
+                  {{ shift.location }}
+                </span>
               </div>
             </dd>
           </template>

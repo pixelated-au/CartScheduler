@@ -12,7 +12,7 @@ export default function(date: Date, baseDate: Date) {
     return format(date, "EEEE");
   }
   if (diff < 13) {
-    return format(date, "'Next' EEEE 'the' eo");
+    return format(date, "'Next' EEEE");
   }
-  return format(date, "EEEE, do MMMM");
+  return format(date, "EEEE");
 }
