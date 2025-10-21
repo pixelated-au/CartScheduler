@@ -32,8 +32,8 @@ const emit = defineEmits([
 
 const confirm = useConfirm();
 
-const availableFrom = dateStringToDateObject(shift.value.available_from);
-const availableTo = dateStringToDateObject(shift.value.available_to);
+const availableFrom = dateStringToDateObject(shift, "available_from");
+const availableTo = dateStringToDateObject(shift, "available_to");
 
 const prefixTime = (time: number) => {
   if (time < 10) {
