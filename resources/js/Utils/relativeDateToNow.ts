@@ -9,7 +9,7 @@ export default function(date: Date, baseDate: Date) {
     return "Tomorrow";
   }
   if (diff < 6) {
-    return format(date, "EEEE");
+    return format(date, "'This' EEEE");
   }
   if (diff < 13) {
     return format(date, "'Next' EEEE");
