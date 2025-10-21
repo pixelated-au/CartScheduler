@@ -21,6 +21,9 @@ class UpdateLocationRequest extends FormRequest
         $shifts     = collect($this->get('shifts', []));
         $shifts     = $shifts->map(function (array $shift) use ($locationId) {
             $shift['location_id'] = $locationId;
+            // convert undefined to null so it can update in the database
+            $shift['available_from'] = $shift['available_from'] ?? null;
+            $shift['available_to'] = $shift['available_to'] ?? null;
             return $shift;
         });
         $this->merge(['shifts' => $shifts->toArray()]);
