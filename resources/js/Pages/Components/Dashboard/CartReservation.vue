@@ -11,8 +11,10 @@ import EmptySlot from "@/Components/Icons/EmptySlot.vue";
 import User from "@/Components/Icons/User.vue";
 import useLocationFilter from "@/Composables/useLocationFilter";
 import useToast from "@/Composables/useToast";
+import useShiftMarkers from "@/Pages/Components/Dashboard/composables/useShiftMarkers";
 import DatePicker from "@/Pages/Components/Dashboard/DatePicker.vue";
 import ShiftList from "@/Pages/Components/Dashboard/ShiftList.vue";
+import { useGlobalState } from "@/store";
 import relativeDateToNow from "@/Utils/relativeDateToNow";
 import type { LocationsOnDate } from "@/Pages/Components/Dashboard/DatePicker.vue";
 import type { ShiftItem as SelectedShift } from "@/Pages/Components/Dashboard/ShiftList.vue";
@@ -32,6 +34,18 @@ const {
   serverDates,
   getShifts,
 } = useLocationFilter(timezone);
+
+const shiftMarkers = useShiftMarkers(serverDates);
+
+const state = useGlobalState();
+const shiftView = computed({
+  get() {
+    return state.value.shiftView;
+  },
+  set(value) {
+    state.value.shiftView = value;
+  },
+});
 
 const gridCols = {
   // See tailwind.config.js
@@ -82,11 +96,15 @@ const toggleReservation = async (locationId: number, shiftId: number, toggleOn: 
 };
 
 const locationsOnDates = ref<LocationsOnDate[]>([]);
-const locationsForSelectedDate = computed(() => {
-  return locationsOnDates.value.filter(
+const locationsForSelectedDate = computed(() =>
+  shiftMarkers.value.map(
+    (marker) => ({
+      locations: marker.locations,
+      date: marker.date,
+    }),
+  ).filter(
     (location) => isSameDay(location.date, date.value),
-  );
-});
+  ));
 
 const setLocationMarkers = (locations: LocationsOnDate[]) => {
   locationsOnDates.value = locations;
@@ -173,23 +191,87 @@ const scrollToLocation = async (itemKey: App.Data.LocationData["id"]) => {
 onMounted(() => {
   void getShifts();
 });
+
+const transitionContainerHeight = ref<string>("auto");
+
+const beforeEnter = (el: Element) => {
+  const element = el as HTMLElement;
+  element.style.opacity = "0";
+  element.style.transform = "translateX(110%)";
+};
+
+const enter = (el: Element, done: () => void) => {
+  const element = el as HTMLElement;
+  console.log("setInitialHeight", element.scrollHeight);
+  transitionContainerHeight.value = `${element.scrollHeight}px`;
+  element.style.opacity = "1";
+  element.style.transform = "translateX(0)";
+  done();
+};
+
+let cancelTimeout = 0;
+const afterEnter = (_: Element) => {
+  clearTimeout(cancelTimeout as number);
+  console.log("resetHeight to 'auto'", transitionContainerHeight.value);
+  cancelTimeout = window.setTimeout(() => {
+    console.log("bam!");
+    transitionContainerHeight.value = "auto";
+  }, 500);
+};
+
+const beforeLeave = async (el: Element) => {
+  const element = el as HTMLElement;
+  console.log("setDepartingHeight", element);
+  transitionContainerHeight.value = `${element.scrollHeight}px`;
+  element.style.opacity = "0";
+  element.style.transform = "translateX(-110%)";
+  element.style.height = `${element.scrollHeight}px`;
+};
 </script>
 
 <template>
   <div class="grid gap-3 grid-cols-1 sm:grid-cols-[20rem_3fr] sm:items-stretch">
-    <div class="py-3 sm:py-0">
-      <ComponentSpinner :show="!locations" class="flex flex-col gap-0 pt-3 sm:pt-0">
-        <ShiftList v-model="selectedShift"
-                   :marker-dates="serverDates"
-                   @clicked="scrollToLocation($event.locationId)" />
-        <DatePicker v-model:date="date"
-                    :max-date="maxReservationDate"
-                    :free-shifts="freeShifts"
-                    :user="user"
-                    :marker-dates="serverDates"
-                    @locations-for-day="setLocationMarkers" />
+    <div class="">
+      <ComponentSpinner :show="!locations" class="flex flex-col">
+        <div class="pb-2 grid grid-cols-2 gap-2">
+          <PButton :disabled="shiftView === 'calendar'"
+                   variant="outlined"
+                   severity="info"
+                   size="small"
+                   @click="shiftView = 'calendar'">
+            <span class="iconify mdi--calendar-month-outline"/>
+            Calendar
+          </PButton>
+          <PButton :disabled="shiftView === 'list'"
+                   variant="outlined"
+                   severity="info"
+                   size="small"
+                   @click="shiftView = 'list'">
+            <span class="iconify mdi--timeline-text-outline"/>
+            Timeline
+          </PButton>
+        </div>
+        <div ref="transitionContainer" class="transition-container">
+          <Transition mode="out-in"
+                      @before-enter="beforeEnter"
+                      @enter="enter"
+                      @after-enter="afterEnter"
+                      @before-leave="beforeLeave">
+            <ShiftList v-if="shiftView === 'list'"
+                       class="w-full"
+                       v-model="selectedShift"
+                       :marker-dates="serverDates"
+                       @clicked="scrollToLocation($event.locationId)" />
+            <DatePicker v-else
+                        v-model:date="date"
+                        :shiftMarkers
+                        :max-date="maxReservationDate"
+                        :free-shifts="freeShifts"
+                        :marker-dates="serverDates"
+                        @locations-for-day="setLocationMarkers" />
+          </Transition>
+        </div>
       </ComponentSpinner>
-      <div class="text-sm text-center text-gray-500">Blue squares indicate free shifts</div>
     </div>
     <div>
       <ComponentSpinner :show="isLoading" class="min-h-[200px] sm:min-h-full">
@@ -206,7 +288,7 @@ onMounted(() => {
                      v-if="!isRestricted && location.freeShifts">
                   <div class="mr-3 ml-1 w-2 h-2 bg-amber-500 rounded-full transition-colors group-hover:bg-amber-600 group-hover:dark:bg-amber-200"></div>
                   <div class="hidden min-w-5 sm:block">
-                    <div class="overflow-x-hidden w-0 text-sm text-gray-600 whitespace-nowrap transition-all group-hover:w-full dark:text-gray-400">
+                    <div class="overflow-x-hidden w-0 text-sm text-gray-600 whitespace-nowrap transition-[width] group-hover:w-full dark:text-gray-400">
                       shifts still available
                     </div>
                   </div>
@@ -293,7 +375,19 @@ onMounted(() => {
   </div>
 </template>
 
+<!--suppress CssUnusedSymbol -->
 <style scoped>
+.transition-container {
+    --timing: 250ms;
+    --delay: 150ms;
+    height: v-bind(transitionContainerHeight);
+    transition: height var(--timing) ease-in-out;
+}
+
+.transition-container > div {
+    transition: transform var(--timing) var(--delay) ease-out, opacity var(--timing) var(--delay) ease-out;
+}
+
 .description {
     p {
         @apply mb-3;

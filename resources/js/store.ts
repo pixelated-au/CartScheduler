@@ -21,6 +21,7 @@ export type LocalStore = {
     responsibleBrother: { label: Labels.ResponsibleBrother; value: boolean };
     mobilePhone: { label: Labels.MobilePhone; value: boolean };
   };
+  shiftView: "list" | "calendar";
 };
 
 const defaults: LocalStore = {
@@ -35,6 +36,7 @@ const defaults: LocalStore = {
     responsibleBrother: { label: Labels.ResponsibleBrother, value: false },
     mobilePhone: { label: Labels.MobilePhone, value: false },
   },
+  shiftView: "calendar",
 };
 
 export const useGlobalState = createGlobalState(

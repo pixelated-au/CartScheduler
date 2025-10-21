@@ -20,3 +20,10 @@ export type LaravelValidationResponse = {
 }
 
 export type CssClass = string | Record<string, boolean> | Array<CssClass>;
+
+export type DateMark = {
+  date: Date;
+  type: "line";
+  color: "#0E9F6E";
+  locations: number[];
+};

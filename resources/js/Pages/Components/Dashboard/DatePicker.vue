@@ -3,7 +3,6 @@ import { usePage } from "@inertiajs/vue3";
 import {
   addMonths,
   eachDayOfInterval,
-  endOfDay,
   endOfMonth,
   isAfter,
   isBefore,
@@ -15,17 +14,9 @@ import {
   startOfMonth,
   subMonths,
 } from "date-fns";
-import { utcToZonedTime } from "date-fns-tz";
-import { computed, ref, watchEffect } from "vue";
+import { computed } from "vue";
 import type { DatePickerDateSlotOptions, DatePickerMonthChangeEvent } from "primevue";
-import type { AuthUser } from "@/types/laravel-request-helpers";
-
-export type DateMark = {
-  date: Date;
-  type: "line";
-  color: "#0E9F6E";
-  locations: number[];
-};
+import type { DateMark } from "@/types/types";
 
 export type LocationsOnDate = {
   locations: DateMark["locations"];
@@ -35,22 +26,20 @@ export type LocationsOnDate = {
 const {
   date,
   maxDate,
-  markerDates,
-  user=undefined,
+  shiftMarkers = [],
   freeShifts,
   canViewHistorical = false,
 } = defineProps<{
   date: Date;
   maxDate?: Date;
+  shiftMarkers?: DateMark[];
   markerDates?: App.Data.AvailableShiftsData["shifts"];
-  user?: AuthUser;
   freeShifts?: App.Data.AvailableShiftsData["freeShifts"];
   canViewHistorical?: boolean;
 }>();
 
 const emit = defineEmits<{
   "update:date": [Date];
-  "locations-for-day": [Array<LocationsOnDate>];
 }>();
 
 const selectedDate = computed({
@@ -61,7 +50,6 @@ const selectedDate = computed({
 
 const page = usePage();
 
-const shiftAvailability = computed(() => page.props.shiftAvailability);
 const isRestricted = computed(() => !page.props.isUnrestricted);
 
 const today = setHours(new Date(), 12);
@@ -75,7 +63,6 @@ const notAfter = computed(() =>
     ? endOfMonth(addMonths(notBefore, 12))
     : maxDate);
 
-const markers = ref<DateMark[]>([]);
 const highlights = computed(() => {
   const highlighted: Date[] = [];
   if (!freeShifts) return highlighted;
@@ -108,7 +95,7 @@ const restrictedDates = computed(() => {
   const restricted: Date[] = [];
 
   for (const date of paddedDates) {
-    if (!markers.value.some((m) => m.date.getDate() === date.getDate())) {
+    if (!shiftMarkers.some((m) => m.date.getDate() === date.getDate())) {
       restricted.push(date);
     }
   }
@@ -116,61 +103,6 @@ const restrictedDates = computed(() => {
   paddedDates = null;
 
   return restricted;
-});
-
-watchEffect(() => {
-  if (!markerDates) {
-    return;
-  }
-  const marks: DateMark[] = [];
-  if (!user) {
-    return [];
-  }
-
-  for (const date in markerDates) {
-    if (!Object.prototype.hasOwnProperty.call(markerDates, date)) {
-      continue;
-    }
-    const foundAtLocation = [];
-    const shiftDateGroup = markerDates[date];
-
-    let isoDate = undefined;
-    for (const shiftId in shiftDateGroup) {
-      if (!Object.prototype.hasOwnProperty.call(shiftDateGroup, shiftId)) {
-        continue;
-      }
-
-      const shifts = shiftDateGroup[shiftId];
-      for (let shiftCount = 0; shiftCount < shifts.length; shiftCount++) {
-        const shift = shifts[shiftCount];
-        if (!isoDate) {
-          isoDate = utcToZonedTime(date, shiftAvailability.value.timezone);
-        }
-
-        if (shift.available_from && isBefore(isoDate, startOfDay(parseISO(shift.available_from)))) {
-          break;
-        }
-        if (shift.available_to && isAfter(isoDate, endOfDay(parseISO(shift.available_to)))) {
-          break;
-        }
-        if (shift.volunteer_id === user?.id) {
-          foundAtLocation.push(shift.location_id);
-        }
-      }
-    }
-    if (foundAtLocation.length) {
-      marks.push({
-        date: isoDate as Date,
-        type: "line",
-        color: "#0E9F6E",
-        locations: foundAtLocation,
-      });
-    }
-  }
-
-  markers.value = marks;
-
-  emit("locations-for-day", marks.map((marker) => ({ locations: marker.locations, date: marker.date })));
 });
 
 /**
@@ -225,11 +157,11 @@ const isDateHighlighted = (date: DatePickerDateSlotOptions) => {
 
 // Function to check if a date has a marker (user's shifts)
 const hasMarker = (date: DatePickerDateSlotOptions) => {
-  if (!markers.value.length) return false;
+  if (!shiftMarkers.length) return false;
 
   const dateObj = new Date(date.year, date.month, date.day);
 
-  return markers.value.some((m) =>
+  return shiftMarkers.some((m) =>
     m.date.getDate() === dateObj.getDate() &&
     m.date.getMonth() === dateObj.getMonth() &&
     m.date.getFullYear() === dateObj.getFullYear());
@@ -252,41 +184,45 @@ const canGoForward = computed(() => {
 </script>
 
 <template>
-  <PDatePicker v-model="selectedDate"
-               inline
-               selectOtherMonths
-               :minDate="notBefore"
-               :maxDate="notAfter"
-               :disabled="false"
-               :showIcon="false"
-               :showButtonBar="false"
-               :manualInput="false"
-               :dateFormat="'mm/dd/yy'"
-               :disabledDates="restrictedDates"
-               @month-change="updateMonthYear"
-               @year-change="updateMonthYear">
-    <template #prevbutton="{ actionCallback }">
-      <button v-if="canGoBack"
-              @click="actionCallback"
-              class="iconify mdi--chevron-left-circle-outline text-lg text-neutral-500 hover:text-neutral-900 dark:hover:text-neutral-300"></button>
-      <div v-else class="iconify mdi--chevron-left-circle-outline text-lg text-neutral-200 dark:text-neutral-700"></div>
-    </template>
+  <div>
+    <PDatePicker v-model="selectedDate"
+                 inline
+                 selectOtherMonths
+                 :minDate="notBefore"
+                 :maxDate="notAfter"
+                 :disabled="false"
+                 :showIcon="false"
+                 :showButtonBar="false"
+                 :manualInput="false"
+                 :dateFormat="'mm/dd/yy'"
+                 :disabledDates="restrictedDates"
+                 @month-change="updateMonthYear"
+                 @year-change="updateMonthYear">
+      <template #prevbutton="{ actionCallback }">
+        <button v-if="canGoBack"
+                @click="actionCallback"
+                class="iconify mdi--chevron-left-circle-outline text-lg text-neutral-500 hover:text-neutral-900 dark:hover:text-neutral-300"></button>
+        <div v-else class="iconify mdi--chevron-left-circle-outline text-lg text-neutral-200 dark:text-neutral-700"></div>
+      </template>
 
-    <template #nextbutton="{ actionCallback }">
-      <button v-if="canGoForward"
-              @click="actionCallback"
-              class="iconify mdi--chevron-right-circle-outline text-lg text-neutral-500 hover:text-neutral-900 dark:hover:text-neutral-300"></button>
-      <div v-else class="iconify mdi--chevron-right-circle-outline text-lg text-neutral-200 dark:text-neutral-700"></div>
-    </template>
+      <template #nextbutton="{ actionCallback }">
+        <button v-if="canGoForward"
+                @click="actionCallback"
+                class="iconify mdi--chevron-right-circle-outline text-lg text-neutral-500 hover:text-neutral-900 dark:hover:text-neutral-300"></button>
+        <div v-else
+             class="iconify mdi--chevron-right-circle-outline text-lg text-neutral-200 dark:text-neutral-700"></div>
+      </template>
 
-    <template #date="{ date }">
-      <span class="formatted-date"
-            :class="{
-              'highlighted-date': isDateHighlighted(date),
-              'marker-date': hasMarker(date)
-            }">
-        {{ date.day }}
-      </span>
-    </template>
-  </PDatePicker>
+      <template #date="{ date }">
+        <span class="formatted-date"
+              :class="{
+                'highlighted-date': isDateHighlighted(date),
+                'marker-date': hasMarker(date)
+              }">
+          {{ date.day }}
+        </span>
+      </template>
+    </PDatePicker>
+    <div v-if="freeShifts" class="text-sm text-center text-gray-500">Blue squares indicate free shifts</div>
+  </div>
 </template>
