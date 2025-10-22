@@ -106,7 +106,7 @@ To deploy a release requires the following steps:
           <- Note, you may need to replace `php` with `ea-php82` if you're using cPanel
 1. Create the admin user. Note, this can only be run once.:
 ```bash
-php artisan carts:create-user <name> <email> <phone> <gender> [<password>]
+php artisan cart-scheduler:create-user "<name>" <email> <phone> <gender> [<password>]
 ```
 1. Navigate to the site and login with the admin user you just created.
     - If you are having a server issue (eg 500 error), review the log file at `storage/logs/laravel.log`.
