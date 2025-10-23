@@ -48,7 +48,7 @@ const removeShift = (index: number) => {
   </div>
 
   <div v-if="locationAdminDataForm.shifts && locationAdminDataForm.shifts.length"
-       class="col-span-full grid grid-cols-1 sm:grid-cols-[auto_1fr_1fr_auto] gap-4">
+       class="col-span-full grid grid-cols-1 sm:grid-cols-[auto_1fr_1fr_auto] gap-3">
     <template v-for="(shift, index) in locationAdminDataForm.shifts" :key="shift.id">
       <Shift v-model="locationAdminDataForm.shifts[index]"
              :index="index"
