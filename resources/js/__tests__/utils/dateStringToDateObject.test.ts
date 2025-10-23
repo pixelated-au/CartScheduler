@@ -1,5 +1,6 @@
 import { format, parse } from "date-fns";
-import { describe, it, expect, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { ref } from "vue";
 import dateStringToDateObject from "@/Utils/dateStringToDateObject";
 
 vi.mock("date-fns", () => ({
@@ -8,27 +9,93 @@ vi.mock("date-fns", () => ({
 }));
 
 describe("dateStringToDateObject", () => {
-  it("returns current date when shift is undefined", () => {
-    const result = dateStringToDateObject(undefined);
-    expect(result.value).toBeInstanceOf(Date);
+  beforeEach(() => {
+    vi.clearAllMocks();
   });
 
-  it("parses date string to Date object when shift is provided", () => {
-    const result = dateStringToDateObject("2025-09-15");
-    expect(result.value).toEqual(new Date("2025-09-15"));
-    expect(parse).toHaveBeenCalledWith("2025-09-15", "yyyy-MM-dd", expect.any(Date));
+  it("returns current date when shift is undefined", () => {
+    const shift = ref<App.Data.ShiftAdminData>({
+      day_friday: false,
+      day_monday: false,
+      day_saturday: false,
+      day_sunday: false,
+      day_thursday: false,
+      day_tuesday: false,
+      day_wednesday: false,
+      end_time: "",
+      is_enabled: false,
+      location_id: 0,
+      start_time: "",
+      available_from: "2025-09-10",
+      available_to: "2025-09-20",
+    });
+
+    expect(dateStringToDateObject(shift, "available_from").value).toBeInstanceOf(Date);
+    expect(parse).toHaveBeenCalledWith("2025-09-10", "yyyy-MM-dd", expect.any(Date));
+
+    expect(dateStringToDateObject(shift, "available_to").value).toBeInstanceOf(Date);
+    expect(parse).toHaveBeenCalledWith("2025-09-20", "yyyy-MM-dd", expect.any(Date));
+  });
+
+  it("parses as 'undefined' if the shift date is falsy", () => {
+    const shift = ref<App.Data.ShiftAdminData>({
+      day_friday: false,
+      day_monday: false,
+      day_saturday: false,
+      day_sunday: false,
+      day_thursday: false,
+      day_tuesday: false,
+      day_wednesday: false,
+      end_time: "",
+      is_enabled: false,
+      location_id: 0,
+      start_time: "",
+    });
+
+    expect(dateStringToDateObject(shift, "available_from").value).toBeUndefined();
+    expect(dateStringToDateObject(shift, "available_to").value).toBeUndefined();
   });
 
   it("formats Date object to string when setting value", () => {
-    const result = dateStringToDateObject("2025-09-15");
-    result.value = new Date("2025-09-15");
-    expect(format).toHaveBeenCalledWith(new Date("2025-09-15"), "yyyy-MM-dd");
+    const shift = ref<App.Data.ShiftAdminData>({
+      day_friday: false,
+      day_monday: false,
+      day_saturday: false,
+      day_sunday: false,
+      day_thursday: false,
+      day_tuesday: false,
+      day_wednesday: false,
+      end_time: "",
+      is_enabled: false,
+      location_id: 0,
+      start_time: "",
+    });
+    const result = dateStringToDateObject(shift, "available_from");
+    expect(shift.value).not.toHaveProperty("available_from");
+    result.value = new Date("2025-09-10");
+
+    expect(format).toHaveBeenCalledWith(new Date("2025-09-10"), "yyyy-MM-dd");
+    expect(shift.value).toHaveProperty("available_from");
   });
 
   it("sets shift to undefined when value is undefined", () => {
-    const result = dateStringToDateObject("2025-09-15");
+    const shift = ref<App.Data.ShiftAdminData>({
+      day_friday: false,
+      day_monday: false,
+      day_saturday: false,
+      day_sunday: false,
+      day_thursday: false,
+      day_tuesday: false,
+      day_wednesday: false,
+      end_time: "",
+      is_enabled: false,
+      location_id: 0,
+      start_time: "",
+    });
+    const result = dateStringToDateObject(shift, "available_to");
     result.value = undefined;
-    // The format function is called in the code, but the result is not used when value is undefined
-    expect(format).toHaveBeenCalled();
+
+    expect(shift.value.available_to).toBeUndefined();
+    expect(format).not.toHaveBeenCalled();
   });
 });
