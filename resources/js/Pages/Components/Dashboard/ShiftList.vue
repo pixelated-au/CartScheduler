@@ -70,7 +70,7 @@ const shifts = computed<Map<string, Array<ShiftItem>>>(() => {
     const shiftDate = utcToZonedTime(date.date, shiftAvailability.value.timezone);
 
     map.set(
-      [relativeDateToNow(shiftDate, now), format(shiftDate, "eo"), format(shiftDate, "MMM")],
+      [relativeDateToNow(shiftDate, now), format(shiftDate, "do"), format(shiftDate, "MMM")],
       parseShiftsOnDate(date.shiftGroup, shiftDate),
     );
   }
@@ -197,13 +197,8 @@ const expandButtonDecoration = computed(() =>
             <span v-else-if="isMobile && !expandShiftList" class="slide-down">show</span>
             <span v-else-if="fullHeightList" class="slide-up">shrink</span>
             <span v-else class="slide-down">expand</span>
-            <!--            <span v-if="isMobile && expandShiftList" :class="expandButtonDecoration" class="inline-block slide-up">hide</span> -->
-            <!--            <span v-else-if="isMobile && !expandShiftList" :class="expandButtonDecoration" class="inline-block slide-down">show</span> -->
-            <!--            <span v-else-if="fullHeightList" :class="expandButtonDecoration" class="inline-block slide-up">shrink</span> -->
-            <!--            <span v-else :class="expandButtonDecoration" class="inline-block slide-down">expand</span> -->
           </Transition>
           <span> your timeline</span>
-          <!--          <span :class="expandButtonDecoration"> your timeline</span> -->
         </div>
       </PButton>
       <Transition @enter="showMobileList"
