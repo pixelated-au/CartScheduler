@@ -54,17 +54,16 @@ declare module "@inertiajs/vue3" {
   export declare function usePage<T extends AppPageProps>(): Page<T>;
 }
 
-export type FormDataKeys<T extends Record<string, unknown>> = T extends T
-  ? keyof T extends infer Key extends Extract<keyof T, string>
-    ? T[Key] extends T
-      ? `${Key}.${FormDataKeys<T[Key]>}` | Key
-      : T[Key] extends Array<infer X extends Record<string, unknown>>
-        ? `${Key}.${number}.${Extract<keyof X, string>}`
-        : Key
-    : never
-  : never;
+// type FormDataKeys<T extends Record<string, unknown>> = keyof T extends infer Key extends Extract<keyof T, string>
+//   ? T[Key] extends Array<infer X extends FormDataKeys<T[Key]>>
+//     ? `${Key}.${number}.${Extract<keyof X, string>}`
+//     : T[Key] extends T
+//       ? `${Key}.${FormDataKeys<T[Key]>}`
+//       : Key
+//   : never;
+//
+// export type FormErrors<T> = Record<FormDataKeys<T>, string>;
 
-export type FormErrors<T> = Record<FormDataKeys<T>, string>;
 
 export interface Form<Data extends Record<string, unknown>> extends PrecognitiveForm<Data> {
   errors: FormErrors<Data>;
