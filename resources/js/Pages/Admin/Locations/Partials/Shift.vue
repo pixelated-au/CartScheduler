@@ -9,18 +9,17 @@ import JetInputError from "@/Jetstream/InputError.vue";
 import JetLabel from "@/Jetstream/Label.vue";
 import JetSectionBorder from "@/Jetstream/SectionBorder.vue";
 import dateStringToDateObject from "@/Utils/dateStringToDateObject";
-import type { FormErrors } from "@/types/shims";
 // https://vue3datepicker.com/
 
 export type DayKey = Extract<keyof App.Data.ShiftAdminData, `day_${string}`>;
-
 const props = defineProps<{
   days: Array<{
     label: string;
     value: DayKey;
   }>;
   index: number;
-  errors: FormErrors<App.Data.LocationAdminData>;
+  errors: Record<string, string>;
+  // errors: FormErrors<App.Data.LocationAdminData>;
 }>();
 
 const shift = defineModel<App.Data.ShiftAdminData>({ required: true });
@@ -116,24 +115,22 @@ const confirmDelete = (event: Event) => {
 
 <template>
   <template v-if="shift">
-    <div>
-      <div class="grid grid-cols-8 gap-2">
-        <div class="text-center justify-self-center">
-          <JetLabel for="all" value="All" />
-          <PCheckbox binary
-                     input-id="all"
-                     v-model="allDays"
-                     :value="true"
-                     class="mt-3" />
-        </div>
-        <div v-for="day in days" :key="day.label" class="text-center justify-self-center">
-          <JetLabel :for="day.value + fieldUnique" :value="day.label" />
-          <PCheckbox binary
-                     :input-id="day.value + fieldUnique"
-                     v-model="shift[day.value]"
-                     :value="day.value"
-                     class="mt-3" />
-        </div>
+    <div class="grid grid-cols-8 gap-2">
+      <div class="text-center justify-self-center">
+        <JetLabel for="all" value="All" />
+        <PCheckbox binary
+                   input-id="all"
+                   v-model="allDays"
+                   :value="true"
+                   class="mt-3" />
+      </div>
+      <div v-for="day in days" :key="day.label" class="text-center justify-self-center">
+        <JetLabel :for="day.value + fieldUnique" :value="day.label" />
+        <PCheckbox binary
+                   :input-id="day.value + fieldUnique"
+                   v-model="shift[day.value]"
+                   :value="day.value"
+                   class="mt-3" />
       </div>
     </div>
     <div class="sm:col-span-2">
@@ -157,14 +154,11 @@ const confirmDelete = (event: Event) => {
                  v-model="shift.is_enabled"
                  :value="true"
                  class="mt-3" />
-
-    <!--      <JetCheckbox :id="`is-enabled-${fieldUnique}`" v-model:checked="shift.is_enabled" class="mt-3" /> -->
     </div>
     <div class="sm:col-start-2">
       <JetLabel :for="`available-from-${fieldUnique}`" value="Available From" />
       <PDatePicker :input-id="`available-to-${fieldUnique}`"
                    show-button-bar
-                   show-icon
                    icon-display="input"
                    v-model="availableFrom"
                    date-format="d M yy"
@@ -176,7 +170,6 @@ const confirmDelete = (event: Event) => {
       <JetLabel :for="`available-to-${fieldUnique}`" value="Available To" />
       <PDatePicker :input-id="`available-to-${fieldUnique}`"
                    show-button-bar
-                   show-icon
                    icon-display="input"
                    v-model="availableTo"
                    date-format="d M yy"
