@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { router, useForm } from "@inertiajs/vue3";
-import { inject, nextTick, ref, watch } from "vue";
+import { nextTick, ref, watch } from "vue";
 import useToast from "@/Composables/useToast";
 import JetConfirmationModal from "@/Jetstream/ConfirmationModal.vue";
 import JetFormSection from "@/Jetstream/FormSection.vue";
@@ -40,7 +40,7 @@ watch(() => form.min_volunteers, (value: number | undefined, oldValue: number | 
   }
 
   if (value < 0) {
-    nextTick(() => {
+    void nextTick(() => {
       form.min_volunteers = oldValue;
     });
   }
@@ -58,7 +58,7 @@ watch(() => form.max_volunteers, (value: number | undefined, oldValue: number | 
   }
 
   if (value > maxVolunteers) {
-    nextTick(() => {
+    void nextTick(() => {
       form.max_volunteers = oldValue;
     });
   }
