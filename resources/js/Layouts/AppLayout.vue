@@ -67,14 +67,14 @@ onMounted(() => {
         <slot name="header" />
       </header>
 
-      <main>
+      <main class="flex-1 flex sm:flex-col">
         <!-- Page Top -->
         <section v-if="$slots['page-top']" class="page-grid text-neutral-900 dark:text-neutral-100">
           <slot name="page-top" />
         </section>
 
         <!-- Page Content -->
-        <section class="w-dvw page-grid">
+        <section class="flex-1 w-dvw page-grid">
           <div class="pt-4 sm:pb-6 px-4 sm:px-4 bg-panel dark:bg-panel-dark overflow-hidden border border-t-0 std-border sm:rounded-b-md sm:mb-5">
             <slot />
           </div>
