@@ -188,7 +188,10 @@ const scrollToLocation = async (itemKey: App.Data.LocationData["id"]) => {
   element.scrollIntoView({ behavior: "smooth" });
 };
 
+let prefersReducedMotion: boolean;
 onMounted(() => {
+  prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
   void getShifts();
 });
 
@@ -197,57 +200,61 @@ const transitionContainerHeight = ref<string>("auto");
 const beforeEnter = (el: Element) => {
   const element = el as HTMLElement;
   element.style.opacity = "0";
-  element.style.transform = "translateX(110%)";
+  if (!prefersReducedMotion) {
+    element.style.transform = "translateX(110%)";
+  }
 };
 
 const enter = (el: Element, done: () => void) => {
   const element = el as HTMLElement;
-  console.log("setInitialHeight", element.scrollHeight);
   transitionContainerHeight.value = `${element.scrollHeight}px`;
   element.style.opacity = "1";
-  element.style.transform = "translateX(0)";
+  if (!prefersReducedMotion) {
+    element.style.transform = "translateX(0)";
+  }
   done();
 };
 
 let cancelTimeout = 0;
 const afterEnter = (_: Element) => {
   clearTimeout(cancelTimeout as number);
-  console.log("resetHeight to 'auto'", transitionContainerHeight.value);
   cancelTimeout = window.setTimeout(() => {
-    console.log("bam!");
     transitionContainerHeight.value = "auto";
   }, 500);
 };
 
 const beforeLeave = async (el: Element) => {
   const element = el as HTMLElement;
-  console.log("setDepartingHeight", element);
   transitionContainerHeight.value = `${element.scrollHeight}px`;
   element.style.opacity = "0";
-  element.style.transform = "translateX(-110%)";
+  if (!prefersReducedMotion) {
+    element.style.transform = "translateX(-110%)";
+  }
   element.style.height = `${element.scrollHeight}px`;
 };
 </script>
 
 <template>
-  <div class="grid gap-3 grid-cols-1 sm:grid-cols-[20rem_3fr] sm:items-stretch">
-    <div class="">
+  <div class="grid gap-3 grid-cols-1 sm:grid-cols-[20rem_3fr] sm:grid-rows-1 sm:items-stretch">
+    <div class="grid grid-cols-1 grid-rows-[auto_1fr]">
       <ComponentSpinner :show="!locations" class="flex flex-col">
         <div class="pb-2 grid grid-cols-2 gap-2">
-          <PButton :disabled="shiftView === 'calendar'"
+          <PButton size="small"
+                   class="shadow-sm"
+                   :disabled="shiftView === 'calendar'"
                    variant="outlined"
-                   severity="info"
-                   size="small"
+                   :severity="shiftView === 'calendar' ? 'secondary' : 'info'"
                    @click="shiftView = 'calendar'">
-            <span class="iconify mdi--calendar-month-outline"/>
+            <span class="iconify mdi--calendar-month-outline" />
             Calendar
           </PButton>
-          <PButton :disabled="shiftView === 'list'"
+          <PButton size="small"
+                   class="shadow-sm"
+                   :disabled="shiftView === 'list'"
                    variant="outlined"
-                   severity="info"
-                   size="small"
+                   :severity="shiftView === 'list' ? 'secondary' : 'info'"
                    @click="shiftView = 'list'">
-            <span class="iconify mdi--timeline-text-outline"/>
+            <span class="iconify mdi--timeline-text-outline" />
             Timeline
           </PButton>
         </div>
@@ -378,14 +385,13 @@ const beforeLeave = async (el: Element) => {
 <!--suppress CssUnusedSymbol -->
 <style scoped>
 .transition-container {
-    --timing: 250ms;
-    --delay: 150ms;
+    --timing: 150ms;
     height: v-bind(transitionContainerHeight);
     transition: height var(--timing) ease-in-out;
 }
 
 .transition-container > div {
-    transition: transform var(--timing) var(--delay) ease-out, opacity var(--timing) var(--delay) ease-out;
+    transition: transform var(--timing) ease-out, opacity var(--timing) ease-out;
 }
 
 .description {
