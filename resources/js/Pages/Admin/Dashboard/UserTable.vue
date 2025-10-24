@@ -8,6 +8,7 @@ import useToast from "@/Composables/useToast";
 import FilledShiftsIndicator from "@/Pages/Admin/Dashboard/FilledShiftsIndicator.vue";
 import { useGlobalState } from "@/store";
 import { EnableUserAvailability } from "@/Utils/provide-inject-keys";
+import type { AssignVolunteerPayload } from "@/types/types";
 
 const props = defineProps({
   shift: {
@@ -42,7 +43,9 @@ const props = defineProps({
   // },
 });
 
-const emit = defineEmits(["assignVolunteer"]);
+const emit = defineEmits<{
+  assignVolunteer: [payload: AssignVolunteerPayload];
+}>();
 
 const state = useGlobalState();
 const columnFilters = computed(() => state.value["columnFilters"]);
