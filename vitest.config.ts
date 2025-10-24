@@ -34,7 +34,7 @@ export default defineConfig({
         '**/{karma,rollup,webpack,vite,vitest,jest,ava,babel,nyc,cypress,tsup,build,eslint,prettier}.config.*',
         '**/vitest.{workspace,projects}.[jt]s?(on)',
         '**/.{eslint,mocha,prettier}rc.{?(c|m)js,yml}',
-        "**/resources/js/bootstrap.js",
+        "**/resources/js/bootstrap.ts",
         "**/resources/js/primevue-customisations.js",
       ],
     },
