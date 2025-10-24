@@ -3,7 +3,7 @@ import { router } from "@inertiajs/vue3";
 import { moveArrayElement, useSortable } from "@vueuse/integrations/useSortable";
 import { nextTick, onMounted, onUnmounted, ref, watch, useTemplateRef, toRef } from "vue";
 import DragDrop from "@/Components/Icons/DragDrop.vue";
-import useToast from "@/Composables/useToast.js";
+import useToast from "@/Composables/useToast";
 import type { SortableEvent } from "sortablejs";
 
 const props = defineProps<{

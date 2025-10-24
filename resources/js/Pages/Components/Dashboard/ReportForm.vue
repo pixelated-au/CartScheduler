@@ -3,7 +3,7 @@ import axios, { isAxiosError } from "axios";
 import { format, parse } from "date-fns";
 import { computed, inject, nextTick, reactive, ref, useId, watch } from "vue";
 import SubmitButton from "@/Components/Form/Buttons/SubmitButton.vue";
-import useToast from "@/Composables/useToast.js";
+import useToast from "@/Composables/useToast";
 import JetInputError from "@/Jetstream/InputError.vue";
 import JetLabel from "@/Jetstream/Label.vue";
 import ReportTags from "@/Pages/Components/Dashboard/ReportTags.vue";

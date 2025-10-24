@@ -4,7 +4,7 @@ import { isAxiosError } from "axios";
 import { useConfirm } from "primevue";
 import { computed, useId } from "vue";
 import { useDarkMode } from "@/Composables/useDarkMode";
-import useToast from "@/Composables/useToast.js";
+import useToast from "@/Composables/useToast";
 import JetInputError from "@/Jetstream/InputError.vue";
 import JetLabel from "@/Jetstream/Label.vue";
 import JetSectionBorder from "@/Jetstream/SectionBorder.vue";

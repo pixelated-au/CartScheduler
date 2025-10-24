@@ -3,7 +3,7 @@ import { Link, router } from "@inertiajs/vue3";
 import { isAxiosError } from "axios";
 import { useConfirm } from "primevue";
 import { nextTick, watch } from "vue";
-import useToast from "@/Composables/useToast.js";
+import useToast from "@/Composables/useToast";
 import JetFormSection from "@/Jetstream/FormSection.vue";
 import JetInputError from "@/Jetstream/InputError.vue";
 import JetLabel from "@/Jetstream/Label.vue";

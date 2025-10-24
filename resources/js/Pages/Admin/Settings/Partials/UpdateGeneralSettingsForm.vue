@@ -2,7 +2,7 @@
 import { useForm } from "@inertiajs/vue3";
 import PSelect from "primevue/select";
 import { useTemplateRef } from "vue";
-import useToast from "@/Composables/useToast.js";
+import useToast from "@/Composables/useToast";
 import JetActionMessage from "@/Jetstream/ActionMessage.vue";
 import JetFormSection from "@/Jetstream/FormSection.vue";
 import JetInputError from "@/Jetstream/InputError.vue";
