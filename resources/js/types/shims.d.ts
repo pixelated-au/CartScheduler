@@ -16,6 +16,10 @@ import type { AppPageProps } from "./laravel-request-helpers";
 declare global {
   const route: typeof routeFn;
   const axios: Axios;
+
+  interface Window {
+    axios: Axios;
+  }
 }
 
 declare module "vue" {
