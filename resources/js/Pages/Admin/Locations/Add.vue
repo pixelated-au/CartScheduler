@@ -24,9 +24,7 @@ const newLocation: App.Data.LocationAdminData = {
   <PageHeader title="Create a new Location">
     <div class="flex justify-between">
       <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">New Location</h2>
-      <PButton class="mx-3" type="button" severity="secondary" outline @click.prevent="listRouteAction">
-        Back
-      </PButton>
+      <BackButton class="mx-3" outline @click.prevent="listRouteAction"/>
     </div>
   </PageHeader>
   <div>

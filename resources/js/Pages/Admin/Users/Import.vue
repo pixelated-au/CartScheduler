@@ -82,9 +82,7 @@ const label = computed(() => {
   <PageHeader title="Import Users">
     <div class="flex justify-between">
       <h2>Import Users</h2>
-      <PButton class="mx-3" type="button" severity="secondary" outline @click.prevent="listRouteAction">
-        Back
-      </PButton>
+      <BackButton class="mx-3" outline @click.prevent="listRouteAction"/>
     </div>
   </PageHeader>
   <div class="pt-10 mx-auto max-w-7xl sm:px-6">

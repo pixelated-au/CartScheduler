@@ -18,9 +18,7 @@ const listRouteAction = () => {
       <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
         Location {{ location.name }}
       </h2>
-      <PButton class="mx-3" type="button" severity="secondary" outline @click.prevent="listRouteAction">
-        Back
-      </PButton>
+      <BackButton class="mx-3" outline @click.prevent="listRouteAction"/>
     </div>
   </PageHeader>
   <div>
