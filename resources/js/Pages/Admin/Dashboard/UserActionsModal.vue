@@ -12,15 +12,19 @@ import UserTable from "@/Pages/Admin/Dashboard/UserTable.vue";
 import { useGlobalState } from "@/store";
 import { EnableUserAvailability } from "@/Utils/provide-inject-keys.js";
 import type { Location, Shift } from "@/Composables/useLocationFilter";
+import type { AssignVolunteerPayload } from "@/types/types";
 
 const props = defineProps<{
   show: boolean;
   date: Date;
-  shift: Shift | null;
-  location: Location | null;
+  shift: Shift | undefined;
+  location: Location | undefined;
 }>();
 
-const emit = defineEmits(["assignVolunteer", "update:show"]);
+const emit = defineEmits<{
+  assignVolunteer: [payload: AssignVolunteerPayload];
+  "update:show": [show: boolean];
+}>();
 
 const showModal = computed({
   get: () => props.show,
@@ -43,27 +47,6 @@ const state = useGlobalState();
 
 const columnFilters = computed(() => state.value.columnFilters);
 
-// const columnFilters = reactive({
-//   gender: { label: "Gender", value: false },
-//   appointment: { label: "Appointment", value: false },
-//   servingAs: { label: "Serving As", value: false },
-//   maritalStatus: { label: "Marital Status", value: false },
-//   birthYear: { label: "Birth Year", value: false },
-//   responsibleBrother: { label: "Is Responsible Bro?", value: false },
-//   mobilePhone: { label: "Phone", value: false },
-// });
-
-type X = Partial<Record<keyof typeof columnFilters, { label: string; value: boolean }>>;
-
-// watch(columnFilters, (val) => {
-//   const col:X = {};
-//   for (const [key, value] of Object.entries(val)) {
-//     col[key] = value;
-//   }
-//
-//   localStorage.setItem("admin-user-rostering-columns", JSON.stringify(col));
-// }, { deep: true });
-
 onBeforeMount(() => {
   const c = localStorage.getItem("admin-user-rostering-columns");
   if (!c) {
@@ -75,7 +58,7 @@ const volunteerSearch = ref("");
 
 const enableUserAvailability = inject(EnableUserAvailability);
 
-const volunteerAssigned = function(data) {
+const volunteerAssigned = function(data: AssignVolunteerPayload) {
   emit("assignVolunteer", data);
   closeModal();
 };
@@ -162,8 +145,7 @@ const volunteerAssigned = function(data) {
             </div>
           </div>
           <small class="mt-2 col-span-6 block text-center w-full text-gray-600 dark:text-gray-400">
-            These
-            filters will remove all volunteers who don't match
+            These filters will remove all volunteers who don't match
           </small>
         </div>
       </div>
