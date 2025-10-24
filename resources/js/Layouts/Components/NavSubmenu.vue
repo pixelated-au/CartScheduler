@@ -2,6 +2,7 @@
 import { Link } from "@inertiajs/vue3";
 import { onClickOutside, useFocusWithin } from "@vueuse/core";
 import { computed, onMounted, onUnmounted, useId, useTemplateRef } from "vue";
+import useCurrentPageInfo from "@/Composables/useCurrentPageInfo";
 import useNavEvents from "./Composables/useNavEvents";
 import type { CssClass } from "@/types/types";
 import type { MenuItem } from "./Composables/useNavEvents";
@@ -27,7 +28,9 @@ const submenuItems = computed(() => {
   throw Error("No submenu found");
 });
 
-const isActive = (routeName: string | undefined) => route().current() === routeName;
+const { routeName } = useCurrentPageInfo();
+
+const isActive = (routName: string | undefined) => routName === routeName.value;
 const id = useId();
 
 const label = computed(() => {
@@ -110,7 +113,7 @@ onClickOutside(target, async (event: Event) => {
               :class="{ 'rotate-180': isSubmenuOpen }"></span>
       </template>
 
-      <slot v-else name="button" />
+      <slot v-else name="button" :isActive="isSubmenuItemActive" />
     </button>
 
     <NavMenuTransition>
@@ -118,7 +121,7 @@ onClickOutside(target, async (event: Event) => {
           ref="submenu"
           :id
           :class="[ popUpPosition === 'start' ? 'sm:absolute sm:left-0' : 'sm:absolute sm:right-0' ]"
-          class="overflow-hidden gap-2 ps-4 sm:ps-1 sm:py-1 sm:mt-2 sm:min-w-48 sm:z-50 sm:bg-white sm:rounded-md sm:ring-1 sm:ring-black sm:ring-opacity-5 sm:shadow-md sm:origin-top-right sm:dark:bg-neutral-700/60 sm:backdrop-blur-sm sm:focus:outline-none">
+          class="overflow-hidden flex flex-col gap-1 ps-4 sm:ps-1 sm:py-1 sm:mt-2 sm:min-w-48 sm:z-50 sm:bg-white sm:rounded-md sm:ring-1 sm:ring-black sm:ring-opacity-5 sm:shadow-md sm:origin-top-right sm:dark:bg-neutral-700/60 sm:backdrop-blur-sm sm:focus:outline-none">
         <li v-for="subItem in submenuItems"
             :key="subItem.label">
           <Link v-if="subItem.href"

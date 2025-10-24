@@ -33,7 +33,7 @@ onUnmounted(() => {
       </Link>
 
       <!-- Desktop Menu -->
-      <ul class="hidden sm:flex items-center grow sm:ml-6 sm:space-x-4">
+      <ul class="hidden sm:flex items-center sm:ms-6 sm:gap-x-4">
         <NavDesktopMain/>
       </ul>
 

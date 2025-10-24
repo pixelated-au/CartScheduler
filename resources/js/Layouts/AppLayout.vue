@@ -2,8 +2,9 @@
 import Bugsnag from "@bugsnag/js";
 import { usePage } from "@inertiajs/vue3";
 import { differenceInDays } from "date-fns";
-import { computed, onMounted, provide, ref } from "vue";
+import { computed, onMounted, provide, ref, watch } from "vue";
 import ObtrusiveNotification from "@/Components/ObtrusiveNotification.vue";
+import useCurrentPageInfo from "@/Composables/useCurrentPageInfo";
 import { useDarkMode } from "@/Composables/useDarkMode.js";
 import { useGlobalState } from "@/store";
 import { EnableUserAvailability } from "@/Utils/provide-inject-keys.js"; // TODO AFTER REMOVING FLOATING-VUE, DELETE
@@ -15,6 +16,10 @@ defineProps<{
 }>();
 
 const page = usePage();
+const { prepareRouteData } = useCurrentPageInfo();
+watch(() => page.url, () => {
+  prepareRouteData();
+}, { immediate: true });
 
 const bugsnagKey = import.meta.env.VITE_BUGSNAG_FRONT_END_API_KEY;
 onMounted(() => {
