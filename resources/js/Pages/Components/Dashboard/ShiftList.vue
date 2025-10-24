@@ -160,9 +160,10 @@ const expandButtonDecoration = computed(() =>
 
 <template>
   <div class="mt-2">
+    <!-- ↑ The first div ('mt-2') is needed for the transitions -->
     <div class="relative sm:pt-0 transition-[padding-top] duration-500"
          :class="[{
-           'relative md:scroll-gradient' : isNotMobile && !fullHeightList,
+           'relative sm:scroll-gradient' : isNotMobile && !fullHeightList,
            'pt-6': !expandShiftList && isMobile,
            'pt-0': expandShiftList && isMobile,
          }]">
@@ -207,12 +208,13 @@ const expandButtonDecoration = computed(() =>
                   @after-leave="resetStyle">
         <div ref="list"
              v-show="showList"
-             class="overflow-hidden md:overflow-y-auto bg-white dark:bg-sub-panel-dark rounded justify-start border"
-             :class="[[ fullHeightList ? desktopListHeight : 'md:h-96' ],
-                      {
-                        'std-border' : isMobile && expandShiftList,
-                        'border-transparent' : isMobile && !expandShiftList,
-                      }]">
+             class="overflow-hidden sm:overflow-y-auto bg-white dark:bg-sub-panel-dark rounded justify-start border std-border"
+             :class="[
+               {
+                 'sm:h-96' : isNotMobile && !fullHeightList,
+                 'std-border' : isMobile && expandShiftList,
+                 'border-transparent' : isMobile && !expandShiftList,
+               }]">
           <dl v-if="shifts.size"
               class="mt-12 flex flex-col gap-1 relative ps-12 pb-8 mb-8
                     before:absolute before:left-11 before:top-0 before:bottom-0 before:border-l before:border-l-neutral-400 before:dark:border-l-neutral-600 before:border-dashed
@@ -240,7 +242,7 @@ const expandButtonDecoration = computed(() =>
               <dd v-for="(shift, idx) in shiftsForDate" :key="idx" class="ms-6">
                 <button type="button"
                         class="group cursor-pointer rounded-s ps-6 py-1 w-full flex flex-col items-start
-                    md:hover:bg-neutral-100 dark:md:hover:bg-neutral-800 md:transition-[background-color,padding] md:duration-300 md:hover:font-bold md:hover:ps-3"
+                    sm:hover:bg-neutral-100 dark:sm:hover:bg-neutral-800 sm:transition-[background-color,padding] sm:duration-300 sm:hover:font-bold sm:hover:ps-3"
                         @click="selectShift(shift)">
                   <span class="group-hover:font-medium transition-[font-weight] duration-300">
                     {{ shift.time }}
