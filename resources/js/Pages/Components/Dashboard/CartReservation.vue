@@ -4,11 +4,6 @@ import { breakpointsTailwind, useBreakpoints } from "@vueuse/core";
 import { isAxiosError } from "axios";
 import { format, isSameDay, parse } from "date-fns";
 import { computed, onMounted, ref, watch } from "vue";
-import Accordion from "@/Components/Accordion.vue";
-import AccordionPanel from "@/Components/AccordionPanel.vue";
-import ComponentSpinner from "@/Components/ComponentSpinner.vue";
-import EmptySlot from "@/Components/Icons/EmptySlot.vue";
-import User from "@/Components/Icons/User.vue";
 import useLocationFilter from "@/Composables/useLocationFilter";
 import useToast from "@/Composables/useToast";
 import useShiftMarkers from "@/Pages/Components/Dashboard/composables/useShiftMarkers";
@@ -286,7 +281,7 @@ const beforeLeave = async (el: Element) => {
           <AccordionPanel v-for="location in locations" :key="location.id" :value="location.id">
             <template #title>
               <div :ref="(el) => setLocationRef(location.id,el as HTMLElement)"
-                   class="flex items-center text-base font-bold p-2 bg-">
+                   class="flex items-center text-base font-bold p-2">
                 <span :class="locationLabel[location.id].classes"
                       v-tooltip="locationLabel[location.id].tooltip">
                   {{ location.name }}
