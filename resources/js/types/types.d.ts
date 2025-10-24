@@ -1,3 +1,5 @@
+import type { Location, Shift } from "@/Composables/useLocationFilter";
+
 type Digit = "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9";
 type NonZeroDigit = Exclude<Digit, "0">;
 type Decade = Extract<Digit, "2" | "3" | "4">;
@@ -26,4 +28,11 @@ export type DateMark = {
   type: "line";
   color: "#0E9F6E";
   locations: number[];
+};
+
+export type AssignVolunteerPayload = {
+  volunteerId: number;
+  volunteerName: string;
+  location: Location;
+  shift: Shift;
 };

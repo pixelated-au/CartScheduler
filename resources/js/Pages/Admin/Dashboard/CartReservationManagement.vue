@@ -4,9 +4,6 @@ import axios, { isAxiosError } from "axios";
 import { format, parse } from "date-fns";
 import { useConfirm } from "primevue";
 import { computed, onMounted, reactive, ref } from "vue";
-import ComponentSpinner from "@/Components/ComponentSpinner.vue";
-import EmptySlot from "@/Components/Icons/EmptySlot.vue";
-import User from "@/Components/Icons/User.vue";
 import useLocationFilter from "@/Composables/useLocationFilter";
 import useToast from "@/Composables/useToast";
 import MoveUserField from "@/Pages/Admin/Dashboard/MoveUserField.vue";
@@ -237,9 +234,10 @@ const rowClass = (gender?: string) => {
   return "bg-slate-200 dark:bg-slate-700 dark:text-gray-50";
 };
 
-const assignUserData = reactive<{ shift: Shift | null; location: Location | null }>({
-  shift: null,
-  location: null,
+type ShiftLocation = { shift: Shift; location: Location };
+const assignUserData = reactive<Partial<ShiftLocation>>({
+  shift: undefined,
+  location: undefined,
 });
 
 const doShowAssignVolunteerModal = (shift: Shift, location: Location) => {
@@ -276,10 +274,10 @@ onMounted(() => {
       </ComponentSpinner>
     </div>
     <ComponentSpinner :show="isLoading" class="min-h-[200px] sm:min-h-full">
-      <PAccordion v-if="!isLoading" v-model:value="accordionExpandIndex" class="rounded border std-border">
-        <PAccordionPanel v-for="location in locations" :key="location.id" :value="location.id" class="group">
-          <PAccordionHeader class="relative after:absolute after:bottom-2 after:left-0 after:right-0 group-[.p-accordionpanel-active]:after:block after:h-px after:hidden after:bg-gradient-to-r after:from-transparent after:from-20% after:via-surface-500/70 after:to-transparent after:to-80%">
-            <div class="flex items-center dark:text-gray-200">
+      <Accordion v-if="!isLoading" v-model="accordionExpandIndex" class="border std-border rounded border-b-0">
+        <AccordionPanel v-for="location in locations" :key="location.id" :value="location.id">
+          <template #title>
+            <div class="flex items-center text-base font-bold p-2">
               <span class="dark:text-gray-200">
                 {{ location.name }}
               </span>
@@ -295,79 +293,72 @@ onMounted(() => {
                 </div>
               </div>
             </div>
+          </template>
 
-            <template #toggleicon="{ active }">
-              <span class="ml-auto text-2xl duration-500 ease-in-out delay-100 iconify mdi--chevron-down transition-rotate"
-                    :class="active ? 'rotate-180' : ''" />
-            </template>
-          </PAccordionHeader>
-          <PAccordionContent>
-            <div class="grid gap-x-2 gap-y-4 w-full"
-                 :class="gridCols[location.max_volunteers as keyof typeof gridCols]">
-              <template v-for="shift in location.filterShifts" :key="shift.id">
-                <div class="self-center pl-3 dark:text-gray-100">
-                  {{ formatTime(shift.start_time) }} - {{ formatTime(shift.end_time) }}
-                </div>
+          <div class="grid gap-x-2 gap-y-4 w-full"
+               :class="gridCols[location.max_volunteers as keyof typeof gridCols]">
+            <template v-for="shift in location.filterShifts" :key="shift.id">
+              <div class="self-center pl-3 dark:text-gray-100">
+                {{ formatTime(shift.start_time) }} - {{ formatTime(shift.end_time) }}
+              </div>
+              <div v-for="(volunteer, index) in shift.volunteers"
+                   :key="index"
+                   class="justify-self-center self-center">
+                <User status="male" v-if="volunteer?.gender === 'male'" v-tooltip="volunteer.name" />
+                <User status="female" v-else-if="volunteer?.gender === 'female'" v-tooltip="volunteer.name" />
+
+                <EmptySlot v-else v-tooltip="'Available shift'" />
+              </div>
+              <div></div>
+              <div class="col-span-full dark:text-gray-50">
                 <div v-for="(volunteer, index) in shift.volunteers"
                      :key="index"
-                     class="justify-self-center self-center">
-                  <User status="male" v-if="volunteer?.gender === 'male'" v-tooltip="volunteer.name" />
-                  <User status="female" v-else-if="volunteer?.gender === 'female'" v-tooltip="volunteer.name" />
-
-                  <EmptySlot v-else v-tooltip="'Available shift'" />
-                </div>
-                <div></div>
-                <div class="col-span-full dark:text-gray-50">
-                  <div v-for="(volunteer, index) in shift.volunteers"
-                       :key="index"
-                       class="p-2 border-b border-gray-400 transition duration-150 first:rounded-t-md last:rounded-b-md last:border-b-0 hover:ease-in"
-                       :class="rowClass(volunteer?.gender)">
-                    <div v-if="volunteer" class="grid grid-cols-2 gap-1.5">
-                      <div class="md:mr-3">
-                        {{ volunteer.gender === "male" ? "Bro" : "Sis" }}
-                        {{ volunteer.name }}
-                      </div>
-                      <div class="text-right">
-                        Ph: <a :href="`tel:${volunteer.mobile_phone}`"
-                               class="underline decoration-blue-800 decoration-dotted decoration-1 underline-offset-4 visited:decoration-blue-800">
-                          {{ volunteer.mobile_phone }}
-                        </a>
-                      </div>
-                      <div class="grid grid-cols-2 col-span-2 gap-1.5 lg:flex lg:gap-3">
-                        <MoveUserField class="inline-block"
-                                       :volunteer="volunteer"
-                                       :date="date"
-                                       :shift="shift"
-                                       :location-id="location.id"
-                                       :empty-shifts-for-time="emptyShiftsForTime"
-                                       @update="promptMoveVolunteer($event, volunteer, shift)" />
-                        <div class="text-right">
-                          <PButton severity="danger"
-                                   label="Remove"
-                                   icon="iconify mdi--account-cancel"
-                                   v-tooltip="removeTooltip(volunteer.name)"
-                                   @click="promptRemoveVolunteer(volunteer, shift, location, date)"/>
-                        </div>
-                      </div>
+                     class="p-2 border-b border-gray-400 transition duration-150 first:rounded-t-md last:rounded-b-md last:border-b-0 hover:ease-in"
+                     :class="rowClass(volunteer?.gender)">
+                  <div v-if="volunteer" class="grid grid-cols-2 gap-1.5">
+                    <div class="md:mr-3">
+                      {{ volunteer.gender === "male" ? "Bro" : "Sis" }}
+                      {{ volunteer.name }}
                     </div>
-                    <div v-else>
-                      <PButton icon="iconify mdi--user-add" label="Add Volunteer" @click="doShowAssignVolunteerModal(shift, location)"/>
+                    <div class="text-right">
+                      Ph: <a :href="`tel:${volunteer.mobile_phone}`"
+                             class="underline decoration-blue-800 decoration-dotted decoration-1 underline-offset-4 visited:decoration-blue-800">
+                        {{ volunteer.mobile_phone }}
+                      </a>
+                    </div>
+                    <div class="grid grid-cols-2 col-span-2 gap-1.5 lg:flex lg:gap-3">
+                      <MoveUserField class="inline-block"
+                                     :volunteer="volunteer"
+                                     :date="date"
+                                     :shift="shift"
+                                     :location-id="location.id"
+                                     :empty-shifts-for-time="emptyShiftsForTime"
+                                     @update="promptMoveVolunteer($event, volunteer, shift)" />
+                      <div class="text-right">
+                        <PButton severity="danger"
+                                 label="Remove"
+                                 icon="iconify mdi--account-cancel"
+                                 v-tooltip="removeTooltip(volunteer.name)"
+                                 @click="promptRemoveVolunteer(volunteer, shift, location, date)"/>
+                      </div>
                     </div>
                   </div>
+                  <div v-else>
+                    <PButton icon="iconify mdi--user-add" label="Add Volunteer" @click="doShowAssignVolunteerModal(shift, location)"/>
+                  </div>
                 </div>
-              </template>
-            </div>
-          </PAccordionContent>
-        </PAccordionPanel>
-      </PAccordion>
+              </div>
+            </template>
+          </div>
+        </AccordionPanel>
+      </Accordion>
     </ComponentSpinner>
   </div>
-
   <PConfirmDialog group="manage-volunteer" pt:root="max-w-lg"/>
 
   <UserActionsModal v-model:show="showUserAddModal"
                     :date="date"
-                    :shift="assignUserData.shift"
-                    :location="assignUserData.location"
+                    :shift="(assignUserData as ShiftLocation).shift"
+                    :location="(assignUserData as ShiftLocation).location"
                     @assignVolunteer="assignVolunteer" />
 </template>
