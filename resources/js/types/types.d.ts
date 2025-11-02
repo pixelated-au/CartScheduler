@@ -1,4 +1,5 @@
 import type { Location, Shift } from "@/Composables/useLocationFilter";
+import type { Form as PrecognitiveForm } from "laravel-precognition-vue-inertia/dist/types";
 
 type Digit = "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9";
 type NonZeroDigit = Exclude<Digit, "0">;
@@ -36,3 +37,24 @@ export type AssignVolunteerPayload = {
   location: Location;
   shift: Shift;
 };
+
+type DeepKeys<T> = T extends object
+  ? {
+    // Iterate over each key K in T
+    [K in keyof T]-?: K extends string // Ensure the key is a string (e.g., exclude symbols)
+      ? T[K] extends (infer U)[] // If T[K] is an array...
+        ? U extends object // ...and array elements are objects
+          ? `${K}.${number}.${DeepKeys<U>}` // Then the path is "key.index.nestedKey"
+          : `${K}.${number}` // ...if array elements are primitives (e.g., string[], number[]), path is "key.index"
+        : T[K] extends object // If T[K] is a plain object (not an array)...
+          ? `${K}.${DeepKeys<T[K]>}` // ...then recurse for nested object keys
+          : K // If T[K] is a primitive (string, number, boolean, etc.), the path is just the key itself
+      : never; // Exclude non-string keys
+  }[keyof T] // This maps the type to a union of all its property types
+  : never; // If T is not an object (e.g., string, number), there are no keys to extract.
+
+export type FormErrors<T> = Record<DeepKeys<T>, string>;
+
+export interface Form<Data extends Record<string, unknown>> extends PrecognitiveForm<Data> {
+  errors: FormErrors<Data>;
+}

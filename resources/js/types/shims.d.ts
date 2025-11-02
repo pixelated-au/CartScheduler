@@ -3,7 +3,6 @@
 
 import "vite/client";
 import { Page, PageProps as InertiaPageProps } from "@inertiajs/core";
-import type { Form as PrecognitiveForm } from "laravel-precognition-vue-inertia";
 import type { Axios } from "axios";
 import type {
   ComponentCustomOptions as VueComponentCustomOptions,
@@ -56,19 +55,4 @@ declare module "@inertiajs/core" {
 
 declare module "@inertiajs/vue3" {
   export declare function usePage<T extends AppPageProps>(): Page<T>;
-}
-
-// type FormDataKeys<T extends Record<string, unknown>> = keyof T extends infer Key extends Extract<keyof T, string>
-//   ? T[Key] extends Array<infer X extends FormDataKeys<T[Key]>>
-//     ? `${Key}.${number}.${Extract<keyof X, string>}`
-//     : T[Key] extends T
-//       ? `${Key}.${FormDataKeys<T[Key]>}`
-//       : Key
-//   : never;
-//
-// export type FormErrors<T> = Record<FormDataKeys<T>, string>;
-
-
-export interface Form<Data extends Record<string, unknown>> extends PrecognitiveForm<Data> {
-  errors: FormErrors<Data>;
 }
