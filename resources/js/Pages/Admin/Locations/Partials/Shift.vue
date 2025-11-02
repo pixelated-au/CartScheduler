@@ -9,6 +9,7 @@ import JetInputError from "@/Jetstream/InputError.vue";
 import JetLabel from "@/Jetstream/Label.vue";
 import JetSectionBorder from "@/Jetstream/SectionBorder.vue";
 import dateStringToDateObject from "@/Utils/dateStringToDateObject";
+import type { FormErrors } from "@/types/types";
 // https://vue3datepicker.com/
 
 export type DayKey = Extract<keyof App.Data.ShiftAdminData, `day_${string}`>;
@@ -18,8 +19,7 @@ const props = defineProps<{
     value: DayKey;
   }>;
   index: number;
-  errors: Record<string, string>;
-  // errors: FormErrors<App.Data.LocationAdminData>;
+  errors: FormErrors<App.Data.LocationAdminData>;
 }>();
 
 const shift = defineModel<App.Data.ShiftAdminData>({ required: true });
@@ -116,7 +116,7 @@ const confirmDelete = (event: Event) => {
 <template>
   <template v-if="shift">
     <div class="grid grid-cols-8 gap-2">
-      <div class="text-center justify-self-center">
+      <div class="justify-self-center text-center">
         <JetLabel for="all" value="All" />
         <PCheckbox binary
                    input-id="all"
@@ -124,7 +124,7 @@ const confirmDelete = (event: Event) => {
                    :value="true"
                    class="mt-3" />
       </div>
-      <div v-for="day in days" :key="day.label" class="text-center justify-self-center">
+      <div v-for="day in days" :key="day.label" class="justify-self-center text-center">
         <JetLabel :for="day.value + fieldUnique" :value="day.label" />
         <PCheckbox binary
                    :input-id="day.value + fieldUnique"
