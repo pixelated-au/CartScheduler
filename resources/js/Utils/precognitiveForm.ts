@@ -1,6 +1,6 @@
 import { useForm } from "laravel-precognition-vue-inertia";
 import type { FormDataConvertible } from "@inertiajs/core";
-import type { Form } from "@/types/shims";
+import type { Form } from "@/types/types";
 import type { ValidRouteName } from "ziggy-js";
 
 export interface Settings {
