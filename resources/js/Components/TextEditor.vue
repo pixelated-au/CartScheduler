@@ -16,13 +16,12 @@ import {EditorContent, useEditor} from '@tiptap/vue-3';
 import {provide, watch} from 'vue';
 import { serialize, deserialize } from "./TextEditorMarkdown"
 
-const props = defineProps<{
-    modelValue: {
-        default: '',
-    },
-    highlightSyntax: {
-        default: false,
-    },
+const {
+    modelValue = '',
+    highlightSyntax = false
+} = defineProps<{
+    modelValue?: string,
+    highlightSyntax?: boolean
 }>();
 
 const emit = defineEmits(["update:modelValue"]);
@@ -33,23 +32,25 @@ let editor_extensions = [
     TextAlign.configure({types: ['paragraph']}),
 ]
 
-if (props.highlightSyntax)
+if (highlightSyntax)
     editor_extensions.push(SyntaxHighlight)
 
+console.log("using extensions: ", editor_extensions)
+
 const editor = useEditor({
-    content: deserialize("", props.modelValue),
+    content: deserialize("", modelValue),
     extensions: editor_extensions,
     editable: true,
     onUpdate: (event) => {
         emit('update:modelValue', serialize(editor.value.view.state.schema, editor.value.getJSON()));
     },
     onCreate: (event) => {
-        event.editor.content = deserialize(event.editor.schema, props.modelValue)
+        event.editor.content = deserialize(event.editor.schema, modelValue)
         //let markdown = serialize(editor.value.view.state.schema, editor.value.getJSON());
     }
 });
 
-watch(() => props.modelValue, (value) => {
+watch(() => modelValue, (value) => {
     if (!editor?.value || value === editor?.value) {
         return;
     }
