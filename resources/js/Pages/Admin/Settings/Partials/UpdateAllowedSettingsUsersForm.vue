@@ -8,7 +8,7 @@ import JetFormSection from "@/Jetstream/FormSection.vue";
 import JetInputError from "@/Jetstream/InputError.vue";
 
 const { settings } = defineProps<{
-  settings: App.Settings.GeneralSettings;
+  settings: Object;
 }>();
 
 const toast = useToast();

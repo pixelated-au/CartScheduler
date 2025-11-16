@@ -9,7 +9,7 @@ import vAutoScroll from "@/Directives/v-autoscroll.js";
 import JetFormSection from "@/Jetstream/FormSection.vue";
 
 const { settings } = defineProps<{
-  settings: App.Settings.GeneralSettings;
+  settings: Object;
 }>();
 
 const processing = ref(false);

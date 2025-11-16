@@ -48,8 +48,8 @@ services:
             MYSQL_ALLOW_EMPTY_PASSWORD: 1
         command: '--default-authentication-plugin=mysql_native_password'
         volumes:
-            - 'sail-mysql:/var/lib/mysql'
-            - './docker/mysql/create-testing-database.sh:/docker-entrypoint-initdb.d/10-create-testing-database.sh'
+            - 'sail-mysql:/var/lib/mysql:z'
+            - './docker/mysql/create-testing-database.sh:/docker-entrypoint-initdb.d/10-create-testing-database.sh:z'
         networks:
             - sail
         healthcheck:

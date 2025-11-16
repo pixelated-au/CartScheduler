@@ -5,7 +5,7 @@ import UpdateAllowedSettingsUsersForm from "@/Pages/Admin/Settings/Partials/Upda
 import UpdateGeneralSettingsForm from "@/Pages/Admin/Settings/Partials/UpdateGeneralSettingsForm.vue";
 
 defineProps({
-  settings: App.Settings.GeneralSettings,
+  settings: Object,
 });
 </script>
 

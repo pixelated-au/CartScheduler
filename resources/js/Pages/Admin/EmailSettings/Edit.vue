@@ -1,5 +1,4 @@
 <script setup>
-import JetButton from '@/Jetstream/Button.vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import LocationForm from '@/Pages/Admin/Locations/Partials/LocationForm.vue';
 import TextEditor from '@/Components/TextEditor.vue';
@@ -64,12 +63,12 @@ const updateLocationData = () => {
 
                 <template #actions>
                     <div>
-                        <JetButton :class="{ 'opacity-25': form.processing }"
-                                   :disabled="form.processing"
-                                   @click.prevent="updateLocationData">
-                            Save
-                        </JetButton>
-                    </div>
+                  <PButton label="Save"
+                           severity="primary"
+                           class="mr-3"
+                           :disabled="form.processing"
+                           @click.prevent="updateLocationData" />
+                              </div>
                 </template>
             </JetFormSection>
         </div>

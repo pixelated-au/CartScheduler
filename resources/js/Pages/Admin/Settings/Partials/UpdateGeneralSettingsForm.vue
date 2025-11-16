@@ -15,7 +15,7 @@ import JetInput from '@/Jetstream/Input.vue';
 import {computed} from "vue";
 
 const { settings } = defineProps<{
-  settings: App.Settings.GeneralSettings;
+  settings: Object;
 }>();
 
 const form = useForm({
