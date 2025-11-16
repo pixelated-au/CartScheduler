@@ -1,4 +1,4 @@
-import { DOMParser as ProseMirrorDOMParser, Node as ProseMirrorNode } from "prosemirror-model";
+import { Node as ProseMirrorNode, Schema } from "prosemirror-model";
 import {
   MarkdownSerializer as ProseMirrorMarkdownSerializer,
   defaultMarkdownSerializer,
@@ -116,7 +116,7 @@ const serializerNodes = {
   },
 };
 
-export function serialize(schema, content) {
+export function serialize(schema : Schema, content : string) {
   const doc = ProseMirrorNode.fromJSON(schema, content);
 
   const serializer = new ProseMirrorMarkdownSerializer(
@@ -127,7 +127,7 @@ export function serialize(schema, content) {
   return markdown
 }
 
-export function deserialize(schema, content) {
+export function deserialize(schema : Schema, content : string) {
   let html = marked.parse(content);
   return html;
 }

@@ -11,7 +11,7 @@ export const SyntaxHighlight = Extension.create({
                 props: {
                     decorations(state) {
                         const { doc } = state
-                        const decorations = []
+                        const decorations : Decoration[] = []
                         const regex = /\{\{\s*[\w\d_]+\s*\}\}/g
 
                         doc.descendants((node, pos) => {
@@ -20,7 +20,7 @@ export const SyntaxHighlight = Extension.create({
                             const text = node.text
                             let match
 
-                            while ((match = regex.exec(text)) !== null) {
+                            while (text && (match = regex.exec(text)) !== null) {
                                 const start = pos + match.index
                                 const end = start + match[0].length
 

@@ -12,8 +12,8 @@ import { SyntaxHighlight } from '@/Components/TextEditorSyntaxHighlighter';
 import Link from '@tiptap/extension-link';
 import TextAlign from '@tiptap/extension-text-align';
 import StarterKit from '@tiptap/starter-kit';
-import {EditorContent, useEditor} from '@tiptap/vue-3';
-import {provide, watch} from 'vue';
+import { EditorContent, useEditor } from '@tiptap/vue-3';
+import { provide } from 'vue';
 import { serialize, deserialize } from "./TextEditorMarkdown"
 
 const {
@@ -41,16 +41,18 @@ const editor = useEditor({
     content: deserialize("", modelValue),
     extensions: editor_extensions,
     editable: true,
-    onUpdate: (event) => {
-        emit('update:modelValue', serialize(editor.value.view.state.schema, editor.value.getJSON()));
+    onUpdate: () => {
+        if (editor.value)
+          emit('update:modelValue', serialize(editor.value.view.state.schema, editor.value.getJSON()));
     },
     onCreate: (event) => {
-        event.editor.content = deserialize(event.editor.schema, modelValue)
+        if ("content" in event.editor)
+          event.editor.content = deserialize(event.editor.schema, modelValue)
         //let markdown = serialize(editor.value.view.state.schema, editor.value.getJSON());
     }
 });
 
-watch(() => modelValue, (value) => {
+/* watch(() => modelValue, (value) => {
     if (!editor?.value || value === editor?.value) {
         return;
     }
@@ -58,7 +60,7 @@ watch(() => modelValue, (value) => {
     //editor.value.commands.setContent(new_html, false);
     //let markdown = serialize(editor.value.view.state.schema, editor.value.getJSON())
     //editor.value.commands.setContent(markdown, false);
-});
+}); */
 
 provide("editor", editor);
 </script>
