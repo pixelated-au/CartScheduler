@@ -60,8 +60,6 @@ function hasValidStructure(stored: any): stored is LocalStore {
 
   if (!keysMatch) return false;
 
-  if (!keysMatch) return false;
-
   // Check if all labels match
   for (const key of expectedKeys) {
     const expectedLabel = defaults.columnFilters[key as keyof typeof defaults.columnFilters].label;
