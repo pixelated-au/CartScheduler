@@ -123,6 +123,13 @@ const tableHeaders = computed(() => {
       sortable: true,
     });
   }
+  if (columnFilters.value.lastLocation.value) {
+    headers.push({
+      text: "Last Location",
+      value: "lastLocation",
+      sortable: false,
+    });
+  }
   headers.push({
     text: "Last Shift",
     value: "lastShift",
@@ -172,6 +179,7 @@ const tableRows = computed(() => {
       comment: volunteer.availability_comments,
       lastShift: volunteer.last_shift_date ? volunteer.last_shift_date : null,
       lastShiftTime: volunteer.last_shift_start_time ? volunteer.last_shift_start_time : null,
+      lastLocation: volunteer.last_location_name ? volunteer.last_location_name : null,
       filledShifts: calcShiftPercentage(daysAlreadyRostered, daysAvailable),
       responsibleBrother: volunteer.responsible_brother,
       appointment: volunteer.appointment,
@@ -377,6 +385,10 @@ const hasDaysAvailable = (daysAvailable) => Object.values(daysAvailable).some((d
 
       <template #item-lastShift="{ lastShift, lastShiftTime }">
         {{ formatShiftDate(lastShift, lastShiftTime) }}
+      </template>
+
+      <template #item-lastLocation="{ lastLocation }">
+        {{ lastLocation || 'Never' }}
       </template>
 
       <template #item-filledShifts="{ daysAlreadyRostered, daysAvailable, filledShifts }">

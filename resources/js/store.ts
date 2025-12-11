@@ -9,6 +9,7 @@ export enum Labels {
   ResponsibleBrother = "Is Responsible Bro?",
   MobilePhone = "Phone",
   AvailabilityComments = "Comments",
+  LastLocation = "Last Location",
 }
 
 export type LocalStore = {
@@ -22,6 +23,7 @@ export type LocalStore = {
     responsibleBrother: { label: Labels.ResponsibleBrother; value: boolean };
     mobilePhone: { label: Labels.MobilePhone; value: boolean };
     availabilityComments: { label: Labels.AvailabilityComments; value: boolean };
+    lastLocation: { label: Labels.LastLocation; value: boolean };
   };
   shiftView: "list" | "calendar";
 };
@@ -37,6 +39,7 @@ const defaults: LocalStore = {
     responsibleBrother: { label: Labels.ResponsibleBrother, value: false },
     mobilePhone: { label: Labels.MobilePhone, value: false },
     availabilityComments: { label: Labels.AvailabilityComments, value: false },
+    lastLocation: { label: Labels.LastLocation, value: false },
   },
   shiftView: "calendar",
 };
