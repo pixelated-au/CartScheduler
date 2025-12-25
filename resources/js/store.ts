@@ -10,6 +10,7 @@ export enum Labels {
   MobilePhone = "Phone",
   AvailabilityComments = "Comments",
   LastLocation = "Last Location",
+  LastShift = "Last Shift",
 }
 
 export type LocalStore = {
@@ -24,6 +25,7 @@ export type LocalStore = {
     mobilePhone: { label: Labels.MobilePhone; value: boolean };
     availabilityComments: { label: Labels.AvailabilityComments; value: boolean };
     lastLocation: { label: Labels.LastLocation; value: boolean };
+    lastShift: { label: Labels.LastShift; value: boolean };
   };
   shiftView: "list" | "calendar";
 };
@@ -40,6 +42,7 @@ const defaults: LocalStore = {
     mobilePhone: { label: Labels.MobilePhone, value: false },
     availabilityComments: { label: Labels.AvailabilityComments, value: false },
     lastLocation: { label: Labels.LastLocation, value: false },
+    lastShift: { label: Labels.LastShift, value: false },
   },
   shiftView: "calendar",
 };
