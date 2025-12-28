@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { format, parse } from "date-fns";
+import { format, parse, getDay } from "date-fns";
 import { Menu as VMenu } from "floating-vue";
 import { computed, inject, ref, watchEffect } from "vue";
 import DataTable from "@/Components/DataTable.vue";
@@ -135,6 +135,13 @@ const tableHeaders = computed(() => {
     value: "lastShift",
     sortable: true,
   });
+  if (columnFilters.value.shiftsPerDay.value) {
+    headers.push({
+      text: "Shifts Per Day",
+      value: "shiftsPerDay",
+      sortable: true,
+    });
+  }
   if (enableUserAvailability) {
     headers.push({
       text: "Availability",
@@ -181,6 +188,7 @@ const tableRows = computed(() => {
       lastShiftTime: volunteer.last_shift_start_time ? volunteer.last_shift_start_time : null,
       lastLocation: volunteer.last_location_name ? volunteer.last_location_name : null,
       filledShifts: calcShiftPercentage(daysAlreadyRostered, daysAvailable),
+      shiftsPerDay: shiftsToday(volunteer),
       responsibleBrother: volunteer.responsible_brother,
       appointment: volunteer.appointment,
       servingAs: volunteer.serving_as,
@@ -220,6 +228,14 @@ const truncateComment = (text: string | null | undefined) => {
   if (!text) return "";
   if (text.length <= MAX_COMMENT_LENGTH) return text;
   return text.substring(0, MAX_COMMENT_LENGTH) + "...";
+};
+
+const shiftsToday = (volunteer: App.Data.ExtendedUserData) => {
+  const dayOfWeek = getDay(props.date); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+  const dayNames = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
+  const dayName = dayNames[dayOfWeek];
+
+  return volunteer[`shifts_${dayName}` as keyof App.Data.ExtendedUserData] as string | undefined;
 };
 
 const assignVolunteer = (volunteerId, volunteerName) => {
@@ -389,6 +405,10 @@ const hasDaysAvailable = (daysAvailable) => Object.values(daysAvailable).some((d
 
       <template #item-lastLocation="{ lastLocation }">
         {{ lastLocation || 'Never' }}
+      </template>
+
+      <template #item-shiftsPerDay="{ shiftsPerDay }">
+        {{ shiftsPerDay || 'Not set' }}
       </template>
 
       <template #item-filledShifts="{ daysAlreadyRostered, daysAvailable, filledShifts }">

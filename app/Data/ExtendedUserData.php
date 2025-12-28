@@ -5,6 +5,7 @@ namespace App\Data;
 use App\Enums\Appointment;
 use App\Enums\MaritalStatus;
 use App\Enums\ServingAs;
+use App\Enums\ShiftsPerDay;
 use Spatie\LaravelData\Attributes\MapInputName;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Optional;
@@ -47,6 +48,13 @@ class ExtendedUserData extends Data
         public int|Optional $filled_saturdays,
         #[MapInputName('comments')]
         public string|Optional $availability_comments,
+        public ShiftsPerDay|Optional $shifts_monday,
+        public ShiftsPerDay|Optional $shifts_tuesday,
+        public ShiftsPerDay|Optional $shifts_wednesday,
+        public ShiftsPerDay|Optional $shifts_thursday,
+        public ShiftsPerDay|Optional $shifts_friday,
+        public ShiftsPerDay|Optional $shifts_saturday,
+        public ShiftsPerDay|Optional $shifts_sunday,
     ) {
     }
 }

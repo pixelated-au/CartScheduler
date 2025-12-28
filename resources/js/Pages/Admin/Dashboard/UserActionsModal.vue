@@ -68,7 +68,7 @@ const volunteerAssigned = function(data: AssignVolunteerPayload) {
   <PDialog maximizable v-model:visible="showModal" modal class="w-11/12">
     <!--  <JetDialogModal :show="showModal" maxWidth="7xl" @close="closeModal"> -->
     <template #header>
-      Assign a volunteer to {{ location?.name }} on {{ format(props.date, "MMM d, yyyy") }}
+      Assign a volunteer to {{ location?.name }} on {{ format(props.date, "EEEE, d MMM yyyy") }}
     </template>
 
     <template #default>

@@ -49,6 +49,14 @@ class UpdateUserRegularAvailabilityController extends Controller
 
         $availability->comments = $request->validated('comments');
 
+        $availability->shifts_monday    = $request->validated('shifts_monday');
+        $availability->shifts_tuesday   = $request->validated('shifts_tuesday');
+        $availability->shifts_wednesday = $request->validated('shifts_wednesday');
+        $availability->shifts_thursday  = $request->validated('shifts_thursday');
+        $availability->shifts_friday    = $request->validated('shifts_friday');
+        $availability->shifts_saturday  = $request->validated('shifts_saturday');
+        $availability->shifts_sunday    = $request->validated('shifts_sunday');
+
         $user->availability = $availability;
         $user->availability->save();
 

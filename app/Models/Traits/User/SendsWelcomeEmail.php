@@ -9,6 +9,6 @@ use Illuminate\Support\Facades\Mail;
 trait SendsWelcomeEmail {
     public static function sendWelcomeEmail(User $user): void
     {
-        Mail::to($user->email)->send(new UserAccountCreated($user));
+        // Mail::to($user->email)->send(new UserAccountCreated($user));
     }
 }

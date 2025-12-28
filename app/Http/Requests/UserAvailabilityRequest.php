@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Enums\ShiftsPerDay;
 use App\Settings\GeneralSettings;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
@@ -61,6 +62,14 @@ class UserAvailabilityRequest extends FormRequest
             'day_sunday.*'    => ['required', 'integer', 'min:0', 'max:23'],
 
             'comments' => ['nullable', 'string', 'max:500'],
+            
+            'shifts_monday' => ['nullable', 'string', Rule::enum(ShiftsPerDay::class)],
+            'shifts_tuesday' => ['nullable', 'string', Rule::enum(ShiftsPerDay::class)],
+            'shifts_wednesday' => ['nullable', 'string', Rule::enum(ShiftsPerDay::class)],
+            'shifts_thursday' => ['nullable', 'string', Rule::enum(ShiftsPerDay::class)],
+            'shifts_friday' => ['nullable', 'string', Rule::enum(ShiftsPerDay::class)],
+            'shifts_saturday' => ['nullable', 'string', Rule::enum(ShiftsPerDay::class)],
+            'shifts_sunday' => ['nullable', 'string', Rule::enum(ShiftsPerDay::class)],
         ];
     }
 

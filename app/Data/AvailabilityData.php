@@ -3,6 +3,7 @@
 namespace App\Data;
 
 use App\Data\Casts\AvailabilityHoursCast;
+use App\Enums\ShiftsPerDay;
 use Illuminate\Support\Collection;
 use Spatie\LaravelData\Attributes\WithCast;
 use Spatie\LaravelData\Data;
@@ -34,6 +35,13 @@ class AvailabilityData extends Data
         public int $num_saturdays = 0,
         public int $num_sundays = 0,
         public ?string $comments = null,
+        public ?ShiftsPerDay $shifts_monday = null,
+        public ?ShiftsPerDay $shifts_tuesday = null,
+        public ?ShiftsPerDay $shifts_wednesday = null,
+        public ?ShiftsPerDay $shifts_thursday = null,
+        public ?ShiftsPerDay $shifts_friday = null,
+        public ?ShiftsPerDay $shifts_saturday = null,
+        public ?ShiftsPerDay $shifts_sunday = null,
     ) {
     }
 }

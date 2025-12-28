@@ -68,7 +68,14 @@ export default function useAvailabilityActions(
   function dayToggle(day: Day): WritableComputedRef<boolean> {
     return computed({
       get: () => (form[`num_${day}s`] as number) > 0,
-      set: (value: boolean) => form[`num_${day}s`] = (value ? 1 : 0),
+      set: (value: boolean) => {
+        form[`num_${day}s`] = (value ? 1 : 0);
+        if (value) {
+          form[`shifts_${day}`] = "1 shift";
+        } else {
+          form[`shifts_${day}`] = undefined;
+        }
+      },
     });
   }
 

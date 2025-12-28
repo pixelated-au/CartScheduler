@@ -19,6 +19,13 @@ declare namespace App.Data {
     num_saturdays: number;
     num_sundays: number;
     comments?: string;
+    shifts_monday?: string;
+    shifts_tuesday?: string;
+    shifts_wednesday?: string;
+    shifts_thursday?: string;
+    shifts_friday?: string;
+    shifts_saturday?: string;
+    shifts_sunday?: string;
   };
   export type AvailableShiftMetaData = {
     volunteer_count: number;
@@ -62,6 +69,13 @@ declare namespace App.Data {
     filled_fridays?: number;
     filled_saturdays?: number;
     availability_comments?: string;
+    shifts_monday?: string;
+    shifts_tuesday?: string;
+    shifts_wednesday?: string;
+    shifts_thursday?: string;
+    shifts_friday?: string;
+    shifts_saturday?: string;
+    shifts_sunday?: string;
   };
   export type FilledShiftData = {
     date: IsoDate;

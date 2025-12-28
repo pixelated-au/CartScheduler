@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Casts\SetAsEnumCollectionCast;
 use App\Enums\AvailabilityHours;
+use App\Enums\ShiftsPerDay;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -24,6 +25,13 @@ class UserAvailability extends Model
         'day_friday',
         'day_saturday',
         'day_sunday',
+        'shifts_monday',
+        'shifts_tuesday',
+        'shifts_wednesday',
+        'shifts_thursday',
+        'shifts_friday',
+        'shifts_saturday',
+        'shifts_sunday',
     ];
 
     protected function casts(): array
@@ -36,6 +44,13 @@ class UserAvailability extends Model
             'day_friday'    => SetAsEnumCollectionCast::class . ':' . AvailabilityHours::class,
             'day_saturday'  => SetAsEnumCollectionCast::class . ':' . AvailabilityHours::class,
             'day_sunday'    => SetAsEnumCollectionCast::class . ':' . AvailabilityHours::class,
+            'shifts_monday' => ShiftsPerDay::class,
+            'shifts_tuesday' => ShiftsPerDay::class,
+            'shifts_wednesday' => ShiftsPerDay::class,
+            'shifts_thursday' => ShiftsPerDay::class,
+            'shifts_friday' => ShiftsPerDay::class,
+            'shifts_saturday' => ShiftsPerDay::class,
+            'shifts_sunday' => ShiftsPerDay::class,
         ];
     }
 

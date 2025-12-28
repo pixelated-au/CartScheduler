@@ -32,14 +32,21 @@ const form = useForm({
   day_friday: availability.day_friday || [ranges.value.start, ranges.value.end],
   day_saturday: availability.day_saturday || [ranges.value.start, ranges.value.end],
   day_sunday: availability.day_sunday || [ranges.value.start, ranges.value.end],
-  num_mondays: availability.num_mondays || 0 as DayOfMonthCount,
-  num_tuesdays: availability.num_tuesdays || 0 as DayOfMonthCount,
-  num_wednesdays: availability.num_wednesdays || 0 as DayOfMonthCount,
-  num_thursdays: availability.num_thursdays || 0 as DayOfMonthCount,
-  num_fridays: availability.num_fridays || 0 as DayOfMonthCount,
-  num_saturdays: availability.num_saturdays || 0 as DayOfMonthCount,
-  num_sundays: availability.num_sundays || 0 as DayOfMonthCount,
+  num_mondays: (availability.num_mondays || 0) as DayOfMonthCount,
+  num_tuesdays: (availability.num_tuesdays || 0) as DayOfMonthCount,
+  num_wednesdays: (availability.num_wednesdays || 0) as DayOfMonthCount,
+  num_thursdays: (availability.num_thursdays || 0) as DayOfMonthCount,
+  num_fridays: (availability.num_fridays || 0) as DayOfMonthCount,
+  num_saturdays: (availability.num_saturdays || 0) as DayOfMonthCount,
+  num_sundays: (availability.num_sundays || 0) as DayOfMonthCount,
   comments: availability.comments || "",
+  shifts_monday: availability.shifts_monday,
+  shifts_tuesday: availability.shifts_tuesday,
+  shifts_wednesday: availability.shifts_wednesday,
+  shifts_thursday: availability.shifts_thursday,
+  shifts_friday: availability.shifts_friday,
+  shifts_saturday: availability.shifts_saturday,
+  shifts_sunday: availability.shifts_sunday,
 });
 
 const { computedRange, dayToggle, tooltipFormat } = useAvailabilityActions(form, ranges);
@@ -149,13 +156,13 @@ watch(() => form.comments, (value, oldValue) => {
                                 :key="name"
                                 v-model:hours-each-day="hoursEachDay[name as keyof typeof hoursEachDay]"
                                 v-model:number-of-days-per-month="form[`num_${name}s` as keyof typeof form] as number"
+                                v-model:shifts-per-day="form[`shifts_${name}` as keyof typeof form] as string"
                                 :start="ranges.start"
                                 :end="ranges.end"
                                 :label="label"
                                 :tooltip-format="tooltipFormat" />
       </div>
-
-      <div class="col-span-6 items-stretch p-3 rounded border std-border bg-sub-panel dark:bg-sub-panel-dark">
+      <div class="col-span-6">
         <JetLabel for="availability-comments" value="Comments (optional)" />
         <textarea id="availability-comments"
                   class="p-3 w-full h-40 rounded border std-border bg-text-input dark:bg-text-input-dark"

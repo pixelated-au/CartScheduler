@@ -101,7 +101,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified',
             Route::post('/users/import', [UsersImportController::class, 'import'])->name('admin.users.import.import');
 
             //TODO This is for the new reporting part of the system
-            Route::get('/users/get/{user}', UserDataController::class)->name('admin.users.get');
+            //Route::get('/users/get/{user}', UserDataController::class)->name('admin.users.get');
 
             Route::group(['middleware' => HandlePrecognitiveRequests::class], static function () {
                 Route::resource('/users', UsersController::class)->names([
