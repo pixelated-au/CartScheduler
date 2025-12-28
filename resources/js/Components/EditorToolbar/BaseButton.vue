@@ -1,13 +1,3 @@
-<script>
-import {VTooltip} from 'floating-vue';
-
-export default {
-    directives: {
-        tooltip: VTooltip,
-    },
-};
-</script>
-
 <script setup>
 import {inject} from 'vue';
 

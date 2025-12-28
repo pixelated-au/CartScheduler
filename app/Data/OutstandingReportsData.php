@@ -1,0 +1,35 @@
+<?php
+
+namespace App\Data;
+
+use Illuminate\Support\Collection;
+use Spatie\LaravelData\Data;
+use Spatie\LaravelData\Optional;
+use Spatie\TypeScriptTransformer\Attributes\LiteralTypeScriptType;
+use Spatie\TypeScriptTransformer\Attributes\TypeScript;
+
+#[TypeScript]
+class OutstandingReportsData extends Data
+{
+    public function __construct(
+        public int $shift_id,
+        #[LiteralTypeScriptType('IsoDate')]
+        public string $shift_date,
+        #[LiteralTypeScriptType('TwentyFourHourTime')]
+        public string $start_time,
+        #[LiteralTypeScriptType('TwentyFourHourTime')]
+        public string $end_time,
+        public int $requires_brother,
+        public string $location_name,
+        public bool|Optional $shift_was_cancelled,
+        public int|Optional $placements_count,
+        public int|Optional $videos_count,
+        public int|Optional $requests_count,
+        public string|Optional $comments,
+        /**
+         * @var \Illuminate\Support\Collection<int, int>
+         */
+        public Collection|Optional $tags,
+    ) {
+    }
+}

@@ -27,6 +27,7 @@ class UpdateUserRegularAvailabilityController extends Controller
         if ($request->validated('user_id')) {
             $user = User::findOrFail($request->validated('user_id'));
         }
+
         $user->load('availability');
         $availability = $user->availability ?? $user->availability()->create();
 
@@ -47,6 +48,14 @@ class UpdateUserRegularAvailabilityController extends Controller
         $availability->day_sunday    = $request->validated('day_sunday');
 
         $availability->comments = $request->validated('comments');
+
+        $availability->shifts_monday    = $request->validated('shifts_monday');
+        $availability->shifts_tuesday   = $request->validated('shifts_tuesday');
+        $availability->shifts_wednesday = $request->validated('shifts_wednesday');
+        $availability->shifts_thursday  = $request->validated('shifts_thursday');
+        $availability->shifts_friday    = $request->validated('shifts_friday');
+        $availability->shifts_saturday  = $request->validated('shifts_saturday');
+        $availability->shifts_sunday    = $request->validated('shifts_sunday');
 
         $user->availability = $availability;
         $user->availability->save();

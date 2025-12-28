@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\ModifyUserRequest;
-use App\Http\Resources\UserAdminResource;
+use App\Data\UserAdminData;
+use App\Http\Requests\UserRequest;
 use App\Models\User;
 use App\Models\UserAvailability;
 use Illuminate\Http\RedirectResponse;
@@ -22,7 +22,7 @@ class UsersController extends Controller
     public function index(): Response
     {
         return Inertia::render('Admin/Users/List', [
-            'users' => UserAdminResource::collection(User::with('spouse')->get()),
+            'users' => UserAdminData::collect(User::with('spouse')->get()),
         ]);
     }
 
@@ -31,7 +31,7 @@ class UsersController extends Controller
         return Inertia::render('Admin/Users/Add');
     }
 
-    public function store(ModifyUserRequest $request): RedirectResponse
+    public function store(UserRequest $request): RedirectResponse
     {
         $data             = $request->validated();
         $data['password'] = null; // Set it to null. Once set, the user will be unable to log in
@@ -40,9 +40,7 @@ class UsersController extends Controller
         // The user model will automatically send a welcome email via the created event
         $user = User::unguarded(static fn() => User::create($data));
 
-        session()->flash('flash.banner', "User $user->name successfully created.");
-        session()->flash('flash.bannerStyle', 'success');
-
+        session()?->flash('flash.message', "$user->name was successfully created.");
         return Redirect::route('admin.users.edit', $user);
     }
 
@@ -51,15 +49,15 @@ class UsersController extends Controller
         UserAvailability::where('user_id', $user->id)
             ->firstOr(fn() => UserAvailability::create(['user_id' => $user->id]));
         return Inertia::render('Admin/Users/Edit', [
-            'editUser' => UserAdminResource::make($user->load(['spouse', 'vacations', 'availability', 'rosterLocations'])),
+            'editUser' => UserAdminData::from($user->load(['spouse', 'vacations', 'availability', 'rosterLocations'])),
         ]);
     }
 
-    public function update(ModifyUserRequest $request, User $user): RedirectResponse
+    public function update(UserRequest $request, User $user): RedirectResponse
     {
         $user->update($request->validated());
 
-        session()->flash('flash.banner', "User $user->name successfully modified.");
+        session()?->flash('flash.message', "$user->name was successfully modified.");
         return Redirect::route('admin.users.edit', $user->fresh());
     }
 
@@ -68,9 +66,8 @@ class UsersController extends Controller
         $name = $user->name;
         $user->delete();
 
-        session()->flash('flash.banner', "User $name successfully deleted.");
-        session()->flash('flash.bannerStyle', 'danger');
-
+        session()?->flash('flash.message', "$name was successfully deleted.");
+        session()?->flash('flash.bannerStyle', 'warn');
         return Redirect::route('admin.users.index');
     }
 }

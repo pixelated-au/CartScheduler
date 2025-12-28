@@ -1,81 +1,67 @@
-<script setup>
-import {onMounted, ref} from 'vue';
+<script setup lang="ts">
+import { useDarkMode } from "@/Composables/useDarkMode.js";
 
-defineProps({
-    darkMode: {
-        type: Boolean,
-    },
-});
-
-const emit = defineEmits(['is-dark-mode']);
-
-const isDarkMode = ref(false);
-
-const toggleDarkMode = () => {
-    if (localStorage.getItem('color-theme')) {
-        if (localStorage.getItem('color-theme') === 'light') {
-            document.documentElement.classList.add('dark');
-            localStorage.setItem('color-theme', 'dark');
-            isDarkMode.value = true;
-        } else {
-            document.documentElement.classList.remove('dark');
-            localStorage.setItem('color-theme', 'light');
-            isDarkMode.value = false;
-        }
-
-        // if NOT set via local storage previously
-    } else {
-        if (document.documentElement.classList.contains('dark')) {
-            document.documentElement.classList.remove('dark');
-            localStorage.setItem('color-theme', 'light');
-            isDarkMode.value = false;
-        } else {
-            document.documentElement.classList.add('dark');
-            localStorage.setItem('color-theme', 'dark');
-            isDarkMode.value = true;
-        }
-    }
-    emit('is-dark-mode', isDarkMode.value);
-};
-
-const setDarkMode = () => {
-    isDarkMode.value =
-        localStorage.getItem('color-theme') === 'dark'
-        || (
-            !('color-theme' in localStorage)
-            && window.matchMedia('(prefers-color-scheme: dark)').matches
-        );
-    emit('is-dark-mode', isDarkMode.value);
-};
-
-onMounted(() => {
-    setDarkMode();
-});
+const { colorMode, toggleDarkMode } = useDarkMode();
 </script>
-<template>
-    <button id="theme-toggle"
-            type="button"
-            class="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 rounded-lg text-sm p-2.5"
-            @click="toggleDarkMode">
-        <svg id="theme-toggle-dark-icon"
-             :class="{hidden: isDarkMode}"
-             class="w-5 h-5"
-             fill="currentColor"
-             viewBox="0 0 20 20"
-             xmlns="http://www.w3.org/2000/svg">
-            <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path>
-        </svg>
-        <svg id="theme-toggle-light-icon"
-             :class="{hidden: !isDarkMode}"
-             class="w-5 h-5"
-             fill="currentColor"
-             viewBox="0 0 20 20"
-             xmlns="http://www.w3.org/2000/svg">
-            <path
-                d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z"
-                fill-rule="evenodd"
-                clip-rule="evenodd"></path>
-        </svg>
-    </button>
 
+<template>
+  <button id="theme-toggle"
+          ref="themeToggle"
+          type="button"
+          class="flex focus:outline-none focus:ring-1 focus:ring-neutral-500 rounded-full p-2 dark:bg-panel-dark"
+          aria-label="Toggle dark mode"
+          @click="toggleDarkMode()">
+    <transition mode="out-in">
+      <DarkModeLabel v-if="colorMode === 'dark'"
+                     label="dark theme"
+                     icon="iconify mdi--moon-and-stars" />
+      <DarkModeLabel v-else-if="colorMode === 'light'"
+                     label="light theme"
+                     icon="iconify mdi--weather-sunny" />
+      <DarkModeLabel v-else
+                     label="system theme"
+                     icon="iconify mdi--cellphone iconify sm:mdi--computer"
+                     class="text-neutral-400 dark:text-neutral-400" />
+    </transition>
+  </button>
 </template>
+
+<!--suppress CssUnusedSymbol -->
+<style scoped>
+.v-enter-active,
+.v-leave-active {
+    transition: all 0.25s ease;
+}
+
+.v-enter-from {
+    opacity: 0;
+    transform: translateY(30px);
+}
+
+.v-leave-to {
+    opacity: 0;
+    transform: translateY(-30px);
+}
+</style>
+
+<style>
+:root {
+    @media (prefers-color-scheme: light) {
+        color-scheme: light;
+    }
+
+    @media (prefers-color-scheme: dark) {
+        color-scheme: dark;
+    }
+}
+
+html {
+    color-scheme: light;
+
+    /*noinspection ALL*/
+
+    &.dark {
+        color-scheme: dark;
+    }
+}
+</style>

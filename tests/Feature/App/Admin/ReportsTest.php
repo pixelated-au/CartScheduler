@@ -46,7 +46,7 @@ class ReportsTest extends TestCase
             ->assertSuccessful()
             ->assertInertia(fn(AssertableInertia $page) => $page
                 ->component('Admin/Reports/List')
-                ->has('reports.data', 3)
+                ->has('reports', 3)
             );
 
         // Confirm that non-admin cannot access reports

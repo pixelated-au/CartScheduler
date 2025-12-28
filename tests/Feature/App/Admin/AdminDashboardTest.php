@@ -55,21 +55,7 @@ class AdminDashboardTest extends TestCase
                 ->where('totalUsers', User::count())
                 ->where('totalLocations', $locations->count())
                 ->has('shiftFilledData', 14)
-                ->has('outstandingReports', 4)
-                ->has('outstandingReports', fn(AssertableInertia $data) => $data
-                    ->whereContains('shift_date', '2023-01-03')
-                    ->each(fn(AssertableInertia $data) => $data
-                        ->whereNot('shift_date', '2023-01-04')
-                        ->etc()
-                    )
-                    ->whereContains('start_time', '09:00:00')
-                    ->whereContains('end_time', '12:00:00')
-                    ->whereContains('start_time', '12:30:00')
-                    ->whereContains('end_time', '15:30:00')
-                    ->whereContains('location_name', $locations[0]->name)
-                    ->whereContains('location_name', $locations[1]->name)
-                    ->etc()
-                )
+                ->where('outstandingReports', 4)
             );
 
         $this->travelTo('2023-01-05 09:00:00');
@@ -91,18 +77,7 @@ class AdminDashboardTest extends TestCase
                     ->where('13.shifts_available', 20)
                     ->etc()
                 )
-                ->has('outstandingReports', 8)
-                ->has('outstandingReports', fn(AssertableInertia $data) => $data
-                    ->whereContains('shift_date', '2023-01-03')
-                    ->whereContains('shift_date', '2023-01-04')
-                    ->whereContains('start_time', '09:00:00')
-                    ->whereContains('end_time', '12:00:00')
-                    ->whereContains('start_time', '12:30:00')
-                    ->whereContains('end_time', '15:30:00')
-                    ->whereContains('location_name', $locations[0]->name)
-                    ->whereContains('location_name', $locations[1]->name)
-                    ->etc()
-                )
+                ->where('outstandingReports', 8)
             );
     }
 
@@ -133,12 +108,12 @@ class AdminDashboardTest extends TestCase
             ->assertOk()
             ->assertJsonCount(31, 'freeShifts')
             ->assertJsonFragment([
-                '2023-01-01' => ['volunteer_count' => 0, 'max_volunteers' => 10, 'has_availability' => true],
-                '2023-01-02' => ['volunteer_count' => 0, 'max_volunteers' => 10, 'has_availability' => true],
-                '2023-01-03' => ['volunteer_count' => 4, 'max_volunteers' => 10, 'has_availability' => true],
-                '2023-01-04' => ['volunteer_count' => 4, 'max_volunteers' => 10, 'has_availability' => true],
-                '2023-01-05' => ['volunteer_count' => 0, 'max_volunteers' => 10, 'has_availability' => true],
-                '2023-01-06' => ['volunteer_count' => 0, 'max_volunteers' => 10, 'has_availability' => true],
+                '2023-01-01' => ['volunteer_count' => 0, 'max_allowed' => 10, 'has_availability' => true],
+                '2023-01-02' => ['volunteer_count' => 0, 'max_allowed' => 10, 'has_availability' => true],
+                '2023-01-03' => ['volunteer_count' => 4, 'max_allowed' => 10, 'has_availability' => true],
+                '2023-01-04' => ['volunteer_count' => 4, 'max_allowed' => 10, 'has_availability' => true],
+                '2023-01-05' => ['volunteer_count' => 0, 'max_allowed' => 10, 'has_availability' => true],
+                '2023-01-06' => ['volunteer_count' => 0, 'max_allowed' => 10, 'has_availability' => true],
             ])
             ->assertJsonCount(1, 'locations')
             ->assertJsonPath('locations.0.id', $location->id)
@@ -151,11 +126,11 @@ class AdminDashboardTest extends TestCase
             ->assertOk()
             ->assertJsonCount(28, 'freeShifts')
             ->assertJsonFragment([
-                '2023-02-01' => ['volunteer_count' => 0, 'max_volunteers' => 10, 'has_availability' => true],
-                '2023-02-28' => ['volunteer_count' => 0, 'max_volunteers' => 10, 'has_availability' => true],
+                '2023-02-01' => ['volunteer_count' => 0, 'max_allowed' => 10, 'has_availability' => true],
+                '2023-02-28' => ['volunteer_count' => 0, 'max_allowed' => 10, 'has_availability' => true],
             ])
-            ->assertJsonPath('freeShifts.2023-02-01.max_volunteers', 10)
-            ->assertJsonPath('freeShifts.2023-02-28.max_volunteers', 10)
+            ->assertJsonPath('freeShifts.2023-02-01.max_allowed', 10)
+            ->assertJsonPath('freeShifts.2023-02-28.max_allowed', 10)
             ->assertJsonMissingPath('freeShifts.2023-01-31')
             ->assertJsonMissingPath('freeShifts.2023-02-29')
             ->assertJsonMissingPath('freeShifts.2023-03-01')
