@@ -160,8 +160,9 @@ will be available in this interface.
 
 ## TODO:
 
+- [ ] Add support for an arbitrary in the report comments. Should be configurable in the admin. 
 - [ ] If admin enters a wrong email address and it generates a \Symfony\Component\Mailer\Exception\UnexpectedResponseException, send a notification to the admin
-- [ ] If a user sets their availabilty to being not available but admin has assigned them a shift before the shift is released, notify the admin. If the shift is released, notify the volunteer.
+- [ ] If a user sets their availability to being not available but admin has assigned them a shift before the shift is released, notify the admin. If the shift is released, notify the volunteer.
 - [ ] Add flag to highlight a shift hasn't opened yet
 - [ ] Make locations and shifts sortable
 - [ ] Add selected dates to the shifts, so rather than entering a range, admin can enter individual dates
