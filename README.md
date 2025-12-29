@@ -160,7 +160,8 @@ will be available in this interface.
 
 ## TODO:
 
-- [ ] Add support for an arbitrary in the report comments. Should be configurable in the admin. 
+- [ ] Add support for an arbitrary in the report comments. Should be configurable in the admin.
+- [ ] Add Content Security Policy (CSP)
 - [ ] If admin enters a wrong email address and it generates a \Symfony\Component\Mailer\Exception\UnexpectedResponseException, send a notification to the admin
 - [ ] If a user sets their availability to being not available but admin has assigned them a shift before the shift is released, notify the admin. If the shift is released, notify the volunteer.
 - [ ] Add flag to highlight a shift hasn't opened yet
