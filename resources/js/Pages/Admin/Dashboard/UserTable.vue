@@ -51,7 +51,6 @@ const state = useGlobalState();
 const columnFilters = computed(() => state.value["columnFilters"]);
 const enableUserAvailability = inject(EnableUserAvailability);
 const volunteers = ref<App.Data.ExtendedUserData[]>([]);
-const MAX_COMMENT_LENGTH = 120;
 
 const tableHeaders = computed(() => {
   const headers = [
@@ -116,27 +115,11 @@ const tableHeaders = computed(() => {
       sortable: false,
     });
   }
-  if (columnFilters.value.availabilityComments.value) {
-    headers.push({
-      text: "Comments",
-      value: "comment",
-      sortable: true,
-    });
-  }
-  if (columnFilters.value.lastLocation.value) {
-    headers.push({
-      text: "Last Location",
-      value: "lastLocation",
-      sortable: false,
-    });
-  }
-  if (columnFilters.value.lastShift.value) {
-    headers.push({
-      text: "Last Shift",
-      value: "lastShift",
-      sortable: true,
-    });
-  }
+  headers.push({
+    text: "Last Shift",
+    value: "lastShift",
+    sortable: true,
+  });
   if (enableUserAvailability) {
     headers.push({
       text: "Availability",
@@ -179,9 +162,8 @@ const tableRows = computed(() => {
       name: `${prefix} ${volunteer.name}`,
       gender: volunteer.gender,
       comment: volunteer.availability_comments,
-      lastShiftDate: volunteer.last_shift_date ? volunteer.last_shift_date : null,
+      lastShift: volunteer.last_shift_date ? volunteer.last_shift_date : null,
       lastShiftTime: volunteer.last_shift_start_time ? volunteer.last_shift_start_time : null,
-      lastLocation: volunteer.last_location_name ? volunteer.last_location_name : null,
       filledShifts: calcShiftPercentage(daysAlreadyRostered, daysAvailable),
       responsibleBrother: volunteer.responsible_brother,
       appointment: volunteer.appointment,
@@ -216,12 +198,6 @@ const calcShiftPercentage = (daysRostered, daysAvailable) => {
     return 0;
   }
   return Math.round((sumOfDaysRostered / sumOfDaysAvailable) * 100);
-};
-
-const truncateComment = (text: string | null | undefined) => {
-  if (!text) return "";
-  if (text.length <= MAX_COMMENT_LENGTH) return text;
-  return text.substring(0, MAX_COMMENT_LENGTH) + "...";
 };
 
 const assignVolunteer = (volunteerId, volunteerName) => {
@@ -333,19 +309,11 @@ const hasDaysAvailable = (daysAvailable) => Object.values(daysAvailable).some((d
         {{ header.text }}
       </template>
 
-      <template #item-name="{ name }">
+      <template #item-name="{ name, comment }">
         {{ name }}
-      </template>
-
-      <template #item-comment="{ comment }">
-        <v-menu v-if="comment && comment.length > MAX_COMMENT_LENGTH" :triggers="['hover']" placement="top">
-          <span class="cursor-help">{{ truncateComment(comment) }}</span>
-
-          <template #popper>
-            <div class="max-w-md p-2">{{ comment }}</div>
-          </template>
-        </v-menu>
-        <span v-else>{{ truncateComment(comment) }}</span>
+        <div class="ms-0.5 text-xs italic text-neutral-900 dark:text-neutral-200">
+          <div>{{ comment }}</div>
+        </div>
       </template>
 
       <template #item-responsibleBrother="{ responsibleBrother }">
@@ -385,12 +353,8 @@ const hasDaysAvailable = (daysAvailable) => Object.values(daysAvailable).some((d
         </div>
       </template>
 
-      <template #item-lastShift="{ lastShiftDate, lastShiftTime }">
-        {{ formatShiftDate(lastShiftDate, lastShiftTime) }}
-      </template>
-
-      <template #item-lastLocation="{ lastLocation }">
-        {{ lastLocation || 'Never' }}
+      <template #item-lastShift="{ lastShift, lastShiftTime }">
+        {{ formatShiftDate(lastShift, lastShiftTime) }}
       </template>
 
       <template #item-filledShifts="{ daysAlreadyRostered, daysAvailable, filledShifts }">
