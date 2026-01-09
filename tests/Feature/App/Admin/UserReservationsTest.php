@@ -42,22 +42,22 @@ class UserReservationsTest extends TestCase
         $admin      = User::factory()->adminRoleUser()
             ->has(UserAvailability::factory()->weekdays9To5(), 'availability')
             ->create(['is_enabled' => true]);
-        $users      = User::factory()->userRoleUser()
+        $users      = User::factory()->userRoleUser()->enabled()
             ->has(UserAvailability::factory()->weekdays9To5(), 'availability')
             ->count(3)
             ->create(['is_enabled' => true]);
         $firstUser  = $users->first();
         $secondUser = $users->get(1);
 
-
         $location = Location::factory()->requiresBrother()->create();
 
         /** @var Shift $shift */
-        $shift = Shift::factory()->everyDay9am()->create([
+        $shift   = Shift::factory()->everyDay9am()->create([
             'location_id' => $location->id,
         ]);
-        $date  = '2023-01-03'; // A Tuesday
+        $date    = '2023-01-03'; // A Tuesday
         $shiftId = $shift->id;
+
         $this->actingAs($admin)
             ->json('GET', "/admin/available-users-for-shift/$shiftId", ['date' => $date])
             // 4 users in the system. Should have 'available' 4 users returned
@@ -90,7 +90,7 @@ class UserReservationsTest extends TestCase
         $this->actingAs($admin)
             ->json('GET', "/admin/available-users-for-shift/$shift2->id", ['date' => $date])
             // Should now only have 'available' 3 users returned
-            ->assertJsonCount(2, )
+            ->assertJsonCount(2)
             ->assertJsonMissing(['*.id' => $firstUser->getKey()])
             ->assertJsonMissing(['*.id' => $secondUser->getKey()]);
     }
