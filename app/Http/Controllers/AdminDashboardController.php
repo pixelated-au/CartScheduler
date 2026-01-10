@@ -2,27 +2,31 @@
 
 namespace App\Http\Controllers;
 
-use App\Actions\GetOutstandingReports;
+use App\Actions\GetOutstandingReportCount;
 use App\Actions\GetShiftFilledData;
 use App\Data\FilledShiftData;
-use App\Enums\Role;
+use App\Enums\CacheKey;
 use App\Models\Location;
 use App\Models\User;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Inertia\Inertia;
 
 class AdminDashboardController extends Controller
 {
-    public function __invoke(GetShiftFilledData $shiftFilledData, GetOutstandingReports $getOutstandingReports)
+    public function __invoke(GetShiftFilledData $shiftFilledData, GetOutstandingReportCount $getOutstandingReportCount)
     {
-        // Not checking for admin role because the routes should check for it
+        $totalUsers         = Cache::flexibleWithEnum(CacheKey::TotalUsers, [7200, 10800], static fn() => User::all()->count());
+        $totalLocations     = Cache::flexibleWithEnum(CacheKey::TotalLocations, [7200, 10800], static fn() => Location::all()->count());
+        $shiftFilledData    = Cache::flexibleWithEnum(CacheKey::ShiftFilledData, [7200, 10800],
+            static fn() => FilledShiftData::collect($shiftFilledData->execute('fortnight')));
+        $outstandingReports = Cache::flexibleWithEnum(CacheKey::OutstandingReports, [7200, 10800],
+            static fn() => $getOutstandingReportCount->execute());
 
         return Inertia::render('Admin/Dashboard', [
-            'totalUsers'         => User::all()->count(),
-            'totalLocations'     => Location::all()->count(),
-            'shiftFilledData'    => FilledShiftData::collect($shiftFilledData->execute('fortnight')),
-            //TODO: Using this next function is superfluous for just a count. It needs to be fixed with a simplified query
-            'outstandingReports' => $getOutstandingReports->execute()->count(),
+            'totalUsers'         => $totalUsers,
+            'totalLocations'     => $totalLocations,
+            'shiftFilledData'    => $shiftFilledData,
+            'outstandingReports' => $outstandingReports,
         ]);
     }
 }
