@@ -10,7 +10,7 @@
         "@bugsnag/plugin-vue": "^8.2.0",
         "@formkit/auto-animate": "^0.8.2",
         "@inertiajs/vue3": "^2.0.4",
-        "@tiptap/extension-link": "^2.11.5",
+        "@tiptap/extension-link": "^2.27.1",
         "@tiptap/extension-text-align": "^2.11.5",
         "@tiptap/starter-kit": "^2.11.5",
         "@tiptap/vue-3": "^2.11.5",
