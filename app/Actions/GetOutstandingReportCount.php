@@ -2,7 +2,7 @@
 
 namespace App\Actions;
 
-use Illuminate\Support\Carbon;
+use Illuminate\Database\Query\JoinClause;
 use Illuminate\Support\Facades\DB;
 
 class GetOutstandingReportCount
@@ -10,16 +10,16 @@ class GetOutstandingReportCount
     public function execute(): int
     {
         return DB::query()
+            ->distinct()
+            ->select('su.shift_date', 'su.shift_id')
             ->from('shift_user', 'su')
-            ->where('shift_date', '<=', Carbon::now()->format('Y-m-d'))
-            ->whereRaw('(SELECT COUNT(*)
-                    FROM reports r
-                    WHERE r.shift_id = su.shift_id
-                    AND r.shift_date = su.shift_date) = 0')
-            ->groupBy([
-                'su.shift_id',
-                'su.shift_date',
-            ])
+            ->leftJoin('reports as r', fn(JoinClause $join) => $join
+                ->on('r.shift_id', '=', 'su.shift_id')
+                ->on('r.shift_date', '=', 'su.shift_date')
+            )
+            ->whereToday('su.shift_date')
+            ->whereNull('r.shift_id')
+            ->get()
             ->count();
     }
 }
