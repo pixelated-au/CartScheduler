@@ -25,10 +25,9 @@ class GetOutstandingReportCountTest extends TestCase
 
     public function test_outstanding_reports_count_query_is_returning_correct_count(): void
     {
-        $locations = Location::factory()
+        $location = Location::factory()
             ->state(['max_volunteers' => 3, 'requires_brother' => true])
             ->has(Shift::factory()->everyDay9am())
-            ->count(2)
             ->create();
 
         /** @var \Illuminate\Support\Collection<int, \Illuminate\Support\Collection<int, User>> $users */
@@ -44,32 +43,17 @@ class GetOutstandingReportCountTest extends TestCase
                 ->push(
                     [
                         'shift_date' => '2023-05-11',
-                        'shift_id'   => $locations[0]->shifts[0]->id,
+                        'shift_id'   => $location->shifts[0]->id,
                         'user_id'    => $user->id,
                     ],
                     [
                         'shift_date' => '2023-05-13',
-                        'shift_id'   => $locations[0]->shifts[0]->id,
+                        'shift_id'   => $location->shifts[0]->id,
                         'user_id'    => $user->id,
                     ],
                 )
             );
 
-        $users->take(3)
-            ->each(fn(User $user) => $dateRange
-                ->push(
-                    [
-                        'shift_date' => '2023-05-14',
-                        'shift_id'   => $locations[0]->shifts[0]->id,
-                        'user_id'    => $user->id,
-                    ],
-                    [
-                        'shift_date' => '2023-05-14',
-                        'shift_id'   => $locations[1]->shifts[0]->id,
-                        'user_id'    => $user->id,
-                    ],
-                )
-            );
 
         ShiftUser::factory()
             ->forEachSequence(...$dateRange->toArray())
@@ -84,7 +68,7 @@ class GetOutstandingReportCountTest extends TestCase
         $this->assertSame(1, $reports);
 
         $report                           = new Report();
-        $report->shift_id                 = $locations[0]->shifts[0]->id;
+        $report->shift_id                 = $location->shifts[0]->id;
         $report->report_submitted_user_id = $users[0]->id;
         $report->shift_date               = '2023-05-11';
         $report->save();
@@ -95,13 +79,51 @@ class GetOutstandingReportCountTest extends TestCase
         $this->travelTo('2023-05-13');
         $reports = $this->getOutstandingReportCount->execute();
         $this->assertSame(1, $reports);
+    }
+
+    public function test_outstanding_reports_count_updates_correctly(): void
+    {
+        $location = Location::factory()
+            ->state(['max_volunteers' => 3, 'requires_brother' => true])
+            ->has(Shift::factory()->everyDay9am())
+            ->has(Shift::factory()->everyDay1230pm())
+            ->create();
+
+        /** @var \Illuminate\Support\Collection<int, \Illuminate\Support\Collection<int, User>> $users */
+        $users = User::factory()
+            ->enabled()
+            ->sequence(['gender' => 'male'], ['gender' => 'female'])
+            ->count(5)
+            ->create();
+
+        $dateRange = collect();
+
+        $users->take(3)
+            ->each(fn(User $user) => $dateRange
+                ->push(
+                    [
+                        'shift_date' => '2023-05-14',
+                        'shift_id'   => $location->shifts[0]->id,
+                        'user_id'    => $user->id,
+                    ],
+                    [
+                        'shift_date' => '2023-05-14',
+                        'shift_id'   => $location->shifts[1]->id,
+                        'user_id'    => $user->id,
+                    ],
+                )
+            );
+
+        ShiftUser::factory()
+            ->forEachSequence(...$dateRange->toArray())
+            ->create();
 
         $this->travelTo('2023-05-14');
         $reports = $this->getOutstandingReportCount->execute();
         $this->assertSame(2, $reports);
 
         $report                           = new Report();
-        $report->shift_id                 = $locations[1]->shifts[0]->id;
+        $report->shift_id                 = $location->shifts[0]->id;
         $report->report_submitted_user_id = $users[0]->id;
         $report->shift_date               = '2023-05-14';
         $report->save();
