@@ -17,7 +17,7 @@ class GetOutstandingReportCount
                 ->on('r.shift_id', '=', 'su.shift_id')
                 ->on('r.shift_date', '=', 'su.shift_date')
             )
-            ->whereToday('su.shift_date')
+            ->whereTodayOrBefore('su.shift_date')
             ->whereNull('r.shift_id')
             ->get()
             ->count();
