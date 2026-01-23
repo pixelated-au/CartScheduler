@@ -15,18 +15,27 @@ class AdminDashboardController extends Controller
 {
     public function __invoke(GetShiftFilledData $shiftFilledData, GetOutstandingReportCount $getOutstandingReportCount)
     {
-        $totalUsers         = Cache::flexibleWithEnum(CacheKey::TotalUsers, [7200, 10800], static fn() => User::all()->count());
-        $totalLocations     = Cache::flexibleWithEnum(CacheKey::TotalLocations, [7200, 10800], static fn() => Location::all()->count());
-        $shiftFilledData    = Cache::flexibleWithEnum(CacheKey::ShiftFilledData, [7200, 10800],
-            static fn() => FilledShiftData::collect($shiftFilledData->execute('fortnight')));
-        $outstandingReports = Cache::flexibleWithEnum(CacheKey::OutstandingReports, [7200, 10800],
-            static fn() => $getOutstandingReportCount->execute());
-
         return Inertia::render('Admin/Dashboard', [
-            'totalUsers'         => $totalUsers,
-            'totalLocations'     => $totalLocations,
-            'shiftFilledData'    => $shiftFilledData,
-            'outstandingReports' => $outstandingReports,
+            'totalUsers'         => Cache::flexibleWithEnum(
+                key: CacheKey::TotalUsers,
+                ttl: [7200, 10800],
+                callback: static fn() => User::all()->count()
+            ),
+            'totalLocations'     => Cache::flexibleWithEnum(
+                key: CacheKey::TotalLocations,
+                ttl: [60, 300],
+                callback: static fn() => Location::all()->count()
+            ),
+            'shiftFilledData'    => Cache::flexibleWithEnum(
+                key: CacheKey::ShiftFilledData,
+                ttl: [7200, 10800],
+                callback: static fn() => FilledShiftData::collect($shiftFilledData->execute('fortnight'))
+            ),
+            'outstandingReports' => Cache::flexibleWithEnum(
+                key: CacheKey::OutstandingReports,
+                ttl: [7200, 10800],
+                callback: static fn() => $getOutstandingReportCount->execute()
+            ),
         ]);
     }
 }
