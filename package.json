@@ -32,7 +32,7 @@
     "echarts": "^6.0.0",
     "floating-vue": "^5.2.2",
     "flowbite": "^1.8.1",
-    "laravel-precognition-vue-inertia": "^0.7.2",
+    "laravel-precognition-vue-inertia": "^0.8.0",
     "primevue": "^4.4.1",
     "sortablejs": "^1.15.6",
     "vite-plugin-vue-devtools": "^7.7.5",
@@ -42,7 +42,6 @@
     "vue3-easy-data-table": "^1.5.47"
   },
   "devDependencies": {
-    "@codecov/vite-plugin": "^1.9.1",
     "@eslint/css": "^0.9.0",
     "@eslint/js": "^9.27.0",
     "@iconify-json/mdi": "^1.2.3",
