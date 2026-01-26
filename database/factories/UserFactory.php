@@ -4,7 +4,6 @@ namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
 class UserFactory extends Factory
@@ -20,8 +19,9 @@ class UserFactory extends Factory
      */
     public function create($attributes = [], ?Model $parent = null)
     {
-        return Model::withoutEvents(fn () => parent::create($attributes, $parent));
+        return Model::withoutEvents(fn() => parent::create($attributes, $parent));
     }
+
 
     /**
      * Define the model's default state.
@@ -43,7 +43,9 @@ class UserFactory extends Factory
             'year_of_birth'       => fake()->numberBetween(1950, date('Y') - 18),
             'marital_status'      => fake()->randomElement(['married', 'single', 'divorced', 'separated', 'widowed']),
             'appointment'         => $this->getAppointment($gender),
-            'serving_as'          => fake()->randomElement(['field missionary', 'special pioneer', 'bethel family member', 'regular pioneer', 'publisher']),
+            'serving_as'          => fake()->randomElement([
+                'field missionary', 'special pioneer', 'bethel family member', 'regular pioneer', 'publisher'
+            ]),
             'responsible_brother' => $gender === 'male' && fake()->boolean(5),
             'is_enabled'          => true,
             'is_unrestricted'     => true,
@@ -135,7 +137,9 @@ class UserFactory extends Factory
     {
         return $this->state(fn(array $attributes) => [
             'role'       => 'user',
-            'serving_as' => fake()->randomElement(['field missionary', 'special pioneer', 'bethel family member', 'regular pioneer']),
+            'serving_as' => fake()->randomElement([
+                'field missionary', 'special pioneer', 'bethel family member', 'regular pioneer'
+            ]),
             'is_enabled' => true,
         ]);
     }
