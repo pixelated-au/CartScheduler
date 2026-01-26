@@ -7,6 +7,7 @@ use App\Enums\MaritalStatus;
 use App\Enums\Role;
 use App\Enums\ServingAs;
 use App\Models\User;
+use App\Rules\SpouseIsOppositeGenderRule;
 use Closure;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Support\Carbon;
@@ -80,17 +81,21 @@ class GetUserValidationUtils
     public function rules(): array
     {
         return [
+            'id'                  => ['sometimes', 'integer'],
             'name'                => ['required', 'string', 'max:255'],
             'email'               => ['required', 'email', 'max:255'],
-            'role'                => ['required', 'string', rule::enum(Role::class)],
+            'role'                => ['required', 'string', Rule::enum(Role::class)],
             'gender'              => ['required', 'string', 'in:male,female'],
             'mobile_phone'        => ['required', 'string', 'regex:/^([0-9\+\-\s]+)$/', 'min:8', 'max:15'],
             'year_of_birth'       => [
                 'nullable', 'integer', 'min:' . Carbon::now()->year - 100, 'max:' . Carbon::now()->year
             ],
-            'appointment'         => ['nullable', 'string', rule::enum(Appointment::class)],
-            'serving_as'          => ['nullable', 'string', rule::enum(ServingAs::class)],
-            'marital_status'      => ['nullable', 'string', rule::enum(MaritalStatus::class)],
+            'appointment'         => ['nullable', 'string', Rule::enum(Appointment::class)],
+            'serving_as'          => ['nullable', 'string', Rule::enum(ServingAs::class)],
+            'spouse_id'           => [
+                'nullable', 'integer', 'exists:users,id', 'unique:users,spouse_id', new SpouseIsOppositeGenderRule,
+            ],
+            'marital_status'      => ['nullable', 'string', Rule::enum(MaritalStatus::class)],
             'responsible_brother' => ['nullable', 'boolean'],
             'is_unrestricted'     => ['boolean'],
         ];
