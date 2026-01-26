@@ -7,6 +7,7 @@ use App\Http\Requests\UserRequest;
 use App\Models\User;
 use App\Models\UserAvailability;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
@@ -55,7 +56,7 @@ class UsersController extends Controller
 
     public function update(UserRequest $request, User $user): RedirectResponse
     {
-        $user->update($request->validated());
+        $user->update(Arr::except($request->validated(), ['id', 'uuid']));
 
         session()?->flash('flash.message', "$user->name was successfully modified.");
         return Redirect::route('admin.users.edit', $user->fresh());
