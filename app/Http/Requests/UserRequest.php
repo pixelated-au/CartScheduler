@@ -56,6 +56,7 @@ class UserRequest extends FormRequest
             'mobile_phone.regex' => "The mobile phone can contain only numbers and spaces. $formatMsg",
             'mobile_phone.min'   => $formatMsg,
             'mobile_phone.max'   => $formatMsg,
+            'spouse_id.unique'   => "The 'spouse' has already been attached to another user",
         ];
     }
 }
