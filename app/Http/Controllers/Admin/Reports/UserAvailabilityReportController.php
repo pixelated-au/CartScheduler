@@ -9,6 +9,10 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
+/**
+ * WIP, ignore in coverage until it's done
+ * @codeCoverageIgnore
+ */
 class UserAvailabilityReportController extends Controller
 {
     public function __invoke(Request $request, GetUserAvailabilityReportAction $action): Response

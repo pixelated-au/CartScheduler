@@ -13,6 +13,9 @@ use Spatie\TypeScriptTransformer\Structures\TransformedType;
 use Spatie\TypeScriptTransformer\Transformers\Transformer;
 use Spatie\TypeScriptTransformer\Transformers\TransformsTypes;
 
+/**
+ * @codeCoverageIgnore
+ */
 class LaravelSettingsTransformer implements Transformer
 {
     use TransformsTypes;

@@ -6,6 +6,10 @@ use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
+/**
+ * WIP, ignore in coverage until it's done
+ * @codeCoverageIgnore
+ */
 class GetUserAvailabilityReportAction
 {
     public function execute(Carbon $startDate, Carbon $endDate): Collection

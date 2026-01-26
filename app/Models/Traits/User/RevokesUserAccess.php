@@ -8,6 +8,9 @@ use App\Settings\GeneralSettings;
 
 trait RevokesUserAccess
 {
+    /**
+     * If a user has been made 'restricted', this will automatically revoke any 'extended' privileges they may have had
+     */
     public static function revokePrivilegedAccess(User $user): void
     {
         if ($user->is_unrestricted) {
