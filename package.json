@@ -31,7 +31,7 @@
         "vue-slicksort": "^2.0.5",
         "vue-toastification": "^2.0.0-rc.5",
         "vue3-easy-data-table": "^1.5.47",
-        "ziggy-js": "^2.5.2"
+        "ziggy-js": "^2.6.0"
     },
     "devDependencies": {
         "@tailwindcss/forms": "^0.5.10",
