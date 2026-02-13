@@ -101,12 +101,6 @@ declare namespace App.Data {
     end_time: TwentyFourHourTime;
     requires_brother: number;
     location_name: string;
-    shift_was_cancelled?: boolean;
-    placements_count?: number;
-    videos_count?: number;
-    requests_count?: number;
-    comments?: string;
-    tags?: { [key: number]: number };
   };
   export type ReportMetadataData = {
     shift_id: number;
@@ -219,6 +213,7 @@ declare namespace App.Data {
 declare namespace App.Enums {
   export type Appointment = "elder" | "ministerial servant";
   export type AvailabilityHours = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 | 21 | 22 | 23;
+  export type CacheKey = "total-users" | "total-locations" | "shift-filled-data" | "outstanding-reports";
   export type DBPeriod = "MONTH" | "MONTHS" | "WEEK" | "WEEKS";
   export type MaritalStatus = "single" | "married" | "separated" | "divorced" | "widowed";
   export type Role = "admin" | "user";
