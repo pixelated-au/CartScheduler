@@ -21,11 +21,43 @@ watch(trimmedMessage, async (msg) => {
 </script>
 
 <template>
-  <div class="grid items-center font-medium transition-[grid-template-rows] duration-150"
-       :class="[!trimmedMessage ? 'grid-rows-[0fr] delay-150' : 'grid-rows-[1fr] delay-0' ]">
-    <div class="text-sm transition-opacity duration-150 text-warning"
-         :class="[!trimmedMessage ? 'opacity-0 delay-0' : 'opacity-100 delay-150']">
-      {{ error }}
+  <transition name="error-message">
+    <div v-if="trimmedMessage"
+         class="will-change-[grid-template-rows] grid items-center font-medium transition-[grid-template-rows] duration-150 overflow-hidden">
+      <div class="text-sm text-warning overflow-hidden">
+        {{ error }}
+      </div>
     </div>
-  </div>
+  </transition>
 </template>
+
+<!--suppress CssUnusedSymbol -->
+<style>
+.error-message-enter-active,
+.error-message-leave-active {
+    transition: grid-template-rows 0.25s ease;
+    > div {
+        transition: opacity 0.25s ease;
+    }
+}
+
+.error-message-leave-active {
+    transition-delay: 150ms;
+}
+
+.error-message-enter-active > div {
+    transition-delay: 150ms;
+}
+
+.error-message-enter-from,
+.error-message-leave-to {
+    grid-template-rows: 0fr;
+    > div {
+        opacity: 0;
+    }
+}
+.error-message-leave-from,
+.error-message-enter-to {
+    grid-template-rows: 1fr;
+}
+</style>
