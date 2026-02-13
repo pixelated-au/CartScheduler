@@ -5,7 +5,7 @@ on:
   push:
     branches:
       - master
-      - '*[-]?beta-*'
+      - beta-*
     tags:
       - "v*"
   pull_request:
