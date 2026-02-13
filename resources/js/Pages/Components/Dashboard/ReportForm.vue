@@ -12,7 +12,7 @@ import type { AxiosError } from "axios";
 import type { ErrorBag, LaravelValidationResponse, TwentyFourHourTime } from "@/types/types";
 
 // TODO How easy would it be be to convert component to an Inertia compatible component?
-const props = defineProps<{
+const { report } = defineProps<{
   report: App.Data.OutstandingReportsData;
 }>();
 
@@ -21,15 +21,15 @@ const emit = defineEmits(["saved"]);
 const tags = inject(ReportTagsKey);
 
 const formData = reactive({
-  shift_id: props.report.shift_id,
-  shift_date: props.report.shift_date,
-  start_time: props.report.start_time,
-  shift_was_cancelled: props.report.shift_was_cancelled,
-  placements_count: props.report.placements_count,
-  videos_count: props.report.videos_count,
-  requests_count: props.report.requests_count,
-  comments: props.report.comments,
-  tags: props.report.tags,
+  shift_id: report.shift_id,
+  shift_date: report.shift_date,
+  start_time: report.start_time,
+  shift_was_cancelled: report.shift_was_cancelled,
+  placements_count: report.placements_count,
+  videos_count: report.videos_count,
+  requests_count: report.requests_count,
+  comments: report.comments,
+  tags: report.tags,
 });
 
 const errors = ref<ErrorBag>({});
