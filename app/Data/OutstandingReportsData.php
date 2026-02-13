@@ -19,8 +19,7 @@ class OutstandingReportsData extends Data
         public string $start_time,
         #[LiteralTypeScriptType('TwentyFourHourTime')]
         public string $end_time,
-        public int $requires_brother,
-        public string $location_name,
+        public int $requires_brother = 0,
         public bool|Optional $shift_was_cancelled,
         public int|Optional $placements_count,
         public int|Optional $videos_count,
