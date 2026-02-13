@@ -11,9 +11,18 @@ import { ReportTags as ReportTagsKey } from "@/Utils/provide-inject-keys";
 import type { AxiosError } from "axios";
 import type { ErrorBag, LaravelValidationResponse, TwentyFourHourTime } from "@/types/types";
 
+type ReportData = App.Data.OutstandingReportsData & {
+  shift_was_cancelled: boolean;
+  placements_count: number;
+  videos_count: number;
+  requests_count: number;
+  comments: string;
+  tags: number[];
+};
+
 // TODO How easy would it be be to convert component to an Inertia compatible component?
 const { report } = defineProps<{
-  report: App.Data.OutstandingReportsData;
+  report: ReportData;
 }>();
 
 const emit = defineEmits(["saved"]);
