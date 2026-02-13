@@ -41,7 +41,7 @@ const reportSaved = () => setTimeout(() => getData(), 1000);
 </script>
 
 <template>
-  <PDialog modal dismissable-mask v-model:visible="show">
+  <PDialog modal dismissable-mask class="w-[90dvw] sm:w-[32rem] md:w-[46rem]" v-model:visible="show">
     <template #header>
       <h3>Outstanding Reports</h3>
     </template>
