@@ -20,15 +20,7 @@ class OutstandingReportsData extends Data
         #[LiteralTypeScriptType('TwentyFourHourTime')]
         public string $end_time,
         public int $requires_brother = 0,
-        public bool|Optional $shift_was_cancelled,
-        public int|Optional $placements_count,
-        public int|Optional $videos_count,
-        public int|Optional $requests_count,
-        public string|Optional $comments,
-        /**
-         * @var \Illuminate\Support\Collection<int, int>
-         */
-        public Collection|Optional $tags,
+        public string $location_name,
     ) {
     }
 }
