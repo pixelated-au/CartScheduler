@@ -32,7 +32,6 @@ const showReportsModal = ref(false);
       </div>
     </div>
   </PageHeader>
-
   <div class="py-2 dashboard">
     <div class="mx-auto max-w-7xl">
       <div class="bg-panel dark:bg-panel-dark sm:rounded-lg">
