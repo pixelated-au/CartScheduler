@@ -1,5 +1,5 @@
 import * as path from "node:path";
-import { codecovVitePlugin } from "@codecov/vite-plugin";
+// import { codecovVitePlugin } from "@codecov/vite-plugin";
 import { PrimeVueResolver } from "@primevue/auto-import-resolver";
 import vue from "@vitejs/plugin-vue";
 import laravel from "laravel-vite-plugin";
@@ -40,11 +40,11 @@ export default defineConfig({
         IconsResolver(),
       ],
     }),
-    codecovVitePlugin({
-      enableBundleAnalysis: process.env.CODECOV_TOKEN !== undefined,
-      bundleName: "front-end",
-      uploadToken: process.env.CODECOV_TOKEN,
-    }),
+    // codecovVitePlugin({
+    //   enableBundleAnalysis: process.env.CODECOV_TOKEN !== undefined,
+    //   bundleName: "front-end",
+    //   uploadToken: process.env.CODECOV_TOKEN,
+    // }),
   ],
   server: {
     // host: "0.0.0.0",
