@@ -8,7 +8,7 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::table('user_vacations', static function (Blueprint $table) {
-            $table->addColumn('text', 'description')->change();
+            $table->addColumn('text', 'description')->nullable()->change();
         });
     }
 };
