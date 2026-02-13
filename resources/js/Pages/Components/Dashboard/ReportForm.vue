@@ -119,8 +119,8 @@ const uId = useId();
   <h4><span class="mr-1">{{ formatDate(report.shift_date) }}:</span> {{ report.location_name }}</h4>
   <div>{{ formatTime(report.start_time) }} - {{ formatTime(report.end_time) }}</div>
 
-  <div class="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-x-2 gap-y-3">
-    <div class="sm:col-span-2 flex items-center">
+  <div class="mt-3 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-x-2 gap-y-2">
+    <div class="sm:col-span-2 md:col-span-3 flex items-center">
       <PCheckbox binary
                  :input-id="`${uId}-cancelled`"
                  v-model="formData.shift_was_cancelled"
@@ -129,51 +129,54 @@ const uId = useId();
       <JetLabel :for="`${uId}-cancelled`" value="Shift was Canceled" />
     </div>
 
-    <div v-if="tags?.length" class="sm:col-span-2">
+    <div v-if="tags?.length" class="sm:col-span-2 md:col-span-3">
       <div class="block font-medium mb-2">Quick Tags</div>
       <ReportTags @toggled="formData.tags = $event" />
       <div class="text-sm text-gray-500">Select any relevant tags</div>
     </div>
 
-    <div class="col-span-2 sm:col-span-1">
+    <div class="flex flex-col gap-1">
       <JetLabel :for="`${uId}-placements`" value="Placements" :is-disabled="disableFields" />
-      <PInputNumber :id="`${uId}-placements`"
+      <PInputNumber :input-id="`${uId}-placements`"
+                    fluid
                     v-model="formData.placements_count"
                     type="number"
-                    class="mt-1 block w-full disabled:text-gray-100 disabled:bg-gray-100 disabled:cursor-not-allowed"
+                    class="disabled:text-gray-100 disabled:bg-gray-100 disabled:cursor-not-allowed"
                     :disabled="disableFields" />
       <JetInputError :message="errorMessages.placements_count" class="mt-2" />
     </div>
-    <div class="col-span-2 sm:col-span-1">
+    <div class="flex flex-col gap-1">
       <JetLabel :for="`${uId}-videos`" value="Videos" :is-disabled="disableFields" />
-      <PInputNumber :id="`${uId}-videos`"
+      <PInputNumber :input-id="`${uId}-videos`"
+                    fluid
                     v-model="formData.videos_count"
                     type="number"
-                    class="mt-1 block w-full disabled:text-gray-100 disabled:bg-gray-100 disabled:cursor-not-allowed"
+                    class="disabled:text-gray-100 disabled:bg-gray-100 disabled:cursor-not-allowed"
                     :disabled="disableFields" />
       <JetInputError :message="errorMessages.videos_count" class="mt-2" />
     </div>
-    <div class="col-span-2 sm:col-span-2">
+    <div class="flex flex-col gap-1">
       <JetLabel :for="`${uId}-requests`" value="Requests" :is-disabled="disableFields" />
-      <PInputNumber :id="`${uId}-requests`"
+      <PInputNumber :input-id="`${uId}-requests`"
+                    fluid
                     v-model="formData.requests_count"
                     type="number"
-                    class="mt-1 block w-full disabled:text-gray-100 disabled:bg-gray-100 disabled:cursor-not-allowed"
+                    class="disabled:text-gray-100 disabled:bg-gray-100 disabled:cursor-not-allowed"
                     :disabled="disableFields" />
       <div class="text-sm italic">Requests for studies, literature, follow-up, etc.</div>
       <JetInputError :message="errorMessages.requests_count" class="mt-2" />
     </div>
-    <div class="sm:col-span-2 ">
+    <div class="sm:col-span-2 md:col-span-3">
       <JetLabel :for="`${uId}-comments`" value="Comments" />
       <PTextarea auto-resize
-                 :id="`${uId}-comments`"
+                 :input-id="`${uId}-comments`"
                  class="rounded-md shadow-sm w-full min-h-32"
                  v-model="formData.comments" />
       <div class="text-sm">{{ commentsRemainingCharacters }} characters remaining</div>
       <JetInputError :message="errorMessages.comments" class="mt-2" />
     </div>
 
-    <div class="col-span-2 flex justify-center">
+    <div class="flex justify-center">
       <SubmitButton label="Save Report"
                     :processing="isSaving"
                     :success="wasSuccessful"
