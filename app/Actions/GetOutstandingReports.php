@@ -27,8 +27,8 @@ class GetOutstandingReports
             ])
             ->when($user !== null, fn(Builder $query) => $query->addSelect('su.user_id'))
             ->from('shift_user', 'su')
-            ->leftJoin('shifts', 'shifts.id', '=', 'su.shift_id')
-            ->leftJoin('locations', 'locations.id', '=', 'shifts.location_id')
+            ->join('shifts', 'shifts.id', '=', 'su.shift_id')
+            ->join('locations', 'locations.id', '=', 'shifts.location_id')
             ->leftJoin('reports as r', fn(JoinClause $join) => $join
                 ->on('r.shift_id', '=', 'su.shift_id')
                 ->on('r.shift_date', '=', 'su.shift_date')
