@@ -19,7 +19,7 @@ class OutstandingReportsData extends Data
         public string $start_time,
         #[LiteralTypeScriptType('TwentyFourHourTime')]
         public string $end_time,
-        public int $requires_brother = 0,
+        public ?int $requires_brother = 0,
         public string $location_name,
     ) {
     }
