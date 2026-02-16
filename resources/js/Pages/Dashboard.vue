@@ -1,11 +1,7 @@
 <script setup lang="ts">
-import { usePage } from "@inertiajs/vue3";
 import { computed, ref } from "vue";
 import CartReservation from "@/Pages/Components/Dashboard/CartReservation.vue";
 import ReportsModal from "@/Pages/Components/Dashboard/ReportsModal.vue";
-
-const page = usePage();
-const user = computed(() => page.props.auth.user);
 
 const outstandingReportCount = ref(0);
 
@@ -32,12 +28,8 @@ const showReportsModal = ref(false);
       </div>
     </div>
   </PageHeader>
-  <div class="py-2 dashboard">
-    <div class="mx-auto max-w-7xl">
-      <div class="bg-panel dark:bg-panel-dark sm:rounded-lg">
-        <CartReservation :user="user"/>
-      </div>
-    </div>
+  <div class="flex flex-col sm:rounded-lg py-2 max-w-7xl sm:min-h-full">
+    <CartReservation/>
   </div>
   <ReportsModal v-model="showReportsModal"
                 @has-outstanding-reports="outstandingReportCount = $event"/>
