@@ -1,5 +1,5 @@
 <script setup lang="ts" generic="AllowedModelValues">
-import { computed, inject, onMounted, onUnmounted, useId, useTemplateRef } from "vue";
+import { computed, inject, onMounted, onUnmounted, ref, useId, useTemplateRef } from "vue";
 import { AccordionContext } from "@/Utils/provide-inject-keys";
 
 const { value, disabled = false } = defineProps<{
@@ -35,20 +35,14 @@ function onKeydown(e: KeyboardEvent) {
   ctx.onHeaderKeydown(e, index);
 }
 
-function toggleStyle(el: Element, isOpening: boolean) {
-  const element = el as HTMLElement;
-  element.style.height = isOpening ? "0px" : `${element.scrollHeight}px`;
-  element.style.overflow = "hidden";
-  element.style.transition = "height 250ms cubic-bezier(0.5, 1, 0.89, 1)";
-  element.style.height = isOpening ? `${element.scrollHeight}px` : "0px";
-}
+const panelHeight = ref("0");
 
-function resetStyle(el: Element) {
+const setHeight = (el: Element, isOpening: boolean) => {
   const element = el as HTMLElement;
-  element.style.height = "";
-  element.style.overflow = "";
-  element.style.transition = "";
-}
+  console.log(element.scrollHeight);
+  panelHeight.value = isOpening ? `${element.scrollHeight}px` : "0px";
+  console.log(panelHeight.value);
+};
 </script>
 
 <template>
@@ -70,17 +64,27 @@ function resetStyle(el: Element) {
       </button>
     </div>
 
-    <Transition @enter="toggleStyle($event, true)"
-                @after-enter="resetStyle"
-                @leave="toggleStyle($event, false)"
-                @after-leave="resetStyle">
+    <Transition @enter="setHeight($event,true)"
+                @leave="setHeight($event,false)">
       <div v-show="open"
            :id="panelId"
-           class="p-2"
+           :style="`--panel-height: ${panelHeight}`"
+           class="transition-[height] duration-500 h-[var(--panel-height)]"
            role="region"
            :aria-labelledby="headerId">
-        <slot />
+        <div class="p-2">
+          <!-- Nested is needed to prevent the panel from collapsing when the content is removed -->
+          <slot />
+        </div>
       </div>
     </Transition>
   </div>
 </template>
+
+<!--suppress CssUnusedSymbol -->
+<style lang="css" scoped>
+.v-enter-active,
+.v-leave-active {
+  overflow: hidden;
+}
+</style>
