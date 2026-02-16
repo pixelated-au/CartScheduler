@@ -9,7 +9,7 @@ const { multiple = false } = defineProps<{
   multiple?: boolean;
 }>();
 
-const emit = defineEmits<{
+defineEmits<{
   transitionStarted: [void];
   transitionFinished: [void];
 }>();
