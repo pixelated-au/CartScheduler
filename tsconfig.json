@@ -33,7 +33,8 @@
       ],
       "ziggy-js": [
         "./vendor/tightenco/ziggy"
-      ]
+      ],
+      "primevue/accordionpanel": ["./resources/js/types/shims.d.ts"]
     },
     "resolveJsonModule": true,
     "skipLibCheck": true,
@@ -50,6 +51,7 @@
   ],
   "exclude": [
     "node_modules",
-    "./resources/js/__*__/*.ts"
+    "node_modules/primevue/accordionpanel/*.ts",
+    "./resources/js/__*__/*.ts",
   ]
 }

@@ -56,3 +56,6 @@ declare module "@inertiajs/core" {
 declare module "@inertiajs/vue3" {
   export declare function usePage<T extends AppPageProps>(): Page<T>;
 }
+
+// Ignoring types from primevue/accordionpanel as they conflict with the local component
+declare module "primevue/accordionpanel";
