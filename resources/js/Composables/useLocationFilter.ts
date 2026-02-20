@@ -70,13 +70,13 @@ export default function(timezone: Ref<string>, canAdmin = false) {
   /**
    * Watch the date change and request shifts for the new dates
    */
-  watch(date, async (newDate, previousDate) => {
+  watch(date, (newDate, previousDate) => {
     if (!newDate || isSameDay(newDate, previousDate)) {
       return;
     }
 
     void getShifts();
-  });
+  }, { flush: "post" });
 
   const emptyShiftsForTime = ref<EmptyShift[]>([]);
 

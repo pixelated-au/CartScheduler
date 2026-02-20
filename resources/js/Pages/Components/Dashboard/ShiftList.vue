@@ -17,11 +17,11 @@ const { markerDates } = defineProps<{
   markerDates?: App.Data.AvailableShiftsData["shifts"];
 }>();
 
+const selectedShift = defineModel<ShiftItem | undefined>({ required: true });
+
 const emit = defineEmits<{
   clicked: [shift: ShiftItem];
 }>();
-
-const selectedShift = defineModel<ShiftItem | undefined>({ required: true });
 
 const page = usePage();
 
@@ -110,13 +110,6 @@ const toggleShiftList = () => {
   void toggleLargeStyle(list.value as HTMLElement);
 };
 
-const desktopListHeight = computed(() => {
-  if (isMobile.value) {
-    return "";
-  }
-  return `${list.value?.scrollHeight}px`;
-});
-
 const borderTransition = "border-color 500ms ease-in-out";
 const transition = `height 500ms ease-in-out, margin 500ms ease-in-out, ${borderTransition}`;
 const hideMobileList = (el: Element) => {
@@ -156,107 +149,98 @@ const expandButtonDecoration = computed(() =>
     ? ""
     // ? "underline underline-offset-4 decoration-dotted decoration-neutral-950/50 dark:decoration-neutral-50/50"
     : "");
+
+const isShiftSelected = (shift: ShiftItem) => {
+  return selectedShift.value?.locationId === shift.locationId && selectedShift.value?.time === shift.time && selectedShift.value?.date.toISOString() === shift.date.toISOString();
+};
 </script>
 
 <template>
-  <div class="mt-2">
-    <!-- ↑ The first div ('mt-2') is needed for the transitions -->
-    <div class="relative sm:pt-0 transition-[padding-top] duration-500"
-         :class="[{
-           'relative sm:scroll-gradient' : isNotMobile && !fullHeightList,
-           'pt-6': !expandShiftList && isMobile,
-           'pt-0': expandShiftList && isMobile,
-         }]">
-      <PButton type="button"
-               variant="outlined"
-               size="small"
-               severity="secondary"
-               class="absolute [transition:transform_.5s,border-color_1s]flex items-center gap-1 z-10"
-               :class="[{
-                 'top-2': isNotMobile,
-                 'top-2 right-2 border-neutral-200 dark:border-neutral-800': expandShiftList && isMobile,
-                 '-translate-y-7 std-border py-1 right-0': !expandShiftList && isMobile,
-                 'right-2 border-none': isNotMobile,
-               }]"
-               @click="toggleShiftList">
-        <span v-if="isMobile"
-              class="iconify mdi--arrow-collapse-up transition-transform duration-500 delay-100 text-neutral-500 dark:text-neutral-300"
+  <div class="sm:h-0 sm:min-h-full relative sm:pt-0 transition-[padding-top] duration-500"
+       :class="[{
+         'relative sm:scroll-gradient' : isNotMobile && !fullHeightList,
+         'pt-7': !expandShiftList && isMobile,
+         'pt-0': expandShiftList && isMobile,
+       }]">
+    <PButton v-if="isMobile"
+             type="button"
+             variant="outlined"
+             size="small"
+             severity="secondary"
+             class="absolute [transition:transform_.5s,border-color_1s]flex items-center gap-1 z-10"
+             :class="[{
+               'top-2 right-2 border-neutral-200 dark:border-neutral-800': expandShiftList,
+               '-translate-y-7 std-border py-1 right-0': !expandShiftList,
+             }]"
+             @click="toggleShiftList">
+      <div :class="expandButtonDecoration" class="inline-grid grid-flow-col gap-1">
+        <span class="iconify mdi--arrow-collapse-up transition-transform duration-500 delay-100 text-neutral-500 dark:text-neutral-300"
               :class="[{
                 'rotate-180': !expandShiftList,
               }]" />
+        <Transition name="slide-away" mode="out-in">
+          <span v-if="expandShiftList" class="slide-up">hide</span>
+          <span v-else-if="!expandShiftList" class="slide-down">show</span>
+        </Transition>
+        <span> your timeline</span>
+      </div>
+    </PButton>
 
-        <template v-else>
-          <span class="iconify mdi--arrow-collapse-down transition-transform duration-500 delay-100 text-neutral-500 dark:text-neutral-300"
-                :class="[{
-                  'rotate-180': fullHeightList,
-                }]" />
-        </template>
-
-        <div :class="expandButtonDecoration" class="inline-grid grid-flow-col gap-1">
-          <Transition name="slide-away" mode="out-in">
-            <span v-if="isMobile && expandShiftList" class="slide-up">hide</span>
-            <span v-else-if="isMobile && !expandShiftList" class="slide-down">show</span>
-            <span v-else-if="fullHeightList" class="slide-up">shrink</span>
-            <span v-else class="slide-down">expand</span>
-          </Transition>
-          <span> your timeline</span>
-        </div>
-      </PButton>
-      <Transition @enter="showMobileList"
-                  @after-enter="resetStyle"
-                  @leave="hideMobileList"
-                  @after-leave="resetStyle">
-        <div ref="list"
-             v-show="showList"
-             class="overflow-hidden sm:overflow-y-auto bg-white dark:bg-sub-panel-dark rounded justify-start border std-border"
-             :class="[
-               {
-                 'sm:h-96' : isNotMobile && !fullHeightList,
-                 'std-border' : isMobile && expandShiftList,
-                 'border-transparent' : isMobile && !expandShiftList,
-               }]">
-          <dl v-if="shifts.size"
-              class="mt-12 flex flex-col gap-1 relative ps-12 pb-8 mb-8
+    <Transition @enter="showMobileList"
+                @after-enter="resetStyle"
+                @leave="hideMobileList"
+                @after-leave="resetStyle">
+      <div ref="list"
+           v-show="showList"
+           class="sm:h-0 sm:min-h-full overflow-hidden sm:overflow-y-auto sm:pt-5 bg-white dark:bg-sub-panel-dark rounded justify-start border std-border"
+           :class="[
+             {
+               '' : isNotMobile && !fullHeightList,
+               'std-border' : isMobile && expandShiftList,
+               'border-transparent' : isMobile && !expandShiftList,
+             }]">
+        <dl v-if="shifts.size"
+            class="mt-12 sm:mt-0 flex flex-col gap-1 relative ps-12 pb-8 mb-8
                     before:absolute before:left-11 before:top-0 before:bottom-0 before:border-l before:border-l-neutral-400 before:dark:border-l-neutral-600 before:border-dashed
                     after:absolute after:left-7 after:w-8 after:bottom-0 after:border-t after:border-t-neutral-400 after:dark:border-t-neutral-600 after:border-dashed">
-            <template v-for="([date, shiftsForDate], idx) of shifts"
-                      :key="date">
-              <dt class="flex items-center h-12 font-semibold relative ps-8 size [&:not(:first-child)]:mt-0">
-                {{ date[0] }}
-                <span class="sr-only">{{ date[1] }} {{ date[2] }}</span>
-                <div aria-hidden="true"
-                     class="absolute -ml-1 -left-6 top-0 size-12 flex flex-col items-center justify-center z-0
+          <template v-for="([date, shiftsForDate]) of shifts"
+                    :key="date">
+            <dt class="flex items-center h-12 font-semibold relative ps-8 size [&:not(:first-child)]:mt-0">
+              {{ date[0] }}
+              <span class="sr-only">{{ date[1] }} {{ date[2] }}</span>
+              <div aria-hidden="true"
+                   class="absolute -ml-1 -left-6 top-0 size-12 flex flex-col items-center justify-center z-0 before:transition-colors before:duration-500
                           before:rounded-full before:absolute before:inset-0 before:border before:border-neutral-400  before:-z-10"
-                     :class="[idx === 0 ? 'before:bg-orange-200 before:dark:bg-orange-600'
-                       : 'before:bg-white before:dark:bg-panel-dark']">
-                  <div class="text-center leading-none text-sm"
-                       :class="[idx === 0 ? 'dark:text-neutral-900' : 'dark:text-neutral-200']">
-                    {{ date[1] }}
-                  </div>
-                  <div class="text-center leading-none text-xs text-neutral-500"
-                       :class="[idx === 0 ? 'dark:text-neutral-800' : 'dark:text-neutral-200']">
-                    {{ date[2] }}
-                  </div>
+                   :class="[(shiftsForDate[0].date.toDateString() === selectedShift?.date.toDateString()) ? 'group selected before:bg-orange-200 before:dark:bg-orange-600'
+                     : 'before:bg-white before:dark:bg-panel-dark']">
+                <div class="text-center leading-none text-sm dark:text-neutral-200 group-[.selected]:dark:text-neutral-900">
+                  {{ date[1] }}
                 </div>
-              </dt>
-              <dd v-for="(shift, idx) in shiftsForDate" :key="idx" class="ms-6">
-                <button type="button"
-                        class="group cursor-pointer rounded-s ps-6 py-1 w-full flex flex-col items-start
+                <div class="text-center leading-none text-xs text-neutral-500 dark:text-neutral-300 group-[.selected]:dark:text-neutral-800">
+                  {{ date[2] }}
+                </div>
+              </div>
+            </dt>
+            <dd v-for="(shift, idx) in shiftsForDate" :key="idx" class="ms-6">
+              <button type="button"
+                      class="group cursor-pointer rounded-s ps-6 py-1 w-full flex flex-col items-start
                     sm:hover:bg-neutral-100 dark:sm:hover:bg-neutral-800 sm:transition-[background-color,padding] sm:duration-300 sm:hover:font-bold sm:hover:ps-3"
-                        @click="selectShift(shift)">
-                  <span class="group-hover:font-medium transition-[font-weight] duration-300">
-                    {{ shift.time }}
-                  </span>
-                  <span class="text-neutral-500 dark:text-neutral-300 font-light group-hover:font-medium transition-[font-weight] duration-300 underline underline-offset-4 decoration-neutral-950/50 dark:decoration-neutral-50/50 decoration-dotted sm:no-underline">
-                    {{ shift.location }}
-                  </span>
-                </button>
-              </dd>
-            </template>
-          </dl>
-        </div>
-      </Transition>
-    </div>
+                      :class="{
+                        'selected underline text-warning dark:text-warning-light underline-offset-4 decoration-warning dark:decoration-warning-light decoration-dotted': isShiftSelected(shift),
+                      }"
+                      @click="selectShift(shift)">
+                <span class="group-hover:font-medium transition-[font-weight] duration-300">
+                  {{ shift.time }}
+                </span>
+                <span class="text-neutral-500 dark:text-neutral-300 group-[.selected]:text-warning dark:group-[.selected]:text-warning-light font-light group-hover:font-medium transition-[font-weight] duration-300 underline underline-offset-4 decoration-neutral-950/50 dark:decoration-neutral-50/50 decoration-dotted sm:no-underline">
+                  {{ shift.location }}
+                </span>
+              </button>
+            </dd>
+          </template>
+        </dl>
+      </div>
+    </Transition>
   </div>
 </template>
 

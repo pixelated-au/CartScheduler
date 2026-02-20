@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { usePage } from "@inertiajs/vue3";
-import { breakpointsTailwind, useBreakpoints } from "@vueuse/core";
+import { breakpointsTailwind, computedWithControl, debouncedWatch, useBreakpoints } from "@vueuse/core";
 import { isAxiosError } from "axios";
 import { format, isSameDay, parse } from "date-fns";
 import { computed, onMounted, ref, watch } from "vue";
@@ -91,15 +91,15 @@ const toggleReservation = async (locationId: number, shiftId: number, toggleOn: 
 };
 
 const locationsOnDates = ref<LocationsOnDate[]>([]);
-const locationsForSelectedDate = computed(() =>
-  shiftMarkers.value.map(
+const locationsForSelectedDate = computedWithControl(
+  () => shiftMarkers.value,
+  () => shiftMarkers.value.map(
     (marker) => ({
       locations: marker.locations,
       date: marker.date,
     }),
-  ).filter(
-    (location) => isSameDay(location.date, date.value),
-  ));
+  ).filter((item) => isSameDay(item.date, date.value)),
+);
 
 const setLocationMarkers = (locations: LocationsOnDate[]) => {
   locationsOnDates.value = locations;
@@ -156,14 +156,10 @@ const reservationWatch = watch(firstReservationForUser, (val) => {
 });
 
 const selectedShift = ref<SelectedShift | undefined>(undefined);
-
 watch(selectedShift, (val) => {
-
-  if (!val) {
-    return;
-  }
+  if (!val) return;
+  accordionExpandIndex.value = val.locationId;
   date.value = val.date;
-
 });
 
 const locationRefs = ref<Record<App.Data.LocationData["id"], HTMLElement>>({});
@@ -193,19 +189,20 @@ onMounted(() => {
 const transitionContainerHeight = ref<string>("auto");
 
 const beforeEnter = (el: Element) => {
-  const element = el as HTMLElement;
-  element.style.opacity = "0";
+  const wrapper = el as HTMLElement;
+  wrapper.style.opacity = "0";
   if (!prefersReducedMotion) {
-    element.style.transform = "translateX(110%)";
+    wrapper.style.transform = "translateX(110%)";
   }
 };
 
 const enter = (el: Element, done: () => void) => {
-  const element = el as HTMLElement;
-  transitionContainerHeight.value = `${element.scrollHeight}px`;
-  element.style.opacity = "1";
+  const wrapper = el as HTMLElement;
+  transitionContainerHeight.value = `${wrapper.scrollHeight}px`;
+  wrapper.style.opacity = "1";
+
   if (!prefersReducedMotion) {
-    element.style.transform = "translateX(0)";
+    wrapper.style.transform = "translateX(0)";
   }
   done();
 };
@@ -215,165 +212,178 @@ const afterEnter = (_: Element) => {
   clearTimeout(cancelTimeout as number);
   cancelTimeout = window.setTimeout(() => {
     transitionContainerHeight.value = "auto";
-  }, 500);
+  }, 1000);
 };
 
 const beforeLeave = async (el: Element) => {
-  const element = el as HTMLElement;
-  transitionContainerHeight.value = `${element.scrollHeight}px`;
-  element.style.opacity = "0";
+
+  const wrapper = el as HTMLElement;
+  transitionContainerHeight.value = `${wrapper.scrollHeight}px`;
+
+  wrapper.style.transitionDelay = "50ms";
+  wrapper.style.opacity = "0";
+
   if (!prefersReducedMotion) {
-    element.style.transform = "translateX(-110%)";
+    wrapper.style.transform = "translateX(-110%)";
   }
-  element.style.height = `${element.scrollHeight}px`;
+  wrapper.style.height = `${wrapper.scrollHeight}px`;
 };
+
+const hasInitialised = computed(() => locations.value.length > 0);
+
+const shiftDate = ref(date.value);
+
+debouncedWatch(locations, () => {
+  shiftDate.value = date.value;
+}, {
+  debounce: 500,
+});
 </script>
 
 <template>
-  <div class="grid gap-3 grid-cols-1 sm:grid-cols-[20rem_3fr] sm:grid-rows-1 sm:items-stretch">
-    <div class="grid grid-cols-1 grid-rows-[auto_1fr]">
-      <ComponentSpinner :show="!locations" class="flex flex-col">
-        <div class="pb-2 grid grid-cols-2 gap-2">
+  <div class="flex-1 grid gap-3 grid-cols-1 sm:grid-cols-[20rem_3fr] sm:grid-rows-1 sm:min-h-full">
+    <ComponentSpinner ref="transitionContainer"
+                      :show="!locations"
+                      class="transition-container flex flex-col sm:h-0 sm:min-h-full">
+      <Transition mode="out-in"
+                  @before-enter="beforeEnter"
+                  @enter="enter"
+                  @after-enter="afterEnter"
+                  @before-leave="beforeLeave">
+        <div v-if="shiftView === 'list'"
+             class="grid grid-cols-1 grid-rows-[auto_1fr] gap-2 sm:h-0 sm:min-h-full"
+             key="list">
           <PButton size="small"
                    class="shadow-sm"
-                   :disabled="shiftView === 'calendar'"
                    variant="outlined"
-                   :severity="shiftView === 'calendar' ? 'secondary' : 'info'"
+                   severity="info"
                    @click="shiftView = 'calendar'">
             <span class="iconify mdi--calendar-month-outline" />
-            Calendar
+            Switch to Calendar view
           </PButton>
+          <ShiftList v-model="selectedShift"
+                     :marker-dates="serverDates"
+                     @clicked="scrollToLocation($event.locationId)" />
+        </div>
+        <div v-else class="grid grid-cols-1 gap-2" key="calendar">
           <PButton size="small"
                    class="shadow-sm"
-                   :disabled="shiftView === 'list'"
                    variant="outlined"
-                   :severity="shiftView === 'list' ? 'secondary' : 'info'"
+                   severity="info"
                    @click="shiftView = 'list'">
             <span class="iconify mdi--timeline-text-outline" />
-            Timeline
+            Switch to Timeline view
           </PButton>
+          <DatePicker v-model:date="date"
+                      :shiftMarkers
+                      :max-date="maxReservationDate"
+                      :free-shifts="freeShifts"
+                      :marker-dates="serverDates"
+                      @locations-for-day="setLocationMarkers" />
         </div>
-        <div ref="transitionContainer" class="transition-container">
-          <Transition mode="out-in"
-                      @before-enter="beforeEnter"
-                      @enter="enter"
-                      @after-enter="afterEnter"
-                      @before-leave="beforeLeave">
-            <ShiftList v-if="shiftView === 'list'"
-                       class="w-full"
-                       v-model="selectedShift"
-                       :marker-dates="serverDates"
-                       @clicked="scrollToLocation($event.locationId)" />
-            <DatePicker v-else
-                        v-model:date="date"
-                        :shiftMarkers
-                        :max-date="maxReservationDate"
-                        :free-shifts="freeShifts"
-                        :marker-dates="serverDates"
-                        @locations-for-day="setLocationMarkers" />
-          </Transition>
-        </div>
-      </ComponentSpinner>
-    </div>
-    <div>
-      <ComponentSpinner :show="isLoading" class="min-h-[200px] sm:min-h-full">
-        <Accordion v-model="accordionExpandIndex" class="border std-border rounded border-b-0">
-          <AccordionPanel v-for="location in locations" :key="location.id" :value="location.id">
-            <template #title>
-              <div :ref="(el) => setLocationRef(location.id,el as HTMLElement)"
-                   class="flex items-center text-base font-bold p-2">
-                <span :class="locationLabel[location.id].classes"
-                      v-tooltip="locationLabel[location.id].tooltip">
-                  {{ location.name }}
-                </span>
-                <div class="flex items-center py-1.5 ml-2 group"
-                     v-if="!isRestricted && location.freeShifts">
-                  <div class="mr-3 ml-1 w-2 h-2 bg-amber-500 rounded-full transition-colors group-hover:bg-amber-600 group-hover:dark:bg-amber-200"></div>
-                  <div class="hidden min-w-5 sm:block">
-                    <div class="overflow-x-hidden w-0 text-sm text-gray-600 whitespace-nowrap transition-[width] group-hover:w-full dark:text-gray-400">
-                      shifts still available
-                    </div>
+      </Transition>
+    </ComponentSpinner>
+    <ComponentSpinner :show="isLoading" class="min-h-56 sm:h-auto sm:min-h-full">
+      <Accordion v-model="accordionExpandIndex" :hasInitialised class="border std-border rounded border-b-0">
+        <AccordionPanel v-for="location in locations"
+                        :key="location.id"
+                        :unique-id="location.id"
+                        :contentTrigger="`${location.id}-${shiftDate}`">
+          <template #title>
+            <div :ref="(el) => setLocationRef(location.id,el as HTMLElement)"
+                 class="flex items-center text-base font-bold p-2">
+              <span class="location-name"
+                    :class="locationLabel[location.id]?.classes"
+                    v-tooltip="locationLabel[location.id]?.tooltip">
+                {{ location.name }}
+              </span>
+              <div class="flex items-center py-1.5 ml-2 group"
+                   v-if="!isRestricted && location.freeShifts">
+                <div class="mr-3 ml-1 w-2 h-2 bg-amber-500 rounded-full transition-colors group-hover:bg-amber-600 group-hover:dark:bg-amber-200"></div>
+                <div class="hidden min-w-5 sm:block">
+                  <div class="overflow-x-hidden w-0 text-sm text-gray-600 whitespace-nowrap transition-[width] group-hover:w-full dark:text-gray-400">
+                    shifts still available
                   </div>
                 </div>
-              </div>
-            </template>
-
-            <div class="w-full">
-              <div v-if="!isRestricted && location.freeShifts" class="flex mb-2 ml-3 sm:hidden group">
-                <div class="flex items-center px-2 py-0.5 rounded-full border border-amber-500 dark:border-amber-600">
-                  <div class="mr-1 w-2 h-2 bg-amber-500 rounded-full"></div>
-                  <div class="text-sm text-amber-600 dark:text-amber-500">
-                    free shifts still available at this location
-                  </div>
-                </div>
-              </div>
-
-              <div v-html="location.description"
-                   class="p-3 pt-0 w-full description dark:text-gray-100"></div>
-              <div class="grid gap-x-2 gap-y-2 w-full sm:gap-y-4"
-                   :class="gridCols[location.max_volunteers as keyof typeof gridCols]">
-                <template v-for="shift in location.filterShifts" :key="shift.id">
-                  <div class="self-center pt-4 pl-3 sm:pr-4 dark:text-gray-100 flex flex-col">
-                    <span>{{ formatTime(shift.start_time) }} - {{ formatTime(shift.end_time) }}</span>
-                    <span class="text-xs">{{ relativeDateToNow(date, new Date()) }}</span>
-                  </div>
-                  <div v-for="(volunteer, index) in shift.volunteers"
-                       :key="index"
-                       class="justify-self-center self-center pt-4">
-                    <template v-if="volunteer">
-                      <template v-if="user.uuid && volunteer.uuid === user.uuid">
-                        <button v-if="!isRestricted"
-                                type="button"
-                                class="block"
-                                @click="toggleReservation(location.id, shift.id, false)">
-                          <User status="reserved" v-tooltip="`${volunteer.name}: Tap to un-reserve this shift`" />
-                        </button>
-                        <User status="reserved" v-else />
-                      </template>
-
-                      <User status="male" v-else-if="volunteer.gender === 'male'" v-tooltip="volunteer.name" />
-                      <User status="female"
-                            v-else-if="volunteer.gender === 'female'"
-                            v-tooltip="volunteer.name" />
-                    </template>
-
-                    <EmptySlot v-else-if="isRestricted" v-tooltip="'You cannot reserve a shift'" />
-                    <EmptySlot v-else-if="index === shift.volunteers.length - 1 && shift.maxedFemales && user.gender === 'female'"
-                               color="#79B9ED"
-                               v-tooltip="'This slot can only be reserved by a brother'" />
-                    <button v-else
-                            type="button"
-                            class="block"
-                            @click="toggleReservation(location.id, shift.id, true)">
-                      <EmptySlot v-tooltip="'Tap to reserve this shift'" />
-                    </button>
-                  </div>
-                  <div class="col-span-full px-3 rounded bg-surface-200 dark:bg-surface-800 dark:text-gray-50 sm:py-2">
-                    <ul>
-                      <li v-for="(volunteer, index) in shift.volunteers"
-                          :key="index"
-                          class="flex justify-between py-2 border-b border-gray-400 last:border-b-0">
-                        <template v-if="volunteer">
-                          <div>{{ volunteer.name }}</div>
-                          <div>
-                            Ph:
-                            <a :href="`tel:${volunteer.mobile_phone}`">{{ volunteer.mobile_phone }}</a>
-                          </div>
-                        </template>
-
-                        <template v-else>
-                          <div>—</div>
-                        </template>
-                      </li>
-                    </ul>
-                  </div>
-                </template>
               </div>
             </div>
-          </AccordionPanel>
-        </Accordion>
-      </ComponentSpinner>
-    </div>
+          </template>
+
+          <div class="w-full">
+            <div v-if="!isRestricted && location.freeShifts" class="flex mb-2 ml-3 sm:hidden group">
+              <div class="flex items-center px-2 py-0.5 rounded-full border border-amber-500 dark:border-amber-600">
+                <div class="mr-1 w-2 h-2 bg-amber-500 rounded-full"></div>
+                <div class="text-sm text-amber-600 dark:text-amber-500">
+                  free shifts still available at this location
+                </div>
+              </div>
+            </div>
+
+            <div v-html="location.description"
+                 class="p-3 pt-0 w-full description dark:text-gray-100"></div>
+            <div class="grid gap-x-2 gap-y-2 w-full sm:gap-y-4"
+                 :class="gridCols[location.max_volunteers as keyof typeof gridCols]">
+              <template v-for="shift in location.filterShifts" :key="shift.id">
+                <div class="self-center pt-4 pl-3 sm:pr-4 dark:text-gray-100 flex flex-col">
+                  <span>{{ formatTime(shift.start_time) }} - {{ formatTime(shift.end_time) }}</span>
+                  <span class="text-xs">{{ relativeDateToNow(date, new Date()) }}</span>
+                </div>
+                <div v-for="(volunteer, index) in shift.volunteers"
+                     :key="index"
+                     class="justify-self-center self-center pt-4">
+                  <template v-if="volunteer">
+                    <template v-if="user.uuid && volunteer.uuid === user.uuid">
+                      <button v-if="!isRestricted"
+                              type="button"
+                              class="block"
+                              @click="toggleReservation(location.id, shift.id, false)">
+                        <User status="reserved" v-tooltip="`${volunteer.name}: Tap to un-reserve this shift`" />
+                      </button>
+                      <User status="reserved" v-else />
+                    </template>
+
+                    <User status="male" v-else-if="volunteer.gender === 'male'" v-tooltip="volunteer.name" />
+                    <User status="female"
+                          v-else-if="volunteer.gender === 'female'"
+                          v-tooltip="volunteer.name" />
+                  </template>
+
+                  <EmptySlot v-else-if="isRestricted" v-tooltip="'You cannot reserve a shift'" />
+                  <EmptySlot v-else-if="index === shift.volunteers.length - 1 && shift.maxedFemales && user.gender === 'female'"
+                             color="#79B9ED"
+                             v-tooltip="'This slot can only be reserved by a brother'" />
+                  <button v-else
+                          type="button"
+                          class="block"
+                          @click="toggleReservation(location.id, shift.id, true)">
+                    <EmptySlot v-tooltip="'Tap to reserve this shift'" />
+                  </button>
+                </div>
+                <div class="col-span-full px-3 rounded bg-surface-200 dark:bg-surface-800 dark:text-gray-50 sm:py-2">
+                  <ul>
+                    <li v-for="(volunteer, index) in shift.volunteers"
+                        :key="index"
+                        class="flex justify-between py-2 border-b border-gray-400 last:border-b-0">
+                      <template v-if="volunteer">
+                        <div>{{ volunteer.name }}</div>
+                        <div>
+                          Ph:
+                          <a :href="`tel:${volunteer.mobile_phone}`">{{ volunteer.mobile_phone }}</a>
+                        </div>
+                      </template>
+
+                      <template v-else>
+                        <div>—</div>
+                      </template>
+                    </li>
+                  </ul>
+                </div>
+              </template>
+            </div>
+          </div>
+        </AccordionPanel>
+      </Accordion>
+    </ComponentSpinner>
   </div>
 </template>
 

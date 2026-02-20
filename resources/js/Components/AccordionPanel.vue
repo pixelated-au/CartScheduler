@@ -1,9 +1,10 @@
-<script setup lang="ts" generic="AllowedModelValues">
-import { computed, inject, onMounted, onUnmounted, ref, useId, useTemplateRef } from "vue";
+<script setup lang="ts" generic="AllowedModelValues, ContentTrigger extends string | number">
+import { computed, inject, nextTick, onMounted, ref, useTemplateRef, watch } from "vue";
 import { AccordionContext } from "@/Utils/provide-inject-keys";
 
-const { value, disabled = false } = defineProps<{
-  value: AllowedModelValues;
+const { uniqueId, disabled = false, contentTrigger } = defineProps<{
+  uniqueId: AllowedModelValues;
+  contentTrigger?: ContentTrigger;
   disabled?: boolean;
 }>();
 
@@ -14,42 +15,70 @@ if (!ctx) {
   throw new Error("AccordionPanel must be used within Accordion");
 }
 
-const index = ctx.registerPanel();
-const open = computed(() => ctx.isOpen(value));
+const open = computed(() => ctx.openedPanel.value === uniqueId);
+const isInitialised = computed(() => ctx.isInitialised);
 
-onMounted(() => ctx.setHeaderRef(index, trigger.value));
-onUnmounted(() => ctx.setHeaderRef(index, null));
+onMounted(() => {
+  if (!trigger.value) throw new Error("A fatal error has occurred. Please refresh the page.");
+  ctx.registerPanel(uniqueId, trigger.value);
+});
 
-const uid = useId();
-
-const headerId = computed(() => `${index}-header-${uid}`);
-const panelId = computed(() => `${index}-panel-${uid}`);
+const headerId = computed(() => `${uniqueId}-header`);
+const panelId = computed(() => `${uniqueId}-panel`);
+const panel = useTemplateRef("panel");
+const panelContent = useTemplateRef("panel-content");
 
 function onClick() {
   if (disabled || !ctx) return;
-  ctx.toggle(value);
+  ctx.toggle(uniqueId);
 }
 
 function onKeydown(e: KeyboardEvent) {
   if (disabled || !ctx) return;
-  ctx.onHeaderKeydown(e, index);
+  ctx.onHeaderKeydown(e, uniqueId);
 }
 
 const panelHeight = ref("0");
 
-const setHeight = (el: Element, isOpening: boolean) => {
-  const element = el as HTMLElement;
-  console.log(element.scrollHeight);
-  panelHeight.value = isOpening ? `${element.scrollHeight}px` : "0px";
-  console.log(panelHeight.value);
+const setHeight = (isOpening: boolean) => {
+  panel.value?.classList.add("overflow-hidden");
+  if (!panel.value) {
+    throw new Error("Panel with not found!");
+  }
+  panelHeight.value = isOpening ? `${panelContent.value?.scrollHeight}px` : "0";
 };
+
+const isMounted = ref(false);
+
+watch(isInitialised, async (val) => {
+  await nextTick();
+  if (val && open.value) {
+    setHeight(true);
+  }
+  setTimeout(() => {
+    isMounted.value = true;
+  }, 50);
+}, {
+  once: true,
+  immediate: true,
+});
+
+watch(() => contentTrigger, async (val) => {
+  await nextTick();
+  if (val) {
+    setHeight(open.value);
+  }
+}, {
+  immediate: true,
+});
 </script>
 
 <template>
-  <div class="border-b std-border-bottom bg-white dark:bg-sub-panel-dark">
+  <div class="border-b std-border-bottom bg-white dark:bg-sub-panel-dark"
+       :style="`--panel-height: ${panelHeight}`">
     <div role="heading" aria-level="1">
       <button ref="trigger"
-              class="flex rounded items-center justify-between w-full bg-transparent border-0 text-left px-2 py-1 cursor-pointer
+              class="hhh flex rounded items-center justify-between w-full bg-transparent border-0 text-left px-2 py-1 cursor-pointer
               outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
               type="button"
               :id="headerId"
@@ -64,27 +93,22 @@ const setHeight = (el: Element, isOpening: boolean) => {
       </button>
     </div>
 
-    <Transition @enter="setHeight($event,true)"
-                @leave="setHeight($event,false)">
-      <div v-show="open"
+    <Transition @enter="setHeight(true)"
+                @after-enter="(el) => el.classList.remove('overflow-hidden')"
+                @leave="setHeight(false)"
+                @after-leave="(el) => el.classList.remove('overflow-hidden')">
+      <div ref="panel"
+           v-show="open"
            :id="panelId"
-           :style="`--panel-height: ${panelHeight}`"
-           class="transition-[height] duration-500 h-[var(--panel-height)]"
+           class="h-[var(--panel-height)]"
+           :class="{ 'transition-[height] duration-[0.5s]': isMounted }"
            role="region"
            :aria-labelledby="headerId">
-        <div class="p-2">
-          <!-- Nested is needed to prevent the panel from collapsing when the content is removed -->
+        <div ref="panel-content" class="p-2">
+          <!-- Nested padding is needed to prevent the panel from jumping when the content is collapsed and then removed -->
           <slot />
         </div>
       </div>
     </Transition>
   </div>
 </template>
-
-<!--suppress CssUnusedSymbol -->
-<style lang="css" scoped>
-.v-enter-active,
-.v-leave-active {
-  overflow: hidden;
-}
-</style>

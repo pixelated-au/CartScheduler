@@ -50,7 +50,7 @@ export default function(serverDates: ShallowRef<App.Data.AvailableShiftsData["sh
     }
 
     markers.value = marks;
-  });
+  }, { flush: "post" });
 
   return markers;
 }
