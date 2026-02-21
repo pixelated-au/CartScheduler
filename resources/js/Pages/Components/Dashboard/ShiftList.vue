@@ -1,14 +1,15 @@
 <script setup lang="ts">
 import { usePage } from "@inertiajs/vue3";
 import { breakpointsTailwind, useBreakpoints } from "@vueuse/core";
-import { format, set } from "date-fns";
+import { format, formatISO, set } from "date-fns";
 import { utcToZonedTime } from "date-fns-tz";
-import { computed, onMounted, ref, useTemplateRef } from "vue";
+import { computed, onMounted, ref, useTemplateRef, watch } from "vue";
 import relativeDateToNow from "@/Utils/relativeDateToNow";
 
 export type ShiftItem = {
   date: Date;
-  time: string;
+  formattedDate: string;
+  formattedTime: string;
   location: string;
   locationId: number;
 };
@@ -27,27 +28,26 @@ const page = usePage();
 
 const shiftAvailability = computed(() => page.props.shiftAvailability);
 
-const parseShiftsOnDate = (shiftGroup: App.Data.AvailableShiftsData["shifts"][string], currentDate: Date) => {
+const parseShiftsOnDate = (shiftGroup: App.Data.AvailableShiftsData["shifts"][string], currentDate: Date): ShiftItem[] => {
   return Object.values(shiftGroup)
     .flat()
-    .map(
-      (shift) => {
-        const startTime = shift.start_time; // as "HH:MM:SS"
-        const split = startTime.split(":");
-        const modifiedDate = set(currentDate, {
-          hours: parseInt(split[0]),
-          minutes: parseInt(split[1]),
-          seconds: parseInt(split[2]),
-          milliseconds: 0,
-        });
-        return {
-          date: modifiedDate,
-          time: format(modifiedDate, "HH:mm a"),
-          location: shift.location_name,
-          locationId: shift.location_id,
-        };
-      },
-    )
+    .map((shift) => {
+      const startTime = shift.start_time; // as "HH:MM:SS"
+      const split = startTime.split(":");
+      const modifiedDate = set(currentDate, {
+        hours: parseInt(split[0]),
+        minutes: parseInt(split[1]),
+        seconds: parseInt(split[2]),
+        milliseconds: 0,
+      });
+      return {
+        date: modifiedDate,
+        formattedDate: formatISO(modifiedDate, { representation: "date" }),
+        formattedTime: format(modifiedDate, "HH:mm a"),
+        location: shift.location_name,
+        locationId: shift.location_id,
+      } satisfies ShiftItem;
+    })
     .sort((a, b) => a.date.getTime() - b.date.getTime());
 };
 
@@ -75,6 +75,12 @@ const shifts = computed<Map<string, Array<ShiftItem>>>(() => {
     );
   }
   return map;
+});
+
+watch(shifts, () => {
+  if (!selectedShift.value) {
+    selectedShift.value = shifts.value.size > 0 ? shifts.value.values().next().value?.[0] : undefined;
+  }
 });
 
 const selectShift = async (shift: ShiftItem) => {
@@ -144,15 +150,11 @@ onMounted(() => {
   resetStyle(list.value as Element);
 });
 
-const expandButtonDecoration = computed(() =>
-  isMobile.value && expandShiftList.value
-    ? ""
-    // ? "underline underline-offset-4 decoration-dotted decoration-neutral-950/50 dark:decoration-neutral-50/50"
-    : "");
+const isShiftSelected = (shift: ShiftItem) => selectedShift.value?.locationId === shift.locationId
+  && selectedShift.value?.formattedTime === shift.formattedTime
+  && selectedShift.value?.formattedDate === shift.formattedDate;
 
-const isShiftSelected = (shift: ShiftItem) => {
-  return selectedShift.value?.locationId === shift.locationId && selectedShift.value?.time === shift.time && selectedShift.value?.date.toISOString() === shift.date.toISOString();
-};
+const doesDateHaveShifts = (shift: ShiftItem) => shift.formattedDate === selectedShift.value?.formattedDate;
 </script>
 
 <template>
@@ -173,7 +175,7 @@ const isShiftSelected = (shift: ShiftItem) => {
                '-translate-y-7 std-border py-1 right-0': !expandShiftList,
              }]"
              @click="toggleShiftList">
-      <div :class="expandButtonDecoration" class="inline-grid grid-flow-col gap-1">
+      <div class="inline-grid grid-flow-col gap-1">
         <span class="iconify mdi--arrow-collapse-up transition-transform duration-500 delay-100 text-neutral-500 dark:text-neutral-300"
               :class="[{
                 'rotate-180': !expandShiftList,
@@ -193,12 +195,11 @@ const isShiftSelected = (shift: ShiftItem) => {
       <div ref="list"
            v-show="showList"
            class="sm:h-0 sm:min-h-full overflow-hidden sm:overflow-y-auto sm:pt-5 bg-white dark:bg-sub-panel-dark rounded justify-start border std-border"
-           :class="[
-             {
-               '' : isNotMobile && !fullHeightList,
-               'std-border' : isMobile && expandShiftList,
-               'border-transparent' : isMobile && !expandShiftList,
-             }]">
+           :class="{
+             '' : isNotMobile && !fullHeightList,
+             'std-border' : isMobile && expandShiftList,
+             'border-transparent' : isMobile && !expandShiftList,
+           }">
         <dl v-if="shifts.size"
             class="mt-12 sm:mt-0 flex flex-col gap-1 relative ps-12 pb-8 mb-8
                     before:absolute before:left-11 before:top-0 before:bottom-0 before:border-l before:border-l-neutral-400 before:dark:border-l-neutral-600 before:border-dashed
@@ -211,7 +212,7 @@ const isShiftSelected = (shift: ShiftItem) => {
               <div aria-hidden="true"
                    class="absolute -ml-1 -left-6 top-0 size-12 flex flex-col items-center justify-center z-0 before:transition-colors before:duration-500
                           before:rounded-full before:absolute before:inset-0 before:border before:border-neutral-400  before:-z-10"
-                   :class="[(shiftsForDate[0].date.toDateString() === selectedShift?.date.toDateString()) ? 'group selected before:bg-orange-200 before:dark:bg-orange-600'
+                   :class="[doesDateHaveShifts(shiftsForDate[0]) ? 'group selected before:bg-orange-200 before:dark:bg-orange-600'
                      : 'before:bg-white before:dark:bg-panel-dark']">
                 <div class="text-center leading-none text-sm dark:text-neutral-200 group-[.selected]:dark:text-neutral-900">
                   {{ date[1] }}
@@ -230,7 +231,7 @@ const isShiftSelected = (shift: ShiftItem) => {
                       }"
                       @click="selectShift(shift)">
                 <span class="group-hover:font-medium transition-[font-weight] duration-300">
-                  {{ shift.time }}
+                  {{ shift.formattedTime }}
                 </span>
                 <span class="text-neutral-500 dark:text-neutral-300 group-[.selected]:text-warning dark:group-[.selected]:text-warning-light font-light group-hover:font-medium transition-[font-weight] duration-300 underline underline-offset-4 decoration-neutral-950/50 dark:decoration-neutral-50/50 decoration-dotted sm:no-underline">
                   {{ shift.location }}
