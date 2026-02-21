@@ -36,6 +36,7 @@ export default function(timezone: Ref<string>, canAdmin = false) {
   const freeShifts = shallowRef<App.Data.AvailableShiftsData["freeShifts"]>();
   const maxReservationDate = ref<Date | undefined>(endOfDay(utcToZonedTime(new Date(), timezone.value)));
   const isLoading = ref(false);
+  const formattedDate = computed(() => date.value ? formatISO(date.value, { representation: "date" }) : "");
 
   const getShifts = async (showLoader = true) => {
     let timeoutId;
@@ -61,11 +62,6 @@ export default function(timezone: Ref<string>, canAdmin = false) {
       }
     }
   };
-
-  const formattedDate = computed(() =>
-    date.value
-      ? formatISO(date.value, { representation: "date" })
-      : "");
 
   /**
    * Watch the date change and request shifts for the new dates
