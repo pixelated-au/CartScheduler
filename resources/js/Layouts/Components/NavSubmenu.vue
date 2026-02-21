@@ -93,6 +93,7 @@ onClickOutside(target, async (event: Event) => {
     <button v-if="!showAsInline"
             ref="toggleButton"
             @click="toggle"
+            @mouseover="toggle"
             type="button"
             class="flex justify-between items-center px-3 py-2 ease-in-out delay-100 w-full font-medium rounded-md transition-colors duration-150"
             :class="[
