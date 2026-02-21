@@ -3,7 +3,7 @@ import { usePage } from "@inertiajs/vue3";
 import { breakpointsTailwind, computedWithControl, debouncedWatch, useBreakpoints } from "@vueuse/core";
 import { isAxiosError } from "axios";
 import { format, isSameDay, parse } from "date-fns";
-import { computed, onMounted, ref, watch } from "vue";
+import { computed, onMounted, reactive, ref, watch } from "vue";
 import useLocationFilter from "@/Composables/useLocationFilter";
 import useToast from "@/Composables/useToast";
 import useShiftMarkers from "@/Pages/Components/Dashboard/composables/useShiftMarkers";
@@ -11,6 +11,7 @@ import DatePicker from "@/Pages/Components/Dashboard/DatePicker.vue";
 import ShiftList from "@/Pages/Components/Dashboard/ShiftList.vue";
 import { useGlobalState } from "@/store";
 import relativeDateToNow from "@/Utils/relativeDateToNow";
+import type { Location } from "@/Composables/useLocationFilter";
 import type { LocationsOnDate } from "@/Pages/Components/Dashboard/DatePicker.vue";
 import type { ShiftItem as SelectedShift } from "@/Pages/Components/Dashboard/ShiftList.vue";
 
@@ -92,6 +93,7 @@ const toggleReservation = async (locationId: number, shiftId: number, toggleOn: 
 
 const locationsOnDates = ref<LocationsOnDate[]>([]);
 const locationsForSelectedDate = computedWithControl(
+  // Only execute when shiftMarkers changes, otherwise 'date' will also execute this, causing a race conditional problem
   () => shiftMarkers.value,
   () => shiftMarkers.value.map(
     (marker) => ({
@@ -112,53 +114,56 @@ const today = new Date();
 const formatTime = (time: string) => format(parse(time, "HH:mm:ss", today), "h:mm a");
 
 const isRestricted = computed(() => !usePage().props.isUnrestricted);
-
+const userShiftLocations = reactive<Set<Location["id"]>>(new Set());
 const firstReservationForUser = ref<number | undefined>();
-const locationLabel = ref<Record<number, { classes: string[]; tooltip?: string }>>({});
+const expandedAccordionPanelIndex = ref<number | undefined>();
 
 const markRosteredLocations = () => {
-  let hasSetFirstReservationForUser = false;
-  const labelData: Record<number, { classes: string[]; tooltip?: string }> = {};
   firstReservationForUser.value = undefined;
+  userShiftLocations.clear();
+
   for (const location of locations.value) {
-    const classes = [];
-    let tooltip = undefined;
-    if (hasShift(location)) {
-      classes.push(...["text-green-800", "dark:text-green-300", "border-b-2", "border-green-500"]);
-      tooltip = "You have at least one shift";
-      if (!hasSetFirstReservationForUser) {
-        firstReservationForUser.value = selectedShift.value?.locationId || location.id;
-        hasSetFirstReservationForUser = true;
-      }
-    } else {
-      classes.push("dark:text-gray-200");
+    if (!hasShift(location)) {
+      continue;
     }
-    labelData[location.id] = { classes, tooltip };
+
+    userShiftLocations.add(location.id);
+    if (!firstReservationForUser.value) {
+      firstReservationForUser.value = selectedShift.value?.locationId || location.id;
+    }
   }
-  locationLabel.value = labelData;
-  if (!hasSetFirstReservationForUser) {
-    firstReservationForUser.value = undefined;
+
+};
+
+const setOpenedPanel = () => {
+  if (expandedAccordionPanelIndex.value) {
+    if (!firstReservationForUser.value) {
+      firstReservationForUser.value = expandedAccordionPanelIndex.value;
+      return;
+    }
+
+    if (!userShiftLocations.has(expandedAccordionPanelIndex.value)) {
+      expandedAccordionPanelIndex.value = firstReservationForUser.value;
+    }
   }
 };
 
 watch(locationsForSelectedDate, () => {
   markRosteredLocations();
+  setOpenedPanel();
 });
-
-const accordionExpandIndex = ref<number | undefined>(undefined);
 
 const reservationWatch = watch(firstReservationForUser, (val) => {
-  if (val === undefined) {
-    accordionExpandIndex.value = undefined;
-    return;
-  }
-  accordionExpandIndex.value = val;
+  // If the first reservation for the user is removed, retain the existing accordionExpandIndex
+  if (!val && expandedAccordionPanelIndex.value) return;
+
+  expandedAccordionPanelIndex.value = val;
 });
 
-const selectedShift = ref<SelectedShift | undefined>(undefined);
+const selectedShift = ref<SelectedShift | undefined>();
 watch(selectedShift, (val) => {
   if (!val) return;
-  accordionExpandIndex.value = val.locationId;
+  expandedAccordionPanelIndex.value = val.locationId;
   date.value = val.date;
 });
 
@@ -284,7 +289,9 @@ debouncedWatch(locations, () => {
       </Transition>
     </ComponentSpinner>
     <ComponentSpinner :show="isLoading" class="min-h-56 sm:h-auto sm:min-h-full">
-      <Accordion v-model="accordionExpandIndex" :hasInitialised class="border std-border rounded border-b-0">
+      <Accordion v-model="expandedAccordionPanelIndex"
+                 :hasInitialised
+                 class="border std-border rounded border-b-0">
         <AccordionPanel v-for="location in locations"
                         :key="location.id"
                         :unique-id="location.id"
@@ -293,8 +300,12 @@ debouncedWatch(locations, () => {
             <div :ref="(el) => setLocationRef(location.id,el as HTMLElement)"
                  class="flex items-center text-base font-bold p-2">
               <span class="location-name"
-                    :class="locationLabel[location.id]?.classes"
-                    v-tooltip="locationLabel[location.id]?.tooltip">
+                    :class="[
+                      userShiftLocations.has(location.id)
+                        ? 'text-green-800 dark:text-green-300 border-b-2 border-green-500'
+                        : 'dark:text-gray-200'
+                    ]"
+                    v-tooltip="userShiftLocations.has(location.id) ? 'You have at least one shift' : undefined">
                 {{ location.name }}
               </span>
               <div class="flex items-center py-1.5 ml-2 group"
