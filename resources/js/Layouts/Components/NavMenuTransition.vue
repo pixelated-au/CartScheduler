@@ -15,7 +15,7 @@ const onEnter = async (el: Element, done: () => void) => {
   await nextTick(() => {
     const style = (el as HTMLElement).style;
     style.transitionProperty = "max-height, opacity";
-    style.transitionDuration = "300ms";
+    style.transitionDuration = "250ms";
     style.transitionTimingFunction = "ease-out";
     style.opacity = "1";
     style.maxHeight = (el as HTMLElement).scrollHeight + "px";
@@ -33,7 +33,7 @@ const onAfterEnter = (el: Element) => {
 const onBeforeLeave = (el: Element) => {
   const style = (el as HTMLElement).style;
   style.transitionProperty = "max-height, opacity";
-  style.transitionDuration = "300ms";
+  style.transitionDuration = "250ms";
   style.transitionTimingFunction = "ease-in";
   style.maxHeight = (el as HTMLElement).scrollHeight + "px";
   style.opacity = "1"; // Start fully visible
