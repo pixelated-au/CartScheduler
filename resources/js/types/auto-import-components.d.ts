@@ -25,7 +25,6 @@ declare module 'vue' {
     CSLogo: typeof import('./../Components/CSLogo.vue')['default']
     DangerButton: typeof import('./../Components/Form/Buttons/DangerButton.vue')['default']
     DarkMode: typeof import('./../Layouts/Components/DarkMode.vue')['default']
-    DarkModeLabel: typeof import('./../Layouts/Components/DarkModeLabel.vue')['default']
     DataTable: typeof import('./../Components/DataTable.vue')['default']
     DragDrop: typeof import('./../Components/Icons/DragDrop.vue')['default']
     EmptySlot: typeof import('./../Components/Icons/EmptySlot.vue')['default']
