@@ -33,7 +33,7 @@ if (bugsnagKey) {
  *     body: string;
  * }>
  */
-createInertiaApp({
+void createInertiaApp({
   title: (title) => `${title} - ${appName}`,
   resolve: (name) => {
     const pages = import.meta.glob<DefineComponent>("./Pages/**/*.vue", { eager: true });
