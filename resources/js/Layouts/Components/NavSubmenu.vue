@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { Link } from "@inertiajs/vue3";
-import { onClickOutside, useFocusWithin } from "@vueuse/core";
-import { computed, onMounted, onUnmounted, useId, useTemplateRef } from "vue";
+import { computed, onMounted, onUnmounted, useId } from "vue";
 import useCurrentPageInfo from "@/Composables/useCurrentPageInfo";
 import useNavEvents from "./Composables/useNavEvents";
 import type { CssClass } from "@/types/types";
@@ -16,7 +15,9 @@ const { item, items, icon, showAsInline = false } = defineProps<{
   buttonClasses?: CssClass;
 }>();
 
-const { submenuOpen, toggleSubmenu, openSubmenus, closeNav, addEscapeHandler, removeEscapeHandler } = useNavEvents();
+const {
+  submenuOpen, toggleSubmenu, openSubmenus, closeNav, addEscapeHandler, removeEscapeHandler,
+} = useNavEvents();
 
 const submenuItems = computed(() => {
   if (item) {
@@ -59,24 +60,6 @@ const toggle = () => {
   }
 };
 
-let menuTimeout: number | undefined = undefined;
-const mouseOut = (_: MouseEvent) => {
-  // this should close the submenu if it is open but only after a 500ms timeout. If the user hovers over the submenu again, the timeout should be cancelled.
-  menuTimeout = window.setTimeout(() => {
-    if (isSubmenuOpen.value) {
-      closeNav(label.value);
-    }
-  }, 500);
-};
-
-const mouseOver = (_: MouseEvent) => {
-  if (menuTimeout) {
-    clearTimeout(menuTimeout);
-    menuTimeout = undefined;
-  }
-  toggle();
-};
-
 onMounted(() => {
   addEscapeHandler("mobile-nav", (event: KeyboardEvent) => {
     if (!isSubmenuOpen.value) return;
@@ -88,28 +71,10 @@ onMounted(() => {
 onUnmounted(() => {
   removeEscapeHandler("mobile-nav");
 });
-
-const target = useTemplateRef("submenu");
-const toggleButton = useTemplateRef("toggleButton");
-
-const { focused } = useFocusWithin(toggleButton);
-onClickOutside(target, async (event: Event) => {
-  if (!isSubmenuOpen.value) {
-    return;
-  }
-
-  if (focused.value) {
-    event.stopPropagation();
-  }
-
-  closeNav(label.value);
-});
 </script>
 
 <template>
-  <li class="relative"
-      @mouseover="mouseOver"
-      @mouseleave="mouseOut">
+  <li class="relative">
     <button v-if="!showAsInline"
             ref="toggleButton"
             @click="toggle"

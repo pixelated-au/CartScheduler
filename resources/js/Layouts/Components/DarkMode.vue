@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { onClickOutside } from "@vueuse/core";
 import { ref, useTemplateRef } from "vue";
 import { useDarkMode } from "@/Composables/useDarkMode.js";
 import type { ColorMode } from "@/Composables/useDarkMode.js";
@@ -88,16 +87,6 @@ const setColorMode = async (mode: ColorMode) => {
   await setMode(mode);
   expand.value = false;
 };
-
-const colorModeButtons = useTemplateRef("color-mode-buttons");
-
-onClickOutside(colorModeButtons, async (_event: Event) => {
-  if (!expand.value) {
-    return;
-  }
-
-  expand.value = false;
-});
 </script>
 
 <template>
@@ -155,25 +144,6 @@ onClickOutside(colorModeButtons, async (_event: Event) => {
     </transition>
   </div>
 </template>
-
-<!--suppress CssUnusedSymbol -->
-<style scoped>
-.v-enter-active,
-.v-leave-active {
-    /*transition: all 0.25s ease;*/
-}
-
-.v-enter-from {
-}
-
-.v-enter-to {
-}
-
-.v-leave-to {
-    /*width: 0;*/
-    /*height: 0;*/
-}
-</style>
 
 <style>
 :root {
