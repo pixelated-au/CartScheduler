@@ -80,7 +80,7 @@ const deleteVacation = (idx: number) => form.deletedVacations = [...form.deleted
                class="grid grid-cols-[auto_minmax(0,_1fr)] sm:grid-cols-[auto_minmax(0,_2fr)] gap-y-px gap-x-3 rounded p-3 items-center mb-3 bg-sub-panel dark:bg-sub-panel-dark shadow">
             <PButton severity=""
                      type="button"
-                     class="row-span-2 self-stretch px-1 py-1 mr-2 bg-transparent dark:bg-transparent dark:border dark:border-slate-700 sm:row-span-2"
+                     class="row-span-2 self-stretch px-1 py-1 bg-transparent dark:bg-transparent dark:border dark:border-slate-700 sm:row-span-2"
                      @click="deleteVacation(idx)">
               <CloseCircle />
             </PButton>

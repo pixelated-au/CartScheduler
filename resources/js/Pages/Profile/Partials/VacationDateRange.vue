@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { parseISO, addDays, formatISO  } from "date-fns";
-import { computed, watch, ref } from "vue";
+import { computed, watch, ref, useId } from "vue";
 import JetInputError from "@/Jetstream/InputError.vue";
 import JetLabel from "@/Jetstream/Label.vue";
 
@@ -53,25 +53,31 @@ const minDate = computed(() => start.value
 const maxDate = computed(() => end.value
   ? end.value
   : undefined);
+
+const id = useId();
 </script>
 
 <template>
-  <div class="grid grid-cols-2 gap-4 grid-rows-1 items-center">
-    <div class="grid grid-cols-1 gap-x-2 gap-y-1">
-      <JetLabel class="font-bold" :has-error="!!startError" value="From"/>
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 grid-rows-1 items-center">
+    <div class="flex flex-col 1 gap-1">
+      <JetLabel :for="`${id}-start`" class="font-bold text-center" :has-error="!!startError" value="From"/>
 
-      <PDatePicker v-model="start"
+      <PDatePicker :input-id="`${id}-start`"
+                   v-model="start"
                    :minDate="new Date()"
                    :maxDate
-                   :dateFormat="fieldFormat" />
+                   :dateFormat="fieldFormat"
+                   input-class="w-full"/>
       <JetInputError :message="startError" />
     </div>
-    <div class="grid grid-cols-1 gap-2">
-      <JetLabel class="font-bold" :has-error="!!endError" value="To"/>
+    <div class="flex flex-col gap-1">
+      <JetLabel :for="`${id}-end`" class="font-bold" :has-error="!!endError" value="To"/>
 
-      <PDatePicker v-model="end"
+      <PDatePicker :input-id="`${id}-end`"
+                   v-model="end"
                    :minDate
-                   :dateFormat="fieldFormat" />
+                   :dateFormat="fieldFormat"
+                   input-class="w-full"/>
       <JetInputError :message="endError" />
     </div>
   </div>
