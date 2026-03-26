@@ -20,7 +20,7 @@ class ShiftData extends Data
         public ?string $available_to,
         /** @var Collection<\App\Data\UserData> */
         public Collection|Optional $volunteers,
-        public LocationData|Optional $location,
+        public ?LocationData $location,
         #[LiteralTypeScriptType('[boolean, boolean, boolean, boolean, boolean, boolean, boolean]')]
         public array $js_days = [],
     ) {
@@ -38,9 +38,9 @@ class ShiftData extends Data
             volunteers: $shift->relationLoaded('users')
                 ? UserData::collect($shift->users)
                 : Optional::create(),
-            location: $shift->relationLoaded('location')
+            location: $shift->relationLoaded('location') && $shift->location !== null
                 ? LocationData::from($shift->location)
-                : Optional::create(),
+                : null,
             js_days: [ // These will map to JavaScript date() days
                        0 => $shift->day_sunday,
                        1 => $shift->day_monday,
