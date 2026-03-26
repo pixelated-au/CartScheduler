@@ -9,26 +9,25 @@ import headers from "./Lib/ReportsDataTableHeaders.js";
 
 const props = defineProps<{
   reports: Array<App.Data.ReportsData>;
-  locations: Array<App.Data.LocationAdminData>;
+  locations: Array<Required<App.Data.LocationAdminData>>;
 }>();
 
 const userSearch = ref("");
 
 const reportData = computed(() => props.reports.map((report) => ({
   id: report.id,
-  location: report.metadata?.location_name || report.shift?.location?.name || "",
-  locationId: report.metadata?.location_id || report.shift?.location?.id || "",
-  userExists: !!report.submitted_by?.id,
-  submittedByName: report.metadata?.submitted_by_name || report.submitted_by?.name || "",
-  submittedByPhone: report.metadata?.submitted_by_phone || report.submitted_by?.mobile_phone || "",
-  submittedByEmail: report.metadata?.submitted_by_email || report.submitted_by?.email || "",
+  location: report.metadata?.location_name,
+  locationId: report.metadata?.location_id,
+  submittedByName: report.metadata?.submitted_by_name,
+  submittedByPhone: report.metadata?.submitted_by_phone,
+  submittedByEmail: report.metadata?.submitted_by_email,
   date: report.shift_date,
-  time: report.shift?.start_time,
+  time: report.metadata?.shift_time,
   placements: report.placements_count,
   videos: report.videos_count,
   requests: report.requests_count,
   comments: report.comments,
-  tags: report.tags.map((tag) => tag.name.en),
+  tags: report.tags.map((tag) => tag.name["en"]),
   cancelled: report.shift_was_cancelled,
   associates: report.metadata?.associates || [],
 })));
@@ -73,10 +72,10 @@ const filter = computed(() => {
             {{ text }}
             <div class="p-2 z-50 absolute top-12 w-64 bg-white border border-gray-300 rounded-md shadow-lg"
                  v-if="showLocationFilter">
-              <select class="location-selector w-full rounded-md"
+              <select class="location-selector w-full rounded-md text-black bg-white"
                       v-model="locationFilter"
                       name="location">
-                <option value="" selected>All</option>
+                <option :value="0">All</option>
                 <option v-for="location in locations" :key="location.id" :value="location.id">
                   {{ location.name }}
                 </option>
@@ -128,7 +127,7 @@ const filter = computed(() => {
   </div>
 </template>
 
-<style lang="scss">
+<style lang="postcss" scoped>
 @import 'vue3-easy-data-table/dist/style.css';
 
 </style>
