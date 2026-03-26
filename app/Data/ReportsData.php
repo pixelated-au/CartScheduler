@@ -12,8 +12,6 @@ class ReportsData extends Data
 {
     public function __construct(
         public int $id,
-        public ?ShiftData $shift = null,
-        public ?UserData $submitted_by = null,
         public ?string $shift_date = null,
         public ?int $placements_count = null,
         public ?int $videos_count = null,
@@ -22,7 +20,7 @@ class ReportsData extends Data
         public bool $shift_was_cancelled = false,
         #[LiteralTypeScriptType('Array<{id: int, name: {[lang: string]: string}, slug: {[lang: string]: string}}>')]
         public Collection $tags = new Collection,
-        public ?ReportMetadataData $metadata = null,
+        public ReportMetadataData $metadata,
     ) {
     }
 }
