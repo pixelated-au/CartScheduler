@@ -17,7 +17,7 @@ class ReportsController extends Controller
             'locations' => LocationAdminData::collect(Location::with('shifts')->get()),
             'reports'   => ReportsData::collect(
                 Report::query()
-                    ->with(['shift.location', 'user', 'tags'])
+                    ->with(['tags'])
                     ->orderBy('id', 'desc')
                     ->get()
             ),
