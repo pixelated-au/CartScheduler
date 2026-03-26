@@ -48,12 +48,12 @@ const saveAction = () => {
     errorBag: "updateUserData",
     preserveScroll: true,
     onSuccess: () => toast.success(
-      `${props.user.name} was saved.`,
+      `${form.name} was saved.`,
       "Success!",
       { group: "bottom" },
     ),
     onError: () => toast.error(
-      `${props.user.name} could not be saved. Please check the validation messages`,
+      `${form.name} could not be saved. Please check the validation messages`,
       "Not Saved!",
       { group: "bottom" },
     ),
