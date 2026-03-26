@@ -99,8 +99,8 @@ declare namespace App.Data {
     shift_date: IsoDate;
     start_time: TwentyFourHourTime;
     end_time: TwentyFourHourTime;
-    requires_brother: number;
-    location_name: string;
+    requires_brother?: number;
+    location_name?: string;
   };
   export type ReportMetadataData = {
     shift_id: number;
@@ -120,8 +120,6 @@ declare namespace App.Data {
   };
   export type ReportsData = {
     id: number;
-    shift?: App.Data.ShiftData;
-    submitted_by?: App.Data.UserData;
     shift_date?: string;
     placements_count?: number;
     videos_count?: number;
@@ -129,7 +127,7 @@ declare namespace App.Data {
     comments?: string;
     shift_was_cancelled: boolean;
     tags: Array<{ id: int; name: { [lang: string]: string }; slug: { [lang: string]: string } }>;
-    metadata?: App.Data.ReportMetadataData;
+    metadata: App.Data.ReportMetadataData;
   };
   export type ShiftAdminData = {
     id?: number;
