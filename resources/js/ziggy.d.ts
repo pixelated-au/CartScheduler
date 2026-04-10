@@ -31,7 +31,7 @@ declare module 'ziggy-js' {
             "binding": "id"
         },
         {
-            "name": "hashedEmail",
+            "name": "token",
             "required": true
         }
     ],
