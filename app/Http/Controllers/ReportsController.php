@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Data\LocationAdminData;
+use App\Data\IdAndNameData;
 use App\Data\ReportsData;
 use App\Models\Location;
 use App\Models\Report;
@@ -14,7 +14,7 @@ class ReportsController extends Controller
     public function index(): Response
     {
         return Inertia::render('Admin/Reports/List', [
-            'locations' => LocationAdminData::collect(Location::with('shifts')->get()),
+            'locations' => IdAndNameData::collect(Location::get(['id', 'name'])),
             'reports'   => ReportsData::collect(
                 Report::query()
                     ->with(['tags'])
