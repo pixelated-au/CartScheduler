@@ -2,14 +2,10 @@
 
 namespace App\Providers;
 
-use App\Actions\EncryptedErrorCodeAction;
-use App\Http\Controllers\SetUserPasswordController;
-use App\Interfaces\ObfuscatedErrorCode;
 use App\Listeners\StreamlineInstalledVersionSetListener;
 use App\Listeners\StreamlineNextAvailableVersionUpdatedListener;
 use BackedEnum;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Schema;
@@ -62,18 +58,5 @@ class AppServiceProvider extends ServiceProvider
 
         Event::listen(InstalledVersionSet::class, StreamlineInstalledVersionSetListener::class);
         Event::listen(NextAvailableVersionUpdated::class, StreamlineNextAvailableVersionUpdatedListener::class);
-
-        $this->configureSetPasswordController();
-    }
-
-    public function configureSetPasswordController(): void
-    {
-        $this->app->when(SetUserPasswordController::class)
-            ->needs(ObfuscatedErrorCode::class)
-            ->give(
-                fn(Application $application) => $application
-                    ->make(EncryptedErrorCodeAction::class,
-                        ['message' => config('cart-scheduler.set_password_generic_error_message')])
-            );
     }
 }
