@@ -62,7 +62,7 @@ use Inertia\Inertia;
 
 Route::get('/', static fn () => Inertia::render('Auth/Login'));
 
-Route::get('/set-password/{user}/{hashedEmail}', [SetUserPasswordController::class, 'show'])->name('set.password.show');
+Route::get('/set-password/{user}/{token}', [SetUserPasswordController::class, 'show'])->name('set.password.show');
 Route::post('/set-password', [SetUserPasswordController::class, 'update'])->name('set.password.update');
 
 // Route::get('/mail', static fn() => new App\Mail\UserAccountCreated(App\Models\User::find(1)));
