@@ -21,7 +21,7 @@ watch(() => page.url, () => {
   prepareRouteData();
 }, { immediate: true });
 
-const bugsnagKey = import.meta.env.VITE_BUGSNAG_FRONT_END_API_KEY;
+const bugsnagKey = import.meta.env["VITE_BUGSNAG_FRONT_END_API_KEY"];
 onMounted(() => {
   if (bugsnagKey) {
     const user = page.props.auth.user;
