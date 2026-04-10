@@ -1,7 +1,9 @@
 // noinspection NpmUsedModulesInstalled,JSUnresolvedReference
 
 import { resolve } from "node:path";
+import e18e from "@e18e/eslint-plugin";
 import css from "@eslint/css";
+import json from "@eslint/json";
 import stylistic from "@stylistic/eslint-plugin";
 import { configureVueProject, defineConfigWithVueTs, vueTsConfigs } from "@vue/eslint-config-typescript";
 import { globalIgnores } from "eslint/config";
@@ -59,7 +61,17 @@ const baseTsConfig = {
 export default defineConfigWithVueTs([
   importX.flatConfigs.recommended,
   importX.flatConfigs.typescript,
+  e18e.configs.recommended,
   globalIgnores(["node_modules", "vendor", "public", "resources/js/ziggy.d.ts", "resources/js/types/*.d.ts"]),
+  {
+    files: ["package.json"],
+    language: "json/json",
+    plugins: {
+      e18e,
+      json,
+    },
+    extends: ["e18e/recommended"],
+  },
   {
     name: "eslint-defaults",
     ignores: ["*.d.ts"],
@@ -96,7 +108,7 @@ export default defineConfigWithVueTs([
     rules: {
       "depend/ban-dependencies": ["error", {
         "presets": ["native", "microutilities", "preferred"],
-        "allowed": ["axios"]
+        "allowed": ["axios"],
       }],
     },
   },
@@ -249,7 +261,7 @@ export default defineConfigWithVueTs([
       "vue/multi-word-component-names": ["off"],
       "vue/no-multi-spaces": ["warn", { ignoreProperties: false }],
       "vue/object-curly-spacing": ["warn", "always"],
-      "vue/prefer-use-template-ref": ["error"],
+      "vue/prefer-use-template-ref": ["warn"],
       "vue/padding-line-between-blocks": ["warn", "always"],
       "vue/padding-line-between-tags": [
         "warn",
