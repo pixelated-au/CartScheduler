@@ -316,7 +316,7 @@ class UsersTest extends TestCase
 
         $render = $mailable->render();
         $hashed = Str::of($render)->match('/set-password\/\d+\/([a-zA-Z0-9]+)/');
-        $this->assertTrue(Hash::check($user->uuid . $user->email, base64_decode($hashed)));
+        $this->assertTrue(Password::tokenExists($user, $hashed));
     }
 
     public function test_validations_are_working(): void

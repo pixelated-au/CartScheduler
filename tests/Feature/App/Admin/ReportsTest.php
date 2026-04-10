@@ -36,7 +36,7 @@ class ReportsTest extends TestCase
 
         $shiftIds = ShiftUser::all()->map(fn(ShiftUser $shiftUser) => ['shift_id' => $shiftUser->shift_id]);
 
-        Report::factory()
+        $x = Report::factory()
             ->count($shiftIds->count())
             ->sequence(...$shiftIds->toArray())
             ->create();
