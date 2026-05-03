@@ -35,8 +35,8 @@ SELECT dates.date
              AND locations.is_enabled = 1
 
          WHERE shifts.is_enabled = 1
-           AND (shifts.available_from IS NULL OR shifts.available_from >= dates.date)
-           AND (shifts.available_to IS NULL OR shifts.available_to <= dates.date)
+           AND (shifts.available_from IS NULL OR shifts.available_from <= dates.date)
+           AND (shifts.available_to IS NULL OR shifts.available_to >= dates.date)
            AND CASE
                  WHEN DAYOFWEEK(dates.date) = 1 THEN shifts.day_sunday
                  WHEN DAYOFWEEK(dates.date) = 2 THEN shifts.day_monday
@@ -53,8 +53,8 @@ FROM dates
                          JOIN shifts
                             ON shifts.id = shift_user.shift_id
                       AND shifts.is_enabled = 1
-                      AND (shifts.available_from IS NULL OR shifts.available_from >= shift_date)
-                      AND (shifts.available_to IS NULL OR shifts.available_to <= shift_date)
+                      AND (shifts.available_from IS NULL OR shifts.available_from <= shift_date)
+                      AND (shifts.available_to IS NULL OR shifts.available_to >= shift_date)
                          JOIN locations
                             ON locations.id = shifts.location_id
                       AND locations.is_enabled = 1) AS derived
