@@ -16,7 +16,8 @@ class ReportsController extends Controller
         return Inertia::render('Admin/Reports/List', [
             'locations.shifts' => LocationAdminResource::collection(Location::all()),
             'reports'          => ReportsResource::collection(
-                Report::with(['shift.location', 'user', 'tags'])
+                Report::with(['shift:start_time' => ['location:id,name'], 'user:id,name,gender,mobile_phone,email', 'tags:name'])
+                      ->where('shift_date', '>=', now()->subMonths(2))
                       ->orderBy('id', 'desc')
                       ->get()
             ),
