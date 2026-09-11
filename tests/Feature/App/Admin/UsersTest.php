@@ -285,12 +285,18 @@ test('resend welcome email is correct', function () {
 });
 
 test('welcome email is correct', function () {
-    $user = User::factory()->enabled()->state(['password' => null])->create();
+    // The name is pinned rather than faked. Blade escapes the apostrophe to
+    // &#039;, then the Markdown mailable's CommonMark pass decodes it back to
+    // a bare apostrophe - CommonMark re-escapes &, < and > on output, but not
+    // quotes. assertSeeInHtml escapes its expectation by default, so it would
+    // look for &#039; and not find it. Faker only sometimes produces a name
+    // with an apostrophe, which made this fail intermittently on CI.
+    $user = User::factory()->enabled()->state(['name' => "Prof. Reina O'Connell", 'password' => null])->create();
 
     $textMatch = "Dear $user->name, an account has been created for you on the ".config('app.name').' Public Witnessing web application.';
     $mailable = (new UserAccountCreated($user))
         ->assertHasSubject(config('app.name').' Account Activation')
-        ->assertSeeInHtml($textMatch)
+        ->assertSeeInHtml($textMatch, escape: false)
         ->assertSeeInText($textMatch);
 
     $render = $mailable->render();
