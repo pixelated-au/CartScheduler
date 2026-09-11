@@ -16,7 +16,8 @@
     "codeload.github.com",
     "codepen.io",
     "pestphp.com",
-    "cdn.playwright.dev"
+    "cdn.playwright.dev",
+    "laravel.com"
   ],
   "cidrs": [],
   "host_ports": [
