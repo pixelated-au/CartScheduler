@@ -1,81 +1,125 @@
-<script setup>
-import {onMounted, ref} from 'vue';
+<script setup lang="ts">
+import { useDarkMode } from "@/Composables/useDarkMode.js";
 
-defineProps({
-    darkMode: {
-        type: Boolean,
-    },
-});
-
-const emit = defineEmits(['is-dark-mode']);
-
-const isDarkMode = ref(false);
-
-const toggleDarkMode = () => {
-    if (localStorage.getItem('color-theme')) {
-        if (localStorage.getItem('color-theme') === 'light') {
-            document.documentElement.classList.add('dark');
-            localStorage.setItem('color-theme', 'dark');
-            isDarkMode.value = true;
-        } else {
-            document.documentElement.classList.remove('dark');
-            localStorage.setItem('color-theme', 'light');
-            isDarkMode.value = false;
-        }
-
-        // if NOT set via local storage previously
-    } else {
-        if (document.documentElement.classList.contains('dark')) {
-            document.documentElement.classList.remove('dark');
-            localStorage.setItem('color-theme', 'light');
-            isDarkMode.value = false;
-        } else {
-            document.documentElement.classList.add('dark');
-            localStorage.setItem('color-theme', 'dark');
-            isDarkMode.value = true;
-        }
-    }
-    emit('is-dark-mode', isDarkMode.value);
-};
-
-const setDarkMode = () => {
-    isDarkMode.value =
-        localStorage.getItem('color-theme') === 'dark'
-        || (
-            !('color-theme' in localStorage)
-            && window.matchMedia('(prefers-color-scheme: dark)').matches
-        );
-    emit('is-dark-mode', isDarkMode.value);
-};
-
-onMounted(() => {
-    setDarkMode();
-});
+const { isDarkMode, toggleDarkMode } = useDarkMode();
 </script>
-<template>
-    <button id="theme-toggle"
-            type="button"
-            class="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 rounded-lg text-sm p-2.5"
-            @click="toggleDarkMode">
-        <svg id="theme-toggle-dark-icon"
-             :class="{hidden: isDarkMode}"
-             class="w-5 h-5"
-             fill="currentColor"
-             viewBox="0 0 20 20"
-             xmlns="http://www.w3.org/2000/svg">
-            <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path>
-        </svg>
-        <svg id="theme-toggle-light-icon"
-             :class="{hidden: !isDarkMode}"
-             class="w-5 h-5"
-             fill="currentColor"
-             viewBox="0 0 20 20"
-             xmlns="http://www.w3.org/2000/svg">
-            <path
-                d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z"
-                fill-rule="evenodd"
-                clip-rule="evenodd"></path>
-        </svg>
-    </button>
 
+<template>
+  <!--
+    Deliberately says nothing about where the current theme came from. Whether
+    it is pinned or inherited from the device is a distinction the user has no
+    live use for, and surfacing it is what prompts people to go hunting for a
+    third state they were not previously missing.
+
+    `role="switch"` carries the state, so the accessible name stays put rather
+    than flipping between "switch to dark" and "switch to light" under the
+    user's cursor.
+
+    The button is a full 44px tap target around a 24px track — the switch reads
+    as small, but it sits in the mobile nav and has to be hittable.
+  -->
+  <button type="button"
+          role="switch"
+          :aria-checked="isDarkMode"
+          aria-label="Dark mode"
+          class="flex size-11 shrink-0 cursor-pointer items-center justify-center rounded-full
+                 focus:outline-none focus-visible:ring-1 focus-visible:ring-neutral-500"
+          @click="toggleDarkMode">
+    <!--
+      Track. `border-2 border-transparent` is load-bearing rather than
+      decoration: with border-box sizing it insets the 20px knob inside the
+      24px track, and leaves the knob flush with each end at either extreme of
+      its 20px travel.
+    -->
+    <span class="relative inline-flex h-6 w-11 rounded-full border-2 border-transparent
+                 transition-colors duration-300 ease-in-out motion-reduce:transition-none"
+          :class="isDarkMode ? 'bg-neutral-600' : 'bg-neutral-300'">
+      <!--
+        Knob. Carries both icons and cross-fades between them as it travels.
+
+        `theme-switch-knob` is not styling — it names the knob to the View
+        Transitions API. Without it the knob is part of the root snapshot, and
+        a snapshot cannot slide: the browser would freeze a picture of the knob
+        at the near end, cross-fade it against a picture at the far end, and
+        the real travel would happen unseen behind the overlay. Named, it
+        becomes its own transition group and the browser interpolates the
+        journey itself, on top of the page cross-fade rather than under it.
+
+        The duration here is the fallback path only (reduced motion aside,
+        that means browsers without the API); the named group's timing lives
+        in the stylesheet below.
+      -->
+      <span class="theme-switch-knob pointer-events-none relative inline-block size-5 rounded-full
+                   bg-white shadow ring-0 transition duration-300 ease-in-out
+                   motion-reduce:transition-none"
+            :class="isDarkMode ? 'translate-x-5' : 'translate-x-0'">
+        <!--
+          The icon plugin runs at scale 1.25, so the em-based sizing this
+          codebase uses everywhere else needs 0.6rem to land on 12px.
+        -->
+        <span aria-hidden="true"
+              class="absolute inset-0 flex size-full items-center justify-center transition-opacity
+                     motion-reduce:transition-none"
+              :class="isDarkMode ? 'opacity-0 duration-150 ease-out' : 'opacity-100 duration-300 ease-in'">
+          <span class="iconify mdi--weather-sunny text-[0.6rem] text-amber-500" />
+        </span>
+        <span aria-hidden="true"
+              class="absolute inset-0 flex size-full items-center justify-center transition-opacity
+                     motion-reduce:transition-none"
+              :class="isDarkMode ? 'opacity-100 duration-300 ease-in' : 'opacity-0 duration-150 ease-out'">
+          <span class="iconify mdi--moon-and-stars text-[0.6rem] text-indigo-600" />
+        </span>
+      </span>
+    </span>
+  </button>
 </template>
+
+<style>
+:root {
+    @media (prefers-color-scheme: light) {
+        color-scheme: light;
+    }
+
+    @media (prefers-color-scheme: dark) {
+        color-scheme: dark;
+    }
+}
+
+html {
+    color-scheme: light;
+
+    /*noinspection ALL*/
+    &.dark {
+        color-scheme: dark;
+    }
+}
+
+/* Lifts the knob out of the root snapshot so it can travel during the theme
+   change instead of being frozen into it. `::view-transition-*` addresses
+   pseudo-elements on the document root, so these rules cannot be scoped. */
+.theme-switch-knob {
+    view-transition-name: theme-switch-knob;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    /* The knob's journey. Outlasts the page cross-fade below on purpose: the
+       colour settles first, then the eye follows the knob the rest of the way
+       and lands on the control that caused it. */
+    ::view-transition-group(theme-switch-knob) {
+        animation-duration: 400ms;
+        animation-timing-function: cubic-bezier(0.65, 0, 0.35, 1);
+    }
+
+    /* The sun/moon swap, carried by the knob's own old and new snapshots. */
+    ::view-transition-image-pair(theme-switch-knob) {
+        animation-duration: 400ms;
+    }
+
+    /* Slower than the UA's 250ms default so the theme reads as changing rather
+       than as having changed. */
+    ::view-transition-old(root),
+    ::view-transition-new(root) {
+        animation-duration: 300ms;
+    }
+}
+</style>

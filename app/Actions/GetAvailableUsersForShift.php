@@ -2,7 +2,7 @@
 
 namespace App\Actions;
 
-use App\Enums\Appontment;
+use App\Enums\Appointment;
 use App\Enums\ServingAs;
 use App\Models\Shift;
 use App\Models\ShiftUser;
@@ -29,7 +29,7 @@ class GetAvailableUsersForShift
 
         return User::query()
             ->distinct()
-            ->select(['users.*', 'last_shift_date', 'last_shift_start_time'])
+            ->select(['users.*', 'last_shift_date', 'last_shift_start_time', 'last_location_name'])
             ->when($this->settings->enableUserAvailability, fn(Builder $query) => $query
                 ->addSelect(['filled_sundays', 'filled_mondays', 'filled_tuesdays', 'filled_wednesdays', 'filled_thursdays', 'filled_fridays', 'filled_saturdays'])
                 ->addSelect(['num_sundays', 'num_mondays', 'num_tuesdays', 'num_wednesdays', 'num_thursdays', 'num_fridays', 'num_saturdays', 'comments'])
@@ -41,6 +41,7 @@ class GetAvailableUsersForShift
                     ->select(['user_id'])
                     ->selectRaw('MAX(shift_date) as last_shift_date')
                     ->selectRaw('MAX(shifts.start_time) as last_shift_start_time')
+                    ->selectRaw("SUBSTRING_INDEX(GROUP_CONCAT(locations.name ORDER BY shift_date DESC, shifts.start_time DESC SEPARATOR '||'), '||', 1) as last_location_name")
                     ->from('shift_user')
                     ->join(table: 'shifts', first: fn(JoinClause $join) => $join
                         ->on('shift_user.shift_id', '=', 'shifts.id')
@@ -97,10 +98,10 @@ class GetAvailableUsersForShift
                 ->where('users.serving_as', '!=', ServingAs::Publisher->value)
             )
             ->when($showOnlyElders, fn(Builder $query) => $query
-                ->where('users.appointment', '=', Appontment::Elder->value)
+                ->where('users.appointment', '=', Appointment::Elder->value)
             )
             ->when($showOnlyMinisterialServants, fn(Builder $query) => $query
-                ->where('users.appointment', '=', Appontment::MinisterialServant->value)
+                ->where('users.appointment', '=', Appointment::MinisterialServant->value)
             )
             ->get();
     }

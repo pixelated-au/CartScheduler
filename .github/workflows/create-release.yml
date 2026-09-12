@@ -6,9 +6,15 @@ jobs:
   test-and-release:
     runs-on: ubuntu-latest
 
+    # The repository default for GITHUB_TOKEN is read-only, which makes
+    # ncipollo/release-action fail with "403: Resource not accessible by
+    # integration". Creating a release needs contents: write.
+    permissions:
+      contents: write
+
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup PHP 8.3
         uses: shivammathur/setup-php@v2
@@ -23,13 +29,13 @@ jobs:
         run: chmod -R 777 storage bootstrap/cache
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
-          node-version: 20
-          check-latest: true
+          node-version-file: '.nvmrc'
+          cache: 'npm'
 
       - name: Install NPM dependencies
-        run: npm install
+        run: npm ci
 
       - name: Compile front-end assets
         run: npm run build
@@ -42,11 +48,26 @@ jobs:
           exclusions: >
             *.git*
             /*node_modules/*
+            /*vendor/*
+            /*.claude/*
+            /*.ai/*
+            /*.devcontainer/*
+            /*tools/*
+            boost.json
+            CLAUDE.md
+            tailwind-color-util.d.ts
             .editorconfig
+            .env.ci
+            .env
             vite.config.js
+            vitest.config.ts
+            eslint.config.js
+            tsconfig.json
+            tsconfig.test.json
             phpunit.xml
             postcss.config.cjs
             docker-compose.yml
+            docker-compose.testing.yml
             jsconfig.json
             tailwind.config.js
             web-types.json

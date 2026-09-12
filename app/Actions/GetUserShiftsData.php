@@ -2,8 +2,8 @@
 
 namespace App\Actions;
 
+use App\Data\UserShiftData;
 use App\Models\User;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use stdClass;
@@ -12,15 +12,15 @@ class GetUserShiftsData
 {
     /**
      * This is a recursive query that will return a list of dates from the start date
-     * to the end date, and then join that list of dates to the shifts table to get
+     * to the end date and then join that list of dates to the shift table to get
      * the shifts for that date.
      *
      * Parameters line up with those in cart-scheduler config
      *
      * @param string $startDate YYYY-MM-DD
      * @param string $endDate YYYY-MM-DD
-     * @param \App\Models\User $user
-     * @return \Illuminate\Support\Collection
+     * @param User $user
+     * @return Collection<string, Collection<int, Collection<UserShiftData>>>
      */
     public function execute(string $startDate, string $endDate, User $user): Collection
     {
@@ -38,11 +38,12 @@ class GetUserShiftsData
                        shift_user.user_id AS volunteer_id,
                        shifts.id AS shift_id,
                        shifts.start_time,
+                       shifts.end_time,
                        shifts.location_id,
                        shifts.available_from,
                        shifts.available_to,
                        locations.max_volunteers,
-                       locations.name
+                       locations.name AS location_name
 
                 FROM dates
                          INNER JOIN shift_user ON shift_user.shift_date = dates.date
@@ -77,23 +78,15 @@ class GetUserShiftsData
 
         $params  = ['startDate' => $startDate, 'endDate' => $endDate, 'userId' => $user->id];
         $results = DB::select($query, $params);
-
         return collect($results)
-            ->map(fn(stdClass $shift) => [
-                'date_group'     => $shift->date,
-                'shift_date'     => Carbon::parse("{$shift->date}T$shift->start_time")->toDateString(),
-                'shift_id'       => $shift->shift_id,
-                'volunteer_id'   => $shift->volunteer_id,
-                'start_time'     => $shift->start_time,
-                'location_id'    => $shift->location_id,
-                'available_from' => $shift->available_from ? Carbon::parse($shift->available_from)->toDateString() : null,
-                'available_to'   => $shift->available_to ? Carbon::parse($shift->available_to)->toDateString() : null,
-                'max_volunteers' => (int)$shift->max_volunteers,
-            ])
-            ->filter(fn(array $shift) => $shift['volunteer_id'] === $user->id)
+            ->map(function (stdClass $shift) {
+                return UserShiftData::from($shift);
+            })
+            ->filter(fn(UserShiftData $shift) => $shift->volunteer_id === $user->id)
+            // Group first by shift date and then by shift id: [[shift_date => [shift_id => UserShiftData]]]
             ->groupBy([
-                'date_group',
-                'shift_id',
+                fn(UserShiftData $shift) => $shift->shift_date->format('Y-m-d'),
+                fn(UserShiftData $shift) => $shift->shift_id,
             ]);
     }
 }

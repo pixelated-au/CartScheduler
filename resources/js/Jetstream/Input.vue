@@ -1,29 +1,34 @@
-<script setup>
-import {onMounted, ref} from 'vue';
+<script setup lang="ts">
+import { onMounted, useTemplateRef } from "vue";
 
-defineProps({
-    modelValue: {
-        type: [String, Number],
-        default: '',
-    },
-});
+const { autofocus = false } = defineProps<{
+  autofocus?: boolean;
+  autocomplete?: string;
+}>();
 
-defineEmits(['update:modelValue']);
+// `defineModel({ type: [String, Number] })` did not survive being read: an array
+// of constructors gives the model a single one of them, and every caller binding
+// a string was reported as handing it a number.
+const model = defineModel<string | undefined>();
 
-const input = ref(null);
+// Typed by what is needed of it: PrimeVue's own instance type does not carry
+// `$el`, and the element behind the wrapper is the thing to focus.
+const input = useTemplateRef<{ $el: HTMLInputElement }>("input");
+
+/** The wrapper is a component, so the element to focus is the one it renders. */
+const focus = () => input.value?.$el.focus();
 
 onMounted(() => {
-    if (input.value.hasAttribute('autofocus')) {
-        input.value.focus();
-    }
+  if (autofocus) {
+    focus();
+  }
 });
 
-defineExpose({focus: () => input.value.focus()});
+defineExpose({ focus });
+
+// TODO, this file is redundant. We need to remove it
 </script>
 
 <template>
-    <input ref="input"
-           class="border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 dark:border-gray-800 dark:focus:border-indigo-800 dark:focus:ring-indigo-800 dark:bg-slate-800 dark:text-gray-100 rounded-md shadow-sm"
-           :value="modelValue"
-           @input="$emit('update:modelValue', $event.target.value)">
+  <PInputText ref="input" v-model="model" :autocomplete="autocomplete ?? 'off'" />
 </template>

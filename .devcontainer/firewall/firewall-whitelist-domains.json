@@ -1,0 +1,55 @@
+{
+  "$comment": "What may be reached through the outbound firewall. Edit, then run `.devcontainer/firewall-ctl.sh reload` from the host — except host_ports, which are iptables rules and need `init`.",
+  "domains": [
+    "registry.npmjs.org",
+    "bun.com",
+    "api.anthropic.com",
+    "console.anthropic.com",
+    "claude.ai",
+    "statsig.com",
+    "sentry.io",
+    "marketplace.visualstudio.com",
+    "vscode.blob.core.windows.net",
+    "update.code.visualstudio.com",
+    "packagist.org",
+    "repo.packagist.org",
+    "codeload.github.com",
+    "codepen.io",
+    "pestphp.com",
+    "cdn.playwright.dev",
+    "laravel.com",
+    "github.com",
+    "productionresultssa0.blob.core.windows.net",
+    "productionresultssa1.blob.core.windows.net",
+    "productionresultssa2.blob.core.windows.net",
+    "productionresultssa3.blob.core.windows.net",
+    "productionresultssa4.blob.core.windows.net",
+    "productionresultssa5.blob.core.windows.net",
+    "productionresultssa6.blob.core.windows.net",
+    "productionresultssa7.blob.core.windows.net",
+    "productionresultssa8.blob.core.windows.net",
+    "productionresultssa9.blob.core.windows.net",
+    "productionresultssa10.blob.core.windows.net",
+    "productionresultssa11.blob.core.windows.net",
+    "productionresultssa12.blob.core.windows.net",
+    "productionresultssa13.blob.core.windows.net",
+    "productionresultssa14.blob.core.windows.net",
+    "productionresultssa15.blob.core.windows.net",
+    "productionresultssa16.blob.core.windows.net",
+    "productionresultssa17.blob.core.windows.net",
+    "productionresultssa18.blob.core.windows.net",
+    "productionresultssa19.blob.core.windows.net"
+  ],
+  "cidrs": [],
+  "host_ports": [
+    9222
+  ],
+  "github_meta": {
+    "enabled": true,
+    "sections": [
+      "web",
+      "api",
+      "git"
+    ]
+  }
+}
